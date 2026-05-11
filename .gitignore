@@ -1,0 +1,18 @@
+# Citlivá konfigurace — NIKDY neverzovat!
+.env
+
+# Uživatelská data
+/uploads/*.gpx
+/uploads/photos/
+/uploads/thumbs/
+/uploads/_errors.log
+/uploads/heatmap_cache.json
+
+# IDE a systémové soubory
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# Claude Code interní data
+.claude/

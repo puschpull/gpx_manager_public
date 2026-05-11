@@ -1,0 +1,607 @@
+/*
+===========================================================
+  GPX Manager – Index Layout (theme-neutral)
+  Pouze rozložení, mezery, gridy. Barvy z theme-*.css.
+===========================================================
+*/
+
+/* ====== ZÁKLADNÍ ====== */
+body {
+    margin: 20px;
+    font-family: Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* ====== HLAVNÍ LAYOUT — SIDEBAR + MAIN ====== */
+.index-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 0 16px;
+    align-items: start;
+}
+
+.index-layout.sidebar-hidden {
+    grid-template-columns: 0 1fr;
+    gap: 0;
+}
+
+.index-sidebar {
+    grid-column: 1;
+    min-width: 0;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    position: sticky;
+    top: 20px;
+}
+
+.index-layout.sidebar-hidden .index-sidebar {
+    width: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    position: absolute;
+}
+
+.index-main {
+    grid-column: 2;
+    min-width: 0;
+    transition: all 0.25s ease;
+}
+
+.index-layout.sidebar-hidden .index-main {
+    grid-column: 1 / -1;
+}
+
+/* ====== TLAČÍTKO TOGGLE SIDEBAR ====== */
+.sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-button);
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.sidebar-toggle:hover {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+.sidebar-toggle.active {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+/* ====== FILTRY V SIDEBARU ====== */
+.index-sidebar form.filters {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    background: var(--card-bg);
+}
+
+.sidebar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-grid label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.sidebar-grid input,
+.sidebar-grid select {
+    width: 100%;
+    padding: 5px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.sidebar-grid button.btn {
+    width: 100%;
+    padding: 7px;
+    font-size: 13px;
+}
+
+.sidebar-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.sidebar-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+}
+
+.sidebar-range {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.sidebar-range label {
+    font-size: 10px;
+}
+
+/* ====== SKRYTÍ CELÉHO SLOUPCE ====== */
+body.hide-col-id                 .col-id                { display: none !important; }
+body.hide-col-filename           .col-filename          { display: none !important; }
+body.hide-col-track_name         .col-track_name        { display: none !important; }
+body.hide-col-alt_title          .col-alt_title         { display: none !important; }
+body.hide-col-note               .col-note              { display: none !important; }
+body.hide-col-color              .col-color             { display: none !important; }
+body.hide-col-device             .col-device            { display: none !important; }
+body.hide-col-date_start         .col-date_start        { display: none !important; }
+body.hide-col-date_end           .col-date_end          { display: none !important; }
+body.hide-col-duration           .col-duration          { display: none !important; }
+body.hide-col-moving_time        .col-moving_time       { display: none !important; }
+body.hide-col-stopped_time       .col-stopped_time      { display: none !important; }
+body.hide-col-distance_km        .col-distance_km       { display: none !important; }
+body.hide-col-ascent             .col-ascent            { display: none !important; }
+body.hide-col-descent            .col-descent           { display: none !important; }
+body.hide-col-elevation_min      .col-elevation_min     { display: none !important; }
+body.hide-col-elevation_max      .col-elevation_max     { display: none !important; }
+body.hide-col-speed_max          .col-speed_max         { display: none !important; }
+body.hide-col-speed_avg          .col-speed_avg         { display: none !important; }
+body.hide-col-speed_avg_total    .col-speed_avg_total   { display: none !important; }
+body.hide-col-avg_ascent_rate    .col-avg_ascent_rate   { display: none !important; }
+body.hide-col-avg_descent_rate   .col-avg_descent_rate  { display: none !important; }
+body.hide-col-max_ascent_rate    .col-max_ascent_rate   { display: none !important; }
+body.hide-col-max_descent_rate   .col-max_descent_rate  { display: none !important; }
+body.hide-col-bounds             .col-bounds            { display: none !important; }
+body.hide-col-trackpoints_count  .col-trackpoints_count { display: none !important; }
+body.hide-col-categories         .col-categories        { display: none !important; }
+body.hide-col-gpx                .col-gpx               { display: none !important; }
+body.hide-col-map                .col-map               { display: none !important; }
+body.hide-col-thumb              .col-thumb             { display: none !important; }
+body.hide-col-difficulty          .col-difficulty         { display: none !important; }
+body.hide-col-activity           .col-activity          { display: none !important; }
+body.hide-col-favorite           .col-favorite          { display: none !important; }
+body.hide-col-photos             .col-photos            { display: none !important; }
+body.hide-col-action             .col-action            { display: none !important; }
+
+/* ====== COMPARE CHECKBOX ====== */
+.col-compare { width: 30px; text-align: center; }
+.col-compare input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
+#compare-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+#compare-btn:not(:disabled) { background: #0077cc; color: white; }
+.bulk-actions { display: inline-flex; align-items: center; gap: 4px; }
+.bulk-actions .select { font-size: 12px; padding: 4px 6px; }
+.btn-bulk { font-size: 12px; padding: 4px 10px; background: #e53935; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-bulk:hover { background: #c62828; }
+
+/* ====== TABULKA ====== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    color: var(--text-color);
+}
+th, td {
+    border: 1px solid var(--table-border-color);
+    padding: 6px 8px;
+    vertical-align: top;
+}
+th {
+    background: var(--table-header-bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: normal !important;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.2em;
+    padding: 2px 4px;
+    vertical-align: middle;
+}
+th a { color: var(--text-color); }
+tr:hover td { background: var(--table-row-hover); }
+
+table td,
+table th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+table td.col-thumb,
+table th.col-thumb {
+    overflow: visible;
+    max-width: 248px;
+    width: 248px;
+    padding: 4px 0px 4px 6px;
+    white-space: normal;
+}
+
+table td {
+    white-space: nowrap;
+    line-height: 1.4em;
+    height: 1.4em;
+}
+
+/* ====== TOGGLE PANEL SLOUPCŮ ====== */
+.column-toggle-panel {
+    margin: 8px 0 14px;
+    padding: 6px 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+.column-toggle-panel summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 4px 0;
+    margin-bottom: 4px;
+}
+.col-buttons {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 6px;
+}
+.btn.small {
+    padding: 2px 6px !important;
+    font-size: 0.75em !important;
+    border-radius: 4px;
+}
+.col-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 2px 6px;
+    padding-top: 4px;
+}
+.col-toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 0;
+    font-size: 0.85em;
+}
+.col-toggle-item input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    transform: translateY(1px);
+}
+
+/* ====== KATEGORIE AND/OR ====== */
+.cat-mode {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+.cat-mode-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+.cat-mode-label input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+}
+.cat-mode-label small {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+/* ====== INVERTOVAT CHECKBOX ====== */
+.inv-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: normal;
+    color: var(--text-muted);
+    margin-left: 8px;
+    cursor: pointer;
+}
+.inv-label input[type="checkbox"] {
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    cursor: pointer;
+}
+
+
+/* ===========================================================
+   MOBILNÍ LAYOUT — @media max-width: 900px
+   Pouze přidává/přepisuje chování pro mobil.
+   Desktop layout (nad 768px) není dotčen.
+   =========================================================== */
+
+@media (max-width: 900px) {
+
+    /* ====== GRID LAYOUT ====== */
+    .index-layout,
+    .index-layout.sidebar-hidden {
+        display: block;
+    }
+
+    /* Sidebar overlay — řídí mobile-init.js */
+
+    
+
+    /* Backdrop — řídí mobile-init.js */
+
+    /* Tlačítko Zavřít — řídí mobile-init.js */
+
+    /* ====== MAIN — vždy plná šířka ====== */
+    .index-main {
+        grid-column: 1 !important;
+        width: 100%;
+    }
+
+    /* ====== TABULKA → KARTY ====== */
+    .track-table thead,
+    .track-table tr:first-child {
+        display: none !important;
+    }
+
+    .track-table {
+        display: block;
+        min-width: 0 !important;
+        border: none;
+        background: transparent;
+    }
+
+    .track-table tbody {
+        display: block;
+    }
+
+    .track-table tr {
+        display: block;
+        margin-bottom: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--card-bg);
+        padding: 10px 12px 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+
+    .track-table tr.in-range-row {
+        border-left: 4px solid var(--highlight-border);
+    }
+
+    /* Výchozí: všechny buňky skrýt */
+    .track-table td {
+        display: none;
+        white-space: normal;
+        max-width: none;
+        overflow: visible;
+        text-overflow: unset;
+        height: auto;
+        line-height: 1.5;
+        border: none;
+        padding: 2px 0;
+    }
+
+    /* Střední sada — přebít hide-col-* s vyšší specificitou */
+    body .track-table td.col-track_name,
+    body .track-table td.col-date_start,
+    body .track-table td.col-distance_km,
+    body .track-table td.col-ascent,
+    body .track-table td.col-descent,
+    body .track-table td.col-speed_avg,
+    body .track-table td.col-device,
+    body .track-table td.col-map,
+    body .track-table td.col-action,
+    body .track-table td.col-gpx,
+    body .track-table td.col-thumb,
+    body .track-table td.col-activity,
+    body .track-table td.col-categories {
+        display: block !important;
+    }
+
+    /* Číselné buňky jako inline-block */
+    body .track-table td.col-distance_km,
+    body .track-table td.col-ascent,
+    body .track-table td.col-descent,
+    body .track-table td.col-speed_avg,
+    body .track-table td.col-device {
+        display: inline-block !important;
+        width: calc(50% - 6px);
+        font-size: 12px;
+        vertical-align: top;
+        margin-bottom: 3px;
+    }
+
+    /* Akční buňky */
+    body .track-table td.col-map,
+    body .track-table td.col-action,
+    body .track-table td.col-gpx {
+        display: inline-block !important;
+        margin-top: 8px;
+        margin-right: 6px;
+    }
+
+    /* Název trasy */
+    .track-table td.col-track_name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 6px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+    .track-table td.col-track_name::before { content: "📍 "; }
+
+    /* Start datum */
+    .track-table td.col-date_start {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+    .track-table td.col-date_start::before { content: "🗓 "; }
+
+    /* Emoji popisky */
+    .track-table td.col-distance_km::before { content: "📏 "; }
+    .track-table td.col-ascent::before       { content: "🧗 "; }
+    .track-table td.col-descent::before      { content: "⬇️ "; }
+    .track-table td.col-speed_avg::before    { content: "⚡ "; }
+    .track-table td.col-device::before       { content: "📡 "; }
+
+    /* Akční odkazy */
+    .track-table td.col-map a,
+    .track-table td.col-action a,
+    .track-table td.col-gpx a {
+        display: inline-block;
+        padding: 8px 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--bg-button);
+        color: var(--text-color);
+        font-size: 13px;
+        text-decoration: none;
+        min-height: 36px;
+        line-height: 20px;
+    }
+
+    /* Náhled */
+    .track-table td.col-thumb {
+        margin-top: 8px;
+    }
+    .track-table td.col-thumb .track-thumb {
+        width: 100%;
+        height: auto;
+        max-height: 160px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    .track-table td.col-thumb .thumb-missing {
+        display: none;
+    }
+
+    /* Kategorie */
+    .track-table td.col-categories {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+    .track-table td.col-categories:not(:empty)::before { content: "🏷 "; }
+
+    /* Skrýt column toggle panel */
+    .column-toggle-panel {
+        display: none;
+    }
+
+    /* Schovat wrapper */
+    .table-responsive {
+        overflow-x: visible;
+        max-height: none;
+        border: none;
+    }
+    .table-scroll-top {
+        display: none;
+    }
+
+    /* ====== TOPBAR ====== */
+    .topbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .topbar .btn {
+        flex: 1 1 calc(50% - 8px);
+        text-align: center;
+        min-height: 44px;
+        line-height: 30px;
+        font-size: 13px;
+        padding: 6px 8px;
+    }
+
+    /* ====== SUMMARY PANEL ====== */
+    .summary-panel {
+        font-size: 13px;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+    .summary-panel span {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+    /* ====== PAGER ====== */
+    .pager {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .pgbtn, .pager .btn {
+        min-height: 40px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+
+    /* ====== COUNT ====== */
+    .count {
+        font-size: 13px;
+    }
+
+}
+/* konec @media (max-width: 900px) */
+
+/* Tlačítko Zavřít — skryté na desktopu */
+@media (min-width: 901px) {
+    .mobile-filter-close {
+        display: none !important;
+    }
+}
+
+/* ===========================================================
+   LANDSCAPE — karty ve dvou sloupcích
+   =========================================================== */
+@media (max-width: 900px) and (orientation: landscape) {
+
+    /* Wrapper kolem tabulky dostane grid */
+    .table-responsive {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        overflow-x: visible !important;
+    }
+
+    .track-table {
+        display: contents !important;
+    }
+
+    .track-table tbody {
+        display: contents !important;
+    }
+
+    .track-table tr:first-child {
+        display: none !important;
+    }
+
+    .track-table tr {
+        display: block !important;
+        margin-bottom: 0 !important;
+    }
+
+}

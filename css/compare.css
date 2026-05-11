@@ -1,0 +1,167 @@
+/* ====== Porovnání tras – styly ====== */
+
+/* Mapa */
+#map {
+    width: 100%;
+    height: 60vh;
+    min-height: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Prázdný stav */
+.compare-empty {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 15px;
+    color: var(--text-color);
+}
+
+.compare-empty a {
+    color: var(--link-color, #0078d7);
+}
+
+/* Legenda */
+.compare-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.compare-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.compare-legend-item a {
+    color: var(--link-color, #0078d7);
+    text-decoration: none;
+}
+
+.compare-legend-item a:hover {
+    text-decoration: underline;
+}
+
+/* Barevný vzorník */
+.compare-color-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* Porovnávací tabulka */
+.compare-results {
+    margin-top: 8px;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.compare-results h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: var(--header-text, var(--text-color));
+}
+
+.compare-table-wrap {
+    overflow-x: auto;
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.compare-table th,
+.compare-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.compare-table th {
+    background: var(--bg-secondary, var(--card-bg));
+    font-weight: 600;
+    color: var(--header-text, var(--text-color));
+    position: sticky;
+    top: 0;
+    min-width: 120px;
+}
+
+.compare-table th:first-child {
+    min-width: 160px;
+}
+
+.compare-table a {
+    color: var(--link-color, #0078d7);
+    text-decoration: none;
+}
+
+.compare-table a:hover {
+    text-decoration: underline;
+}
+
+.compare-table .param-label {
+    font-weight: 600;
+    background: var(--bg-secondary, var(--card-bg));
+    color: var(--header-text, var(--text-color));
+}
+
+/* Zvýraznění max/min hodnot */
+.compare-table .val-max {
+    font-weight: 700;
+    color: var(--success-color, #28a745);
+}
+
+.compare-table .val-min {
+    font-weight: 700;
+    color: var(--link-color, #0078d7);
+}
+
+/* Tooltip na mapě */
+.compare-tooltip {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #map {
+        height: 50vh;
+        min-height: 300px;
+    }
+
+    .compare-legend {
+        gap: 6px 12px;
+        font-size: 12px;
+    }
+
+    .compare-table {
+        font-size: 12px;
+    }
+
+    .compare-table th,
+    .compare-table td {
+        padding: 6px 8px;
+    }
+}

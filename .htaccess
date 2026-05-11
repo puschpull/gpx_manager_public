@@ -1,0 +1,36 @@
+# ============================================================
+#  GPX Manager — root .htaccess
+# ============================================================
+
+# ---- Upload limity ----
+<IfModule mod_php.c>
+    php_value upload_max_filesize 200M
+    php_value post_max_size 210M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# ---- Charset (původní) ----
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .txt .css .js .html .md
+
+# ---- Zákaz výpisu adresářů ----
+Options -Indexes
+
+# ---- Blokace citlivých souborů ----
+# Všechny dotfiles (.env, .git*, .htaccess, .gitignore, .gitattributes, .claude, …)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Konkrétní citlivé PHP soubory (pro jistotu)
+<FilesMatch "^(config\.php|phpinfo\.php)$">
+    Require all denied
+</FilesMatch>
+
+# ---- HTTP bezpečnostní hlavičky ----
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

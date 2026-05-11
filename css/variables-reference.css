@@ -1,0 +1,169 @@
+/*
+===========================================================
+  GPX Manager – CSS Variables Reference
+  (Dokumentace všech použitých CSS proměnných pro motivy)
+===========================================================
+
+Tento soubor slouží pouze jako referenční přehled proměnných.
+Nenačítá se do aplikace – pomáhá při tvorbě a úpravách theme-*.css.
+
+Struktura:
+  1️⃣ Základní barvy
+  2️⃣ Akcenty a zvýraznění
+  3️⃣ Karty, panely, tlačítka
+  4️⃣ Hlavička
+  5️⃣ Tabulky
+  6️⃣ Komponenty (mapa, profil, tlačítka, filtry)
+===========================================================
+*/
+
+:root {
+
+  /* =======================================================
+     1️⃣ ZÁKLADNÍ BARVY
+     -------------------------------------------------------
+     Nastavují hlavní vzhled pozadí, textu a ohraničení.
+  ======================================================= */
+
+  --bg-color:           #f9f9f9;   /* Hlavní barva pozadí stránky */
+  --text-color:         #222222;   /* Barva základního textu */
+  --text-muted:         #777777;   /* Tlumený text (poznámky, sekundární info) */
+  --border-color:       #cccccc;   /* Barva ohraničení, tabulek a boxů */
+
+
+  /* =======================================================
+     2️⃣ AKCENTY A ZVÝRAZNĚNÍ
+     -------------------------------------------------------
+     Používají se pro odkazy, tlačítka a zvýrazněné prvky.
+  ======================================================= */
+
+  --accent-color:       #0078d7;   /* Primární akcent (aktivní prvek, odkaz, hover) */
+  --accent-hover:       #005a9e;   /* Barva při najetí myší */
+  --highlight-bg:       #e7f2ff;   /* Pozadí zvýrazněných oblastí (aktivní filtr apod.) */
+  --highlight-border:   #0078d7;   /* Ohraničení zvýrazněných oblastí */
+
+
+  /* =======================================================
+     3️⃣ KARTY, PANELY, TLAČÍTKA
+     -------------------------------------------------------
+     Používají se pro sekce, boxy, formuláře a tlačítka.
+  ======================================================= */
+
+  --card-bg:            #ffffff;   /* Pozadí panelů, tabulek, karet */
+  --bg-secondary:       #f5f5f5;   /* Druhá úroveň pozadí (např. badge, pager) */
+  --bg-button:          #f0f0f0;   /* Výchozí pozadí tlačítek */
+  --bg-hover:           #e9f3ff;   /* Pozadí při najetí myší */
+  --bg-input:           #ffffff;   /* Pozadí vstupních polí formulářů */
+
+
+  /* =======================================================
+     4️⃣ HLAVIČKA
+     -------------------------------------------------------
+     Barvy nadpisu (h1) a jeho panelu.
+  ======================================================= */
+
+  --header-bg:          #e8eef5;   /* Pozadí hlavičky stránky */
+  --header-text:        #003366;   /* Barva textu nadpisu */
+
+
+  /* =======================================================
+     5️⃣ TABULKY
+     -------------------------------------------------------
+     Barvy pro hlavičku, řádky, hover a okraje tabulek.
+  ======================================================= */
+
+  --table-header-bg:    #f2f5fa;   /* Pozadí hlavičky tabulky */
+  --table-row-bg:       #ffffff;   /* Pozadí běžného řádku */
+  --table-row-hover:    #f5f9ff;   /* Pozadí při najetí na řádek */
+  --table-border-color: #d0d7de;   /* Barva okrajů buněk tabulky */
+
+
+  /* =======================================================
+     6️⃣ KOMPONENTY – MAPA, PROFIL, AKCE
+     -------------------------------------------------------
+     Používají se v detailu trasy (mapa + výškový profil).
+  ======================================================= */
+
+  /* Mapa a výškový profil */
+  /* Tyto hodnoty se běžně nedefinují jako proměnné, ale
+     všechny motivy používají jednotné výšky a okraje.
+     Pokud bys chtěl někdy měnit výšku grafu podle tématu,
+     lze přidat například: */
+  /* --map-height: 500px; */
+  /* --profile-height: 320px; */
+
+  /* Sekundární texty a doplňky */
+  /* Používají již existující proměnné: --text-muted, --bg-secondary */
+
+}
+
+
+
+
+
+
+/*
+Tady máš přehled všech používaných CSS proměnných v našem systému vzhledů pro GPX Manager — funguje to jako jednoduchá, přehledná dokumentace, kterou si můžeš vytisknout nebo přidat jako komentář do CSS.
+
+Přehled CSS proměnných (Theme System Reference)
+
+Každá proměnná začíná prefixem --, který se načítá z aktivního theme-*.css.
+
+Kategorie	Proměnná	Popis	Typická hodnota (Classic)
+🎨 Základní barvy			
+	--bg-color	Barva pozadí celé stránky	#f8f8f8
+	--text-color	Hlavní barva textu	#222
+	--muted-text	Sekundární text (poznámky, doplňky)	#666
+	--border-color	Rámečky, oddělovače, okraje prvků	#ccc
+🧱 Karty, panely, tlačítka			
+	--card-bg	Pozadí boxů, panelů, formulářů, tlačítek	#ffffff
+	--accent-color	Barva zvýraznění (odkazy, aktivní prvky)	#0066cc
+	--accent-hover	Barva zvýraznění při hoveru	#004c99
+🧾 Tabulky			
+	--table-header-bg	Pozadí hlavičky tabulky <th>	#f0f0f0
+	--table-row-hover	Pozadí řádku při najetí myší	#e8f0ff
+	--table-border-color	Barva mřížky tabulky	#ccc
+⚡ Zvýraznění rozsahu (např. dat)			
+	--highlight-bg	Pozadí zvýrazněných buněk	#fff9e6
+	--highlight-border	Barva levého pruhu u zvýrazněných řádků	#f5c04f
+🏁 Hlavička stránky / nadpisy			
+	--header-bg	Pozadí záhlaví nebo <h1>	#eaeaea
+	--header-text	Barva textu v záhlaví	#111
+💬 Pomocné			
+	--error-color (rezervováno)	Barva pro chyby / varování	#cc0000
+	--success-color (rezervováno)	Barva pro potvrzení / úspěch	#00aa00
+📘 Jak proměnné fungují
+
+Každé téma (theme-classic.css, theme-dark.css, theme-blue.css, theme-minimal.css)
+má vlastní definici všech těchto proměnných uvnitř:
+
+*/
+
+:root {
+  --bg-color: #f8f8f8;
+  --text-color: #222;
+  --muted-text: #666;
+  --border-color: #ccc;
+  --card-bg: #fff;
+  --accent-color: #0066cc;
+  --accent-hover: #004c99;
+  ...
+}
+
+/*
+index.css a style.css potom nikde neobsahují konkrétní barvy, ale používají var(--název-proměnné).
+
+🧰 Výhoda systému
+
+✅ Každý motiv mění jen hodnoty proměnných
+✅ Všechny komponenty zůstávají vizuálně konzistentní
+✅ Rychlá úprava nebo přidání nového vzhledu (např. „green“, „amber“, „matrix“)
+✅ Možnost později přidat automatický přepínač podle systému (light/dark)
+
+💡 Doporučení pro tebe
+
+Vytvoř si v /public/css/ soubor variables-reference.css (nebo textový dokument), kam můžeš tento přehled vložit.
+
+Až budeš přidávat nové prvky (např. grafy, mapové panely, notifikace apod.), používej jen tyto proměnné — tím zajistíš, že motivy zůstanou 100 % konzistentní.
+
+*/

@@ -1,0 +1,37 @@
+/*
+===========================================================
+  GPX Manager – Dark Theme
+===========================================================
+*/
+
+:root {
+    --bg-color:           #1e1f22;
+    --text-color:         #e4e4e4;
+    --text-muted:         #a0a0a0;
+    --border-color:       #333333;
+
+    --accent-color:       #4da3ff;
+    --accent-hover:       #78b6ff;
+    --highlight-bg:       #2d2f33;
+    --highlight-border:   #f0c24b;
+
+    --card-bg:            #2a2b2f;
+    --bg-secondary:       #2a2b2f;
+    --bg-button:          #2a2b2f;
+    --bg-hover:           #3a3d42;
+    --bg-input:           #25262a;
+
+    --header-bg:          #2d2f33;
+    --header-text:        #ffffff;
+
+    --table-header-bg:    #33363a;
+    --table-row-bg:       #26282c;
+    --table-row-hover:    #2f3a47;
+    --table-border-color: #444444;
+}
+
+/* Dark téma – světlý text na tmavém accentu */
+.btn:hover,
+.pgbtn:hover {
+    color: #000;
+}
