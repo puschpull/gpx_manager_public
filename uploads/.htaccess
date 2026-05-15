@@ -1,0 +1,17 @@
+# Block PHP execution (covers .php, .php3-9, .phtml, .phps, .pht, .phar)
+<FilesMatch "\.(php[3-9]?|phtml|phps|pht|phar)$">
+    Require all denied
+</FilesMatch>
+# Block sensitive files
+<FilesMatch "\.(log|sql|env|ini|sh|bak)$">
+    Require all denied
+</FilesMatch>
+# Disable directory listing
+Options -Indexes
+# Force download for HTML/SVG/XML to prevent XSS via uploaded content.
+# Wrapped in IfModule so we don't 500 on hosts without mod_headers.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html?|svg|xml)$">
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+</IfModule>

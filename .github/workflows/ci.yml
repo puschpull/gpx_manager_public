@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  php-lint:
+    name: PHP Syntax & i18n Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, simplexml, gd, exif, zip, mbstring
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Composer install
+        run: composer install --no-progress --prefer-dist --no-interaction
+
+      - name: PHP syntax check (parallel)
+        run: |
+          find . -name "*.php" \
+            -not -path "./vendor/*" \
+            -not -path "./.git/*" \
+            -print0 | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: i18n key consistency
+        run: php scripts/lint_lang.php
+
+  css-build:
+    name: Tailwind Build Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Build CSS
+        run: npm run build
+
+      - name: Check app.css is up to date
+        run: |
+          if ! git diff --quiet assets/css/app.css; then
+            echo "::error::assets/css/app.css is outdated. Run 'npm run build' and commit."
+            git diff assets/css/app.css | head -50
+            exit 1
+          fi
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check .env not committed
+        run: |
+          if git ls-files | grep -q "^\.env$"; then
+            echo "::error::.env is committed! Remove it immediately and rotate all credentials."
+            exit 1
+          fi
+
+      - name: Warn if setup.php present
+        run: |
+          if [ -f "setup.php" ]; then
+            echo "::warning::setup.php is present in repo. After install, delete it or block via .htaccess."
+          fi

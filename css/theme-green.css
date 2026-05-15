@@ -1,0 +1,31 @@
+/*
+===========================================================
+  GPX Manager – Green Theme
+===========================================================
+*/
+
+:root {
+    --bg-color:           #f5faf5;
+    --text-color:         #1e2b1e;
+    --text-muted:         #5a6b5a;
+    --border-color:       #c6d5c6;
+
+    --accent-color:       #2e7d32;
+    --accent-hover:       #1b5e20;
+    --highlight-bg:       #e2f3e2;
+    --highlight-border:   #2e7d32;
+
+    --card-bg:            #ffffff;
+    --bg-secondary:       #f0f7f0;
+    --bg-button:          #edf6ed;
+    --bg-hover:           #dff0df;
+    --bg-input:           #ffffff;
+
+    --header-bg:          #e8f4e8;
+    --header-text:        #1b5e20;
+
+    --table-header-bg:    #e3f1e3;
+    --table-row-bg:       #ffffff;
+    --table-row-hover:    #f3faf3;
+    --table-border-color: #c9d8c9;
+}

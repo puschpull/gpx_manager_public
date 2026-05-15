@@ -1,0 +1,548 @@
+/* ====== GPX Track Cleaner — filter.css ====== */
+/* ====== Info banner při načtení trasy z DB ====== */
+.filter-db-banner {
+    background: var(--card-bg);
+    border: 1px solid var(--accent-color);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-color);
+}
+.filter-db-banner strong {
+    color: var(--accent-color);
+}
+
+/* ====== GPX Track Cleaner – Layout ====== */
+.filter-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+/* ====== Levy panel ====== */
+.filter-panel {
+    position: sticky;
+    top: 60px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.filter-panel h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: var(--header-text);
+}
+
+.filter-panel h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--header-text);
+}
+
+/* ====== Sekce filtru ====== */
+.filter-section {
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary, var(--card-bg));
+}
+
+.filter-section summary {
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-section summary::-webkit-details-marker {
+    display: none;
+}
+
+.filter-section summary::before {
+    content: "▶";
+    font-size: 10px;
+    transition: transform 0.15s;
+    color: var(--text-muted);
+}
+
+.filter-section[open] summary::before {
+    transform: rotate(90deg);
+}
+
+.filter-body {
+    padding: 6px 10px 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.filter-toggle input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* ====== Slider ====== */
+.slider-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 40px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.slider-row label {
+    font-weight: normal;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.slider-row input[type="range"] {
+    width: 100%;
+    height: 6px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+}
+
+.slider-row output {
+    text-align: right;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent-color);
+    min-width: 36px;
+}
+
+.filter-hint {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+/* ====== Preset sekce ====== */
+.preset-section {
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+.preset-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preset-controls select {
+    width: 100%;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.preset-buttons .btn {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* ====== Oddelovac ====== */
+.filter-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 12px 0;
+}
+
+/* ====== Akce ====== */
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-actions .btn {
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--accent-color) !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* ====== Pravy panel ====== */
+.filter-main {
+    min-width: 0;
+}
+
+/* ====== Statistiky pred/po ====== */
+.filter-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.stat-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.stat-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.stat-orig {
+    color: var(--text-muted);
+}
+
+.stat-arrow {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.stat-new {
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.stat-diff {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+.stat-diff.positive { color: #cc0000; }
+.stat-diff.negative { color: #008800; }
+
+/* ====== Mapa ====== */
+#filterMap {
+    height: 450px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+/* ====== Legenda mapy ====== */
+.map-legend {
+    display: flex;
+    gap: 16px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text-color);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-bottom: 12px;
+}
+
+.map-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.map-layer-cb {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.map-legend-line {
+    display: inline-block;
+    width: 24px;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.map-legend-line.original {
+    background: #888;
+}
+
+.map-legend-line.kept {
+    background: #2196F3;
+}
+
+.map-legend-line.removed {
+    background: #e53935;
+    background-image: repeating-linear-gradient(
+        90deg,
+        #e53935 0px, #e53935 6px,
+        transparent 6px, transparent 14px
+    );
+}
+
+/* ====== Vyskovy profil ====== */
+#filterElevWrap {
+    height: 220px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+#filterElev {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ====== Statistiky odstraneni ====== */
+.filter-removal-stats {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.filter-removal-stats h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--header-text);
+}
+
+.removal-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.removal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.removal-badge .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.removal-badge.speed    { border-color: #c62828; color: #c62828; }
+.removal-badge.speed .dot    { background: #c62828; }
+.removal-badge.speed::before { content: "\26A1\00A0"; }
+.removal-badge.spike    { border-color: #e65100; color: #e65100; }
+.removal-badge.spike .dot    { background: #e65100; }
+.removal-badge.spike::before { content: "\1F4CD\00A0"; }
+.removal-badge.stationary    { border-color: #6e6b00; color: #6e6b00; }
+.removal-badge.stationary .dot    { background: #6e6b00; }
+.removal-badge.stationary::before { content: "\23F8\00A0"; }
+.removal-badge.elevation { border-color: #9c27b0; color: #9c27b0; }
+.removal-badge.elevation .dot { background: #9c27b0; }
+.removal-badge.segment  { border-color: #757575; color: #757575; }
+.removal-badge.segment .dot  { background: #757575; }
+.removal-badge.simplify { border-color: #e91e63; color: #e91e63; }
+.removal-badge.simplify .dot { background: #e91e63; }
+
+/* ====== Dropzone ====== */
+.filter-dropzone {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.filter-dropzone.dragover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.filter-dropzone input[type="file"] {
+    display: none;
+}
+
+/* ====== Varovani ====== */
+.filter-warnings {
+    margin-top: 12px;
+    padding: 10px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    color: #856404;
+    font-size: 13px;
+}
+
+/* ====== Scroll panelu ====== */
+.filter-panel::-webkit-scrollbar { width: 6px; }
+.filter-panel::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* ====== Expanded map mode — velká mapa + panel vedle sebe ====== */
+body.filter-mode-expanded .filter-layout {
+    grid-template-columns: 310px 1fr;
+    align-items: start;
+    gap: 10px;
+}
+
+body.filter-mode-expanded .filter-panel {
+    position: sticky;
+    top: 10px;
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
+}
+
+body.filter-mode-expanded #filterMap {
+    height: calc(100vh - 160px) !important;
+    min-height: 400px;
+}
+
+body.filter-mode-expanded #filterElevWrap,
+body.filter-mode-expanded .filter-removal-stats {
+    display: none !important;
+}
+
+/* Tlačítko pro přepínání módu */
+#btnMapMode {
+    margin-left: auto;
+}
+
+/* ====== Responsivni ====== */
+@media (max-width: 900px) {
+    .filter-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-panel {
+        position: static;
+        max-height: none;
+    }
+
+    #filterMap {
+        height: 300px;
+    }
+
+    #filterElevWrap {
+        height: 180px;
+    }
+
+    .filter-stats {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .slider-row {
+        grid-template-columns: 1fr 100px 36px;
+    }
+}
+
+/* ====== Preset name dialog (A11Y-026) ====== */
+#preset-name-dialog {
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 360px;
+    width: 90vw;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+    background: var(--bg-color, #fff);
+    color: var(--text-color, #1a1a1a);
+}
+
+#preset-name-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+#preset-name-dialog h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.dialog-desc {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary-color, #666);
+}
+
+#preset-name-dialog label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+}
+
+#preset-name-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: var(--input-bg, #fff);
+    color: var(--text-color, #1a1a1a);
+    margin-bottom: 0.5rem;
+}
+
+#preset-name-input:focus {
+    outline: 2px solid var(--accent-color, #2563eb);
+    outline-offset: 1px;
+}
+
+.dialog-error {
+    color: #b91c1c;
+    font-size: 0.8rem;
+    margin: 0 0 0.5rem;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}

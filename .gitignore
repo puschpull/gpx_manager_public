@@ -1,0 +1,31 @@
+# Citlivá konfigurace — NIKDY neverzovat!
+.env
+
+# Setup marker — created manually before running setup.php, deleted on success
+.setup-allowed
+
+# Uživatelská data
+/uploads/*.gpx
+/uploads/photos/
+/uploads/thumbs/
+/uploads/_tile_cache/
+/uploads/_errors.log
+/uploads/heatmap_cache.json
+logs/*.log
+
+# IDE a systémové soubory
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# Claude Code interní data
+.claude/
+
+# Composer vendor — instaluj lokálně přes "composer install"
+# composer.lock se commituje pro deterministický build
+/vendor/
+
+# Node / npm — instaluj lokálně přes "npm install"
+# package-lock.json se commituje pro deterministický build
+/node_modules/

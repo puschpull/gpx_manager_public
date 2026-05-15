@@ -1,0 +1,13 @@
+{
+  "name": "gpx-manager",
+  "version": "1.0.0",
+  "description": "Self-hosted GPX & photo manager",
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -i assets/css/input.css -o assets/css/app.css --minify",
+    "watch": "tailwindcss -i assets/css/input.css -o assets/css/app.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.2.4"
+  }
+}

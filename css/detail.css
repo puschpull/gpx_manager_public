@@ -1,0 +1,54 @@
+/*
+===========================================================
+  GPX Manager – Detail page styles
+  Extracted from js/detail-elevation.js (FE-12 / TASK-24).
+  Previously injected at runtime via document.createElement('style').
+===========================================================
+*/
+
+/* ===== Slope legend (výškový profil) ===== */
+.slope-legend {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.slope-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slope-legend .legend-item span {
+    display: inline-block;
+    width: 16px;
+    height: 10px;
+    border-radius: 2px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Tooltip toggle (barevný tooltip) ===== */
+.tooltip-toggle {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    opacity: 0.85;
+    cursor: pointer;
+}
+
+.tooltip-toggle input {
+    transform: scale(1.2);
+}
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    .slope-legend,
+    .tooltip-toggle {
+        transition: none;
+    }
+}

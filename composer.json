@@ -1,0 +1,34 @@
+{
+    "name": "puschpull/gpx-manager",
+    "description": "Self-hosted GPX & photo manager",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "GpxManager\\": "src/"
+        },
+        "files": [
+            "includes/app_constants.php",
+            "includes/constants.php",
+            "includes/paths.php",
+            "includes/format.php",
+            "includes/i18n.php",
+            "includes/sort_query.php",
+            "includes/activity.php",
+            "includes/track_filter.php",
+            "includes/helpers.php",
+            "includes/security.php",
+            "includes/app_config.php",
+            "includes/ajax.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

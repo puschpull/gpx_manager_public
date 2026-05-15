@@ -1,0 +1,87 @@
+/*
+===========================================================
+  GPX Manager – Hlavní Grid Layout
+  Definuje hlavní rozložení stránky (Dashboard styl)
+===========================================================
+*/
+
+/* 1. Hlavní kontejner aplikace */
+.app-layout {
+  display: grid;
+  
+  /* Definice sloupců: 
+    - První sloupec (sidebar) je široký 320px.
+    - Druhý sloupec (main) zabere zbytek (1fr).
+  */
+  grid-template-columns: 320px 1fr;
+  
+  /*
+    Definice řádků:
+    - První řádek (header) má automatickou výšku.
+    - Druhý řádek (obsah) zabere zbytek místa.
+  */
+  grid-template-rows: auto 1fr;
+
+  /*
+    Pojmenování oblastí pro snadné přiřazení obsahu.
+    "header header" = header zabere oba sloupce
+    "sidebar main" = sidebar v prvním, main v druhém
+  */
+  grid-template-areas:
+    "header  header"
+    "sidebar main";
+  
+  min-height: 100vh; /* Layout zabere minimálně celou výšku okna */
+  gap: 1.25rem;       /* Mezery mezi oblastmi */
+  padding: 1.25rem;     /* Vnější "obal" celé aplikace */
+  box-sizing: border-box; /* Zajistí, že padding se započítá do velikosti */
+}
+
+/* 2. Přiřazení prvků do oblastí */
+.app-header { 
+  grid-area: header; 
+  /* Zajištění, že se H1 a meta-data (tlačítka) správně zarovnají */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.app-sidebar { 
+  grid-area: sidebar; 
+  /* Zajistí, že pokud bude formulář delší, bude se scrollovat jen on */
+  overflow-y: auto;
+}
+.app-main { 
+  grid-area: main;
+  /* Zajistí, že obsah (hlavně tabulka) nebude "vytlačovat" layout */
+  overflow-x: hidden;
+}
+
+
+/* 3. Responzivita pro mobilní telefony a tablety */
+@media (max-width: 1024px) {
+  .app-layout {
+    /* Na mobilech změníme layout na jeden sloupec:
+      Všechny oblasti (header, sidebar, main) půjdou pod sebe.
+    */
+    grid-template-columns: 1fr; /* Už jen jeden sloupec */
+    grid-template-areas:
+      "header"
+      "sidebar"
+      "main";
+    padding: 1rem; /* Menší padding na mobilu */
+    gap: 1rem;
+  }
+
+  .app-header {
+    /* Na mobilu dáme H1 a tlačítka pod sebe pro úsporu místa */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .app-sidebar {
+    overflow-y: visible; /* Vypneme scroll, vše je pod sebou */
+  }
+}

@@ -1,0 +1,1378 @@
+================================================================================
+  GPX Manager Redesign – Přehled změn
+  Projekt: https://github.com/puschpull/gpx_manager
+  Poslední aktualizace: 5. května 2026
+  
+================================================================================
+
+
+── 5. května 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — WIDGET POČASÍ: TRASY 3–7 DNÍ STARÉ NEZOBRAZOVALY DATA             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: js/detail-weather.js
+
+  Příčina: trasy starší 3 dnů byly přesměrovány na Archive API (ERA5),
+  ale ERA5 data mají latenci ~5–7 dní — pro trasy v tomto rozmezí
+  archivní data ještě neexistovala, widget se tiše skryl.
+
+  Oprava: práh pro přepnutí na Archive API zvýšen z 3 na 7 dní.
+  Trasy mladší 7 dní nyní vždy používají Forecast API, které má
+  aktuální i nedávná historická data okamžitě k dispozici.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — WIDGET POČASÍ NA DETAILU TRASY                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor:      js/detail-weather.js
+  Upravené soubory: includes/detail_view.php
+
+  Na stránce detailu trasy přibyl widget zobrazující podmínky počasí
+  v době zahájení trasy. Data pochází ze zdroje Open-Meteo Archive API
+  (zdarma, bez nutnosti API klíče) pomocí klimatického modelu ERA5-seamless
+  (~10 km prostorové rozlišení).
+
+  Zobrazené informace:
+    – stav počasí s ikonou (WMO kódy 0–99, popis v češtině i angličtině)
+    – teplota vzduchu [°C]
+    – srážky [mm]
+    – rychlost větru [km/h]
+    – oblačnost [%]
+
+  Technické detaily:
+    – pro trasy starší 3 dnů: Archive API (model era5_seamless)
+    – pro novější trasy: Forecast API (bez modelu)
+    – MySQL datetime "YYYY-MM-DD HH:MM:SS" → JS Date správně parsován
+      (mezera nahrazena za T před voláním new Date())
+    – souřadnice počasí: střed bounds trasy z DB pole tracks.bounds
+    – widget se zobrazí jen pokud trasa má datum a GPS souřadnice
+    – při chybě API widget tiše zmizí (žádná uživatelská chybová hláška)
+    – disclaimer "~ odhad z modelu" upozorňuje na přibližnost dat
+
+── 4. května 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — FILTROVÁNÍ PODLE DATA V KALENDÁŘI                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: includes/helpers.php
+
+  Příčina: kliknutí na den v GitHub-style heatmapě kalendáře přiřadilo
+  filtr date_from = date_to = '2024-07-15', ale SQL podmínka používala
+  date_end <= :date_to. MySQL porovnává datetime (12:30:00) s datem
+  (00:00:00), takže jednodenní trasy s koncem v průběhu dne nesplnily
+  podmínku → stránka zobrazila "žádné trasy".
+
+  Oprava v buildFilterSQL(): přepnuto na DATE(date_start) >= :date_from
+  a DATE(date_start) <= :date_to. Filtr nyní správně najde všechny
+  trasy zahájené v daný den bez ohledu na čas konce.
+
+  Poznámka: stejná oprava provedena i v původním repozitáři
+  gpx_manager_claude (commit 8dc029c).
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÝ PROJEKT — VIZUÁLNÍ REDESIGN (Outdoor / Přírodní téma)                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+  Cíl: kompletní vizuální rebrand aplikace GPX Manager v outdoor / přírodním
+  stylu při zachování veškeré PHP business logiky z původního repozitáře.
+
+  Tech stack:
+    – Tailwind CSS 4 (standalone CLI, CSS-first config v assets/css/input.css)
+    – Alpine.js 3 (CDN, x-data / $store / x-on)
+    – Lucide icons (CDN, lucide.createIcons())
+    – Google Fonts: Inter, Manrope, JetBrains Mono
+    – Leaflet + Chart.js (zachováno z původní verze)
+
+  Design systém (outdoor paleta):
+    – Primary (Forest): #2D4A3E / #3F6B57 / #5B8A75
+    – Accent (Terracotta): #C97B3F / #E89455
+    – Earth: #5C4A3A / #A89A8C / #D4C4B0
+    – Surface: #FAF8F3 (cream) / #F5F1EA (parchment)
+    – Dark mode: #1A2620 / #243028 / #2F3D34
+    – Topografická SVG textura v hero sekci (assets/img/topo-lines.svg)
+
+  Nové soubory (layout):
+    – includes/layout_header.php — sticky nav, logo, theme toggle, lang dropdown
+    – includes/layout_footer.php — footer, CDN skripty, lucide init
+    – js/redesign-ui.js — Alpine komponenty: count-up, filter chips, card hover
+    – js/chart-theme.js — Chart.js outdoor paleta defaults
+    – assets/css/input.css — Tailwind vstup + custom komponenty
+    – assets/css/app.css — generovaný Tailwind výstup (committován)
+    – assets/img/topo-lines.svg — hero topografický pattern
+    – assets/img/logo-mountain.svg — brand mark
+
+  Přepsané stránky:
+    – includes/index_view.php — hero s count-up statistikami, filter chip bar,
+      kartová mřížka nedávných tras, insights pruh, toggle detailní tabulky
+    – includes/detail_view.php — mapa-first hero, stat grid, ghost action buttons
+    – includes/table_tracks.php — Tailwind utility třídy, outdoor hover
+    – photos.php, stats.php, calendar.php, heatmap.php, map_search.php,
+      nearby.php, filter.php, compare.php, settings.php, edit.php, import.php
+      — sjednoceny na nový layout (layout_header + layout_footer), btn-outdoor
+    – admin.php — outdoor dashboard layout, konfigurabilní cesta k uploads/
+
+  Nové funkce oproti původní verzi:
+    – Konfigurovatelná cesta k uploads/ přes admin.php
+      (funkce uploads_fs() a uploads_url() v helpers.php — redesign sdílí
+      uploads složku s původní aplikací nebo si ji nastaví vlastní)
+    – Mobile nav: slide-over drawer přes Alpine.js $store.mobileNav
+    – Lang switcher: dropdown s vlajkami v layout_header
+    – CSS animace při načtení stránky (.anim-fade-up, .anim-fade-up-1..6)
+    – Skeleton shimmer loader (.skeleton keyframe)
+    – Focus ring pro přístupnost (outline s outdoor barvou)
+    – Styled scrollbar (Webkit + CSS scrollbar-color)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 5 POLISH — Animace, CSS proměnné, scrollbar, focus ring               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: assets/css/input.css
+
+  CSS proměnné — doplněny chybějící legacy vars (pro kompatibilitu se starými
+  stránkami css/style.css, css/filter.css, css/compare.css):
+    – :root: --link-color, --success-color, --error-color, --row-hover,
+             --btn-primary-bg, --btn-primary-text
+    – .dark:  stejné proměnné s tmavou outdoor paletou
+
+  Keyframe animace:
+    – @keyframes fadeSlideUp / fadeInUp — fade + posun zdola
+    – @keyframes fadeIn — čisté fade
+    – @keyframes shimmer — skeleton loader (position: -400px → 400px)
+
+  CSS třídy:
+    – .anim-fade-up — základní animace 0.5s ease-out
+    – .anim-fade-up-1 až .anim-fade-up-6 — stagger delay (0.1s – 0.6s)
+    – .skeleton — skeleton shimmer s outdoor barvami
+    – :focus-visible — outline 2px, outdoor accent barva, offset 2px
+    – ::-webkit-scrollbar / scrollbar-color — styled scrollbar (forest/sand)
+
+  Použití animací:
+    – includes/index_view.php: hero levý sloupec (.anim-fade-up-1),
+      sekce Quick Filters (.anim-fade-up-3)
+    – includes/detail_view.php: hlavní sekce (.anim-fade-up-1),
+      stat grid (.anim-fade-up-2)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  POLISH — Čistění tlačítek a odstraňování nadbytečného CSS                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nahrazení class="btn" za btn-outdoor komponenty na všech stránkách:
+
+  heatmap.php:
+    – Odstraněn <link css/style.css>
+    – Tlačítko Aktualizovat: btn-outdoor btn-outdoor-ghost + Lucide refresh-cw
+
+  map_search.php:
+    – Odstraněn <link css/style.css>
+    – Přesunuty .table-responsive styly do inline <style>
+    – JS template akční tlačítka: class="btn" → class="result-btn" (nová CSS třída)
+
+  import.php:
+    – Zachován <link css/style.css> (potřebný pro .controls, .note, .list, .bar)
+    – pickBtn: btn-outdoor btn-outdoor-ghost
+    – startBtn: btn-outdoor btn-outdoor-primary
+    – Odkaz zpět: btn-outdoor btn-outdoor-ghost
+
+  settings.php:
+    – Odstraněn <link css/style.css>
+    – Tlačítko Uložit: btn-outdoor btn-outdoor-primary + Lucide save
+
+  edit.php:
+    – Zachován <link css/style.css> (potřebný pro .track-nav, .flash-ok/error)
+    – Navigace prev/next: btn-outdoor btn-outdoor-ghost + Lucide chevron ikony
+    – Disabled nav: opacity-40 pointer-events-none
+    – Uložit: btn-outdoor btn-outdoor-primary + Lucide save
+    – Zpět / detail: btn-outdoor btn-outdoor-ghost
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOST — Blokace HTTP přístupu k citlivým adresářům                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: .htaccess (root), tools/.htaccess (nový)
+
+  Problém: <FilesMatch "^\\."> blokuje jen soubory začínající tečkou, ale
+  ne obsah podadresářů — .git/config, .git/HEAD, .claude/settings.json byly
+  veřejně čitelné i přes FilesMatch.
+
+  Oprava — RewriteRule direktivy v root .htaccess:
+    – RewriteRule ^\.git(/.*)?$    — blokuje celý .git adresář
+    – RewriteRule ^\.claude(/.*)?$ — Claude Code nastavení (session data)
+    – RewriteRule ^\.idea(/.*)?$   — PhpStorm projekt
+    – RewriteRule ^\.vscode(/.*)?$ — VS Code nastavení
+    – RewriteRule ^tools(/.*)?$    — Tailwind CLI binary a build skripty
+
+  tools/.htaccess: Require all denied (dvojitá ochrana adresáře)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  DEPLOYMENT — Nový GitHub repozitář a webhook                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+  GitHub Webhook:
+    – Payload URL: https://
+    – Content type: application/json
+    – Secret: HMAC-SHA256, uloženo v .env na serveru
+    – Event: push do větve main → automatický deploy ~1s
+
+  _deploy_hook.php:
+    – Původně nastaven na REPO_NAME = 'gpx_manager_claude' (zkopírováno)
+    – Opraven na REPO_NAME = 'gpx_manager'
+    – GitHub token s právy Contents: Read-only uložen v .env (GITHUB_TOKEN)
+
+  tools/tailwindcss.exe:
+    – Standalone Tailwind CLI binary — pouze pro lokální vývoj (watch mode)
+    – Na produkční server se nenahrává (.gitignore)
+    – assets/css/app.css je generovaný soubor, verzovaný v gitu (committován)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  CLEANUP — Odstranění dev souborů z repozitáře                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Smazané soubory (git rm):
+    – PROGRESS.md — interní poznámky vývoje (nesouvisí s produkcí)
+    – js/theme-tester.js — nástroj pro testování 9 původních témat
+      (redesign používá jen 2 témata: Light Outdoor / Dark Forest)
+
+
+── 29. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ — SHIFT+CLICK VÝBĚR ROZSAHU (checkboxy + skrytí fotek)           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: photos.php
+
+  Shift+click na checkbox:
+    – Kliknutí nastaví kotevní bod; Shift+kliknutí na jinou fotku vybere /
+      zruší výběr celého rozsahu mezi oběma fotkami
+    – Stav (zaškrtnuto / odškrtnuto) se řídí stavem druhého kliknutí
+
+  Shift+click na tlačítko 👁 / 🙈 (skrýt / zobrazit):
+    – První kliknutí nastaví kotvu a zapamatuje cílový stav (skrytá / zobrazená)
+    – Shift+kliknutí na jiné tlačítko aplikuje stejný stav na celý rozsah
+    – Hromadná akce proběhne jedním AJAX voláním (nový endpoint bulk_visible)
+      místo desítek samostatných requestů
+    – UI se aktualizuje okamžitě; při chybě serveru se automaticky vrátí zpět
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — TIMELINE: 429 TOO MANY REQUESTS (nginx rate limiting)              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: photos.php
+
+  Příčina: při otevření měsíce s mnoha fotkami (říjen 2023: ~630 fotek)
+  posílal prohlížeč stovky HTTP requestů na náhledy najednou → nginx
+  na produkčním serveru vrátil 429 Too Many Requests.
+
+  Řešení — throttlovaný lazy loader:
+    – Náhledy v timeline mají src = prázdný 1×1px placeholder, reálná URL
+      je v atributu data-src
+    – IntersectionObserver sleduje viditelnost; viditelné fotky se přidávají
+      do fronty
+    – Fronta zpracovává max 4 souběžné requesty (bezpečné pro nginx)
+    – Při otevření <details> měsíce se automaticky spustí načítání nových fotek
+    – Klikání do lightboxu funguje beze změn (data-full-url zůstává na elementech)
+
+
+── 27.–28. dubna 2026 ────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — LOKÁLNÍ IMPORT FOTEK (photo_import.php)                       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: photo_import.php
+
+  Nástroj pro dávkový import fotek přímo z lokálního PC nebo síťové složky
+  (UNC cesty typu \\PC\sdilena\slozka\ jsou plně podporovány).
+  Nahrazuje zdlouhavý online upload přes photos.php při práci s velkými
+  archívy (testováno na 17 780 fotkách přes noc bez pádu).
+
+  Tok práce:
+    1. Zadání cesty ke složce (nebo výběr z posledních 6 použitých — localStorage)
+    2. Rekurzivní skenování — limit 50 000 souborů, výpis počtu okamžitě
+    3. Dávkové načtení EXIF dat (batch 25 fotek): GPS, datum, auto-assign trasy,
+       detekce duplikátů podle orig_name
+    4. Galerie s náhledy — lazy loading přes IntersectionObserver,
+       max 4 souběžné requesty (ochrana před přetížením Apache při síťovém disku)
+    5. Filtrování: Vše / Jen nové / Jen GPS / GPS + nové / Jen s trasou
+    6. Hromadný výběr + import vybraných — progress bar ve sticky liště,
+       dávky po 8 fotkách, live výsledky (OK / duplikát / chyba)
+
+  Bezpečnost:
+    – Dostupné pouze adminu (session check)
+    – Cesty validovány přes realpath() + whitelist přípon
+    – Žádné directory traversal
+
+  Upravené soubory: admin.php (odkaz na import v sekci Data)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ — AUTO-PŘIŘAZENÍ FOTEK K TRASE (přesnost na GPX linii)           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: includes/photo_helper.php
+
+  Původní algoritmus používal haversinovu vzdálenost středu bounding boxu trasy.
+  Výsledek: domácí fotky s GPS se nesprávně přiřazovaly k blízkým trasám.
+
+  Nový algoritmus (3 kroky):
+    1. Časové okno ±2h od date_start/date_end trasy
+    2. Bounding box jako rychlý pre-filtr (fotka musí ležet uvnitř bbox)
+    3. Parsování skutečných GPX trackpointů (SimpleXML, namespace-agnostic xpath)
+       → přiřazení jen pokud nejbližší trackpoint je do 500 m
+
+  Nová pomocná funkce _min_dist_to_gpx() — čte trackpointy ze souboru na disku,
+  early-exit při vzdálenosti < 50 m pro výkon.
+
+  Opravená chyba: haversine() vrací metry (R = 6 371 000), nikoli km.
+  Threshold byl 0.5 (fakticky 0,5 m = skoro žádná shoda) místo správných 500.
+  Po opravě: 2 shody → stovky správných shod ze stejného archívu.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — VIDITELNOST FOTKY NA TRASE (zobrazit / skrýt)                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: photos.php, includes/db.php, includes/index_data.php
+
+  Každá fotka má nový přepínač 👁 / 🙈 (jen admin):
+    – Skrytá fotka se nezobrazí na mapě trasy ani v galerii pro návštěvníky
+    – Vizuálně dimovaná v admin galerii s odznakem SKRYTA
+    – AJAX endpoint toggle_visible — přepíná visible (0/1) v DB
+    – Nový sloupec visible TINYINT(1) DEFAULT 1 — auto-migrace v db.php
+
+  Viditelnost respektují všechny dotazy:
+    – Galerie, časová osa, statistiky na photos.php (filtr pro non-adminy)
+    – AJAX endpoint ?ajax=track (fotky na mapě detailu trasy)
+    – Počítadlo fotek v tabulce tras (index_data.php)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ — SPRÁVA FOTEK: HROMADNÝ VÝBĚR PO TRASÁCH + STRÁNKOVÁNÍ          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: photos.php
+
+  Výběr fotek po skupinách tras:
+    – Každá sekce trasy má tlačítka ☑ Vybrat / ✕ Zrušit (jen admin)
+    – Funguje nezávisle na globálním výběru v sticky liště
+
+  Stránkování galerie (nutné při 5 000+ fotkách):
+    – Stránkování po skupinách tras — skupina se nikdy nerozdělí přes 2 stránky
+    – Volba fotek na stránku: 50 / 100 / 250 / 500 (výchozí 250)
+    – Navigace: « První  ← Předchozí  |  Strana X / Y  |  Další →  Poslední »
+    – Číselný skok: input + tlačítko Jít
+    – Aktivní záložka Gallery zachována při přechodu mezi stránkami (GET param tab=gallery)
+    – Statistiky (celkový počet fotek) zůstávají globální — lehký COUNT dotaz
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÝ NÁSTROJ — DÁVKOVÝ RESIZE FOTEK PRO PRODUKCI (resize_photos.py)        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: resize_photos.py (Python 3, závislost: Pillow)
+
+  Převede všechny fotky a náhledy do menší verze vhodné pro produkci,
+  aniž by se dotkl originálů:
+    – Čte z:  uploads/photos/ a uploads/photos/thumbs/
+    – Zapisuje do: uploads/photos_resized/ a uploads/photos_resized/thumbs/
+    – Výchozí: fotky max 1200px / kvalita 78%, náhledy max 300px / kvalita 75%
+    – Parametry přes CLI: --max-px, --quality, --thumb-px, --thumb-q
+    – Přeskočí soubory kde je cíl novější než zdroj (bezpečné spustit opakovaně)
+    – Progress bar + závěrečná statistika úspory
+
+  Výsledek prvního běhu na 5 376 fotkách:
+    Původní: 2 461 MB → Nové: 1 072 MB — úspora 1 390 MB (56%), čas: 274 s
+
+
+── 26. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA BEZPEČNOSTI — SKRYTÍ ADMIN AKCÍ PRO NÁVŠTĚVNÍKY                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: includes/detail_view.php, includes/table_tracks.php,
+                    includes/filter_view.php, includes/filter_data.php
+
+    - detail_view.php: tlačítko ✏ Upravit trasu skryto pro návštěvníky
+    - table_tracks.php: sloupce Oblíbené (⭐) a Akce (Upravit) skryty
+      pro návštěvníky — záhlaví i všechny řádky tabulky
+    - filter_view.php: tlačítko 💾 Uložit jako novou trasu skryto pro
+      návštěvníky (⬇ Stáhnout GPX zůstává dostupné)
+    - filter_data.php: AJAX endpointy save_cleaned, preset_save,
+      preset_delete vrací HTTP 403 pro ne-adminy (backend ochrana)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — NÁHLED WEBU JAKO NÁVŠTĚVNÍK                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: includes/public_access.php, includes/auth.php
+
+    - Admin vidí v modrém banneru nové tlačítko 👁 Náhled jako návštěvník
+    - Kliknutím se stránka přepne do oranžového banneru s pohledem visitora
+    - Oranžový banner zobrazuje "✕ Zpět na admin pohled" pro snadný návrat
+    - Přepínač funguje přes ?visitor_preview=1/0 uložený v $_SESSION
+    - Bezpečné: funguje pouze pro požadavky z admin IP adresy
+    - Na admin stránkách (admin.php, edit.php…) preview přesměruje na index.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ — SESKUPENÍ FOTEK NA STEJNÉ GPS POZICI V MAPĚ                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: js/detail-map.js, css/style.css
+
+    - Fotky ze stejného místa (~11m přesnost) se sloučí do jednoho markeru
+    - Marker zobrazuje růžový odznak s počtem fotek (např. 📸 + odznak "3")
+    - Popup skupiny: mřížka 3 sloupce s náhledy, každý klikatelný
+    - Jeden marker = jedna fotka: původní layout beze změny
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — FOTOGRAFIE NA TRASÁCH (📸 VRSTVA V MAPĚ)                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: photos.php, includes/photo_helper.php
+
+    - Nová admin stránka Fotografie (📸 Fotografie v topbaru)
+    - Upload fotek s GPS EXIF (JPEG, PNG, WebP) — drag & drop nebo výběr souboru
+    - Podpora ZIP souborů (Google Takeout) — automatická extrakce, limit 200 fotek
+    - Automatický resize při uploadu: originál (2–4 MB) → max 1600px JPEG (~200–400 KB)
+    - Generování náhledů 400px pro mapové popupy
+    - Čtení EXIF: GPS souřadnice (DMS→decimal), nadmořská výška, čas pořízení
+    - Korekce EXIF orientace (rotace dle Orientation tag)
+    - Auto-přiřazení fotky k trase: časové okno ±2h → bounds containment → haversine
+    - Zobrazení kompresního poměru (např. "3.2 MB → 280 KB") ve výsledcích uploadu
+    - Správa fotek: galerie seskupená dle tras, ruční přiřazení/odebrání, smazání
+    - Přehled nepřiřazených fotek v samostatné záložce
+
+  Nová DB tabulka: track_photos (track_id, filename, lat, lon, altitude,
+                                  taken_at, width, height, file_size)
+
+  Upravené soubory: js/detail-map.js, includes/detail_view.php,
+                    includes/index_view.php, includes/db.php
+
+    - Detail trasy: nová vrstva "📸 Moje fotografie" v layer controlu
+    - Markery s popupem (thumbnail, datum, GPS, nadmořská výška)
+    - Kliknutí na thumbnail otevře plnou fotku
+    - Vrstva se ukládá do localStorage (chování stejné jako ostatní vrstvy)
+    - window.gpxDetailData doplněno o trackId pro AJAX volání
+
+── 24. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  MAPY — JEDNOTNÉ VRSTVY NA HEATMAP A MAP_SEARCH                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: heatmap.php, map_search.php
+
+    - Obě stránky mají nyní stejnou sadu vrstev jako detail a filter mapa
+    - 8 základních vrstev: OSM, Topo, Esri Satellite, Mapy.com (základní,
+      turistická, zimní, letecká), Thunderforest
+    - 3 překryvné vrstvy: Turistické značení (Waymarked), Fotografie
+      (Mapillary, VectorGrid), Fotografie (Wikimedia Commons)
+    - Přidána knihovna Leaflet.VectorGrid do obou stránek
+    - Přidán Mapillary token do apiKeys obou stránek
+    - Vybraná vrstva se ukládá do localStorage (sdíleno s ostatními mapami)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — AJAX ENDPOINTY VRACELY HTML MÍSTO JSON                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: includes/public_access.php
+
+    - check_page_access() vypisoval HTML admin banner i při AJAX requestech
+    - Výsledek: JSON odpověď začínala "<div style=…" → JS parser selhal
+    - Projevy: heatmap "Unexpected token '<'", map_search nenacházel trasy,
+      nearby "Chyba při komunikaci se serverem"
+    - Oprava: detekce AJAX přes $_GET['ajax'] nebo X-Requested-With header,
+      při AJAX requestu se banner přeskočí — opravuje všechny tři stránky
+      najednou i preventivně chrání další AJAX endpointy (filter, index…)
+
+── 23. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  KML/GEOJSON EXPORT + QR KÓD                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: export_kml.php, export_geojson.php
+
+    - Detail trasy: tlačítka ⬇ KML a ⬇ GeoJSON (Google Earth, QGIS, Leaflet…)
+    - Detail trasy: tlačítko 📱 QR — zobrazí QR kód s odkazem pro sdílení mobilem
+    - GeoJSON obsahuje metadata: vzdálenost, stoupání, aktivita, obtížnost
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  GPX CLEANER ↔ DATABÁZE — UX VYLEPŠENÍ                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    - Info-banner při načtení trasy z DB (název, km, stoupání)
+    - Jasnější labely: ⬇ Stáhnout GPX, 💾 Uložit jako novou trasu
+    - Feedback při ukládání: ⏳ Ukládám… → ✅ Uloženo! → redirect na detail
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  FILTER.PHP — ROZŠÍŘENÝ MÓD VELKÁ MAPA + PANEL                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    - Tlačítko ↗ Velká mapa + panel v topbaru
+    - Mapa se roztáhne na výšku viewportu, panel filtrů zůstane viditelný
+    - Živé prohlížení změn filtrů na velké mapě
+    - Preference se ukládá do localStorage
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  REDESIGN ZÁHLAVÍ — VLAJKY, KOMPAKTNÍ SELEKTY                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: lang/flags/ (8× PNG vlajek z flagcdn.com)
+
+    - Vlajka aktuálního jazyka jako obrázek (funguje i na Windows)
+    - Theme a lang select pouze tak široké jako obsah
+    - DB/Server info menší, pod selekty, zarovnáno vpravo
+    - Sdílená funkce renderHeaderMeta() pro všech 12 stránek
+
+── 20. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVY CHYB — přepínač jazyka a konfigurace přístupu                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: includes/helpers.php, includes/db.php,
+                    includes/filter_view.php, includes/filter_data.php
+
+    - helpers.php: t() má return type string|array (months_short, days_*
+      jsou pole → PHP 8 TypeError způsoboval pád calendar.php)
+    - db.php: CREATE TABLE app_config zabalen do try/catch (webglobe MySQL
+      user nemá CREATE práva → nevznikla tabulka → pád všech stránek)
+    - filter_view.php: odstraněno duplicitní volání render_admin_banner()
+      (check_page_access() v filter.php již banner vypisuje)
+    - filter_data.php: odstraněn require auth.php (blokoval visitors při
+      otevřeném přístupu a způsoboval headers-already-sent warning)
+
+── 20. dubna 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PŘEPÍNAČ JAZYKA PRO NÁVŠTĚVNÍKY — vlajkový dropdown v hlavičce             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: js/lang-switcher.js, includes/app_config.php,
+                includes/public_access.php
+
+    - Všechny stránky s theme selectorem mají nový dropdown 🌐 s vlajkami
+    - Kliknutí na jazyk nastaví cookie app_lang a stránku přenačte
+    - Viditelné jazyky odpovídají konfiguraci admina
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ADMIN KONFIGURACE PŘÍSTUPU — témata, jazyky, viditelné stránky             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nová DB tabulka: app_config (klíč–hodnota, auto-migrace v db.php)
+  Upravený soubor: admin.php (nová sekce s formulářem)
+
+    - Admin na stránce admin.php zaškrtne dostupné vzhledy (z 9)
+    - Admin zaškrtne dostupné jazyky (z 8)
+    - Admin zaškrtne které stránky vidí návštěvníci (stats, calendar, heatmap,
+      map_search, nearby, filter, compare, settings)
+    - Admin vidí vždy vše; odškrtnuté stránky přesměrují návštěvníky na index
+    - Minimálně 1 téma a 1 jazyk zůstanou vždy aktivní (fallback Classic/cs)
+    - Globální nastavení platí pro všechny návštěvníky okamžitě
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  REFAKTORING PŘÍSTUPU KE STRÁNKÁM                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: includes/public_access.php (session + IP admin detekce)
+
+    - stats.php, calendar.php, heatmap.php, map_search.php, settings.php:
+      nahrazen auth.php (který vždy blokoval visitors) za public_access.php
+    - nearby.php, filter.php, compare.php: přidáno session + access check
+    - index.php: přidáno session start pro admin detekci v topbaru
+    - Topbar na index.php zobrazuje tlačítka podmíněně dle role a konfigurace
+
+── 18.–19. dubna 2026 ────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ROZŠÍŘENÍ MULTIJAZYČNOSTI — 6 nových jazyků (de, sk, es, fr, pl, it)       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: lang/de.php, lang/sk.php, lang/es.php, lang/fr.php,
+                lang/pl.php, lang/it.php (~400 klíčů každý)
+  Upravené soubory: includes/helpers.php (rozšířen seznam platných jazyků),
+                    settings.php (dynamický výběr jazyků, validace),
+                    lang/cs.php, lang/en.php (nové klíče lang_*)
+
+    Celkem nyní 8 podporovaných jazyků:
+    - 🇨🇿 Čeština, 🇬🇧 Angličtina, 🇩🇪 Němčina, 🇸🇰 Slovenština,
+    - 🇪🇸 Španělština, 🇫🇷 Francouzština, 🇵🇱 Polština, 🇮🇹 Italština
+    - Každý jazyk má lokalizované měsíce (months_short) a jazykové plurály
+    - Jazykový výběr na settings.php ve 2sloupcové mřížce (grid)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  i18n VÝŠKOVÉHO PROFILU — překlady v JS (js/detail-elevation.js)            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: js/detail-elevation.js, includes/detail_view.php,
+                    všech 8 jazykových souborů (7 nových klíčů)
+
+    - Předání překladů z PHP do JS přes window.gpxDetailData.i18n
+    - Helper ei(key) v JS pro fallback na klíč
+    - Přeloženo: osa X/Y grafu, legenda svahů (Prudké klesání, Mírné klesání,
+      Rovinaté / mírné stoupání, Prudké stoupání), popisek "Barevný tooltip"
+    - Nové klíče: elev_label_elev, elev_label_dist, slope_steep_down,
+      slope_mild_down, slope_flat, slope_steep_up, colorful_tooltip
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  KOMPAKTNĚJŠÍ DESIGN NASTAVENÍ (settings.php)                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený soubor: settings.php
+
+    - Menší paddingy (14px 18px) a font (13px) pro úspornější zobrazení
+    - Horizontální radio skupiny (.radio-group-inline) pro jednotky a mapu
+    - Jazyky v CSS Gridu 2 × 4 (grid-template-columns: 1fr 1fr)
+    - Skryté nativní radio inputy, zvýraznění přes :has(input:checked)
+    - Sloučení souvisejících karet (jednotky + mapová vrstva)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÉ TÉMA „BROWN" — teplá hnědá paleta                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: css/theme-brown.css
+  Upravené soubory: 12 PHP souborů ($available_themes + $themeLabels)
+    (admin.php, edit.php, stats.php, calendar.php, heatmap.php, map_search.php,
+     settings.php, includes/index_data.php, includes/detail_data.php,
+     includes/compare_data.php, includes/nearby_data.php,
+     includes/filter_data.php)
+
+    - Tmavá hnědá paleta (--bg-color: #1a1410, --accent-color: #c08040)
+    - Batch-update přes sed (přidání 'brown' do pole témat a labelů)
+
+
+── 16.–17. dubna 2026 ────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  KALENDÁŘOVÁ HEATMAPA — GitHub-style roční přehled aktivity                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: calendar.php
+
+    Vizuální heatmapa aktivity za celý rok ve stylu GitHubu:
+    - CSS Grid mřížka 52 týdnů × 7 dnů s barevnou intenzitou (4 úrovně)
+    - Přepínání metrik: počet tras / km / stoupání
+    - Výběr roku, souhrnné karty (trasy, aktivní dny, km, stoupání, hodiny)
+    - Klik na buňku → přejde na přehled tras filtrovaný na daný den
+    - Podpora tmavých témat (vlastní barvy pro dark/darkblue/darkgreen)
+    - Responzivní layout (menší buňky na mobilu)
+    - Tooltip s detailem dne při najetí myší
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  UŽIVATELSKÉ NASTAVENÍ — jednotky, mapová vrstva, jazyk                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: settings.php
+
+    Stránka s preferencemi uživatele:
+    - Přepínání jednotek: metrické (km, m, km/h) ↔ imperiální (mi, ft, mph)
+    - Výběr výchozí mapové vrstvy (OSM, Topo, Satelit, Mapy.com, Thunderforest)
+    - Výběr jazyka rozhraní (čeština / angličtina)
+    - Cookie-based (1 rok platnost), funguje bez přihlášení
+    - Živý náhled přepočtu jednotek
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  MULTIJAZYČNOST (i18n) — kompletní podpora češtiny a angličtiny             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory: lang/cs.php, lang/en.php (~400 klíčů)
+  Upravené soubory: includes/helpers.php (funkce t(), app_lang(), fmtDist(),
+    fmtElev(), fmtSpeed()), stats.php, admin.php, login.php, import.php,
+    edit.php, calendar.php, settings.php, includes/index_view.php,
+    includes/table_tracks.php, includes/compare_view.php,
+    includes/detail_view.php
+
+    Architektura:
+    - Funkce t('key') načítá překlady z lang/{jazyk}.php
+    - Jazyk se ukládá do cookie app_lang (výchozí: čeština)
+    - Veškeré hardcodované české texty nahrazeny voláním t()
+    - Přidání dalšího jazyka = vytvořit nový soubor lang/{kód}.php
+    - Jednotky se automaticky formátují pomocí fmtDist/fmtElev/fmtSpeed
+    - Pokrytí: záhlaví, navigace, filtry, tabulky, formuláře, grafy,
+      hromadné akce, potvrzovací dialogy, chybové hlášky
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SYNCHRONIZACE DVOU PC — sdílený Claude Code hook                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor: .claude/settings.json
+
+    SessionStart hook: automatický git pull origin main při startu Claude Code.
+    Soubor je verzovaný v Gitu (výjimka v .gitignore), takže oba pracovní PC
+    mají stejnou konfiguraci.
+
+
+── 6. dubna 2026 ──────────────────────────────────────────────────────────────
+
+Tento den proběhla rozsáhlá série vylepšení aplikace GPX Manager, rozdělená
+do tří hlavních částí. Vše začalo malou testovací změnou pro ověření fungování
+automatického nasazení přes GitHub Actions na produkční web.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  TESTOVACÍ ZMĚNA — ověření CI/CD pipeline                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Zvětšení seznamu kategorií ve filtrech
+  Soubor: includes/index_view.php
+
+    V postranním panelu filtrů se po kliknutí na "Filtry" zobrazuje výběr
+    kategorií. Původně byl nastaven na zobrazení 8 položek najednou, což bylo
+    při rostoucím počtu kategorií nedostatečné. Hodnota byla zvýšena na 16,
+    aby uživatel viděl více kategorií bez nutnosti scrollování.
+
+    Tato drobná změna posloužila hlavně k otestování celého řetězce:
+    úprava na lokálním PC → commit → push na GitHub → automatický deploy
+    na produkční web přes FTP.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ČÁST 1 — Rychlá vylepšení                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. TLAČÍTKO PRO SMAZÁNÍ TRASY
+     Soubory: delete.php (nový), edit.php, css/style.css
+
+    Až dosud neexistoval způsob, jak trasu z aplikace smazat — dala se pouze
+    upravit nebo zobrazit. Nyní je na stránce editace trasy (edit.php)
+    úplně dole červené tlačítko "Smazat trasu". Po kliknutí se zobrazí
+    potvrzovací dialog s názvem trasy a upozorněním, že akce je nevratná.
+
+    Smazání odstraní:
+    – záznam z databáze (tabulka tracks)
+    – přiřazené kategorie (tabulka track_categories)
+    – GPX soubor z adresáře uploads/
+    – náhledový obrázek z uploads/thumbs/
+
+    Celá operace je chráněna CSRF tokenem a vyžaduje přihlášení administrátora.
+    Po smazání je uživatel přesměrován zpět na hlavní přehled tras s
+    původními filtry zachovanými.
+
+
+  2. POČÍTADLA U FILTRŮ
+     Soubory: includes/index_data.php, includes/index_view.php
+
+    Ve filtrovacím panelu se u každé barvy a kategorie nyní zobrazuje počet
+    tras v závorce, například "Cyan (12)" nebo "Krušné hory (8)". Uživatel
+    tak na první pohled vidí, kolik tras daná volba obsahuje, a může se
+    lépe rozhodovat při filtrování.
+
+    SQL dotazy pro barvy a kategorie byly přepsány z prostého SELECT DISTINCT
+    na GROUP BY s COUNT(*), čímž se získávají počty v jednom dotazu bez
+    dalšího zatížení databáze.
+
+
+  3. OBLÍBENÉ TRASY (SYSTÉM HVĚZDIČEK)
+     Soubory: api_toggle_favorite.php (nový), includes/db.php,
+              includes/helpers.php, includes/index_data.php,
+              includes/index_view.php, includes/table_tracks.php,
+              css/style.css, css/index.css,
+              edit.php, includes/detail_data.php
+
+    Zcela nová funkcionalita umožňující označit libovolnou trasu jako
+    oblíbenou kliknutím na hvězdičku přímo v tabulce. Přepnutí probíhá
+    okamžitě přes AJAX bez nutnosti obnovení stránky — prázdná hvězdička (☆)
+    se změní na plnou (⭐) a naopak.
+
+    Technické detaily:
+    – Do tabulky tracks byl přidán sloupec is_favorite (TINYINT, výchozí 0)
+    – Migrace probíhá automaticky při prvním načtení stránky
+    – V postranním panelu filtrů přibyl checkbox "Pouze oblíbené"
+    – Sloupec je řaditelný (kliknutím na záhlaví)
+    – Viditelnost sloupce lze přepínat v panelu viditelnosti sloupců
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ČÁST 2 — Statistiky a obtížnost                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  4. STATISTICKÝ DASHBOARD
+     Soubor: stats.php (nový)
+
+    Kompletně nová stránka s přehledovým dashboardem, dostupná přes tlačítko
+    "Statistiky" v horním panelu. Stránka obsahuje:
+
+    Souhrnné karty (8 dlaždic):
+    – Celkem tras, celkem km, celkem stoupání, celkem klesání
+    – Celkem hodin na trasách, průměrná rychlost
+    – Počet oblíbených tras, časové období (od–do)
+
+    Sekce rekordů (6 karet s odkazy na konkrétní trasy):
+    – Nejdelší trasa (km)
+    – Největší stoupání (m)
+    – Nejvyšší dosažený bod (m n.m.)
+    – Nejvyšší rychlost (km/h)
+    – Nejdelší doba trvání
+    – Nejtěžší trasa (podle obtížnosti)
+
+    Interaktivní grafy:
+    – Měsíční sloupcový graf s přepínačem metriky (km / počet / stoupání)
+    – Koláčový graf rozložení obtížnosti
+
+    Další přehledy:
+    – Top 10 nejpoužívanějších kategorií
+    – Tabulka statistik po jednotlivých letech (srovnání ročníků)
+
+
+  5. HODNOCENÍ OBTÍŽNOSTI TRAS
+     Soubory: recalc_difficulty.php (nový), includes/db.php,
+              includes/helpers.php, includes/index_data.php,
+              includes/index_view.php, includes/table_tracks.php,
+              includes/detail_view.php, includes/detail_data.php,
+              edit.php, import.php, css/style.css, css/index.css
+
+    Každá trasa nyní dostává automatické hodnocení obtížnosti na stupnici 1–5:
+      1 ●○○○○  Velmi snadná (zelená) — krátké rovné procházky
+      2 ●●○○○  Snadná (světle zelená)
+      3 ●●●○○  Středně náročná (oranžová)
+      4 ●●●●○  Náročná (červená)
+      5 ●●●●●  Velmi náročná (fialová) — dlouhé strmé trasy
+
+    Výpočet zohledňuje tři faktory:
+    – Vzdálenost trasy (body za délku)
+    – Celkové stoupání (body za převýšení)
+    – Průměrný sklon (poměr stoupání ku vzdálenosti)
+
+    Obtížnost se zobrazuje:
+    – V tabulce tras jako nový sloupec s barevnými puntíky
+    – V detailu trasy vedle názvu v záhlaví
+    – Ve statistickém dashboardu jako koláčový graf
+
+    Filtrování podle obtížnosti je možné v postranním panelu — dva selecty
+    Min/Max umožňují vybrat rozsah (např. jen středně náročné a těžší).
+
+    Obtížnost se automaticky přepočítává:
+    – Při importu nové trasy
+    – Při uložení editace trasy (pokud se změní vzdálenost nebo stoupání)
+    – Hromadně přes nástroj recalc_difficulty.php
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ČÁST 3 — Pokročilé mapové funkce a rozpoznání aktivit                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  6. HEATMAPA VŠECH TRAS
+     Soubor: heatmap.php (nový)
+
+    Nová stránka zobrazující teplotní mapu (heatmapu) všech zaznamenaných
+    tras. Čím častěji uživatel určitým místem prochází nebo projíždí, tím
+    intenzivnější je barva na mapě — od modré přes zelenou a žlutou až po
+    červenou.
+
+    Data se načítají AJAXem — server projde všechny GPX soubory a z každého
+    vezme podvzorkovaných maximálně 100 trackpointů (pro výkon). Výsledná
+    mapa tak zobrazuje hustotu průchodů bez zahlcení prohlížeče.
+
+    Tři posuvníky umožňují přizpůsobit vzhled v reálném čase:
+    – Poloměr (jak široký je efekt kolem každého bodu)
+    – Intenzita (práh maximální hodnoty)
+    – Rozostření (vyhlazení přechodů)
+
+    Využívá knihovnu Leaflet.heat. Mapa podporuje přepínání podkladů
+    (OSM, OpenTopoMap, Mapy.cz Outdoor).
+
+
+  7. VYHLEDÁVÁNÍ TRAS PODLE MAPY
+     Soubor: map_search.php (nový)
+
+    Umožňuje najít trasy v libovolné geografické oblasti nakresleném
+    přímo na mapě. Uživatel klikne na dva protilehlé rohy — tím se vytvoří
+    obdélník a systém okamžitě vyhledá všechny trasy, jejichž bounding box
+    se s vybranou oblastí překrývá.
+
+    Výsledky se zobrazí:
+    – V tabulce pod mapou (název, vzdálenost, stoupání, obtížnost, datum)
+    – Na mapě jako barevné čárkované obdélníky (bounding boxy nalezených tras)
+    – S tooltipem zobrazujícím název trasy při najetí myší
+
+    Tlačítko "Vymazat výběr" smaže obdélník a výsledky pro nové hledání.
+
+    Vyhledávání využívá sloupec bounds (JSON s minlat/maxlat/minlon/maxlon),
+    který se plní automaticky při importu GPX souboru.
+
+
+  8. AUTOMATICKÉ ROZPOZNÁNÍ TYPU AKTIVITY
+     Soubory: recalc_activity.php (nový), includes/helpers.php, import.php
+
+    Nová funkce, která na základě naměřených dat automaticky rozpozná,
+    o jaký typ aktivity se jedná, a přiřadí odpovídající kategorii:
+
+      Pěšky     — průměrná rychlost pod 6 km/h, málo stoupání
+      Turistika — průměrná rychlost pod 6 km/h, stoupání nad 100 m
+      Běh       — průměrná rychlost 6–12 km/h
+      Kolo      — průměrná rychlost 12–35 km/h
+      E-bike    — rychlost 15+ km/h s vysokým poměrem stoupání na km
+      Auto      — průměrná rychlost nad 35 km/h nebo max rychlost nad 80 km/h
+
+    Rozpoznání se spouští:
+    – Automaticky při importu každé nové trasy (kategorie se přiřadí ihned)
+    – Hromadně přes recalc_activity.php (přeskočí trasy, které už mají
+      přiřazenou některou z aktivitních kategorií)
+
+    Kategorie aktivit jsou běžné kategorie v systému — zobrazují se v
+    tabulce, dají se filtrovat, editovat, kombinovat s dalšími kategoriemi.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ADMIN PANEL                                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  9. CENTRÁLNÍ ADMINISTRAČNÍ STRÁNKA
+     Soubory: admin.php (nový), includes/index_view.php, stats.php
+
+    S rostoucím počtem nástrojů a utilit vznikla potřeba je mít na jednom
+    místě. Admin panel (dostupný přes tlačítko "Admin" v topbaru) sdružuje
+    všechny funkce do přehledných karet:
+
+    Přehled stavu — 8 informačních dlaždic:
+    – Celkem tras, kategorií, oblíbených
+    – Počet tras bez obtížnosti (zvýrazněno žlutě pokud > 0)
+    – Počet tras bez přiřazené aktivity
+    – Počet tras bez náhledového obrázku
+    – Velikost GPX souborů na disku
+    – Verze PHP
+
+    Správa dat:
+    – Import tras, CSV export, ZIP export
+
+    Hromadné přepočty:
+    – Přepočet obtížnosti (s informací kolik tras to potřebuje)
+    – Rozpoznání aktivit
+    – Přegenerování náhledových obrázků
+
+    Mapy a vizualizace:
+    – Statistiky, heatmapa, hledání na mapě, nejbližší trasy
+
+    Nástroje:
+    – GPX Cleaner, PHP info, odhlášení
+
+    Stránka je chráněna přihlášením administrátora (IP nebo heslo)
+    a poskytuje okamžitý přehled o tom, co je potřeba udělat — žlutě
+    zvýrazněné karty signalizují, kde chybí data.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVY A VYLEPŠENÍ — follow-up                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  10. SOUBOR SEZNAM ZMĚN (CHANGELOG)
+      Soubory: CHANGELOG.txt (nový), admin.php
+
+    Vytvořen tento soubor s podrobným popisem všech provedených změn v
+    českém jazyce. Odkaz na něj byl přidán do admin panelu v sekci
+    Nástroje → "📋 Seznam změn" (otevírá se v novém okně).
+
+
+  11. OPRAVA KÓDOVÁNÍ ČESKÝCH ZNAKŮ V TXT SOUBORECH
+      Soubor: .htaccess (nový)
+
+    Při přímém zobrazení CHANGELOG.txt v prohlížeči se české znaky
+    zobrazovaly jako nečitelné symboly. Příčinou bylo, že webserver
+    Webglobe neposílal u textových souborů hlavičku s kódováním.
+
+    Řešení: vytvořen soubor .htaccess v kořenové složce projektu
+    s direktivami AddDefaultCharset UTF-8 a AddCharset UTF-8 pro
+    soubory .txt, .css, .js a .html.
+
+
+  12. OPRAVA TIMEOUTU PŘI DEPLOYI NA GITHUB ACTIONS
+      Soubor: .github/workflows/deploy.yml
+
+    Po přidání .htaccess selhal automatický deploy s chybou
+    "Timeout (control socket)". FTP spojení s Webglobe serverem
+    nestihlo dokončit přenos v původním limitu 2 minut.
+
+    Řešení: timeout zvýšen na 5 minut (300 000 ms). Zároveň se
+    ukázalo, že verze FTP-Deploy-Action v4.4.0 neexistuje — pokus
+    o upgrade selhal a bylo nutné se vrátit na ověřenou v4.3.6.
+
+    Poznámka: GitHub Actions hlásí warning o deprecated Node.js 20,
+    ale na funkčnost deploye to nemá vliv — autor akce zatím nevydal
+    verzi kompatibilní s Node.js 24.
+
+
+  13. OPRAVA VÝKONU HEATMAPY
+      Soubor: heatmap.php
+
+    Při spuštění heatmapy na localhostu se stránka zasekla na
+    "Načítání dat..." a nereagovala i po 15 minutách. Příčinou bylo,
+    že AJAX endpoint při každém požadavku parsoval všech 624 GPX
+    souborů pomocí simplexml_load_file, což bylo extrémně pomalé.
+
+    Řešení — dvourežimový přístup:
+
+    a) Rychlý režim (výchozí) — místo čtení GPX souborů se použijí
+       souřadnice z databázového sloupce bounds. Z bounding boxu
+       každé trasy se vygeneruje 9 bodů (střed + 4 rohy + 4 mezibody).
+       Výsledek je okamžitý — stránka se načte za vteřinu.
+
+    b) Detailní režim — tlačítko "🔄 Detailní heatmapa" spustí
+       kompletní čtení všech GPX souborů s podvzorkováním na 30 bodů
+       na trasu. Výsledek se uloží do cache souboru
+       (uploads/heatmap_cache.json) s platností 1 hodiny, takže
+       další návštěvy jsou opět okamžité.
+
+    Rychlý režim dává dostatečně přesný vizuální výsledek pro běžné
+    použití. Detailní režim je vhodný spustit jednorázově pro
+    nejpřesnější zobrazení hustoty průchodů.
+
+
+── 8. dubna 2026 ──────────────────────────────────────────────────────────────
+
+  15. SLOUPEC AKTIVITA V TABULCE TRAS
+      Soubory: includes/db.php, includes/helpers.php, includes/index_data.php,
+               includes/index_view.php, includes/table_tracks.php,
+               css/index.css, edit.php, import.php, recalc_activity.php
+
+    Typ aktivity (Pěšky, Turistika, Běh, Kolo, E-bike, Auto) se dosud
+    ukládal pouze jako kategorie v tabulce track_categories. Nyní je
+    přidán jako vlastní sloupec activity_type přímo v tabulce tracks.
+
+    Změny:
+    – Nový sloupec activity_type VARCHAR(20) s auto-migrací (db.php)
+    – Nový sloupec "Aktivita" v hlavní tabulce s ikonovým badgem
+      (🚶 Pěšky, 🥾 Turistika, 🏃 Běh, 🚴 Kolo, ⚡🚴 E-bike, 🚗 Auto)
+    – Filtr aktivity v sidebaru — dropdown s počty tras u každého typu
+    – Řazení podle aktivity v tabulce (klik na záhlaví)
+    – Sloupec se dá skrýt/zobrazit v panelu viditelnosti sloupců
+    – Při importu trasy se activity_type vyplní automaticky
+    – Při uložení trasy v editoru se activity_type přepočítá
+    – Hromadný přepočet (recalc_activity.php) nyní aktualizuje sloupec
+      activity_type u VŠECH tras, nejen u těch bez kategorie
+    – Mobilní zobrazení (kartový režim) ukazuje aktivitu
+
+    Pro naplnění sloupce u existujících tras je potřeba spustit
+    přepočet aktivit z Admin panelu → "Rozpoznání aktivit".
+
+
+  14. OPRAVA AJAX CHYBY V HEATMAPĚ A VYHLEDÁVÁNÍ NA MAPĚ
+      Soubory: heatmap.php, map_search.php
+
+    Po spuštění heatmapy nebo vyhledávání na mapě se zobrazila chyba:
+    "Chyba při načítání: Unexpected token '<', " <div style"... is not
+    valid JSON"
+
+    Příčina: funkce render_admin_banner() (zobrazující admin banner pro
+    přihlášené uživatele) byla volaná na začátku souboru — ještě před
+    AJAX endpointy. Při AJAX požadavku tak server místo čistého JSONu
+    vrátil HTML <div> následovaný JSON daty, což JavaScript nedokázal
+    zparsovat.
+
+    Řešení: v obou souborech přesunuta funkce render_admin_banner()
+    za všechny AJAX bloky (které končí příkazem exit), těsně před
+    <!DOCTYPE html>. AJAX odpovědi tak vrací čistý JSON a admin banner
+    se zobrazí pouze při normálním načtení stránky.
+
+
+── 16. dubna 2026 ─────────────────────────────────────────────────────────────
+
+  Dokončení bezpečnostního auditu, přestavba deploy pipeline a centrální
+  logování chyb.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  DEPLOY PIPELINE — WEBHOOK MÍSTO FTP                                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. GITHUB WEBHOOK DEPLOY
+     Soubory: _deploy_hook.php (nový, server-only),
+              .github/workflows/deploy.yml (smazán)
+
+    Původní deploy přes GitHub Actions + lftp/FTPS byl chronicky nespolehlivý
+    — Webglobe FTP server občas visel 7–15 minut nebo úplně timeoutoval.
+    Celý mechanismus byl nahrazen pull-based webhookem:
+
+    Nový princip:
+    – GitHub po každém push pošle POST webhook na _deploy_hook.php
+    – Skript ověří HMAC podpis (sha256), zparsuje payload
+    – Ze seznamu commitů zjistí přidané/upravené/smazané soubory
+    – Stáhne obsah změněných souborů z GitHub API (autentizováno tokenem)
+    – Zapíše soubory na disk, smaže odstraněné soubory
+    – Loguje vše do uploads/_deploy.log
+
+    Výhody oproti FTP:
+    – Rychlost: ~1 sekunda místo 30s–15min
+    – Spolehlivost: HTTPS vždy funguje, žádné FTP hangy
+    – Bezúdržbovost: žádné GitHub Actions, žádné závislosti
+
+    Bezpečnost:
+    – HMAC-SHA256 ověření podpisu (webhook secret v .env)
+    – GitHub token s minimálními právy (Contents: Read-only)
+    – Skript ignoruje citlivé soubory (.env, uploads/, sám sebe)
+    – Reaguje pouze na push do větve main
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOSTNÍ VYLEPŠENÍ                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  2. OCHRANA EXPORTŮ — POUZE PRO ADMINISTRÁTORY
+     Soubory: export.php, zip_export.php
+
+    CSV export a ZIP export GPX souborů byly dosud přístupné komukoli,
+    kdo znal URL. Nyní oba soubory vyžadují přihlášení administrátora
+    (přes includes/auth.php). Nepřihlášený uživatel je přesměrován
+    na login.php.
+
+
+  3. CENTRÁLNÍ LOGOVÁNÍ CHYB
+     Soubory: config.php, admin.php, includes/db.php, includes/index_data.php,
+              includes/index_view.php, delete.php, edit.php, import.php,
+              api_toggle_favorite.php
+
+    Přidán globální systém logování chyb:
+
+    a) Globální exception handler (config.php):
+       – Nezachycené výjimky se logují do uploads/_errors.log
+       – Na produkci uživatel vidí pouze "Chyba serveru"
+       – Na lokálu se zobrazí plný detail chyby
+       – AJAX požadavky dostanou JSON odpověď
+
+    b) Shutdown handler pro fatální chyby (config.php):
+       – Zachytí E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR
+       – Zaloguje do uploads/_errors.log i chyby, které nelze catchnout
+
+    c) Oprava tichých catch bloků:
+       – admin.php, index_data.php, index_view.php měly prázdné catch {}
+       – Nyní všechny volají error_log() s kontextem
+
+    d) Skrytí interních chybových zpráv na produkci:
+       – db.php, delete.php, edit.php, import.php, api_toggle_favorite.php
+       – Dříve zobrazovaly $e->getMessage() uživateli (bezpečnostní riziko)
+       – Nyní: produkce = obecná zpráva, lokál = plný detail
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  POROVNÁNÍ A ANALÝZA TRAS                                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  4. POROVNÁNÍ VYBRANÝCH TRAS
+     Soubory: compare.php (nový), includes/compare_data.php (nový),
+              includes/compare_view.php (nový), js/compare-map.js (nový),
+              css/compare.css (nový)
+
+    Nová funkce umožňující vybrat 2 a více tras a zobrazit je na jedné mapě
+    vedle srovnávací tabulky parametrů.
+
+    Použití:
+    – V tabulce tras zaškrtnout checkboxy u požadovaných tras
+    – Kliknout na tlačítko "⚖️ Porovnat" (aktivní při 2+ vybraných)
+    – Otevře se nová stránka s mapou a tabulkou
+
+    Mapa:
+    – Každá trasa je vykreslena jinou barvou (paleta 10 barev)
+    – Legenda pod mapou s barevnými čtverečky a odkazy na detail
+    – Tooltip s názvem trasy při najetí myší na stopu
+    – Klik na trasu otevře její detail
+    – Plná podpora mapových vrstev (OSM, Topo, Esri, Mapy.com, Thunderforest)
+
+    Srovnávací tabulka:
+    – Vzdálenost, stoupání, klesání, doba trvání, doba pohybu
+    – Min/max nadmořská výška, max/průměrná rychlost
+    – Obtížnost, aktivita, datum, zařízení
+    – Nejvyšší hodnoty zvýrazněny zeleně, nejnižší výška modře
+
+
+  5. PODOBNÉ TRASY NA STRÁNCE DETAILU
+     Soubory: includes/detail_data.php, includes/detail_view.php, css/style.css
+
+    Na stránce detailu trasy se nyní zobrazuje sekce „Podobné trasy"
+    s kartami odkazujícími na trasy s podobnými parametry.
+
+    Algoritmus podobnosti (skóre 0–100 bodů):
+    – Zeměpisná blízkost (50 %) — Haversinova vzdálenost středů tras
+      (0 km = 50 bodů, 100+ km = 0 bodů)
+    – Podobná délka (25 %) — poměr kratší/delší trasy
+    – Podobná obtížnost (15 %) — rozdíl úrovní 1–5
+    – Podobné převýšení (10 %) — poměr stoupání
+
+    Zobrazuje se top 6 tras. Každá karta obsahuje náhledový obrázek,
+    název, vzdálenost, stoupání, dobu a obtížnost. Data se načítají
+    AJAXem (endpoint detail_data.php?ajax=similar).
+
+    Sekce je umístěna pod checkbox „Barevný tooltip" na konci profilu.
+
+
+  6. HROMADNÉ OPERACE S TRASAMI
+     Soubory: api_bulk_action.php (nový), includes/index_view.php,
+              includes/table_tracks.php, css/index.css
+
+    Nová funkcionalita pro hromadné akce nad vybranými trasami:
+
+    Výběr tras:
+    – Checkbox u každého řádku v tabulce
+    – Zaškrtávátko „Vybrat vše" v záhlaví
+    – Počítadlo vybraných tras v akční liště
+
+    Dostupné hromadné akce (dropdown menu):
+    – ⭐ Nastavit jako oblíbené / Zrušit oblíbené
+    – 📁 Přiřadit kategorii (vytvoří ji, pokud neexistuje)
+    – 🗑️ Odebrat kategorii
+    – 🎨 Nastavit barvu
+    – ❌ Smazat vybrané trasy (s potvrzením, smaže i soubory)
+
+    API endpoint (api_bulk_action.php):
+    – Vyžaduje přihlášení administrátora
+    – CSRF ochrana tokenem
+    – Vrací JSON s počtem ovlivněných tras
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ GRAFŮ A STATISTIK                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  7. PRŮMĚRNÁ RYCHLOST V MĚSÍČNÍCH GRAFECH
+     Soubory: stats.php, includes/index_data.php, includes/index_view.php,
+              js/index-chart.js
+
+    Do přepínače metriky v měsíčním grafu přidána nová volba
+    „Prům. rychlost (km/h)". Dostupná jak na stránce Statistiky,
+    tak na hlavním přehledu tras (index.php).
+
+    Při výběru rychlosti se graf automaticky přepne na liniový typ
+    (s hladkou křivkou a vyplněnou plochou) — lépe ukazuje trend
+    rychlosti v čase. Ostatní metriky (km, počet, stoupání) zůstávají
+    jako sloupcové.
+
+    Na index.php graf respektuje aktivní filtry — zobrazuje průměrnou
+    rychlost pouze z vyfiltrovaných tras.
+
+
+── 15. dubna 2026 ─────────────────────────────────────────────────────────────
+
+  Bezpečnostní audit a hardening aplikace. Provedena kontrola všech veřejných
+  i administračních stránek, opraveny nalezené zranitelnosti, odstraněn
+  mrtvý kód a nasazena ochrana session cookies.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOSTNÍ HARDENING                                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1. HARDENING .htaccess
+     Soubor: .htaccess
+
+    Kořenový .htaccess byl rozšířen o bezpečnostní pravidla:
+    – Options -Indexes (zakázání výpisu adresářů)
+    – Blokace přístupu k souborům začínajícím tečkou (.env, .git, .claude)
+    – Zakázání přímého přístupu ke config.php a phpinfo.php
+    – HTTP hlavičky: X-Content-Type-Options, X-Frame-Options, Referrer-Policy
+
+    V adresáři uploads/ byla přidána pravidla zakazující vykonávání
+    skriptů (PHP, CGI, Python, apod.) — i kdyby se podařilo nahrát
+    škodlivý soubor, Apache ho nespustí.
+
+
+  2. ODSTRANĚNÍ MRTVÉHO KÓDU
+     Smazané soubory: api_keys.php, phpinfo.php
+
+    Soubor api_keys.php vracel API klíče (Thunderforest, Mapy.com,
+    Mapillary) jako JSON bez jakéhokoli ověření. Analýza ukázala, že
+    soubor nikdo nepoužívá — všechny mapové stránky vkládají klíče
+    přímo přes PHP do HTML (window.gpx*Data.apiKeys).
+
+    Soubor phpinfo.php zobrazoval kompletní konfiguraci serveru
+    (verze PHP, cesty, rozšíření) — užitečné při vývoji, ale
+    bezpečnostní riziko na produkci.
+
+
+  3. ZABEZPEČENÍ SESSION COOKIES
+     Soubory: includes/security.php (nový), includes/auth.php, login.php
+
+    Vytvořen centrální modul security.php s funkcemi pro správu sessions
+    a CSRF tokenů. Session cookie PHPSESSID nyní má nastaveny flagy:
+
+    – HttpOnly: JavaScript nemůže číst session cookie (ochrana proti XSS)
+    – Secure: cookie se posílá pouze přes HTTPS (ochrana proti odposlechu)
+    – SameSite=Lax: cookie se neposílá při cross-site POST (ochrana CSRF)
+
+    Flag Secure se na Webglobe vynucuje na základě APP_ENV (reverse proxy
+    nenastavuje standardní $_SERVER['HTTPS']), na lokálním PC se detekuje
+    automaticky aby fungoval vývoj přes HTTP.
+
+    CSRF ochrana využívá hash_equals() pro timing-safe porovnání tokenů.
+
+
+  4. OCHRANA EXPORTŮ — POUZE PRO ADMINISTRÁTORY
+     Soubory: export.php, zip_export.php
+
+    CSV export a ZIP export GPX souborů byly dosud přístupné komukoli,
+    kdo znal URL. Nyní oba soubory vyžadují přihlášení administrátora
+    (přes includes/auth.php). Nepřihlášený uživatel je přesměrován
+    na login.php.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  DEPLOY PIPELINE                                                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  5. PŘESTAVBA GITHUB ACTIONS DEPLOY PIPELINE
+     Soubor: .github/workflows/deploy.yml
+
+    Původní deploy přes SamKirkland/FTP-Deploy-Action trpěl opakovanými
+    timeouty (control socket), Node.js 20 deprecation warningy a skenoval
+    celý adresářový strom (pomalé na 600+ GPX souborech).
+
+    Nový deploy je postaven na lftp s explicitním FTPS (port 21) a má
+    dva režimy:
+
+    a) Diff mode (výchozí, při push do main):
+       – git diff zjistí, které soubory se změnily od posledního commitu
+       – lftp nahraje/smaže pouze tyto soubory
+       – Typická doba: 30–40 sekund
+
+    b) Full sync mode (ruční spuštění s checkbox full_sync):
+       – lftp mirror přenese celý projekt
+       – Pro případ, že diff mode vynechal nějakou změnu
+
+    Spolehlivost zajišťuje vnější retry smyčka:
+    – Každý pokus má hard timeout 150 sekund (ochrana proti FTP hangům)
+    – Až 4 pokusy s 20s pauzou mezi nimi
+    – Interní lftp timeout 20s a max 2 retry (fail-fast)
+
+    Pipeline používá actions/checkout@v5 (Node.js 24, bez deprecation).
+
+
+  6. VÝCHOZÍ STRÁNKOVÁNÍ 25 → 50
+     Soubor: includes/index_data.php
+
+    Zvýšen výchozí počet zobrazených tras na stránku z 25 na 50.
+    S rostoucím počtem tras v databázi (600+) bylo 25 tras příliš málo
+    a uživatel musel zbytečně listovat. Hodnota 50 je kompromis mezi
+    přehledností a rychlostí načtení.
+
+
+================================================================================
+  Technické poznámky
+================================================================================
+
+  – Všechny databázové změny (nové sloupce) se migrují automaticky při
+    prvním načtení stránky — není potřeba ručně upravovat strukturu DB.
+
+  – Nové funkce respektují stávající systém témat (8 barevných schémat)
+    a jsou responzivní pro mobilní zařízení.
+
+  – Nasazení probíhá automaticky: push do větve main na GitHubu spustí
+    webhook, který stáhne změněné soubory z GitHub API přímo na server
+    (Webglobe). Deploy trvá ~1 sekundu.
+
+================================================================================
