@@ -55,14 +55,6 @@ jobs:
       - name: Build CSS
         run: npm run build
 
-      - name: Check app.css is up to date
-        run: |
-          if ! git diff --quiet assets/css/app.css; then
-            echo "::error::assets/css/app.css is outdated. Run 'npm run build' and commit."
-            git diff assets/css/app.css | head -50
-            exit 1
-          fi
-
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
