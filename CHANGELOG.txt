@@ -1,9 +1,42 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 5. května 2026
+  Poslední aktualizace: 18. května 2026
   
 ================================================================================
+
+
+── 18. května 2026 ─────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ INSTALACE A DOKUMENTACE                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené soubory: config.php, composer.json, install.sql,
+                    migrations/0010_login_attempts.sql
+  Nové soubory:     includes/bootstrap.php, docs/htaccess-navod.md,
+                    docs/htaccess-guide.md, .htaccess.localhost.example,
+                    .htaccess.subdir.example
+
+  INSTALACE BEZ COMPOSERU
+  Aplikace nově funguje i po čisté FTP instalaci bez spuštění
+  "composer install". Když chybí složka vendor/, config.php načte
+  sdílené soubory z includes/ přímo přes nový includes/bootstrap.php.
+  Ten je zároveň jediným místem se seznamem načítaných souborů —
+  composer.json (autoload.files) i fallback v config.php ho sdílejí.
+
+  KONZISTENTNÍ COLLATE TABULKY login_attempts
+  install.sql a migrations/0010_login_attempts.sql nově určují
+  COLLATE=utf8mb4_unicode_ci i u tabulky login_attempts. Dříve jako
+  jediná COLLATE neměla a dědila výchozí collation serveru — schéma
+  tak nebylo identické napříč MySQL a MariaDB.
+
+  DOKUMENTACE KE KONFIGURACI .HTACCESS
+  Nový návod docs/htaccess-navod.md (CZ) a docs/htaccess-guide.md (EN)
+  vysvětluje všechny tři .htaccess soubory a postup instalace na
+  localhost (WAMP, XAMPP — Alias i VirtualHost) i na webhosting.
+  Přibyly ukázkové varianty .htaccess.localhost.example (vypnutý
+  HTTPS redirect pro localhost) a .htaccess.subdir.example.
 
 
 ── 5. května 2026 ────────────────────────────────────────────────────────────

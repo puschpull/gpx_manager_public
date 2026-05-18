@@ -1,9 +1,13 @@
 <?php
 
-// Composer autoloader (graceful — aplikace funguje i bez vendor/, dokud uživatel nespustí composer install)
+// Načtení sdílených souborů z includes/.
+// S Composerem: vendor/autoload.php (autoload.files → includes/bootstrap.php).
+// Bez Composeru (FTP instalace): includes/bootstrap.php načteme přímo.
 $_autoload = __DIR__ . '/vendor/autoload.php';
 if (is_file($_autoload)) {
     require_once $_autoload;
+} else {
+    require_once __DIR__ . '/includes/bootstrap.php';
 }
 unset($_autoload);
 

@@ -1,0 +1,106 @@
+# ============================================================
+# GPX Manager — .htaccess (varianta pro LOCALHOST: WAMP / XAMPP)
+# ============================================================
+# Použití: přejmenuj tento soubor na ".htaccess".
+# Liší se od produkční verze pouze ZAKOMENTOVANÝM HTTPS redirectem.
+# Podrobnosti viz docs/htaccess-navod.md.
+# ============================================================
+
+# ---- Upload limity ----
+<IfModule mod_php.c>
+    php_value upload_max_filesize 200M
+    php_value post_max_size 210M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# ---- Charset ----
+AddDefaultCharset UTF-8
+AddCharset UTF-8 .txt .css .js .html
+
+# ---- Zákaz výpisu adresářů ----
+Options -Indexes
+
+# ---- HTTPS redirect — VYPNUTO pro localhost ----
+# WAMP/XAMPP běží typicky na http://localhost bez SSL certifikátu.
+# Vynucení HTTPS by zde způsobilo nedostupnost webu nebo redirect smyčku.
+# Na webhostingu tento blok ODKOMENTUJ (nebo použij produkční .htaccess).
+#<IfModule mod_rewrite.c>
+#    RewriteEngine On
+#    RewriteCond %{HTTPS} off
+#    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+#    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#</IfModule>
+
+# ---- Blokace dotfiles ----
+# .env, .git*, .htaccess, .gitignore, .claude, ...
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ---- Blokace PHP konfiguračních a citlivých souborů ----
+<FilesMatch "^(config\.php|phpinfo\.php|info\.php|test\.php)$">
+    Require all denied
+</FilesMatch>
+
+# ---- Blokace instalačních souborů ----
+# setup.php je chráněn vlastní logikou (TASK-05): vyžaduje .setup-allowed marker
+# a smaže se po úspěšné instalaci. Blokovat ho zde by znemožnilo instalaci.
+# migrate.php a install.php jsou blokovány — spouštět výhradně přes CLI.
+<FilesMatch "^(install\.php|migrate\.php)$">
+    Require all denied
+</FilesMatch>
+
+# ---- Blokace SQL, logů, záloh, .md, shell skriptů, lock souborů ----
+<FilesMatch "\.(sql|log|bak|md|sh|lock)$">
+    Require all denied
+</FilesMatch>
+
+# ---- Blokace package a build konfiguračních souborů ----
+<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|tailwind\.config\.js)$">
+    Require all denied
+</FilesMatch>
+
+# ---- HTTP bezpečnostní hlavičky ----
+# POZN: X-Frame-Options, CSP, HSTS, Permissions-Policy, COOP nastavuje security.php
+# (single source of truth). Zde pouze static defaults pro non-PHP requesty.
+# X-Frame-Options je záměrně vynechán — security.php posílá DENY.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ---- Komprese (mod_deflate) ----
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml application/xml
+</IfModule>
+
+# ---- Cache static assets ----
+# Pozn: bez asset versioning nepoužíváme "immutable" flag.
+# max-age=2592000 (30 dní) je bezpečný kompromis.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css                "access plus 30 days"
+    ExpiresByType application/javascript  "access plus 30 days"
+    ExpiresByType image/png               "access plus 30 days"
+    ExpiresByType image/jpeg              "access plus 30 days"
+    ExpiresByType image/webp              "access plus 30 days"
+    ExpiresByType image/svg+xml           "access plus 30 days"
+    ExpiresByType font/woff2              "access plus 1 year"
+    ExpiresByType font/woff               "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Cache-Control pro statické assety (CSS, JS, obrázky, fonty)
+    <FilesMatch "\.(css|js|png|jpe?g|webp|gif|ico|svg|woff2?)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+
+    # No-cache pro PHP a HTML — vždy čerstvý obsah
+    <FilesMatch "\.(php|html?)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+    </FilesMatch>
+</IfModule>
