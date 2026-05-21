@@ -188,7 +188,8 @@ function _gpx_extract_trackpoints(SimpleXMLElement $xml, array $ns): array
 /**
  * Computes distance/elevation/speed/time metrics from raw trackpoints.
  *
- * Uses MOVING_THRESHOLD_MS constant to classify stationary segments.
+ * Uses MOVING_THRESHOLD_MS to classify stationary segments and
+ * GPX_ELEVATION_NOISE_M as a hysteresis band for ascent/descent.
  * avgSpeedMS_moving / avgSpeedMS_total are NOT included here — they are
  * derived in parse_gpx() after _gpx_apply_trackstats() may update the times.
  *
@@ -204,6 +205,7 @@ function _gpx_compute_metrics(array $trackpoints): array
     $movingTimeS = 0.0;
     $eleMin      = INF;
     $eleMax      = -INF;
+    $eleRef      = null;
     $times       = [];
 
     $count = count($trackpoints);
@@ -214,6 +216,22 @@ function _gpx_compute_metrics(array $trackpoints): array
         if ($p['ele'] !== null) {
             if ($p['ele'] < $eleMin) $eleMin = $p['ele'];
             if ($p['ele'] > $eleMax) $eleMax = $p['ele'];
+
+            // Stoupání/klesání s hysterezí: změny menší než GPX_ELEVATION_NOISE_M
+            // se považují za GPS šum a nezapočítají se. Trvalé převýšení se
+            // akumuluje od poslední významné hodnoty ($eleRef).
+            if ($eleRef === null) {
+                $eleRef = $p['ele'];
+            } else {
+                $eleDelta = $p['ele'] - $eleRef;
+                if ($eleDelta >= GPX_ELEVATION_NOISE_M) {
+                    $ascentM += $eleDelta;
+                    $eleRef = $p['ele'];
+                } elseif ($eleDelta <= -GPX_ELEVATION_NOISE_M) {
+                    $descentM += -$eleDelta;
+                    $eleRef = $p['ele'];
+                }
+            }
         }
 
         if ($i === 0) continue;
@@ -223,12 +241,6 @@ function _gpx_compute_metrics(array $trackpoints): array
 
         $d = haversine($a['lat'], $a['lon'], $b['lat'], $b['lon']);
         $totalDistM += $d;
-
-        if ($a['ele'] !== null && $b['ele'] !== null) {
-            $diff = $b['ele'] - $a['ele'];
-            if ($diff > 0) $ascentM += $diff;
-            else $descentM += -$diff;
-        }
 
         // Instantaneous speed: prefer device-recorded value, fall back to derived
         $v = null;

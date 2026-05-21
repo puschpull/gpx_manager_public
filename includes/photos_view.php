@@ -36,6 +36,28 @@ $_isAdmin = !empty($_SESSION['is_admin']);
     </p>
 </section>
 
+<?php if (!empty($filterTrack)): ?>
+<!-- Banner: fotky jedné trasy -->
+<section class="mx-auto max-w-7xl px-4 sm:px-6 mt-4">
+    <div class="card-outdoor p-4 flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-terracotta-500">
+        <div class="text-sm">
+            <div class="text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60">
+                <?= htmlspecialchars(t('photos_filter_label', 'Filtr')) ?>
+            </div>
+            <div class="mt-0.5 text-base font-semibold text-forest-700 dark:text-sand-100">
+                🗺 <?= htmlspecialchars(t('photos_filter_track', 'Fotky trasy')) ?>:
+                <a href="detail.php?id=<?= (int)$filterTrack['id'] ?>" class="hover:text-terracotta-500">
+                    <?= h($filterTrack['track_name'] ?: $filterTrack['filename']) ?>
+                </a>
+            </div>
+        </div>
+        <a href="photos.php" class="btn-outdoor btn-outdoor-ghost shrink-0">
+            ← <?= htmlspecialchars(t('photos_filter_clear', 'Zobrazit všechny fotky')) ?>
+        </a>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- Statistiky -->
 <section class="mx-auto max-w-7xl px-4 sm:px-6 mt-6">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -84,19 +106,25 @@ $_isAdmin = !empty($_SESSION['is_admin']);
 
 <!-- Záložky -->
 <?php
-$activeTab = $_GET['tab'] ?? ($_isAdmin ? 'upload' : 'gallery');
+$activeTab = $_GET['tab'] ?? (($_isAdmin && empty($filterTrack)) ? 'upload' : 'gallery');
 if (!in_array($activeTab, ['upload','gallery','unassigned','timeline'])) {
-    $activeTab = $_isAdmin ? 'upload' : 'gallery';
+    $activeTab = ($_isAdmin && empty($filterTrack)) ? 'upload' : 'gallery';
 }
 if (!$_isAdmin && $activeTab === 'upload') {
+    $activeTab = 'gallery';
+}
+// V režimu „fotky jedné trasy" nemají záložky Nahrát / Nepřiřazené smysl.
+if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     $activeTab = 'gallery';
 }
 ?>
 <div class="photos-tabs">
     <?php if ($_isAdmin): ?>
+    <?php if (empty($filterTrack)): ?>
     <button class="photos-tab <?= $activeTab === 'upload'     ? 'active' : '' ?>" data-tab="upload">⬆ <?= htmlspecialchars(t('photos_tab_upload', 'Nahrát fotky')) ?></button>
+    <?php endif; ?>
     <button class="photos-tab <?= $activeTab === 'gallery'    ? 'active' : '' ?>" data-tab="gallery">🖼 <?= htmlspecialchars(t('photos_tab_manage', 'Správa')) ?> (<?= $totalCount ?>)</button>
-    <?php if ($unassigned > 0): ?>
+    <?php if (empty($filterTrack) && $unassigned > 0): ?>
     <button class="photos-tab <?= $activeTab === 'unassigned' ? 'active' : '' ?>" data-tab="unassigned">⚠ <?= htmlspecialchars(t('photos_tab_unassigned', 'Nepřiřazené')) ?> (<?= $unassigned ?>)</button>
     <?php endif; ?>
     <?php else: ?>
@@ -129,6 +157,7 @@ if (!$_isAdmin && $activeTab === 'upload') {
     <?php
     $pgUrl = fn(int $p) => '?' . http_build_query(array_merge($_GET, ['page' => $p, 'per_page' => $galleryPerPage, 'tab' => 'gallery']));
     ?>
+    <?php if (empty($filterTrack)): ?>
     <div class="gallery-pager">
         <?php if ($galleryPage > 1): ?>
             <a class="btn" href="<?= h($pgUrl(1)) ?>">« <?= htmlspecialchars(t('photos_pager_first', 'První')) ?></a>
@@ -162,6 +191,7 @@ if (!$_isAdmin && $activeTab === 'upload') {
             <?php endforeach; ?>
         </select>
     </div>
+    <?php endif; ?>
 
     <?php foreach ($groupedForDisplay as $grp): ?>
     <div class="track-section" id="track-section-<?= (int)($grp['track_id'] ?? 0) ?>">

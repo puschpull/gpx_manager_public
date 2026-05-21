@@ -16,7 +16,7 @@ body {
 /* ====== HLAVNÍ LAYOUT — SIDEBAR + MAIN ====== */
 .index-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 228px 1fr;
     gap: 0 16px;
     align-items: start;
 }
@@ -142,6 +142,12 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
+}
+
+/* U výběru data (datetime-local) jsou inputy širší — stack od/do pod sebe,
+   aby byl druhý kalendář v popoveru viditelný i v užším sidebaru. */
+.sidebar-range:has(input[type="datetime-local"]) {
+    grid-template-columns: 1fr;
 }
 
 .sidebar-range label {

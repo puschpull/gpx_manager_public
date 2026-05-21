@@ -18,6 +18,11 @@ const PHOTO_AUTO_ASSIGN_RADIUS_M = 500;
 // GPX speed below which a point is considered stationary (m/s) — see gpx_parser.php
 const MOVING_THRESHOLD_MS = 0.5;
 
+// GPX elevation noise band (m) — see gpx_parser.php.
+// Změny nadmořské výšky menší než tato mez se považují za GPS šum a do
+// stoupání/klesání se nezapočítají; trvalé převýšení se akumuluje.
+const GPX_ELEVATION_NOISE_M = 1.0;
+
 // Auto-detect activity_type = 'Auto' threshold (km/h, max speed) — see activity.php
 const ACTIVITY_AUTO_THRESHOLD_KMH = 80;
 
