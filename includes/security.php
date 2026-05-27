@@ -91,7 +91,7 @@ function send_security_headers(): void {
          . "https://*.tile.openstreetmap.org https://*.tile.opentopomap.org "
          . "https://server.arcgisonline.com https://api.mapy.com "
          . "https://*.tile.thunderforest.com https://tiles.mapillary.com "
-         . "https://api.open-meteo.com; "
+         . "https://api.open-meteo.com https://archive-api.open-meteo.com; "
          . "frame-ancestors 'none'; "
          . "base-uri 'self'; "
          . "form-action 'self';";

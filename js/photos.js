@@ -74,18 +74,34 @@ if (dropzone && fileInput && progress) {
     });
 }
 
-const UPLOAD_BATCH = 100;
+// Dynamické dávkování: nová dávka začne, jakmile by aktuální překročila
+// MAX_BYTES nebo MAX_FILES. Hodnoty jsou bezpečné i pro hosting s přísnými
+// PHP limity (post_max_size=8M, max_file_uploads=20).
+const UPLOAD_MAX_FILES = 8;
+const UPLOAD_MAX_BYTES = 5 * 1024 * 1024;   // ~5 MB / dávka
 
 async function uploadFiles(files) {
     const fileArr = Array.from(files);
     const total   = fileArr.length;
     const hasZip  = fileArr.some(f => f.name.toLowerCase().endsWith('.zip'));
 
-    // Rozdělení do dávek po UPLOAD_BATCH
+    // Rozdělení do dávek podle velikosti i počtu souborů.
     const batches = [];
-    for (let i = 0; i < fileArr.length; i += UPLOAD_BATCH) {
-        batches.push(fileArr.slice(i, i + UPLOAD_BATCH));
+    let curBatch  = [];
+    let curBytes  = 0;
+    for (const f of fileArr) {
+        const fSize = f.size || 0;
+        const wouldOverflow = curBatch.length > 0 &&
+            (curBatch.length >= UPLOAD_MAX_FILES || curBytes + fSize > UPLOAD_MAX_BYTES);
+        if (wouldOverflow) {
+            batches.push(curBatch);
+            curBatch = [];
+            curBytes = 0;
+        }
+        curBatch.push(f);
+        curBytes += fSize;
     }
+    if (curBatch.length > 0) batches.push(curBatch);
 
     // Progress bar UI
     const statusEl = document.createElement('div');
