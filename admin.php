@@ -75,10 +75,31 @@ $actStmt->execute($activityCats);
 $withActivity = (int)$actStmt->fetchColumn();
 $withoutActivity = $totalTracks - $withActivity;
 
-// Náhledy
+// Náhledy — počítáme trasy, kterým reálně chybí PNG náhled.
+// (Dříve: $totalTracks - počet .png ve složce → mohlo jít do záporu kvůli
+//  osiřelým náhledům po smazaných trasách.)
 $thumbDir = __DIR__ . '/uploads/thumbs/';
-$thumbCount = is_dir($thumbDir) ? count(glob($thumbDir . '*.png')) : 0;
-$withoutThumbs = $totalTracks - $thumbCount;
+$withoutThumbs = 0;
+$orphanThumbs  = 0;
+if (is_dir($thumbDir)) {
+    $trackFilenames = $pdo->query("SELECT filename FROM tracks")->fetchAll(PDO::FETCH_COLUMN);
+    $expectedThumbs = [];
+    foreach ($trackFilenames as $fn) {
+        $thumbName = pathinfo((string)$fn, PATHINFO_FILENAME) . '.png';
+        $expectedThumbs[$thumbName] = true;
+        if (!is_file($thumbDir . $thumbName)) {
+            $withoutThumbs++;
+        }
+    }
+    // Osiřelé náhledy: PNG ve složce, kterým neodpovídá žádná trasa.
+    foreach (glob($thumbDir . '*.png') as $png) {
+        if (!isset($expectedThumbs[basename($png)])) {
+            $orphanThumbs++;
+        }
+    }
+} else {
+    $withoutThumbs = $totalTracks;
+}
 
 // Velikost uploads
 $uploadsSize = 0;
@@ -292,7 +313,7 @@ require __DIR__ . '/includes/layout_header.php';
                 <a href="rebuild_thumbs.php">
                     <span><?= t('tool_rebuild_thumbs') ?></span>
                 </a>
-                <div class="tool-desc"><?= t('desc_rebuild_thumbs') ?><?= $withoutThumbs > 0 ? " — {$withoutThumbs} ×" : '' ?></div>
+                <div class="tool-desc"><?= t('desc_rebuild_thumbs') ?><?= $withoutThumbs > 0 ? " — {$withoutThumbs} ×" : '' ?><?= $orphanThumbs > 0 ? " · {$orphanThumbs} osiřelých náhledů" : '' ?></div>
             </li>
         </ul>
     </div>
@@ -318,6 +339,12 @@ require __DIR__ . '/includes/layout_header.php';
                     <span><?= t('tool_heatmap') ?></span>
                 </a>
                 <div class="tool-desc"><?= t('desc_heatmap') ?></div>
+            </li>
+            <li>
+                <a href="photo_heatmap.php">
+                    <span><?= t('tool_photo_heatmap', '📸 Foto-heatmapa') ?></span>
+                </a>
+                <div class="tool-desc"><?= t('desc_photo_heatmap', 'Hustota fotografií na mapě, při přiblížení jednotlivé fotky') ?></div>
             </li>
             <li>
                 <a href="map_search.php">
@@ -393,7 +420,7 @@ $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩
     'sk'=>'🇸🇰 Slovenčina','es'=>'🇪🇸 Español','fr'=>'🇫🇷 Français',
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
 $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
-    'heatmap'=>'🔥 Heatmapa','map_search'=>'🗺️ Hledat na mapě',
+    'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','map_search'=>'🗺️ Hledat na mapě',
     'nearby'=>'📍 Nejbližší trasy','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení',
     'photos'=>'📸 Fotografie (jen prohlížení)'];

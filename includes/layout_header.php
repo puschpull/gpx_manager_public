@@ -157,6 +157,13 @@ if (!function_exists('t')) {
                 ['calendar.php', 'calendar',     t('nav_calendar', 'Kalendář')],
                 ['heatmap.php',  'flame',        t('nav_heatmap',  'Heatmapa')],
             ];
+            // Foto-heatmapa — v menu jen pokud je viditelná (admin vždy, návštěvník dle konfigurace)
+            $_visPages = function_exists('get_app_config')
+                ? (array)get_app_config('visible_pages', function_exists('all_pages') ? all_pages() : [])
+                : [];
+            if ($isAdmin || in_array('photo_heatmap', $_visPages, true)) {
+                $navItems[] = ['photo_heatmap.php', 'camera', t('nav_photo_heatmap', 'Foto-heatmapa')];
+            }
             foreach ($navItems as [$href, $icon, $label]):
                 $active = ($currentScript === $href);
             ?>

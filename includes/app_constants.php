@@ -30,7 +30,7 @@ function all_langs(): array {
  * Toto je jediné místo, kde se tento seznam definuje.
  */
 function all_pages(): array {
-    return ['stats', 'calendar', 'heatmap', 'map_search', 'nearby', 'filter', 'compare', 'settings'];
+    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'filter', 'compare', 'settings'];
 }
 
 /**
