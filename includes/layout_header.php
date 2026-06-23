@@ -164,6 +164,9 @@ if (!function_exists('t')) {
             if ($isAdmin || in_array('photo_heatmap', $_visPages, true)) {
                 $navItems[] = ['photo_heatmap.php', 'camera', t('nav_photo_heatmap', 'Foto-heatmapa')];
             }
+            if ($isAdmin || in_array('virtual_tracks', $_visPages, true)) {
+                $navItems[] = ['virtual_tracks.php', 'route', t('nav_virtual_tracks', 'Virtuální trasy')];
+            }
             foreach ($navItems as [$href, $icon, $label]):
                 $active = ($currentScript === $href);
             ?>

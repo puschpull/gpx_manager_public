@@ -51,15 +51,18 @@ function load_photos_page_data(\PDO $pdo): array
     $statsRow = $pdo->query("
         SELECT COUNT(*) AS total,
                SUM(lat IS NOT NULL) AS with_gps,
-               SUM(track_id IS NOT NULL) AS with_track
+               SUM(track_id IS NOT NULL) AS with_track,
+               SUM(virtual_track_id IS NOT NULL) AS with_virtual
         FROM track_photos
         $statsWhere
     ")->fetch(\PDO::FETCH_ASSOC);
 
-    $totalCount = (int)$statsRow['total'];
-    $withGps    = (int)$statsRow['with_gps'];
-    $withTrack  = (int)$statsRow['with_track'];
-    $unassigned = $totalCount - $withTrack;
+    $totalCount  = (int)$statsRow['total'];
+    $withGps     = (int)$statsRow['with_gps'];
+    $withTrack   = (int)$statsRow['with_track'];
+    $withVirtual = (int)$statsRow['with_virtual'];
+    // Nepřiřazené = bez GPX trasy I bez virtuální trasy
+    $unassigned  = $totalCount - $withTrack - $withVirtual;
 
     // --- Gallery pagination (vypnuté v single-track režimu) ---
     $GALLERY_PER_PAGE_OPTIONS = [50, 100, 250, 500];
@@ -69,7 +72,12 @@ function load_photos_page_data(\PDO $pdo): array
     }
     $galleryPage = max(1, (int)($_GET['page'] ?? 1));
 
+    // Galerie „Správa" zobrazuje jen GPX trasy + skutečně nepřiřazené —
+    // fotky ve virtuální trase mají vlastní záložku, sem nepatří.
     $groupsWhere = $buildWhere('p');
+    $groupsWhere = $groupsWhere === ''
+        ? 'WHERE p.virtual_track_id IS NULL'
+        : $groupsWhere . ' AND p.virtual_track_id IS NULL';
 
     if ($filterTrack) {
         // Single-track režim: jedna skupina, žádné stránkování.
@@ -142,7 +150,7 @@ function load_photos_page_data(\PDO $pdo): array
                 $params   = $nonNullIds;
             }
             if ($hasNullGroup) {
-                $parts[] = 'p.track_id IS NULL';
+                $parts[] = '(p.track_id IS NULL AND p.virtual_track_id IS NULL)';
             }
 
             $visibleCond = $isAdmin ? '' : 'AND (p.visible IS NULL OR p.visible = 1)';
@@ -162,15 +170,46 @@ function load_photos_page_data(\PDO $pdo): array
     }
 
     // --- Unassigned photos (v single-track režimu irelevantní) ---
+    // Skutečně nepřiřazené = bez GPX trasy I bez virtuální trasy.
     $unassignedPhotos = [];
     if (!$filterTrack && $unassigned > 0) {
         $unassignedPhotos = $pdo->query("
             SELECT p.id, p.filename, p.orig_name, p.lat, p.lon, p.taken_at, p.track_id
             FROM track_photos p
-            WHERE p.track_id IS NULL
+            WHERE p.track_id IS NULL AND p.virtual_track_id IS NULL
             ORDER BY p.taken_at DESC, p.id DESC
             LIMIT 500
         ")->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    // --- Virtuální trasy (samostatná záložka) — seskupené fotky ---
+    $virtualGroups = [];
+    if (!$filterTrack && $withVirtual > 0) {
+        $visV = $isAdmin ? '' : 'AND (p.visible IS NULL OR p.visible = 1)';
+        $vrows = $pdo->query("
+            SELECT p.id, p.filename, p.orig_name, p.lat, p.lon, p.taken_at, p.caption,
+                   p.virtual_track_id,
+                   v.name AS vt_name, v.date_start AS vt_date, v.photo_count AS vt_count,
+                   v.distance_km AS vt_dist
+            FROM track_photos p
+            JOIN virtual_tracks v ON v.id = p.virtual_track_id
+            WHERE p.virtual_track_id IS NOT NULL $visV
+            ORDER BY v.date_start DESC, v.id DESC, p.taken_at ASC, p.id ASC
+        ")->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($vrows as $r) {
+            $key = (int)$r['virtual_track_id'];
+            if (!isset($virtualGroups[$key])) {
+                $virtualGroups[$key] = [
+                    'id'          => $key,
+                    'name'        => $r['vt_name'],
+                    'date_start'  => $r['vt_date'],
+                    'photo_count' => (int)$r['vt_count'],
+                    'distance_km' => $r['vt_dist'],
+                    'photos'      => [],
+                ];
+            }
+            $virtualGroups[$key]['photos'][] = $r;
+        }
     }
 
     // Tracks for assign select
@@ -228,7 +267,9 @@ function load_photos_page_data(\PDO $pdo): array
         'totalCount'              => $totalCount,
         'withGps'                 => $withGps,
         'withTrack'               => $withTrack,
+        'withVirtual'             => $withVirtual,
         'unassigned'              => $unassigned,
+        'virtualGroups'           => $virtualGroups,
         'GALLERY_PER_PAGE_OPTIONS'=> $GALLERY_PER_PAGE_OPTIONS,
         'galleryPerPage'          => $galleryPerPage,
         'galleryPage'             => $galleryPage,

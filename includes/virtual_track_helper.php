@@ -1,0 +1,193 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * virtual_track_helper.php — shlukování nepřiřazených fotek do virtuálních tras.
+ *
+ * Virtuální trasa = trasa tvořená body z GPS fotek (ne GPX). Fotky se shluknou
+ * do „výletů" podle času i polohy; z každého shluku vznikne virtuální trasa.
+ *
+ * Znovupoužívá haversine() a GPX_ELEVATION_NOISE_M.
+ */
+
+require_once __DIR__ . '/gpx_parser.php';   // haversine()
+require_once __DIR__ . '/constants.php';    // GPX_ELEVATION_NOISE_M
+
+/**
+ * Vrátí nepřiřazené fotky vhodné pro tvorbu virtuálních tras
+ * (bez GPX trasy i bez virtuální trasy, s GPS i časem), seřazené taken_at ASC.
+ *
+ * @return array<int,array<string,mixed>>
+ */
+function vt_fetch_candidates(\PDO $pdo): array
+{
+    return $pdo->query("
+        SELECT id, lat, lon, altitude, taken_at, filename, orig_name, caption
+        FROM track_photos
+        WHERE track_id IS NULL AND virtual_track_id IS NULL
+          AND lat IS NOT NULL AND lon IS NOT NULL AND taken_at IS NOT NULL
+        ORDER BY taken_at ASC, id ASC
+    ")->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+/**
+ * Shlukne fotky do výletů podle času i vzdálenosti.
+ *
+ * Nový shluk začne, když je vůči předchozí fotce:
+ *   - časová mezera > $gapHours hodin, NEBO
+ *   - vzdálenost > $gapKm km (velký skok v poloze).
+ * Shluky s méně než $minPhotos fotkami se vrátí zvlášť jako „rejected".
+ *
+ * @param array $photos    fotky seřazené taken_at ASC (s klíči lat, lon, taken_at)
+ * @return array{clusters: array<int,array>, rejected: array<int,array>}
+ */
+function vt_cluster_photos(array $photos, float $gapHours, float $gapKm, int $minPhotos): array
+{
+    $clusters = [];
+    $current  = [];
+    $prev     = null;
+
+    foreach ($photos as $p) {
+        if ($prev !== null) {
+            $dtHours = (strtotime((string)$p['taken_at']) - strtotime((string)$prev['taken_at'])) / 3600.0;
+            $distKm  = haversine((float)$prev['lat'], (float)$prev['lon'], (float)$p['lat'], (float)$p['lon']) / 1000.0;
+            if ($dtHours > $gapHours || $distKm > $gapKm) {
+                $clusters[] = $current;
+                $current = [];
+            }
+        }
+        $current[] = $p;
+        $prev = $p;
+    }
+    if ($current) {
+        $clusters[] = $current;
+    }
+
+    $accepted = [];
+    $rejected = [];
+    foreach ($clusters as $c) {
+        if (count($c) >= $minPhotos) {
+            $accepted[] = $c;
+        } else {
+            $rejected = array_merge($rejected, $c);
+        }
+    }
+    return ['clusters' => $accepted, 'rejected' => $rejected];
+}
+
+/**
+ * Spočítá statistiky virtuální trasy z bodů shluku.
+ * distance_km je přibližná (vzdušná čára mezi fotkami). ascent/descent z altitude
+ * s hysterezí GPX_ELEVATION_NOISE_M, jen pokud altitude existuje (jinak null).
+ *
+ * @param array $clusterPhotos fotky seřazené taken_at ASC
+ * @return array<string,mixed>
+ */
+function vt_compute_stats(array $clusterPhotos): array
+{
+    $n = count($clusterPhotos);
+    $lats = [];
+    $lons = [];
+    $distM = 0.0;
+    $ascent = 0.0;
+    $descent = 0.0;
+    $eleRef = null;
+    $prev = null;
+
+    foreach ($clusterPhotos as $p) {
+        $lat = (float)$p['lat'];
+        $lon = (float)$p['lon'];
+        $lats[] = $lat;
+        $lons[] = $lon;
+
+        if ($prev !== null) {
+            $distM += haversine((float)$prev['lat'], (float)$prev['lon'], $lat, $lon);
+        }
+
+        // ascent/descent z altitude s hysterezí
+        if (isset($p['altitude']) && $p['altitude'] !== null && $p['altitude'] !== '') {
+            $ele = (float)$p['altitude'];
+            if ($eleRef === null) {
+                $eleRef = $ele;
+            } else {
+                $d = $ele - $eleRef;
+                if ($d >= GPX_ELEVATION_NOISE_M) {
+                    $ascent += $d;
+                    $eleRef = $ele;
+                } elseif ($d <= -GPX_ELEVATION_NOISE_M) {
+                    $descent += -$d;
+                    $eleRef = $ele;
+                }
+            }
+        }
+        $prev = $p;
+    }
+
+    $minLat = min($lats);
+    $maxLat = max($lats);
+    $minLon = min($lons);
+    $maxLon = max($lons);
+    $dateStart = (string)$clusterPhotos[0]['taken_at'];
+    $dateEnd   = (string)$clusterPhotos[$n - 1]['taken_at'];
+    $hasAlt    = $eleRef !== null;
+
+    $name = 'Virtuální trasa — ' . date('j. n. Y', (int)strtotime($dateStart)) . " ({$n} fotek)";
+
+    return [
+        'name'         => $name,
+        'date_start'   => $dateStart,
+        'date_end'     => $dateEnd,
+        'photo_count'  => $n,
+        'distance_km'  => round($distM / 1000.0, 2),
+        'ascent'       => $hasAlt ? round($ascent, 0) : null,
+        'descent'      => $hasAlt ? round($descent, 0) : null,
+        'bounds'       => json_encode([
+            'minlat' => $minLat, 'maxlat' => $maxLat,
+            'minlon' => $minLon, 'maxlon' => $maxLon,
+        ], JSON_UNESCAPED_SLASHES),
+        'centroid_lat' => ($minLat + $maxLat) / 2.0,
+        'centroid_lon' => ($minLon + $maxLon) / 2.0,
+    ];
+}
+
+/**
+ * Přepočítá a uloží statistiky virtuální trasy z jejích fotek
+ * (po posunu/úpravě polohy fotky). Název (name) se NEMĚNÍ.
+ * Vrátí přepočítané statistiky, nebo null pokud trasa nemá body.
+ *
+ * @return array<string,mixed>|null
+ */
+function vt_recompute_and_save(\PDO $pdo, int $vtId): ?array
+{
+    $stmt = $pdo->prepare("
+        SELECT id, lat, lon, altitude, taken_at
+        FROM track_photos
+        WHERE virtual_track_id = ? AND lat IS NOT NULL AND lon IS NOT NULL
+        ORDER BY taken_at ASC, id ASC
+    ");
+    $stmt->execute([$vtId]);
+    $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    if (!$rows) {
+        return null;
+    }
+    $s = vt_compute_stats($rows);
+    $pdo->prepare("
+        UPDATE virtual_tracks SET
+            date_start = :date_start, date_end = :date_end, photo_count = :photo_count,
+            distance_km = :distance_km, ascent = :ascent, descent = :descent,
+            bounds = :bounds, centroid_lat = :centroid_lat, centroid_lon = :centroid_lon
+        WHERE id = :id
+    ")->execute([
+        ':date_start'   => $s['date_start'],
+        ':date_end'     => $s['date_end'],
+        ':photo_count'  => $s['photo_count'],
+        ':distance_km'  => $s['distance_km'],
+        ':ascent'       => $s['ascent'],
+        ':descent'      => $s['descent'],
+        ':bounds'       => $s['bounds'],
+        ':centroid_lat' => $s['centroid_lat'],
+        ':centroid_lon' => $s['centroid_lon'],
+        ':id'           => $vtId,
+    ]);
+    return $s;
+}

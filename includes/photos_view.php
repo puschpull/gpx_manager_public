@@ -107,7 +107,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
 <!-- Záložky -->
 <?php
 $activeTab = $_GET['tab'] ?? (($_isAdmin && empty($filterTrack)) ? 'upload' : 'gallery');
-if (!in_array($activeTab, ['upload','gallery','unassigned','timeline'])) {
+if (!in_array($activeTab, ['upload','gallery','unassigned','virtual','timeline'])) {
     $activeTab = ($_isAdmin && empty($filterTrack)) ? 'upload' : 'gallery';
 }
 if (!$_isAdmin && $activeTab === 'upload') {
@@ -129,6 +129,9 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     <?php endif; ?>
     <?php else: ?>
     <button class="photos-tab <?= $activeTab === 'gallery'    ? 'active' : '' ?>" data-tab="gallery">🖼 <?= htmlspecialchars(t('photos_tab_gallery', 'Fotografie')) ?> (<?= $totalCount ?>)</button>
+    <?php endif; ?>
+    <?php if (empty($filterTrack) && !empty($virtualGroups)): ?>
+    <button class="photos-tab <?= $activeTab === 'virtual' ? 'active' : '' ?>" data-tab="virtual">🧭 <?= htmlspecialchars(t('photos_tab_virtual', 'Virtuální trasy')) ?> (<?= count($virtualGroups) ?>)</button>
     <?php endif; ?>
     <?php if (!empty($timelinePhotos)): ?>
     <button class="photos-tab <?= $activeTab === 'timeline'   ? 'active' : '' ?>" data-tab="timeline">📅 <?= htmlspecialchars(t('photos_tab_timeline', 'Časová osa')) ?> (<?= count($timelinePhotos) ?>)</button>
@@ -311,6 +314,12 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
         Přiřadit je můžete ručně tlačítkem ✏.
         <?php if ($unassigned > 500): ?><strong>Zobrazeno prvních 500.</strong><?php endif; ?>
     </p>
+    <?php if ($_isAdmin): ?>
+    <p style="margin-bottom:14px;">
+        <a href="virtual_tracks.php" class="btn-outdoor btn-outdoor-primary">🧭 Vytvořit virtuální trasy z nepřiřazených</a>
+        <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">Chytře seskupí fotky s GPS a časem do výletů.</span>
+    </p>
+    <?php endif; ?>
     <div class="photo-grid">
         <?php foreach ($unassignedPhotos as $p): ?>
         <div class="photo-card" data-id="<?= (int)$p['id'] ?>">
@@ -342,6 +351,44 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
         </div>
         <?php endforeach; ?>
     </div>
+</div>
+<?php endif; ?>
+
+<!-- Záložka: Virtuální trasy (fotky bez GPX, seskupené do virtuálních tras) -->
+<?php if (!empty($virtualGroups)): ?>
+<div class="photos-tab-content" id="tab-virtual">
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+        Fotky poskládané do <strong>virtuálních tras</strong> (z výšlapů bez GPX záznamu).
+        Jsou oddělené od fotek u GPX tras. Správa na stránce
+        <a href="virtual_tracks.php">🧭 Virtuální trasy</a>.
+    </p>
+    <?php foreach ($virtualGroups as $vg): ?>
+    <div class="track-section" style="border-left:4px solid #e91e63; padding-left:10px;">
+        <div class="track-section-header">
+            🧭 <a href="virtual_track_detail.php?id=<?= (int)$vg['id'] ?>"><?= h($vg['name'] ?: ('Virtuální trasa #' . $vg['id'])) ?></a>
+            <span style="font-size:12px; color:var(--text-muted);">
+                · <?= $vg['date_start'] ? h(date('j. n. Y', strtotime($vg['date_start']))) : '—' ?>
+                · 📸 <?= (int)$vg['photo_count'] ?> · 📏 ≈<?= h(number_format((float)$vg['distance_km'], 2, ',', ' ')) ?> km
+            </span>
+        </div>
+        <div class="photo-grid">
+            <?php foreach ($vg['photos'] as $p): ?>
+            <div class="photo-card" data-id="<?= (int)$p['id'] ?>">
+                <img src="<?= h(photo_thumb_url($p['filename'])) ?>"
+                     data-full-url="<?= h(photo_full_url($p['filename'])) ?>"
+                     data-taken-at="<?= h($p['taken_at'] ?? '') ?>"
+                     alt="<?= h($p['orig_name'] ?? $p['filename']) ?>"
+                     loading="lazy"
+                     onerror="this.style.opacity='.3'">
+                <div class="photo-meta">
+                    <?= h($p['orig_name'] ?? $p['filename']) ?><br>
+                    <?php if ($p['taken_at']): ?>📅 <?= substr($p['taken_at'], 0, 16) ?><?php endif; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endforeach; ?>
 </div>
 <?php endif; ?>
 

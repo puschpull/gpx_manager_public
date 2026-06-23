@@ -347,6 +347,12 @@ require __DIR__ . '/includes/layout_header.php';
                 <div class="tool-desc"><?= t('desc_photo_heatmap', 'Hustota fotografií na mapě, při přiblížení jednotlivé fotky') ?></div>
             </li>
             <li>
+                <a href="virtual_tracks.php">
+                    <span><?= t('tool_virtual_tracks', '🧭 Virtuální trasy') ?></span>
+                </a>
+                <div class="tool-desc"><?= t('desc_virtual_tracks', 'Chytré roztřídění nepřiřazených fotek do tras (z GPS bodů fotek)') ?></div>
+            </li>
+            <li>
                 <a href="map_search.php">
                     <span><?= t('tool_map_search') ?></span>
                 </a>
@@ -420,7 +426,7 @@ $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩
     'sk'=>'🇸🇰 Slovenčina','es'=>'🇪🇸 Español','fr'=>'🇫🇷 Français',
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
 $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
-    'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','map_search'=>'🗺️ Hledat na mapě',
+    'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě',
     'nearby'=>'📍 Nejbližší trasy','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení',
     'photos'=>'📸 Fotografie (jen prohlížení)'];
