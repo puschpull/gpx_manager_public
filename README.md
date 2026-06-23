@@ -6,10 +6,18 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 
 ---
 
+## What's new in v2.1
+
+- **Virtual tracks from photos** — for hikes recorded without a GPX track: unassigned geotagged photos are clustered into trips (by time *and* distance gap) and turned into photo-only routes stored in a separate table. Generator with dry-run preview; detail map with a polyline through the photo points, toggleable thumbnail/red-dot layers, lightbox, and admin drag-to-fix for a bad GPS fix.
+- **Photo heatmap** — density of all geotagged photos on one map, with toggleable heatmap / red-dot / thumbnail overlays.
+- **Single-track photo view** — clicking a track's photo count shows only that track's photos.
+- **Elevation hysteresis** — ascent/descent computed from points ignores sub-threshold GPS jitter.
+- **Fixes** — nearest-track search ranks by the actual nearest track point (not centroid); weather widget CSP for historical tracks; admin buttons on the track detail; size-aware photo upload batching for shared-hosting PHP limits; corrected "missing thumbnail" admin stat.
+
 ## What's new in v2.0
 
 - **Security audit** — 166 findings fixed: XXE prevention, CSRF on all mutating endpoints, path traversal hardening, XSS escaping, SQL injection prevention via prepared statements
-- **Migration system** — 14 numbered migrations, CLI runner (`php migrate.php`)
+- **Migration system** — 15 numbered migrations, CLI runner (`php migrate.php`)
 - **Refactored architecture** — REST API endpoints (`api/`), shared PHP helpers, PSR-12, `declare(strict_types=1)`
 - **Batch photo upload** — up to 100 photos per batch, ZIP archive support (Google Takeout compatible)
 - **Photo import from local folder** — scan server directory, EXIF batch read, auto-assign to tracks by GPS + time
@@ -24,10 +32,12 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 
 - **GPX import** — single files or batch via ZIP archive
 - **Interactive map** for each track with elevation profile
-- **Photos on the track** — GPS EXIF → automatic assignment to track, lightbox gallery, timeline
+- **Photos on the track** — GPS EXIF → automatic assignment to track, lightbox gallery, timeline; per-track photo view
+- **Virtual tracks from photos** — build photo-only routes from unassigned geotagged photos (hikes without a GPX track)
 - **Statistics** — track overview, favourites, categories, difficulty, activity type
 - **Filter & compare** — advanced filtering, side-by-side track comparison on map
-- **Heatmap** and **activity calendar**
+- **Nearest tracks** — click a point on the map to find the closest tracks
+- **Heatmap**, **photo heatmap** and **activity calendar**
 - **Visitor mode** — public view-only access with configurable page visibility
 - **Multilingual UI** — Czech, English, German, Slovak, Spanish, French, Italian, Polish
 - **9 colour themes**

@@ -1,9 +1,135 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 18. května 2026
-  
+  Poslední aktualizace: 23. června 2026
+
 ================================================================================
+
+
+── Květen – červen 2026 ─────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — VIRTUÁLNÍ TRASY Z FOTEK                                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory:  migrations/0015_virtual_tracks.sql,
+                 includes/virtual_track_helper.php,
+                 virtual_tracks.php, virtual_track_detail.php,
+                 api/virtual_tracks/{preview,create,delete,rename,points,move_photo}.php
+  Upravené:      includes/app_constants.php, includes/layout_header.php, admin.php,
+                 includes/photos_data.php, includes/photos_view.php
+
+  Pro fotky z výšlapů, u nichž nebyla zaznamenána GPX trasa. Nepřiřazené
+  fotky s GPS a časem se chytře shluknou do „výletů" podle časové mezery
+  I skoku v poloze a vznikne z nich virtuální trasa (body z fotek, ne
+  GPX), uložená v nové tabulce virtual_tracks. Generátor s nastavitelnými
+  prahy a náhledem (dry-run). Detail: mapa s polyline mezi fotkami, plná
+  sada vrstev, vypínatelné vrstvy „náhledy" a „červené tečky poloh",
+  lightbox; admin může chybně umístěnou fotku přetáhnout myší na správné
+  místo (oprava GPS fixu). Ve správě fotek samostatná záložka — fotky
+  virtuálních tras jsou oddělené od GPX tras i od nepřiřazených.
+  Konfigurovatelná viditelnost, odkaz v menu.
+
+  Migrace 0015 — spusť `php migrate.php` (na webhostingu bez CLI proveď
+  obsah migrations/0015_virtual_tracks.sql ručně v phpMyAdmin/Adminer).
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — FOTO-HEATMAPA                                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nový soubor:  photo_heatmap.php
+  Upravené:     includes/app_constants.php, includes/layout_header.php, admin.php
+
+  Hustota všech geotagovaných fotek na jedné mapě se stejnou sadou vrstev
+  jako ostatní mapy. Tři vypínatelné překryvy: heatmapa hustoty, červené
+  tečky všech fotek (klik → lightbox) a náhledy v aktuálním výřezu při
+  přiblížení. Konfigurovatelná viditelnost, odkaz v menu.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ FUNKCE — FILTR FOTEK NA JEDNU TRASU                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené:  includes/photos_data.php, includes/photos_view.php
+
+  Klik na počet fotek v tabulce tras (photos.php?track_id=X) zobrazí JEN
+  fotky dané trasy — s bannerem a odkazem zpět na všechny fotky.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VYLEPŠENÍ — VÝPOČET PŘEVÝŠENÍ S HYSTEREZÍ                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené:  includes/constants.php (GPX_ELEVATION_NOISE_M = 1.0),
+             includes/gpx_parser.php
+
+  Stoupání/klesání počítané z bodů (GPX bez Garmin TrackStatsExtension)
+  používá hysterezi — drobné změny výšky pod práh se považují za GPS šum
+  a nezapočítají se. Zabraňuje nafouknutí převýšení chvěním GPS.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — NEJBLIŽŠÍ TRASY: ŘAZENÍ PODLE SKUTEČNÉHO NEJBLIŽŠÍHO BODU           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený:  includes/nearby_data.php
+
+  SQL mělo LIMIT 100 bez ORDER BY → v hustých oblastech vracelo náhodných
+  100 tras a opravdu blízké vypadly; vzdálenost se počítala ke STŘEDU
+  trasy, ne k nejbližšímu bodu. Opraveno: řazení podle blízkosti před
+  LIMIT + výpočet skutečného nejbližšího trackpointu u top kandidátů.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — POČASÍ U HISTORICKÝCH TRAS (CSP)                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený:  includes/security.php
+
+  CSP (connect-src) nepovolovala archive-api.open-meteo.com → widget
+  počasí se u tras starších 7 dní tiše blokoval. Doména přidána do CSP.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — ADMIN TLAČÍTKA NA DETAILU TRASY                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený:  detail.php
+
+  Chyběl require_once includes/public_access.php → nestartovala se session
+  a admin tlačítka se nezobrazila ani adminovi. Doplněno.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — UPLOAD VĚTŠÍHO POČTU FOTEK (HTTP 413 / 400)                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený:  js/photos.js
+
+  Pevná dávka 100 fotek překračovala PHP limity hostingu → upload selhal.
+  Nově dynamické dávkování (nová dávka při ~5 MB nebo 8 souborech).
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — STATISTIKA „BEZ NÁHLEDU" V ADMINU                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravený:  admin.php
+
+  „Bez náhledu" mohlo jít do záporu (osiřelé náhledy po smazaných trasách).
+  Nově se počítá z DB (trasy, jimž reálně chybí PNG) + zobrazí se počet
+  osiřelých náhledů u nástroje „Přegenerovat náhledy".
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ÚPRAVY ROZHRANÍ                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Upravené:  css/index.css, includes/detail_view.php
+
+  – Boční filtr (index-legacy) zúžen na 228 px; výběr data od/do pod sebou.
+  – Na detailu trasy přidáno tlačítko „Upravit trasu".
 
 
 ── 18. května 2026 ─────────────────────────────────────────────────────────
