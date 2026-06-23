@@ -44,6 +44,27 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 
 ---
 
+## Using virtual tracks
+
+For photos taken on a hike where no GPX track was recorded, GPX Manager can
+build a photo-only route from the photo locations:
+
+1. **Upload** the photos as usual (Photos → Upload). Photos with no matching
+   GPX track stay **unassigned**.
+2. Open **Virtual tracks** from the menu (admin only).
+3. Set the clustering thresholds — **time gap**, **distance jump**, **min.
+   photos per track** — and click **Preview** (a dry run that writes nothing).
+4. When the proposal looks right, click **Create**. The photos are grouped into
+   virtual tracks (by time *and* distance gap), each stored in a separate table.
+5. On a virtual track's detail map you can **drag** a mis-placed photo (a bad
+   GPS fix) to the correct spot — the position is saved and the distance
+   recomputed.
+
+Virtual-track photos are kept clearly separate from GPX-track photos in the
+photo manager. See the full guide → [instructions/en.md](instructions/en.md).
+
+---
+
 ## Requirements
 
 | Component | Minimum | Recommended |

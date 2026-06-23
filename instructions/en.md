@@ -312,10 +312,12 @@ In the **Settings** menu (admin only) you can enable or disable individual pages
 - Statistics
 - Activity calendar
 - Heatmap
+- Photo heatmap
 - Map search
 - Nearby tracks
 - GPX filter / cleaner
 - Track comparison
+- Virtual tracks
 
 ### Editing Tracks
 
@@ -326,6 +328,29 @@ Clicking on a track in the overview opens the detail page with a map, elevation 
 - Difficulty (1–5)
 - Category
 - Favourite (star)
+
+### Virtual Tracks from Photos
+
+For photos taken on a hike where no GPX track was recorded (e.g. you had no
+GPS device with you). The app builds a "virtual" route from the photo
+locations — stored separately from regular GPX tracks.
+
+1. Upload the photos as usual (**Photos → Upload**). Photos with no matching
+   GPX track stay **unassigned**.
+2. Open **Virtual tracks** from the menu (admin only).
+3. Set the clustering thresholds and click **Preview** (writes nothing):
+   - **Time gap (h)** — a longer pause between photos starts a new trip.
+   - **Distance jump (km)** — a bigger jump between photos starts a new trip
+     (even on the same day).
+   - **Min. photos per track** — clusters with fewer photos are skipped.
+4. When the proposal looks right, click **Create** — the photos are grouped
+   into virtual tracks.
+5. The virtual track detail shows a map with a line through the photo points.
+   As admin you can **drag** a mis-placed photo (bad GPS fix) to the correct
+   spot — the position is saved and the distance recomputed.
+
+In the photo manager, virtual tracks have their own tab, kept separate from
+photos assigned to GPX tracks and from unassigned photos.
 
 ---
 

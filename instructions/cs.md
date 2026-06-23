@@ -312,10 +312,12 @@ V menu **Nastavení** (dostupné jen pro admina) můžeš zapnout nebo vypnout j
 - Statistiky
 - Kalendář aktivit
 - Heatmapa
+- Foto-heatmapa
 - Hledání na mapě
 - Trasy v okolí
 - Filtr / čistič GPX
 - Porovnání tras
+- Virtuální trasy
 
 ### Úprava tras
 
@@ -326,6 +328,27 @@ Po kliknutí na trasu v přehledu se otevře detailní stránka s mapou, výško
 - Obtížnost (1–5)
 - Kategorii
 - Oblíbenou trasu (hvězdička)
+
+### Virtuální trasy z fotek
+
+Pro fotky z výšlapů, u kterých nebyla zaznamenána GPX trasa (např. jsi neměl
+u sebe navigaci). Aplikace z nich poskládá „virtuální" trasu tvořenou polohami
+fotek — uloženou odděleně od běžných GPX tras.
+
+1. Nahraj fotky obvyklým způsobem (**Fotografie → Nahrát**). Fotky, ke kterým
+   se nenajde odpovídající GPX trasa, zůstanou **nepřiřazené**.
+2. Otevři **Virtuální trasy** v menu (jen admin).
+3. Nastav prahy shlukování a klikni **Náhled** (nic nezapíše):
+   - **Časová mezera (h)** — větší pauza mezi fotkami = nový výlet.
+   - **Skok v poloze (km)** — větší skok mezi fotkami = nový výlet (i ve stejný den).
+   - **Min. fotek na trasu** — shluky s méně fotkami se přeskočí.
+4. Když návrh sedí, klikni **Vytvořit** — fotky se seskupí do virtuálních tras.
+5. V detailu virtuální trasy je mapa s linií mezi fotkami. Chybně umístěnou
+   fotku (špatný GPS fix) můžeš jako admin **přetáhnout myší** na správné místo
+   — poloha se uloží a přepočítá se vzdálenost.
+
+Ve správě fotek mají virtuální trasy vlastní záložku, oddělenou od fotek
+přiřazených ke GPX trasám i od nepřiřazených.
 
 ---
 
