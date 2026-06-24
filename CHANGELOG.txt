@@ -9,6 +9,39 @@
 ── 24. června 2026 ─────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  VIRTUÁLNÍ TRASY — ÚSEKY, PROFILY, POROVNÁNÍ, PŘÍSTUP                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory:  api/virtual_tracks/resplit_preview.php,
+                 api/virtual_tracks/resplit_apply.php
+  Upravené:      virtual_tracks.php, virtual_track_detail.php,
+                 includes/virtual_track_helper.php, api/virtual_tracks/route.php
+
+  – Poznámka ve výpisu: v seznamu virtuálních tras se u každé zobrazí i poznámka
+    (max 2 řádky) pro rychlou orientaci, kde trasa je.
+  – Rozdělení trasy na úseky: existující virtuální trasu lze „naživo" rozdělit
+    podle parametrů (časová mezera / skok v poloze / min. fotek) s náhledem a
+    obarvením úseků na mapě. Po potvrzení zůstane původní trasa 1. úsekem (název,
+    poznámka, barva, ⭐) a zbytek vznikne jako nové trasy; malé úseky se přilepí
+    k sousednímu (nic se neztratí). Fce vt_split_photos / vt_fetch_track_photos.
+  – Odhad trasy po cestách — víc profilů a živý náhled: výběr rozšířen o kolo
+    (silnice/terén) a auto (rychlá/nejkratší) vedle pěší turistické a nejkratší;
+    po přepnutí se trasa hned překreslí a ukáže délku i odhad času. Zvolený
+    profil se pamatuje.
+  – Porovnání variant na mapě: vykreslí víc profilů naráz různými barvami se
+    seznamem délka/čas — vidíš, která varianta nejlíp sedí na realitu.
+  – Mód po úsecích: trasu lze rozdělit klikáním na hranice (přichytí se k nejbližší
+    fotce) a každému úseku přiřadit vlastní profil; route.php přijímá rozsah
+    from/to, úseky se spočítají, obarví a sečtou (po úsecích i celkem). Definice
+    úseků se pamatuje (localStorage).
+  – Oddělení přístupu: návštěvník virtuální trasu jen prohlíží (mapa, fotky,
+    galerie, info, poznámka, počasí); veškeré nástroje odhadu trasy (profil,
+    porovnání, úseky) i editace jsou jen pro admina (zápisové endpointy admin +
+    CSRF). Zobrazení virtuálních tras návštěvníkům se zapíná v admin.php →
+    Viditelné stránky pro návštěvníky.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  VIRTUÁLNÍ TRASY — ROZŠÍŘENÍ (náhled, počasí, editace, odhad trasy)           │
 └──────────────────────────────────────────────────────────────────────────────┘
 

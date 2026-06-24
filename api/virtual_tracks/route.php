@@ -30,12 +30,27 @@ ajax_endpoint(function () use ($pdo): array {
     $stmt = $pdo->prepare("
         SELECT lat, lon FROM track_photos
         WHERE virtual_track_id = ? AND lat IS NOT NULL AND lon IS NOT NULL
+          AND (visible IS NULL OR visible = 1)
         ORDER BY taken_at ASC, id ASC
     ");
     $stmt->execute([$vtId]);
     $pts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     if (count($pts) < 2) {
         return ['ok' => false, 'error' => 'Trasa má málo bodů.'];
+    }
+
+    // Volitelný úsek [from..to] (indexy do chronologického pořadí fotek) — mód po úsecích.
+    // Stejné řazení i filtr jako points.php → indexy klienta odpovídají.
+    $from = array_key_exists('from', $_GET) ? (int)$_GET['from'] : null;
+    $to   = array_key_exists('to',   $_GET) ? (int)$_GET['to']   : null;
+    if ($from !== null && $to !== null) {
+        $n    = count($pts);
+        $from = max(0, min($from, $n - 1));
+        $to   = max(0, min($to,   $n - 1));
+        if ($to - $from < 1) {
+            return ['ok' => false, 'error' => 'Úsek má málo bodů.'];
+        }
+        $pts = array_slice($pts, $from, $to - $from + 1);
     }
 
     // Podvzorkování: start + end + max 15 mezibodů (limit Mapy.com).
@@ -52,9 +67,10 @@ ajax_endpoint(function () use ($pdo): array {
         $mids = $picked;
     }
 
-    // Profil: rychlá (foot_fast) vs turistická (foot_hiking)
+    // Profil routingu (Mapy.com routeType). Pěšky / kolo / auto varianty.
     $profile = (string)($_GET['profile'] ?? 'foot_fast');
-    if (!in_array($profile, ['foot_fast', 'foot_hiking'], true)) {
+    $allowedProfiles = ['foot_fast', 'foot_hiking', 'bike_road', 'bike_mountain', 'car_fast', 'car_short'];
+    if (!in_array($profile, $allowedProfiles, true)) {
         $profile = 'foot_fast';
     }
 
@@ -129,6 +145,8 @@ ajax_endpoint(function () use ($pdo): array {
         'length_m'   => $length !== null ? (float)$length : null,
         'duration_s' => $duration !== null ? (float)$duration : null,
         'waypoints'  => count($mids) + 2,
+        'from'       => $from,
+        'to'         => $to,
     ];
 }, ['csrf' => false, 'admin' => false, 'name' => 'virtual_tracks/route']);
 

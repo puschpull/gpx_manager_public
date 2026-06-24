@@ -17,7 +17,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
 
 // Seznam virtuálních tras + počet kandidátů (nepřiřazené fotky s GPS+časem)
 $vtracks = $pdo->query("
-    SELECT id, name, date_start, date_end, photo_count, distance_km, ascent, descent,
+    SELECT id, name, note, date_start, date_end, photo_count, distance_km, ascent, descent,
            centroid_lat, centroid_lon
     FROM virtual_tracks
     ORDER BY date_start DESC, id DESC
@@ -40,6 +40,8 @@ require __DIR__ . '/includes/layout_header.php';
     .vt-gen input[type="number"] { width: 70px; padding: 4px 6px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); color: var(--text-color); }
     .vt-list-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; background: var(--card-bg); }
     .vt-list-item .meta { font-size: 12px; color: var(--text-muted); }
+    .vt-list-item .note { font-size: 13px; color: var(--text-color); opacity: 0.9; margin-top: 4px; line-height: 1.4; max-width: 640px;
+        display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
     .vt-list-item a.name { font-weight: 600; color: var(--text-color); text-decoration: none; }
     .vt-list-item a.name:hover { color: var(--accent-color); }
     .vt-preview-row { padding: 6px 0; border-bottom: 1px dashed var(--border-color); font-size: 13px; }
@@ -132,6 +134,9 @@ require __DIR__ . '/includes/layout_header.php';
                         · 📏 ≈<?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?> km
                         <?php if ($vt['ascent'] !== null): ?> · ↑<?= (int)$vt['ascent'] ?> m<?php endif; ?>
                     </div>
+                    <?php if (!empty($vt['note'])): ?>
+                    <div class="note">📝 <?= nl2br(h($vt['note'])) ?></div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">

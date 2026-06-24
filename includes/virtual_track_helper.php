@@ -79,6 +79,25 @@ function vt_fetch_candidates(\PDO $pdo): array
 }
 
 /**
+ * Vrátí fotky JEDNÉ virtuální trasy (s GPS i časem), seřazené taken_at ASC —
+ * vstup pro re-split (rozdělení existující trasy na úseky).
+ *
+ * @return array<int,array<string,mixed>>
+ */
+function vt_fetch_track_photos(\PDO $pdo, int $vtId): array
+{
+    $stmt = $pdo->prepare("
+        SELECT id, lat, lon, altitude, taken_at
+        FROM track_photos
+        WHERE virtual_track_id = :vt
+          AND lat IS NOT NULL AND lon IS NOT NULL AND taken_at IS NOT NULL
+        ORDER BY taken_at ASC, id ASC
+    ");
+    $stmt->execute([':vt' => $vtId]);
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+}
+
+/**
  * Shlukne fotky do výletů podle času i vzdálenosti.
  *
  * Nový shluk začne, když je vůči předchozí fotce:
@@ -121,6 +140,81 @@ function vt_cluster_photos(array $photos, float $gapHours, float $gapKm, int $mi
         }
     }
     return ['clusters' => $accepted, 'rejected' => $rejected];
+}
+
+/**
+ * Rozdělí fotky JEDNÉ trasy na úseky podle času i polohy (stejné zlomy jako
+ * vt_cluster_photos), ale úseky s méně než $minPhotos fotkami se NEZAHODÍ —
+ * přilepí se k časově nejbližšímu sousednímu úseku (žádná fotka se neztratí).
+ *
+ * Používá se pro „online" doladění už vytvořené virtuální trasy: vstupní fotky
+ * jsou souvislá časová řada, takže výsledkem je vždy 1..N úseků pokrývajících
+ * úplně všechny vstupní fotky.
+ *
+ * @param array $photos seřazené taken_at ASC (klíče lat, lon, taken_at)
+ * @return array<int,array<int,array>> úseky (každý aspoň 1 fotka)
+ */
+function vt_split_photos(array $photos, float $gapHours, float $gapKm, int $minPhotos): array
+{
+    if (count($photos) <= 1) {
+        return $photos ? [array_values($photos)] : [];
+    }
+
+    // 1) Hrubé úseky podle zlomů (čas NEBO skok v poloze) — nic se nezahazuje.
+    $segments = [];
+    $current  = [];
+    $prev     = null;
+    foreach ($photos as $p) {
+        if ($prev !== null) {
+            $dtHours = (strtotime((string)$p['taken_at']) - strtotime((string)$prev['taken_at'])) / 3600.0;
+            $distKm  = haversine((float)$prev['lat'], (float)$prev['lon'], (float)$p['lat'], (float)$p['lon']) / 1000.0;
+            if ($dtHours > $gapHours || $distKm > $gapKm) {
+                $segments[] = $current;
+                $current = [];
+            }
+        }
+        $current[] = $p;
+        $prev = $p;
+    }
+    if ($current) {
+        $segments[] = $current;
+    }
+
+    // 2) Malé úseky (< minPhotos) přilepit k časově nejbližšímu sousedovi.
+    //    Každá iterace odebere jeden úsek → smyčka vždy skončí.
+    $lastTaken  = static fn(array $seg): int => (int)strtotime((string)$seg[count($seg) - 1]['taken_at']);
+    $firstTaken = static fn(array $seg): int => (int)strtotime((string)$seg[0]['taken_at']);
+
+    while (count($segments) > 1 && $minPhotos > 1) {
+        $smallIdx = -1;
+        foreach ($segments as $i => $seg) {
+            if (count($seg) < $minPhotos) { $smallIdx = $i; break; }
+        }
+        if ($smallIdx === -1) {
+            break; // všechny úseky jsou dost velké
+        }
+
+        // soused: jediný možný (kraj), jinak časově bližší
+        if ($smallIdx === 0) {
+            $target = 1;
+        } elseif ($smallIdx === count($segments) - 1) {
+            $target = $smallIdx - 1;
+        } else {
+            $gapPrev = $firstTaken($segments[$smallIdx]) - $lastTaken($segments[$smallIdx - 1]);
+            $gapNext = $firstTaken($segments[$smallIdx + 1]) - $lastTaken($segments[$smallIdx]);
+            $target  = ($gapPrev <= $gapNext) ? $smallIdx - 1 : $smallIdx + 1;
+        }
+
+        // spojit v časovém pořadí (dřívější úsek první)
+        if ($target < $smallIdx) {
+            $segments[$target] = array_merge($segments[$target], $segments[$smallIdx]);
+        } else {
+            $segments[$target] = array_merge($segments[$smallIdx], $segments[$target]);
+        }
+        array_splice($segments, $smallIdx, 1);
+    }
+
+    return $segments;
 }
 
 /**
