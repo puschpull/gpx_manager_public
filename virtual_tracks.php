@@ -5,6 +5,7 @@
 require_once __DIR__ . '/includes/public_access.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/includes/virtual_track_helper.php';
 check_page_access('virtual_tracks');
 
 init_theme_cookie();
@@ -109,14 +110,28 @@ require __DIR__ . '/includes/layout_header.php';
         <p class="vt-empty">Zatím žádné virtuální trasy.<?= $_isAdmin ? ' Vytvoř je z nepřiřazených fotek výše.' : '' ?></p>
     <?php else: ?>
         <?php foreach ($vtracks as $vt): ?>
+        <?php
+        // Náhled mapy — lazy generování chybějícího (jen admin, jednorázově)
+        $vtThumb = vt_thumb_path((int)$vt['id']);
+        if (!is_file($vtThumb) && $_isAdmin) { @vt_generate_thumb($pdo, (int)$vt['id']); }
+        $vtThumbUrl = is_file($vtThumb) ? ('uploads/vt_thumbs/' . (int)$vt['id'] . '.png?t=' . filemtime($vtThumb)) : null;
+        ?>
         <div class="vt-list-item" id="vt-row-<?= (int)$vt['id'] ?>">
-            <div>
-                <a class="name" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>"><?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?></a>
-                <div class="meta">
-                    📅 <?= $vt['date_start'] ? h(date('j. n. Y', strtotime($vt['date_start']))) : '—' ?>
-                    · 📸 <?= (int)$vt['photo_count'] ?> fotek
-                    · 📏 ≈<?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?> km
-                    <?php if ($vt['ascent'] !== null): ?> · ↑<?= (int)$vt['ascent'] ?> m<?php endif; ?>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <?php if ($vtThumbUrl): ?>
+                <a href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>" style="flex-shrink:0;">
+                    <img src="<?= h($vtThumbUrl) ?>" alt="náhled trasy" width="120" height="60"
+                         style="width:120px; height:60px; object-fit:cover; border-radius:6px; border:1px solid var(--border-color);">
+                </a>
+                <?php endif; ?>
+                <div>
+                    <a class="name" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>"><?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?></a>
+                    <div class="meta">
+                        📅 <?= $vt['date_start'] ? h(date('j. n. Y', strtotime($vt['date_start']))) : '—' ?>
+                        · 📸 <?= (int)$vt['photo_count'] ?> fotek
+                        · 📏 ≈<?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?> km
+                        <?php if ($vt['ascent'] !== null): ?> · ↑<?= (int)$vt['ascent'] ?> m<?php endif; ?>
+                    </div>
                 </div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">

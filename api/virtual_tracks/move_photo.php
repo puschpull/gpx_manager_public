@@ -40,6 +40,9 @@ ajax_endpoint(function () use ($pdo): array {
     // Přepočítat statistiky virtuální trasy (vzdálenost, bounds, centroid…)
     $s = vt_recompute_and_save($pdo, $vtId);
 
+    // Překreslit náhled mapy (změnil se tvar trasy)
+    @vt_generate_thumb($pdo, $vtId);
+
     return [
         'ok'          => true,
         'distance_km' => $s['distance_km'] ?? null,

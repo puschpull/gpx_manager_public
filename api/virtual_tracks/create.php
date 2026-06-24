@@ -37,6 +37,7 @@ ajax_endpoint(function () use ($pdo): array {
 
     $created  = 0;
     $assigned = 0;
+    $newVtIds = [];
 
     $pdo->beginTransaction();
     try {
@@ -61,11 +62,17 @@ ajax_endpoint(function () use ($pdo): array {
                 $assignStmt->execute([':vt' => $vtId, ':id' => (int)$p['id']]);
                 $assigned++;
             }
+            $newVtIds[] = $vtId;
         }
         $pdo->commit();
     } catch (Throwable $e) {
         $pdo->rollBack();
         throw $e;
+    }
+
+    // Náhledy mapy (po commitu — stahuje OSM dlaždice, ať nedrží transakci)
+    foreach ($newVtIds as $vtId) {
+        @vt_generate_thumb($pdo, $vtId);
     }
 
     return [

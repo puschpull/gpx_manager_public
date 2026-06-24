@@ -1,9 +1,35 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 23. června 2026
+  Poslední aktualizace: 24. června 2026
 
 ================================================================================
+
+
+── 24. června 2026 ─────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VIRTUÁLNÍ TRASY — ROZŠÍŘENÍ (náhled, počasí, editace, odhad trasy)           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové soubory:  api/virtual_tracks/update.php, api/virtual_tracks/route.php
+  Upravené:      includes/virtual_track_helper.php, virtual_tracks.php,
+                 virtual_track_detail.php, api/virtual_tracks/create.php,
+                 api/virtual_tracks/move_photo.php
+
+  – Náhled mapy: každá virtuální trasa má miniaturu trasy na mapě v seznamu
+    (reuse generate_thumb z bodů fotek; obnoví se i po posunu fotky).
+  – Počasí na výletě: na detailu znovupoužitý widget počasí (Open-Meteo) podle
+    centroidu a data trasy.
+  – Editace metadat: oblíbená (⭐), barva trasy (obarví čáru, živý náhled) a
+    poznámka — endpoint api/virtual_tracks/update.php.
+  – Odhad trasy po cestách: vypínatelná vrstva — polohy fotek jako waypointy →
+    Mapy.com routing API (server-side, vyžaduje Mapy.com API klíč) → trasa po
+    reálných cestách. Přepínač profilu turistická (foot_hiking) / rychlá
+    (foot_fast) s živým překreslením.
+  – Čárkovaná spojnice fotek je nově samostatná vypínatelná vrstva.
+  – Mapa si pamatuje zvolené overlay vrstvy (localStorage); výchozí zapnuté:
+    spojnice + odhad trasy + náhledy fotek.
 
 
 ── Květen – červen 2026 ─────────────────────────────────────────────────────

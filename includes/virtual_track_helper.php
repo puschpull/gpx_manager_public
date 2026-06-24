@@ -10,8 +10,56 @@ declare(strict_types=1);
  * Znovupoužívá haversine() a GPX_ELEVATION_NOISE_M.
  */
 
-require_once __DIR__ . '/gpx_parser.php';   // haversine()
-require_once __DIR__ . '/constants.php';    // GPX_ELEVATION_NOISE_M
+require_once __DIR__ . '/gpx_parser.php';      // haversine()
+require_once __DIR__ . '/constants.php';       // GPX_ELEVATION_NOISE_M
+require_once __DIR__ . '/generate_thumb.php';  // generate_thumb()
+
+/** Adresář s náhledy virtuálních tras. */
+function vt_thumb_dir(): string {
+    return __DIR__ . '/../uploads/vt_thumbs/';
+}
+
+/** Cesta k PNG náhledu virtuální trasy. */
+function vt_thumb_path(int $vtId): string {
+    return vt_thumb_dir() . $vtId . '.png';
+}
+
+/**
+ * Vygeneruje náhled mapy virtuální trasy (linie mezi body fotek) do
+ * uploads/vt_thumbs/<id>.png. Reuse generate_thumb() přes dočasné minimální GPX.
+ */
+function vt_generate_thumb(\PDO $pdo, int $vtId): bool {
+    $stmt = $pdo->prepare("
+        SELECT lat, lon FROM track_photos
+        WHERE virtual_track_id = ? AND lat IS NOT NULL AND lon IS NOT NULL
+        ORDER BY taken_at ASC, id ASC
+    ");
+    $stmt->execute([$vtId]);
+    $pts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    if (count($pts) < 2) return false;
+
+    $dir = vt_thumb_dir();
+    if (!is_dir($dir)) @mkdir($dir, 0755, true);
+
+    // Dočasné minimální GPX z bodů fotek
+    $gpx = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+         . '<gpx version="1.1" creator="GPX Manager" xmlns="http://www.topografix.com/GPX/1/1">' . "\n"
+         . '<trk><trkseg>' . "\n";
+    foreach ($pts as $p) {
+        $gpx .= '<trkpt lat="' . (float)$p['lat'] . '" lon="' . (float)$p['lon'] . '"></trkpt>' . "\n";
+    }
+    $gpx .= '</trkseg></trk></gpx>';
+
+    $tmp = tempnam(sys_get_temp_dir(), 'vtgpx_');
+    if ($tmp === false) return false;
+    $tmpGpx = $tmp . '.gpx';
+    @rename($tmp, $tmpGpx);
+    file_put_contents($tmpGpx, $gpx);
+
+    $ok = generate_thumb($tmpGpx, vt_thumb_path($vtId));
+    @unlink($tmpGpx);
+    return $ok;
+}
 
 /**
  * Vrátí nepřiřazené fotky vhodné pro tvorbu virtuálních tras
