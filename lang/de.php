@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Scannt ein Verzeichnis auf dem PC und importiert Fotos stapelweise',
     'admin_access_config'       => 'Besucherzugang konfigurieren',
     'admin_access_saved'        => 'Zugriffskonfiguration gespeichert',
-    'admin_available_themes'    => 'Verfügbare Designs',
     'admin_available_langs'     => 'Verfügbare Sprachen',
     'admin_visible_pages'       => 'Sichtbare Seiten für Besucher',
     'admin_visible_pages_hint'  => 'Admin sieht immer alles. Nicht markierte Seiten leiten Besucher auf die Hauptseite um.',

@@ -8,10 +8,6 @@ require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/gpx_parser.php';
 check_page_access('heatmap');
 
-/* ===== Theme ===== */
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 /* ===== Cache soubor pro heatmapu ===== */

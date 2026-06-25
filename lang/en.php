@@ -542,7 +542,6 @@ return [
     'desc_photo_import'         => 'Scans a directory on the PC, selects and imports photos in bulk (without browser upload)',
     'admin_access_config'       => 'Visitor access configuration',
     'admin_access_saved'        => 'Access configuration saved',
-    'admin_available_themes'    => 'Available themes',
     'admin_available_langs'     => 'Available languages',
     'admin_visible_pages'       => 'Visible pages for visitors',
     'admin_visible_pages_hint'  => 'Admin always sees everything. Unchecked pages redirect visitors to the main page.',

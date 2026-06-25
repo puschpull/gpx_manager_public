@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Escanea un directorio en el PC e importa fotos en lote',
     'admin_access_config'       => 'Configuración de acceso para visitantes',
     'admin_access_saved'        => 'Configuración de acceso guardada',
-    'admin_available_themes'    => 'Temas disponibles',
     'admin_available_langs'     => 'Idiomas disponibles',
     'admin_visible_pages'       => 'Páginas visibles para visitantes',
     'admin_visible_pages_hint'  => 'El administrador siempre ve todo. Las páginas no marcadas redirigen a los visitantes a la página principal.',

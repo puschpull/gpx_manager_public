@@ -2,10 +2,6 @@
 require_once __DIR__ . '/../includes/helpers.php';
 // gpx_parser.php removed — nearby AJAX now uses centroid BBOX, no GPX parsing (TASK-11)
 
-// ====== Stylování ======
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 // ====== AJAX endpoint ======

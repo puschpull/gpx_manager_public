@@ -162,10 +162,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'similar') {
     exit;
 }
 
-// ====== Stylování ======
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 // ====== Načtení dat o trase ======

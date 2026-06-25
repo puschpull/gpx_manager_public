@@ -4,10 +4,6 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 
-/* ===== Theme ===== */
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 /* ===== ID záznamu ===== */

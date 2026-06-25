@@ -1,9 +1,33 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 24. června 2026
+  Poslední aktualizace: 25. června 2026
 
 ================================================================================
+
+
+── 25. června 2026 ─────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ÚKLID LEGACY TÉMAT — odstranění mrtvého kódu 9 barevných témat                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Theming je od TASK-24 plně v css/style.css (:root = světlý, html.dark = tmavý,
+  řízeno přepínačem v hlavičce). Starý systém 9 témat (theme cookie → css/theme-*.css
+  + js/theme.js dropdown) byl nepoužívaný mrtvý kód — žádné UI cookie nenastavovalo —
+  a byl kompletně odstraněn. Vzhled stránek se nemění (světlý/tmavý zůstává).
+
+  Smazáno:   css/theme-{classic,dark,darkblue,darkgreen,blue,green,minimal,
+             lightgray,brown}.css (9×), js/theme.js, js/theme-tester.js
+  Upraveno:  includes/app_constants.php (odstraněny all_themes / available_themes /
+             active_theme / init_theme_cookie), includes/layout_header.php (legacy
+             injekční blok), includes/i18n.php (renderHeaderMeta), includes/app_config.php
+             (default allowed_themes), includes/photo_import_view.php (data-theme +
+             injekce), admin.php (karta „Dostupné vzhledy" + handler), boilerplate
+             $theme/$available_themes ve ~16 stránkách, lang/*.php (klíč
+             admin_available_themes ×8), CLAUDE.md, docs/css-variables-reference.md
+  Pozn.:     chart-theme.js (paleta grafů) zůstává — není součástí legacy témat.
+             Stará DB hodnota app_config.allowed_themes (pokud existuje) se ignoruje.
 
 
 ── 24. června 2026 ─────────────────────────────────────────────────────────

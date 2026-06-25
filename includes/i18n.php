@@ -95,34 +95,3 @@ function renderLangSelector(array $allowedLangs): void {
     echo '</span>';
 }
 
-/**
- * Renders the full header-meta block (theme selector, lang picker, DB/server info).
- *
- * @param array  $available_themes List of enabled theme slugs.
- * @param string $theme            Currently active theme slug.
- * @param array  $allowedLangs    List of enabled language codes.
- */
-function renderHeaderMeta(array $available_themes, string $theme, array $allowedLangs): void {
-    $themeLabels = [
-        'classic'   => 'Classic',    'dark'      => 'Dark',
-        'darkblue'  => 'Dark Blue',  'darkgreen' => 'Dark Green',
-        'blue'      => 'Blue',       'green'     => 'Green',
-        'minimal'   => 'Minimal',    'lightgray' => 'Light Gray',
-        'brown'     => 'Brown',
-    ];
-    echo '<span class="header-meta">';
-    echo '<span class="header-controls">';
-    echo '<select id="theme-selector" class="select">';
-    foreach ($available_themes as $th) {
-        $sel   = $th === $theme ? ' selected' : '';
-        $label = htmlspecialchars($themeLabels[$th] ?? ucfirst($th), ENT_QUOTES, 'UTF-8');
-        echo "<option value=\"$th\"$sel>$label</option>";
-    }
-    echo '</select>';
-    renderLangSelector($allowedLangs);
-    echo '</span>';
-    echo '<small class="header-info">';
-    echo t('db_label') . ': <b>' . DB_NAME . '</b> | ' . t('server_label') . ': <b>' . APP_ENV . '</b>';
-    echo '</small>';
-    echo '</span>';
-}

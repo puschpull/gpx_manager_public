@@ -7,7 +7,7 @@
 ## Project context
 
 **Název projektu**: GPX Manager
-**Stručný popis**: Self-hosted PHP webová aplikace pro správu GPS tras a fotek z výletů — import GPX, mapy, statistiky, fotogalerie, vícejazyčné UI, 9 témat. Cílový uživatel: jednotlivec nebo malá skupina, nasazení na sdílený hosting (Webglobe v ČR) nebo lokálně (WAMP).
+**Stručný popis**: Self-hosted PHP webová aplikace pro správu GPS tras a fotek z výletů — import GPX, mapy, statistiky, fotogalerie, vícejazyčné UI, světlý/tmavý režim. Cílový uživatel: jednotlivec nebo malá skupina, nasazení na sdílený hosting (Webglobe v ČR) nebo lokálně (WAMP).
 **Stage**: production (live na vlastní doméně autora, single-tenant per instalace)
 **Referenční audit**: `AUDIT_REPORT.md` (166 nálezů, 30 implementačních tasků)
 
@@ -21,7 +21,7 @@
 - Server-rendered HTML přes inline PHP
 - Tailwind CSS v4 (`assets/css/input.css` → `assets/css/app.css`) — postupně migruje vrstvy
 - Alpine.js 3.x pro interaktivitu v novém UI
-- Legacy CSS v `css/theme-*.css` (9 témat) — koexistuje s Tailwind
+- Legacy CSS proměnné pro světlý/tmavý režim v `css/style.css` (`:root` + `html.dark`) — koexistuje s Tailwind
 - Vanilla JS v `js/` (žádný build pipeline, soubory servovány raw)
 **Mapy**: Leaflet 1.9.4 (CDN), leaflet-gpx, leaflet.heat, leaflet.vectorgrid (Mapillary)
 **Grafy**: Chart.js 4.x (CDN)
@@ -57,7 +57,7 @@
 - **Visitor mode / visitor preview**: read-only přístup pro nepřihlášené uživatele (omezeno na stránky v `app_config.visible_pages`)
 - **Admin via IP / Admin via login**: dva způsoby autentizace; `$_SESSION['admin_via']` = `'IP'` nebo `'login'`
 - **App config**: globální runtime nastavení v tabulce `app_config` (themes, jazyky, viditelné stránky, uploads cesta)
-- **Theme**: jedno z 9 barevných témat (`classic`, `dark`, `darkblue`, `darkgreen`, `blue`, `green`, `minimal`, `lightgray`, `brown`)
+- **Theme**: světlý/tmavý režim — řízený Tailwind `.dark` třídou (`gpx-theme` v localStorage, přepínač v `layout_header.php`); legacy stránky dědí přes CSS proměnné `:root`/`html.dark` v `css/style.css`. (9 barevných témat bylo odstraněno jako mrtvý kód, 2026-06-25.)
 - **Activity type**: hodnota v `tracks.activity_type` — momentálně české stringy (`'Pěšky'`, `'Auto'`, `'Kolo'`...) — i18n přes label funkci (TASK-25 OPTION A)
 - **Difficulty**: spočítaná hodnota 1–5 podle vzorce v `calculateDifficulty()` (distance + ascent kombinace)
 - **Migration**: SQL soubor v `migrations/NNNN_*.sql` (po TASK-09); idempotentní, číslovaný, spouštěný přes `migrate.php`
@@ -128,7 +128,7 @@ Doplňující ke standardům z agentů:
 - [ ] **`declare(strict_types=1);`** v každém novém PHP souboru
 - [ ] **Žádné nové `console.log`** v JS bez `if (window.GPX_DEBUG)`
 - [ ] **CDN scripty pinnuté** na konkrétní verzi + SRI hash (žádné `@latest`)
-- [ ] **WCAG 2.2 AA** — kontrast ≥ 4.5:1 pro normální text ve VŠECH 9 tématech
+- [ ] **WCAG 2.2 AA** — kontrast ≥ 4.5:1 pro normální text ve světlém i tmavém režimu
 - [ ] **`prefers-reduced-motion` honored** — žádné animace bez respektování
 - [ ] **`<html lang>` reflektuje `app_lang()`**, ne hardcoded `cs`
 

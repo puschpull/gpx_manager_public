@@ -8,7 +8,7 @@
  *   $stats  (array) — totals (total_tracks, total_km, total_ascent, total_descent, avg_speed)
  *   $page, $per_page, $total_pages, $total_rows — pagination
  *   $q, $fav_only, ...  — active filter values from GET
- *   $available_themes, $theme, $allowedLangs — theming
+ *   $allowedLangs — enabled UI languages
  */
 
 if (!isset($_SESSION)) { @session_start(); }

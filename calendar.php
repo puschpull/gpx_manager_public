@@ -7,10 +7,6 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 check_page_access('calendar');
 
-/* ===== Theme ===== */
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 /* ===== Dostupné roky ===== */

@@ -2,7 +2,7 @@
 /**
  * Detail trasy — Outdoor redesign.
  * Variables ze detail_data.php: $track, $track_name, $prevId, $nextId, $position, $total_nav,
- *                               $available_themes, $theme, $allowedLangs.
+ *                               $allowedLangs.
  *
  * Důležité: zachovává DOM ID (#map, #elev, #stats, #exportBtn, #qrBox, #qrToggleBtn,
  * #timeMode, #similar-wrap, #similar-tracks) aby JS moduly fungovaly beze změny.

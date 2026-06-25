@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Skenuje adresár na PC a hromadne importuje fotky (bez nahrávania cez prehliadač)',
     'admin_access_config'       => 'Konfigurácia prístupu pre návštevníkov',
     'admin_access_saved'        => 'Konfigurácia prístupu uložená',
-    'admin_available_themes'    => 'Dostupné vzhľady',
     'admin_available_langs'     => 'Dostupné jazyky',
     'admin_visible_pages'       => 'Viditeľné stránky pre návštevníkov',
     'admin_visible_pages_hint'  => 'Admin vidí vždy všetko. Nezačiarknuté stránky presmerujú návštevníkov na hlavnú stránku.',

@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Skanuje katalog na PC i importuje zdjęcia hurtowo',
     'admin_access_config'       => 'Konfiguracja dostępu dla odwiedzających',
     'admin_access_saved'        => 'Konfiguracja dostępu zapisana',
-    'admin_available_themes'    => 'Dostępne motywy',
     'admin_available_langs'     => 'Dostępne języki',
     'admin_visible_pages'       => 'Widoczne strony dla odwiedzających',
     'admin_visible_pages_hint'  => 'Administrator zawsze widzi wszystko. Nieoznaczone strony przekierowują odwiedzających na stronę główną.',

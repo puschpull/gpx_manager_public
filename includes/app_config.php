@@ -58,7 +58,6 @@ function init_app_config(): void {
     }
 
     $defaults = [
-        'allowed_themes' => all_themes(),
         'allowed_langs'  => all_langs(),
         'visible_pages'  => all_pages(),
         '_init_done'     => '1',

@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Scansiona una directory sul PC e importa foto in blocco',
     'admin_access_config'       => 'Configurazione accesso visitatori',
     'admin_access_saved'        => 'Configurazione accesso salvata',
-    'admin_available_themes'    => 'Temi disponibili',
     'admin_available_langs'     => 'Lingue disponibili',
     'admin_visible_pages'       => 'Pagine visibili ai visitatori',
     'admin_visible_pages_hint'  => 'L\'amministratore vede sempre tutto. Le pagine non selezionate reindirizzano i visitatori alla pagina principale.',

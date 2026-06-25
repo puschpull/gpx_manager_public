@@ -536,7 +536,6 @@ return [
     'desc_photo_import'         => 'Analyse un répertoire sur le PC et importe des photos en lot',
     'admin_access_config'       => 'Configuration de l\'accès visiteurs',
     'admin_access_saved'        => 'Configuration d\'accès enregistrée',
-    'admin_available_themes'    => 'Thèmes disponibles',
     'admin_available_langs'     => 'Langues disponibles',
     'admin_visible_pages'       => 'Pages visibles pour les visiteurs',
     'admin_visible_pages_hint'  => 'L\'administrateur voit toujours tout. Les pages non cochées redirigent les visiteurs vers la page principale.',

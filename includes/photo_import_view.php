@@ -2,16 +2,13 @@
 /**
  * photo_import_view.php — HTML template for the local photo import page.
  *
- * Expected variables (set by photo_import.php):
- *   $theme (string)  — active theme slug (for data-theme attribute)
- *
  * No DB queries here. All AJAX calls go to api/photo_import/*.php.
  * CSS: css/photo-import.css (extracted TASK-19)
  * JS:  js/photo-import.js  (extracted TASK-19)
  */
 ?>
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>" data-theme="<?= h($theme) ?>">
+<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,19 +16,6 @@
 
     <!-- CSRF token for AJAX requests (read by photo-import.js via meta[name=csrf-token]) -->
     <meta name="csrf-token" content="<?= h(csrf_token()) ?>">
-
-    <script>
-    (function() {
-        const match = document.cookie.match(/theme=([^;]+)/);
-        const theme = match ? match[1] : 'classic';
-        const link  = document.createElement('link');
-        link.rel    = 'stylesheet';
-        link.id     = 'theme-style';
-        link.href   = 'css/theme-' + theme + '.css';
-        document.head.appendChild(link);
-        document.documentElement.setAttribute('data-theme', theme);
-    })();
-    </script>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/photo-import.css">

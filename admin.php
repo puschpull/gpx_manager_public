@@ -18,14 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])
     // all_pages() does not include 'photos' — photos is a special extra page for visitors
     $allPagesWithPhotos = array_merge(all_pages(), ['photos']);
 
-    $themes = array_values(array_intersect($_POST['allowed_themes'] ?? [], all_themes()));
     $langs  = array_values(array_intersect($_POST['allowed_langs']  ?? [], all_langs()));
     $pages  = array_values(array_intersect($_POST['allowed_pages']  ?? [], $allPagesWithPhotos));
 
-    if (empty($themes)) $themes = ['classic'];
     if (empty($langs))  $langs  = ['cs'];
 
-    set_app_config('allowed_themes', $themes);
     set_app_config('allowed_langs',  $langs);
     set_app_config('visible_pages',  $pages);
 
@@ -43,11 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_uploads_config']
     exit;
 }
 
-/* ===== Theme ===== */
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
-$allThemes = all_themes();  // full list needed for the admin checkbox UI
 $allowedLangs = available_langs();
 
 /* ===== Rychlé statistiky ===== */
@@ -415,13 +407,9 @@ require __DIR__ . '/includes/layout_header.php';
 
 <!-- ===== KONFIGURACE PŘÍSTUPU NÁVŠTĚVNÍKŮ ===== -->
 <?php
-$cfgThemes = available_themes();
 $cfgLangs  = available_langs();
 $cfgPages  = get_app_config('visible_pages', all_pages());
 
-$themeLabelsAll = ['classic'=>'Classic','dark'=>'Dark','darkblue'=>'Dark Blue',
-    'darkgreen'=>'Dark Green','blue'=>'Blue','green'=>'Green',
-    'minimal'=>'Minimal','lightgray'=>'Light Gray','brown'=>'Brown'];
 $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩🇪 Deutsch',
     'sk'=>'🇸🇰 Slovenčina','es'=>'🇪🇸 Español','fr'=>'🇫🇷 Français',
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
@@ -435,19 +423,6 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
     <h2 style="font-size:17px;margin-bottom:12px;color:var(--text-color);">🔐 <?= htmlspecialchars(t('admin_access_config', 'Konfigurace přístupu pro návštěvníky')) ?></h2>
     <form method="POST" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
         <?= csrf_field() ?>
-
-        <div class="admin-card">
-            <h3>🎨 <?= htmlspecialchars(t('admin_available_themes', 'Dostupné vzhledy')) ?></h3>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-            <?php foreach ($allThemes as $th): ?>
-                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-                    <input type="checkbox" name="allowed_themes[]" value="<?= $th ?>"
-                        <?= in_array($th, $cfgThemes) ? 'checked' : '' ?>>
-                    <?= htmlspecialchars($themeLabelsAll[$th] ?? $th, ENT_QUOTES, 'UTF-8') ?>
-                </label>
-            <?php endforeach; ?>
-            </div>
-        </div>
 
         <div class="admin-card">
             <h3>🌍 <?= htmlspecialchars(t('admin_available_langs', 'Dostupné jazyky')) ?></h3>

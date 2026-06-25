@@ -26,32 +26,13 @@ if (!function_exists('t')) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> — GPX Manager</title>
 
-    <!-- Inline blok: nastav dark mode + legacy theme PŘED parsováním <body> — eliminuje FOUC (FE-6) -->
+    <!-- Inline blok: nastav dark mode PŘED parsováním <body> — eliminuje FOUC (FE-6) -->
     <script>
         (function () {
-            // 1) Tailwind dark mode (gpx-theme klíč)
+            // Tailwind dark mode (gpx-theme klíč) — světlý/tmavý přepínač v hlavičce
             var t = localStorage.getItem('gpx-theme');
             if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
-            }
-
-            // 2) Legacy CSS theme system (theme cookie → css/theme-*.css)
-            var theme = '';
-            try {
-                var m = document.cookie.match(/(?:^|;\s*)theme=([^;]+)/);
-                if (m) { theme = decodeURIComponent(m[1]); }
-            } catch (e) {}
-            if (!theme) {
-                try { theme = localStorage.getItem('theme') || ''; } catch (e) {}
-            }
-            // Whitelist: only known slugs to prevent path injection
-            var allowed = ['classic','dark','darkblue','darkgreen','blue','green','minimal','lightgray','brown'];
-            if (theme && allowed.indexOf(theme) !== -1) {
-                var link = document.createElement('link');
-                link.rel  = 'stylesheet';
-                link.id   = 'theme-style';
-                link.href = 'css/theme-' + theme + '.css';
-                document.head.appendChild(link);
             }
         })();
     </script>

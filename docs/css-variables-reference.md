@@ -2,9 +2,12 @@
 
 > Documentation file. Not loaded by the application.
 > Source: previously `css/variables-reference.css` — relocated in TASK-24 (FE-19).
+> Updated 2026-06-25: 9 barevných témat odstraněno; zůstává jen světlý/tmavý režim.
 
-This document lists all CSS custom properties (variables) used across the 9 themes in `css/theme-*.css`.
-Each theme defines all variables in `:root {}`. Pages consume them via `var(--name)` — no hardcoded colors in component CSS.
+This document lists all CSS custom properties (variables) used by the light/dark mode.
+They are defined in **`css/style.css`**: light values in `:root {}`, dark overrides in `html.dark {}`.
+Pages consume them via `var(--name)` — no hardcoded colors in component CSS.
+The "Classic value" column below is the `:root` (light-mode) value.
 
 ---
 
@@ -85,9 +88,16 @@ All `--text-muted` values must achieve **4.5:1** against their respective `--bg-
 
 ## How the system works
 
-1. Each page that uses the legacy theme system includes `css/style.css` (always) and optionally `css/filter.css`, `css/detail.css` etc.
-2. A theme stylesheet (`css/theme-{slug}.css`) is injected **before `<body>`** via an inline `<script>` in `<head>` — this eliminates FOUC (FE-6).
-3. JS in `js/theme.js` handles theme *changes* (dropdown select), updating the `<link id="theme-style">` element and saving to `localStorage` + cookie.
-4. The two theming systems that coexist:
-   - **Legacy** (`css/theme-*.css` + CSS variables): authoritative for most pages (detail, admin, filter, settings, stats, etc.)
-   - **Tailwind** (`assets/css/app.css` + `.dark` class): used on `index.php`, `photos.php`, `login.php`, `layout_header.php`
+1. Legacy pages include `css/style.css` (plus optionally `css/filter.css`, `css/detail.css` etc.).
+   `css/style.css` defines the variables for both modes: light values in `:root {}`, dark overrides in `html.dark {}`.
+2. Dark mode is driven by the Tailwind `.dark` class on `<html>` (key `gpx-theme` in `localStorage`),
+   toggled by the light/dark button in `includes/layout_header.php`. An inline `<script>` in `<head>`
+   sets the class before `<body>` to avoid FOUC (FE-6).
+3. One switch covers everything: the same `.dark` class drives both the Tailwind utility colors
+   (`assets/css/app.css`, used on `index.php`, `photos.php`, `login.php`, redesigned pages) and the
+   legacy `var(--*)` colors (`css/style.css`, used on detail, admin, filter, settings, stats, etc.).
+
+> **Historical:** until 2026-06-25 there were 9 separate `css/theme-*.css` files selected via a `theme`
+> cookie + a `js/theme.js` dropdown (`renderHeaderMeta()` / `<select id="theme-selector">`). That whole
+> layer was unused dead code — no UI ever set the cookie — and was removed. The per-theme tables below
+> are kept only as a historical reference for the surviving light `:root` values.

@@ -31,12 +31,6 @@ if (!$_isAdmin) {
     }
 }
 
-/* =====================================================================
-   Theme (must be set before layout_header.php)
-   ===================================================================== */
-init_theme_cookie();
-$theme           = active_theme();
-$available_themes = available_themes();
 $allowedLangs    = available_langs();
 
 /* =====================================================================

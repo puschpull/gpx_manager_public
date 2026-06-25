@@ -191,10 +191,6 @@ if ($ajax !== '') {
     exit;
 }
 
-// ====== Stylování ======
-init_theme_cookie();
-$theme = active_theme();
-$available_themes = available_themes();
 $allowedLangs = available_langs();
 
 // ====== Načtení trasy (volitelné) ======
