@@ -35,16 +35,26 @@ ajax_endpoint(function () use ($pdo): array {
     ");
     $assignStmt = $pdo->prepare("UPDATE track_photos SET virtual_track_id = :vt WHERE id = :id");
 
+    // Volitelné uživatelské názvy z generátoru (v pořadí shluků). Prázdné → datum-only název.
+    $names = (isset($_POST['names']) && is_array($_POST['names'])) ? $_POST['names'] : [];
+
     $created  = 0;
     $assigned = 0;
     $newVtIds = [];
 
     $pdo->beginTransaction();
     try {
-        foreach ($res['clusters'] as $c) {
-            $s = vt_compute_stats($c);
+        foreach ($res['clusters'] as $i => $c) {
+            $s    = vt_compute_stats($c);
+            $name = $s['name'];
+            if (array_key_exists($i, $names)) {
+                $cand = trim((string)$names[$i]);
+                if ($cand !== '') {
+                    $name = mb_substr($cand, 0, 255);
+                }
+            }
             $insVt->execute([
-                ':name'         => $s['name'],
+                ':name'         => $name,
                 ':date_start'   => $s['date_start'],
                 ':date_end'     => $s['date_end'],
                 ':photo_count'  => $s['photo_count'],

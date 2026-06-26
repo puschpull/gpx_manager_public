@@ -155,49 +155,89 @@ const VT_CSRF = <?= json_encode(csrf_token()) ?>;
 <?php if ($_isAdmin): ?>
 (function () {
     const $ = id => document.getElementById(id);
-    function params() {
+    const box = () => $('previewResult');
+    let lastParams = null;   // parametry posledního náhledu — drží konzistenci preview → návrh → vytvoření
+
+    function readParams() {
+        return { gap_hours: $('gapHours').value, gap_km: $('gapKm').value, min_photos: $('minPhotos').value };
+    }
+    function paramsForm(p) {
         const fd = new FormData();
         fd.append('_csrf_token', VT_CSRF);
-        fd.append('gap_hours', $('gapHours').value);
-        fd.append('gap_km', $('gapKm').value);
-        fd.append('min_photos', $('minPhotos').value);
+        fd.append('gap_hours', p.gap_hours);
+        fd.append('gap_km', p.gap_km);
+        fd.append('min_photos', p.min_photos);
         return fd;
     }
 
     $('previewBtn').addEventListener('click', () => {
-        const box = $('previewResult');
-        box.innerHTML = '⏳ Počítám…';
-        fetch('api/virtual_tracks/preview.php', { method: 'POST', body: params() })
+        lastParams = readParams();
+        box().innerHTML = '⏳ Počítám…';
+        fetch('api/virtual_tracks/preview.php', { method: 'POST', body: paramsForm(lastParams) })
             .then(r => r.json())
             .then(d => {
-                if (!d.ok) { box.innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
+                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
                 if (d.cluster_count === 0) {
-                    box.innerHTML = `Z ${d.candidates} nepřiřazených fotek nevznikla žádná trasa (zkus menší „min. fotek" nebo větší mezery). Nezařazeno: ${d.rejected}.`;
+                    box().innerHTML = `Z ${d.candidates} nepřiřazených fotek nevznikla žádná trasa (zkus menší „min. fotek" nebo větší mezery). Nezařazeno: ${d.rejected}.`;
                     $('createBtn').style.display = 'none';
                     return;
                 }
-                let html = `<p><strong>Návrh:</strong> ${d.cluster_count} výletů z ${d.candidates} fotek (nezařazeno ${d.rejected}):</p>`;
+                let html = `<p><strong>Návrh:</strong> ${d.cluster_count} výletů z ${d.candidates} fotek (nezařazeno ${d.rejected}). Název uprav ručně, nebo nech doplnit dle místa:</p>`;
                 d.clusters.forEach((c, i) => {
-                    html += `<div class="vt-preview-row">${i+1}. <strong>${c.name}</strong> — 📸 ${c.photo_count} · 📏 ≈${c.distance_km} km${c.ascent!=null?` · ↑${c.ascent} m`:''}</div>`;
+                    html += `<div class="vt-preview-row">
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px;">${i+1}. 📸 ${c.photo_count} · 📏 ≈${c.distance_km} km${c.ascent!=null?` · ↑${c.ascent} m`:''}</div>
+                        <input type="text" class="vt-name-input" data-idx="${i}" aria-label="Název trasy ${i+1}" style="width:100%;max-width:560px;padding:5px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--card-bg);color:var(--text-color);font-size:13px;">
+                    </div>`;
                 });
-                box.innerHTML = html;
+                html += `<div style="margin-top:10px;"><button class="vt-btn" id="suggestNamesBtn" type="button">✨ Navrhnout názvy dle míst</button></div>`;
+                box().innerHTML = html;
+                // předvyplň datum-only názvy přes .value (bez HTML escapování)
+                d.clusters.forEach((c, i) => {
+                    const inp = box().querySelector(`.vt-name-input[data-idx="${i}"]`);
+                    if (inp) inp.value = c.name;
+                });
+                const sb = $('suggestNamesBtn');
+                if (sb) sb.addEventListener('click', suggestNames);
                 $('createBtn').style.display = '';
             })
-            .catch(e => { box.innerHTML = '⚠️ ' + e.message; });
+            .catch(e => { box().innerHTML = '⚠️ ' + e.message; });
     });
 
-    $('createBtn').addEventListener('click', () => {
-        if (!confirm('Vytvořit virtuální trasy podle náhledu? Fotky se přiřadí k těmto trasám.')) return;
-        const box = $('previewResult');
-        box.innerHTML = '⏳ Vytvářím…';
-        fetch('api/virtual_tracks/create.php', { method: 'POST', body: params() })
+    function suggestNames() {
+        const sb = $('suggestNamesBtn');
+        if (!sb || !lastParams) return;
+        const orig = sb.textContent;
+        sb.disabled = true; sb.textContent = '⏳ Hledám místa…';
+        fetch('api/virtual_tracks/suggest_names.php', { method: 'POST', body: paramsForm(lastParams) })
             .then(r => r.json())
             .then(d => {
-                if (!d.ok) { box.innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
-                box.innerHTML = '✅ ' + d.message + ' Stránka se obnoví…';
+                if (!d.ok) { alert('Návrh názvů selhal: ' + (d.error || '?')); return; }
+                (d.names || []).forEach((nm, i) => {
+                    const inp = box().querySelector(`.vt-name-input[data-idx="${i}"]`);
+                    if (inp && nm) inp.value = nm;
+                });
+            })
+            .catch(e => alert('Chyba: ' + e.message))
+            .finally(() => { sb.disabled = false; sb.textContent = orig; });
+    }
+
+    $('createBtn').addEventListener('click', () => {
+        if (!lastParams) return;
+        if (!confirm('Vytvořit virtuální trasy podle náhledu? Fotky se přiřadí k těmto trasám.')) return;
+        // sesbírej názvy z polí PŘED přepsáním obsahu boxu
+        const fd = paramsForm(lastParams);
+        box().querySelectorAll('.vt-name-input').forEach(inp => {
+            fd.append('names[' + inp.dataset.idx + ']', inp.value);
+        });
+        box().innerHTML = '⏳ Vytvářím…';
+        fetch('api/virtual_tracks/create.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(d => {
+                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
+                box().innerHTML = '✅ ' + d.message + ' Stránka se obnoví…';
                 setTimeout(() => location.reload(), 1200);
             })
-            .catch(e => { box.innerHTML = '⚠️ ' + e.message; });
+            .catch(e => { box().innerHTML = '⚠️ ' + e.message; });
     });
 
     document.querySelectorAll('.vt-del').forEach(btn => {

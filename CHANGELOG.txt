@@ -1,10 +1,33 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 25. června 2026
+  Poslední aktualizace: 26. června 2026
 
 ================================================================================
 
+
+── 26. června 2026 ─────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  VIRTUÁLNÍ TRASY — AUTO-NÁZEV DLE MÍSTA (Mapy.com reverse-geocode)             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Generátor i detail VT umí navrhnout název podle hlavních obcí na trase
+  (reverse-geocode Mapy.com, vytahuje regional.municipality). Návrh se vždy
+  předvyplní do EDITOVATELNÉHO pole — uživatel ho potvrdí, nebo ručně upraví.
+  Formát: "Virtuální trasa — Místo1, Místo2 - j. n. Y (N fotek)".
+
+  Nové soubory:  api/virtual_tracks/suggest_name.php  (1 trasa — detail)
+                 api/virtual_tracks/suggest_names.php (shluky — generátor)
+  Upravené:      includes/virtual_track_helper.php (vt_reverse_geocode_municipality,
+                 vt_collect_places, vt_suggest_name_from_points + vzorkování bodů),
+                 api/virtual_tracks/create.php (přijímá names[] z generátoru),
+                 virtual_tracks.php (náhled = editovatelná pole názvů +
+                 „✨ Navrhnout názvy dle míst"), virtual_track_detail.php (✨ u ✏️)
+
+  - Geokódování běží server-side (klíč MAPYCOM_API_KEY zůstává na serveru),
+    až na vyžádání (klik), max ~5 vzorků bodů na trasu → šetří API kvótu.
+  - Bez DB migrace. Když klíč chybí / geokódování selže → fallback na datum-only.
 
 ── 25. června 2026 ─────────────────────────────────────────────────────────────
 

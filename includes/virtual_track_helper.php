@@ -333,3 +333,128 @@ function vt_recompute_and_save(\PDO $pdo, int $vtId): ?array
     ]);
     return $s;
 }
+
+/**
+ * Reverse-geocode jednoho bodu přes Mapy.com → název obce (regional.municipality),
+ * nebo null když se nepodaří. Server-side (API klíč zůstává na serveru).
+ * Reuse curl vzoru z api/virtual_tracks/route.php (CURL_CA_BUNDLE pro lokální WAMP).
+ */
+function vt_reverse_geocode_municipality(float $lat, float $lon): ?string
+{
+    if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
+        return null;
+    }
+    $url = 'https://api.mapy.com/v1/rgeocode?' . http_build_query([
+        'lat'    => $lat,
+        'lon'    => $lon,
+        'lang'   => 'cs',
+        'apikey' => MAPYCOM_API_KEY,
+    ]);
+
+    $body = false;
+    if (function_exists('curl_init')) {
+        $ch   = curl_init($url);
+        $opts = [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+        ];
+        if (defined('CURL_CA_BUNDLE') && CURL_CA_BUNDLE !== '' && is_file(CURL_CA_BUNDLE)) {
+            $opts[CURLOPT_CAINFO] = CURL_CA_BUNDLE;
+        }
+        curl_setopt_array($ch, $opts);
+        $body = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        if ($body === false || $http >= 400) {
+            return null;
+        }
+    } else {
+        $ctx  = stream_context_create(['http' => ['timeout' => 15, 'header' => "Accept: application/json\r\n"]]);
+        $body = @file_get_contents($url, false, $ctx);
+        if ($body === false) {
+            return null;
+        }
+    }
+
+    $data  = json_decode((string)$body, true);
+    $parts = $data['items'][0]['regionalStructure'] ?? null;
+    if (!is_array($parts)) {
+        return null;
+    }
+    foreach ($parts as $part) {
+        if (($part['type'] ?? '') === 'regional.municipality' && !empty($part['name'])) {
+            return trim((string)$part['name']);
+        }
+    }
+    return null;
+}
+
+/**
+ * Vybere až $max bodů rovnoměrně rozložených podél (chronologického) pole bodů.
+ * Vždy zahrne první a poslední.
+ *
+ * @param array $points body (klíče lat, lon)
+ * @return array<int,array<string,mixed>>
+ */
+function vt_sample_points(array $points, int $max = 5): array
+{
+    $points = array_values($points);
+    $n = count($points);
+    if ($n <= $max || $max < 2) {
+        return $points;
+    }
+    $idx = [];
+    for ($i = 0; $i < $max; $i++) {
+        $idx[(int)round($i * ($n - 1) / ($max - 1))] = true;
+    }
+    $out = [];
+    foreach (array_keys($idx) as $i) {
+        $out[] = $points[$i];
+    }
+    return $out;
+}
+
+/**
+ * Posbírá až $maxPlaces různých obcí podél trasy (v chronologickém pořadí výskytu).
+ *
+ * @param array $points body seřazené chronologicky (klíče lat, lon)
+ * @return array<int,string>
+ */
+function vt_collect_places(array $points, int $maxPlaces = 2): array
+{
+    $places = [];
+    foreach (vt_sample_points($points, 5) as $p) {
+        if (!isset($p['lat'], $p['lon'])) {
+            continue;
+        }
+        $m = vt_reverse_geocode_municipality((float)$p['lat'], (float)$p['lon']);
+        if ($m !== null && $m !== '' && !in_array($m, $places, true)) {
+            $places[] = $m;
+            if (count($places) >= $maxPlaces) {
+                break;
+            }
+        }
+    }
+    return $places;
+}
+
+/**
+ * Navrhne název virtuální trasy podle hlavních míst (obcí) na trase.
+ * Formát: "Virtuální trasa — Místo1, Místo2 - j. n. Y (N fotek)".
+ * Když se nepodaří zjistit žádné místo → fallback na datum-only formát
+ * (shodný s názvem z vt_compute_stats()).
+ *
+ * @param array  $points     body trasy (chronologicky; klíče lat, lon)
+ * @param string $dateStart  datum začátku (pro datovou část názvu)
+ * @param int    $photoCount počet fotek
+ */
+function vt_suggest_name_from_points(array $points, string $dateStart, int $photoCount, int $maxPlaces = 2): string
+{
+    $datePart = date('j. n. Y', (int)strtotime($dateStart));
+    $places   = vt_collect_places($points, $maxPlaces);
+    if ($places) {
+        return 'Virtuální trasa — ' . implode(', ', $places) . ' - ' . $datePart . " ({$photoCount} fotek)";
+    }
+    return 'Virtuální trasa — ' . $datePart . " ({$photoCount} fotek)";
+}

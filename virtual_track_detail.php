@@ -60,6 +60,7 @@ require __DIR__ . '/includes/layout_header.php';
         <span id="vtName"><?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?></span>
         <?php if ($_isAdmin): ?>
         <button id="renameBtn" title="Přejmenovat" style="background:none;border:none;cursor:pointer;font-size:16px;">✏️</button>
+        <button id="suggestNameBtn" title="Navrhnout název dle místa (Mapy.com)" style="background:none;border:none;cursor:pointer;font-size:16px;">✨</button>
         <?php endif; ?>
     </h1>
 </section>
@@ -521,6 +522,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(r => r.json())
                 .then(d => { if (d.ok) document.getElementById('vtName').textContent = d.name; else alert('Chyba: ' + (d.error || '?')); })
                 .catch(e => alert('Chyba: ' + e.message));
+        });
+
+        // Návrh názvu dle místa (Mapy.com reverse-geocode) → předvyplní editovatelný prompt
+        const snb = document.getElementById('suggestNameBtn');
+        if (snb) snb.addEventListener('click', () => {
+            const orig = snb.textContent;
+            snb.textContent = '⏳'; snb.disabled = true;
+            fetch('api/virtual_tracks/suggest_name.php?id=' + encodeURIComponent(window.gpxVtData.vtId))
+                .then(r => r.json())
+                .then(d => {
+                    if (!d.ok) { alert('Návrh názvu selhal: ' + (d.error || '?')); return; }
+                    const cur = document.getElementById('vtName').textContent;
+                    const name = prompt('Návrh názvu dle místa (uprav nebo potvrď):', d.name);
+                    if (!name || name.trim() === '' || name === cur) return;
+                    const fd = new FormData();
+                    fd.append('_csrf_token', window.gpxVtData.csrf);
+                    fd.append('id', window.gpxVtData.vtId);
+                    fd.append('name', name.trim());
+                    fetch('api/virtual_tracks/rename.php', { method: 'POST', body: fd })
+                        .then(r => r.json())
+                        .then(d2 => { if (d2.ok) document.getElementById('vtName').textContent = d2.name; else alert('Chyba: ' + (d2.error || '?')); })
+                        .catch(e => alert('Chyba: ' + e.message));
+                })
+                .catch(e => alert('Chyba: ' + e.message))
+                .finally(() => { snb.textContent = orig; snb.disabled = false; });
         });
 
         // Editace metadat: oblíbená / barva / poznámka
