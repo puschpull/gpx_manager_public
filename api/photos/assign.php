@@ -2,14 +2,16 @@
 declare(strict_types=1);
 
 /**
- * api/photos/assign.php — Assign a photo to a track
- * POST photo_id, track_id (empty string = unassign)
+ * api/photos/assign.php — Assign a photo to a track (GPX or virtual)
+ * POST photo_id, track_id
+ *   ''   = unassign | 'N' = GPX track N | 'vN' = virtual track N
  * csrf: yes | admin: yes
  */
 
 require_once __DIR__ . '/../../includes/public_access.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/ajax.php';
+require_once __DIR__ . '/../../includes/virtual_track_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -18,17 +20,26 @@ ajax_endpoint(function () use ($pdo): array {
     }
 
     $photoId = (int)($_POST['photo_id'] ?? 0);
-    $trackId = (isset($_POST['track_id']) && $_POST['track_id'] !== '')
-        ? (int)$_POST['track_id']
-        : null;
-
     if (!$photoId) {
         http_response_code(400);
         return ['ok' => false, 'error' => 'Chybí photo_id'];
     }
 
-    $stmt = $pdo->prepare("UPDATE track_photos SET track_id = ? WHERE id = ?");
-    $stmt->execute([$trackId, $photoId]);
+    [$trackId, $virtualTrackId] = vt_parse_assign_target($_POST['track_id'] ?? '');
+
+    // Stará virtuální trasa fotky — po odebrání ji přepočítáme
+    $sel = $pdo->prepare("SELECT virtual_track_id FROM track_photos WHERE id = ?");
+    $sel->execute([$photoId]);
+    $oldVt = (int)($sel->fetchColumn() ?: 0);
+
+    $pdo->prepare("UPDATE track_photos SET track_id = ?, virtual_track_id = ? WHERE id = ?")
+        ->execute([$trackId, $virtualTrackId, $photoId]);
+
+    // Přepočítat statistiky + náhled dotčených virtuálních tras (stará i nová)
+    foreach (array_unique(array_filter([$oldVt, $virtualTrackId])) as $vt) {
+        vt_recompute_and_save($pdo, (int)$vt);
+        @vt_generate_thumb($pdo, (int)$vt);
+    }
 
     return ['ok' => true];
 }, ['csrf' => true, 'admin' => true, 'name' => 'photos/assign']);

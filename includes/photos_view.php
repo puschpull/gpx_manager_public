@@ -6,7 +6,7 @@
  *   $totalCount, $withGps, $withTrack, $unassigned
  *   $GALLERY_PER_PAGE_OPTIONS, $galleryPerPage, $galleryPage, $totalGalleryPages
  *   $currentPageGroups, $pagePhotos, $groupedForDisplay
- *   $unassignedPhotos, $tracksForSelect
+ *   $unassignedPhotos, $tracksForSelect, $virtualTracksForSelect
  *   $timeline, $timelinePhotos, $monthNamesCz, $currentYear
  *
  * All echo output is escaped via h() or explicit (int) casts.
@@ -456,12 +456,24 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
         <h3>✏ <?= htmlspecialchars(t('photos_modal_assign_title', 'Přiřadit fotku k trase')) ?></h3>
         <select id="assignTrackSelect" class="select">
             <option value="">— <?= htmlspecialchars(t('photos_modal_unassigned', 'Nepřiřazená')) ?> —</option>
+            <?php if (!empty($virtualTracksForSelect)): ?>
+            <optgroup label="🧭 <?= htmlspecialchars(t('photos_optgroup_virtual', 'Virtuální trasy')) ?>">
+            <?php foreach ($virtualTracksForSelect as $vt): ?>
+            <option value="v<?= (int)$vt['id'] ?>">
+                <?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?>
+                <?= $vt['date_start'] ? ' (' . substr($vt['date_start'], 0, 10) . ')' : '' ?>
+            </option>
+            <?php endforeach; ?>
+            </optgroup>
+            <?php endif; ?>
+            <optgroup label="🗺 <?= htmlspecialchars(t('photos_optgroup_tracks', 'GPX trasy')) ?>">
             <?php foreach ($tracksForSelect as $tr): ?>
             <option value="<?= (int)$tr['id'] ?>">
                 <?= h($tr['track_name'] ?: $tr['filename']) ?>
                 <?= $tr['date_start'] ? ' (' . substr($tr['date_start'], 0, 10) . ')' : '' ?>
             </option>
             <?php endforeach; ?>
+            </optgroup>
         </select>
         <div class="modal-actions">
             <button class="btn" id="assignCancelBtn"><?= htmlspecialchars(t('cancel', 'Zrušit')) ?></button>

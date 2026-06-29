@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Localización en español
  * Las claves están organizadas por páginas / secciones.

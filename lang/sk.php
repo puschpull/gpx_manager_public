@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Slovenská lokalizácia
  * Kľúče sú organizované podľa stránok / sekcií.

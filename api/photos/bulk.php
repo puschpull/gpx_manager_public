@@ -14,6 +14,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/public_access.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/ajax.php';
+require_once __DIR__ . '/../../includes/virtual_track_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -45,19 +46,32 @@ ajax_endpoint(function () use ($pdo): array {
     }
 
     if ($action === 'bulk_assign') {
-        $ids     = array_filter(array_map('intval', (array)($_POST['photo_ids'] ?? [])));
-        $trackId = (isset($_POST['track_id']) && $_POST['track_id'] !== '')
-            ? (int)$_POST['track_id']
-            : null;
-
+        $ids = array_filter(array_map('intval', (array)($_POST['photo_ids'] ?? [])));
         if (empty($ids)) {
             http_response_code(400);
             return ['ok' => false, 'error' => 'Žádná ID.'];
         }
 
+        // '' = nepřiřadit | 'N' = GPX trasa | 'vN' = virtuální trasa
+        [$trackId, $virtualTrackId] = vt_parse_assign_target($_POST['track_id'] ?? '');
+
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $params = array_merge([$trackId], $ids);
-        $pdo->prepare("UPDATE track_photos SET track_id = ? WHERE id IN ($placeholders)")->execute($params);
+
+        // Staré virtuální trasy dotčených fotek (pro přepočet po odebrání)
+        $oldStmt = $pdo->prepare("SELECT DISTINCT virtual_track_id FROM track_photos WHERE id IN ($placeholders) AND virtual_track_id IS NOT NULL");
+        $oldStmt->execute($ids);
+        $affected = array_map('intval', $oldStmt->fetchAll(\PDO::FETCH_COLUMN));
+
+        $params = array_merge([$trackId, $virtualTrackId], $ids);
+        $pdo->prepare("UPDATE track_photos SET track_id = ?, virtual_track_id = ? WHERE id IN ($placeholders)")->execute($params);
+
+        if ($virtualTrackId) {
+            $affected[] = $virtualTrackId;
+        }
+        foreach (array_unique(array_filter($affected)) as $vt) {
+            vt_recompute_and_save($pdo, (int)$vt);
+            @vt_generate_thumb($pdo, (int)$vt);
+        }
 
         return ['ok' => true, 'updated' => count($ids)];
     }

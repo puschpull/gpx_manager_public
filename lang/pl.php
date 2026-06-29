@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Lokalizacja polska
  * Klucze są zorganizowane według stron / sekcji.

@@ -220,6 +220,14 @@ function load_photos_page_data(\PDO $pdo): array
         LIMIT  500
     ")->fetchAll(\PDO::FETCH_ASSOC);
 
+    // Virtual tracks for assign select (hodnota v selectu = 'v' + id)
+    $virtualTracksForSelect = $pdo->query("
+        SELECT id, name, date_start
+        FROM   virtual_tracks
+        ORDER  BY date_start DESC
+        LIMIT  500
+    ")->fetchAll(\PDO::FETCH_ASSOC);
+
     // --- Timeline (omezeno v single-track režimu) ---
     $timelineParts = ['p.taken_at IS NOT NULL'];
     if (!$isAdmin)         $timelineParts[] = '(p.visible IS NULL OR p.visible = 1)';
@@ -278,6 +286,7 @@ function load_photos_page_data(\PDO $pdo): array
         'pagePhotos'              => $pagePhotos,
         'unassignedPhotos'        => $unassignedPhotos,
         'tracksForSelect'         => $tracksForSelect,
+        'virtualTracksForSelect'  => $virtualTracksForSelect,
         'timeline'                => $timeline,
         'timelinePhotos'          => $timelinePhotos,
         'monthNamesCz'            => $monthNamesCz,

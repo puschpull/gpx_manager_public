@@ -9,6 +9,35 @@
 ── 26. června 2026 ─────────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  FOTKY — PŘIŘAZENÍ K VIRTUÁLNÍ TRASE                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Přiřazovací nabídka v galerii fotek (✏ Přiřadit k trase) teď nabízí i
+  virtuální trasy — ve dvou skupinách „🧭 Virtuální trasy" (první) a
+  „🗺 GPX trasy". Hodnota virtuální trasy v selectu = 'v' + id.
+
+  Upravené:  includes/photos_data.php (načte virtuální trasy do selectu),
+             includes/photos_view.php (optgroupy, virtuální trasy první),
+             api/photos/assign.php, api/photos/bulk.php (nastaví track_id NEBO
+             virtual_track_id; přepočet statistik + náhledu dotčených VT),
+             includes/virtual_track_helper.php (vt_parse_assign_target;
+             photo_count VT teď počítá i fotky bez GPS)
+
+  - track_id a virtual_track_id jsou vzájemně výlučné; „Nepřiřazená" vynuluje oba.
+  - Fotka bez GPS jde přiřadit k VT (objeví se v galerii, počet naskočí),
+    ale neovlivní čáru/vzdálenost — geometrii dělají jen GPS fotky.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA — UTF-8 BOM v 9 PHP souborech                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Odstraněn UTF-8 BOM z: rebuild_thumbs.php, zip_export.php,
+  includes/generate_thumb.php a lang/{de,es,fr,it,pl,sk}.php.
+  - generate_thumb.php prosakoval BOM do JSON odpovědí (require z VT helperu).
+  - Lang soubory emitovaly BOM před hlavičkami → riziko „headers already sent"
+    pro de/es/fr/it/pl/sk. Uloženo jako UTF-8 bez BOM (byte-level řez, jen −3 B).
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  VIRTUÁLNÍ TRASY — AUTO-NÁZEV DLE MÍSTA (Mapy.com reverse-geocode)             │
 └──────────────────────────────────────────────────────────────────────────────┘
 

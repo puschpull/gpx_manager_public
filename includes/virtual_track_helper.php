@@ -313,6 +313,16 @@ function vt_recompute_and_save(\PDO $pdo, int $vtId): ?array
         return null;
     }
     $s = vt_compute_stats($rows);
+
+    // photo_count = všechny fotky trasy (vč. ručně přiřazených bez GPS),
+    // ne jen body, ze kterých se počítá geometrie.
+    $cntStmt = $pdo->prepare("SELECT COUNT(*) FROM track_photos WHERE virtual_track_id = ?");
+    $cntStmt->execute([$vtId]);
+    $totalPhotos = (int)$cntStmt->fetchColumn();
+    if ($totalPhotos > 0) {
+        $s['photo_count'] = $totalPhotos;
+    }
+
     $pdo->prepare("
         UPDATE virtual_tracks SET
             date_start = :date_start, date_end = :date_end, photo_count = :photo_count,
@@ -457,4 +467,29 @@ function vt_suggest_name_from_points(array $points, string $dateStart, int $phot
         return 'Virtuální trasa — ' . implode(', ', $places) . ' - ' . $datePart . " ({$photoCount} fotek)";
     }
     return 'Virtuální trasa — ' . $datePart . " ({$photoCount} fotek)";
+}
+
+/**
+ * Rozparsuje hodnotu z přiřazovacího selectu na cíl fotky.
+ *   ''   → [null, null]  (nepřiřadit)
+ *   'N'  → [N, null]      (GPX trasa)
+ *   'vN' → [null, N]      (virtuální trasa)
+ *
+ * track_id a virtual_track_id jsou vzájemně výlučné — vrácená dvojice vždy
+ * obsahuje nejvýš jednu nenulovou hodnotu.
+ *
+ * @return array{0:?int,1:?int} [track_id, virtual_track_id]
+ */
+function vt_parse_assign_target($raw): array
+{
+    $raw = trim((string)$raw);
+    if ($raw === '') {
+        return [null, null];
+    }
+    if ($raw[0] === 'v' || $raw[0] === 'V') {
+        $id = (int)substr($raw, 1);
+        return $id > 0 ? [null, $id] : [null, null];
+    }
+    $id = (int)$raw;
+    return $id > 0 ? [$id, null] : [null, null];
 }

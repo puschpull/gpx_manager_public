@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Localizzazione italiana
  * Le chiavi sono organizzate per pagine / sezioni.

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Localisation française
  * Les clés sont organisées par pages / sections.

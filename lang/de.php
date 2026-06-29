@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Deutsche Lokalisierung
  * Schlüssel sind nach Seiten / Abschnitten organisiert.
