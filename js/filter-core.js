@@ -622,26 +622,47 @@ window.GpxFilter = (function () {
         const parser = new DOMParser();
         const xml = parser.parseFromString(originalXmlText, "application/xml");
 
-        // Ziskame vsechny trkpt a vytvorime set zachovanych origIndex
-        const keepSet = new Set();
-        for (const p of filteredPoints) {
-            if (p !== null) keepSet.add(p.origIndex);
-        }
-
-        // Projdeme vsechny trkpt a odstranime ty, ktere nejsou v keepSet
+        // Puvodni trkpt uzly v poradi dokumentu — origIndex ukazuje sem.
         const allTrkPt = Array.from(xml.getElementsByTagName("trkpt"));
-        for (let i = 0; i < allTrkPt.length; i++) {
-            if (!keepSet.has(i)) {
-                allTrkPt[i].parentNode.removeChild(allTrkPt[i]);
+
+        // Rozdel zachovane body na souvisle useky podle null (mezer/zlomu).
+        // Kazdy usek se stane samostatnym <trkseg>, aby se vzdalenost nepocitala
+        // pres diru (napr. po odfiltrovani jizdy autem mezi dvema vyslapy).
+        const segIndices = [];
+        let cur = [];
+        for (const p of filteredPoints) {
+            if (p === null) {
+                if (cur.length) { segIndices.push(cur); cur = []; }
+            } else {
+                cur.push(p.origIndex);
             }
         }
+        if (cur.length) segIndices.push(cur);
 
-        // Odstranime prazdne trkseg
-        const segments = Array.from(xml.getElementsByTagName("trkseg"));
-        for (const seg of segments) {
-            if (seg.getElementsByTagName("trkpt").length === 0) {
-                seg.parentNode.removeChild(seg);
+        const trk = xml.getElementsByTagName("trk")[0];
+        if (trk && segIndices.length > 0) {
+            const nsUri = trk.namespaceURI;
+            // Odstran vsechny puvodni <trkseg> (uzly <trkpt> si drzime v allTrkPt).
+            Array.from(xml.getElementsByTagName("trkseg")).forEach(s => s.parentNode.removeChild(s));
+            // Pro kazdy souvisly usek vytvor novy <trkseg> a presun do nej puvodni body.
+            for (const idxList of segIndices) {
+                const seg = nsUri ? xml.createElementNS(nsUri, "trkseg") : xml.createElement("trkseg");
+                for (const origIdx of idxList) {
+                    const node = allTrkPt[origIdx];
+                    if (node) seg.appendChild(node);
+                }
+                trk.appendChild(seg);
             }
+        } else {
+            // Fallback (zadny <trk> nebo zadne body) — puvodni chovani.
+            const keepSet = new Set();
+            for (const p of filteredPoints) { if (p !== null) keepSet.add(p.origIndex); }
+            for (let i = 0; i < allTrkPt.length; i++) {
+                if (!keepSet.has(i)) allTrkPt[i].parentNode.removeChild(allTrkPt[i]);
+            }
+            Array.from(xml.getElementsByTagName("trkseg")).forEach(seg => {
+                if (seg.getElementsByTagName("trkpt").length === 0) seg.parentNode.removeChild(seg);
+            });
         }
 
         const serializer = new XMLSerializer();

@@ -9,6 +9,35 @@
 ── 26. června 2026 ─────────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  FILTRACE TRASY — „APLIKOVAT NA TUTO TRASU" + KOREKTNÍ MEZERY                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové tlačítko „♻ Aplikovat na tuto trasu" na filtrační stránce přepíše
+  vyčištěnou verzí PŘÍMO stávající trasu (stejné id) — fotky i kategorie
+  zůstanou, statistiky se přepočítají, originál GPX se zazálohuje (.bak).
+  Vedle původního „Uložit jako novou trasu".
+
+  Navíc: výlety typu „výšlap–auto–výšlap" teď vycházejí správně:
+  - Export filtru rozdělí trasu v místě odfiltrované mezery na samostatné
+    <trkseg> (js/filter-core.js).
+  - parse_gpx nepočítá vzdálenost/převýšení přes zlom segmentu (dřív natáhl
+    přímku přes díru a km nafoukl). Přidán _gpx_segment_start_indices().
+    Pozn.: měněn jen výpočet, XXE/loading vrstva (safe_load_gpx) netknutá.
+
+  Upravené: includes/filter_data.php (akce apply_cleaned), includes/filter_view.php,
+            js/filter-ui.js, js/filter-core.js, includes/gpx_parser.php
+  Pozn.: detail mapa (leaflet-gpx) víc segmentů vizuálně spojuje čarou —
+         data jsou správná, mezera na mapě je kosmetika (ponecháno).
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  CACHE-BUSTING NÁHLEDŮ A GPX (?v=<mtime>)                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  thumb_url() a gpx_url() (includes/paths.php) přidávají ?v=<čas změny souboru>.
+  Po přepsání souboru se stejným názvem (in-place úprava trasy, přegenerování
+  náhledu) se změní URL a prohlížeč načte novou verzi bez tvrdého refreshe.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  FOTKY — PŘIŘAZENÍ K VIRTUÁLNÍ TRASE                                           │
 └──────────────────────────────────────────────────────────────────────────────┘
 

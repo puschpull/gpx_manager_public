@@ -80,14 +80,28 @@ function photo_full_url(string $filename): string {
     return uploads_url('photos/' . rawurlencode($filename));
 }
 
+/**
+ * Vrátí "?v=<mtime>" pro cache-busting, pokud soubor v uploads existuje (jinak "").
+ * Díky tomu se po přepsání souboru se stejným názvem (in-place úprava trasy,
+ * přegenerování náhledu) změní URL a prohlížeč načte novou verzi bez tvrdého refreshe.
+ */
+function uploads_cache_bust(string $relative): string {
+    try {
+        $fs = uploads_fs($relative);
+    } catch (\Throwable $e) {
+        return '';
+    }
+    return is_file($fs) ? '?v=' . filemtime($fs) : '';
+}
+
 /** URL shortcut for a GPX file stored in uploads/. */
 function gpx_url(string $filename): string {
-    return uploads_url(rawurlencode($filename));
+    return uploads_url(rawurlencode($filename)) . uploads_cache_bust($filename);
 }
 
 /** URL shortcut for a track thumbnail image. */
 function thumb_url(string $filename): string {
-    return uploads_url('thumbs/' . rawurlencode($filename));
+    return uploads_url('thumbs/' . rawurlencode($filename)) . uploads_cache_bust('thumbs/' . $filename);
 }
 
 /**

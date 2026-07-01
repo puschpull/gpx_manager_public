@@ -229,6 +229,7 @@ require __DIR__ . '/layout_header.php';
             <button id="btnReset" class="btn">↺ Resetovat</button>
             <button id="btnExport" class="btn" disabled title="Stáhnout vyčištěný GPX soubor">⬇ Stáhnout GPX</button>
             <?php if ($track && $_isAdmin): ?>
+            <button id="btnApplyTrack" class="btn btn-primary" disabled title="Přepíše přímo tuto trasu (#<?= (int)$track['id'] ?>) vyčištěnou verzí — fotky i kategorie zůstanou, originál GPX se zazálohuje (.bak)">♻ Aplikovat na tuto trasu</button>
             <button id="btnSaveCatalog" class="btn" disabled title="Uložit vyčištěnou verzi jako novou trasu v databázi (originál zůstane nedotčen)">💾 Uložit jako novou trasu</button>
             <?php endif; ?>
         </div>

@@ -189,8 +189,10 @@ function _t(key, fallback) {
         // Povolit export
         const btnExport = el("btnExport");
         const btnSave = el("btnSaveCatalog");
+        const btnApplyTrack = el("btnApplyTrack");
         if (btnExport) btnExport.disabled = false;
         if (btnSave) btnSave.disabled = false;
+        if (btnApplyTrack) btnApplyTrack.disabled = false;
     }
 
     function debouncedRun() {
@@ -313,6 +315,10 @@ function _t(key, fallback) {
         const btnSave = el("btnSaveCatalog");
         if (btnSave) btnSave.addEventListener("click", saveToCatalog);
 
+        // Aplikovat na tuto trasu (in-place)
+        const btnApplyTrack = el("btnApplyTrack");
+        if (btnApplyTrack) btnApplyTrack.addEventListener("click", applyToTrack);
+
         // Presety
         const btnLoad = el("presetLoad");
         const btnSavePreset = el("presetSave");
@@ -374,6 +380,44 @@ function _t(key, fallback) {
             .catch(err => {
                 if (btn) { btn.disabled = false; btn.textContent = origLabel; }
                 showWarning("Chyba při ukládání: " + err.message);
+            });
+    }
+
+    // Aplikace vyčištěné verze PŘÍMO na aktuální trasu (in-place, stejné id).
+    function applyToTrack() {
+        if (!originalXmlText || !lastResult) return;
+        const trackId = window.gpxFilterData?.trackId;
+        if (!trackId) return;
+        if (!confirm("Přepsat přímo tuto trasu #" + trackId + " vyčištěnou verzí?\n\n"
+            + "Fotky i kategorie zůstanou, statistiky se přepočítají. "
+            + "Originál GPX se zazálohuje (.bak).")) return;
+
+        const btn = el("btnApplyTrack");
+        const origLabel = btn ? btn.textContent : "";
+        if (btn) { btn.disabled = true; btn.textContent = "⏳ Aplikuji…"; }
+
+        const gpxContent = GpxFilter.exportGpx(originalXmlText, lastResult.filtered);
+        const csrfToken = window.gpxFilterData?.csrfToken || "";
+
+        const form = new FormData();
+        form.append("_csrf_token", csrfToken);
+        form.append("track_id", trackId);
+        form.append("gpx_content", gpxContent);
+
+        fetch("filter.php?ajax=apply_cleaned", { method: "POST", body: form })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok) {
+                    if (btn) { btn.textContent = "✅ Hotovo! Přesměrovávám…"; }
+                    setTimeout(() => { window.location.href = "detail.php?id=" + data.id; }, 800);
+                } else {
+                    if (btn) { btn.disabled = false; btn.textContent = origLabel; }
+                    showWarning("Chyba při aplikaci: " + (data.error || "neznámá chyba"));
+                }
+            })
+            .catch(err => {
+                if (btn) { btn.disabled = false; btn.textContent = origLabel; }
+                showWarning("Chyba při aplikaci: " + err.message);
             });
     }
 

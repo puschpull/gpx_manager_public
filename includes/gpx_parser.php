@@ -159,8 +159,12 @@ function _gpx_extract_trackpoints(SimpleXMLElement $xml, array $ns): array
     $nsTPXv1 = $ns['tp1'];
     $nsTPXv2 = $ns['tp2'];
 
+    // Ploché indexy bodů, které jsou prvním bodem nového trkseg. Vzdálenost se
+    // přes ně NEpřičítá (mezera po odfiltrování / pauza záznamu → žádná přímka přes díru).
+    $segStart = _gpx_segment_start_indices($xml, $ns);
+
     $points = [];
-    foreach ($trkpts as $pt) {
+    foreach ($trkpts as $i => $pt) {
         $lat  = (float)$pt['lat'];
         $lon  = (float)$pt['lon'];
         $ele  = isset($pt->ele)  ? (float)$pt->ele  : null;
@@ -179,10 +183,36 @@ function _gpx_extract_trackpoints(SimpleXMLElement $xml, array $ns): array
             }
         }
 
-        $points[] = ['lat' => $lat, 'lon' => $lon, 'ele' => $ele, 'time' => $time, 'speed' => $speed];
+        $point = ['lat' => $lat, 'lon' => $lon, 'ele' => $ele, 'time' => $time, 'speed' => $speed];
+        if (isset($segStart[$i])) {
+            $point['seg_start'] = true;
+        }
+        $points[] = $point;
     }
 
     return $points;
+}
+
+/**
+ * Vrátí množinu plochých indexů bodů (napříč všemi trkseg), které jsou PRVNÍM
+ * bodem nového segmentu. Slouží k tomu, aby se vzdálenost/převýšení nepřičítaly
+ * přes zlom mezi segmenty (mezera po odfiltrování úseku, pauza záznamu apod.).
+ *
+ * @return array<int,true>
+ */
+function _gpx_segment_start_indices(SimpleXMLElement $xml, array $ns): array
+{
+    $starts = [];
+    $flat   = 0;
+    $segs   = $xml->xpath('//g:trk/g:trkseg') ?: [];
+    foreach ($segs as $i => $seg) {
+        $cnt = count($seg->children($ns['g'])->trkpt);
+        if ($i > 0 && $flat > 0 && $cnt > 0) {
+            $starts[$flat] = true;   // první bod tohoto segmentu = zlom
+        }
+        $flat += $cnt;
+    }
+    return $starts;
 }
 
 /**
@@ -212,6 +242,11 @@ function _gpx_compute_metrics(array $trackpoints): array
     for ($i = 0; $i < $count; $i++) {
         $p = $trackpoints[$i];
 
+        // Nový segment (zlom po mezeře / pauze) — nepřičítat převýšení ani
+        // vzdálenost/rychlost přes díru (žádná přímka mezi konci úseků).
+        $segBreak = !empty($p['seg_start']);
+        if ($segBreak) $eleRef = null;
+
         if ($p['time'] !== null) $times[] = $p['time'];
         if ($p['ele'] !== null) {
             if ($p['ele'] < $eleMin) $eleMin = $p['ele'];
@@ -234,7 +269,7 @@ function _gpx_compute_metrics(array $trackpoints): array
             }
         }
 
-        if ($i === 0) continue;
+        if ($i === 0 || $segBreak) continue;
 
         $a = $trackpoints[$i - 1];
         $b = $p;
