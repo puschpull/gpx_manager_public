@@ -10,6 +10,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/public_access.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/ajax.php';
+require_once __DIR__ . '/../../includes/virtual_track_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -23,7 +24,7 @@ ajax_endpoint(function () use ($pdo): array {
         return ['ok' => false, 'error' => 'Chybí photo_id'];
     }
 
-    $stmt = $pdo->prepare("SELECT filename FROM track_photos WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT filename, virtual_track_id FROM track_photos WHERE id = ?");
     $stmt->execute([$photoId]);
     $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
@@ -31,6 +32,13 @@ ajax_endpoint(function () use ($pdo): array {
         @unlink(uploads_fs('photos/' . $row['filename']));
         @unlink(uploads_fs('photos/thumbs/' . $row['filename']));
         $pdo->prepare("DELETE FROM track_photos WHERE id = ?")->execute([$photoId]);
+
+        // Fotka patřila k virtuální trase → přepočítat statistiky + náhled
+        $vtId = (int)($row['virtual_track_id'] ?? 0);
+        if ($vtId > 0) {
+            vt_recompute_and_save($pdo, $vtId);
+            @vt_generate_thumb($pdo, $vtId);
+        }
     }
 
     return ['ok' => true];

@@ -41,10 +41,13 @@ try {
 
     $pdo->commit();
 
-    // Smazání GPX souboru
+    // Smazání GPX souboru (+ případné zálohy z in-place filtrace)
     $gpxFile = uploads_fs($track['filename']);
     if (is_file($gpxFile)) {
         unlink($gpxFile);
+    }
+    if (is_file($gpxFile . '.bak')) {
+        unlink($gpxFile . '.bak');
     }
 
     // Smazání náhledu

@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS app_config (
 
 -- ------------------------------------------------------------
 --  Tabulka: filter_presets (uložené filtry tras)
---  Poznámka: vytváří se automaticky i při prvním spuštění PHP
+--  Poznámka: shodné s migrations/0016_filter_presets.sql
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS filter_presets (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -146,15 +146,16 @@ CREATE TABLE IF NOT EXISTS login_attempts (
     attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     success      TINYINT(1) NOT NULL DEFAULT 0,
     INDEX idx_la_ip_time (ip, attempted_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
 --  Výchozí konfigurace aplikace
 -- ------------------------------------------------------------
+-- Pozn.: seznamy musí odpovídat all_langs() / all_pages() v includes/app_constants.php
+-- (allowed_themes odstraněno — barevná témata zrušena 6/2026, zůstal světlý/tmavý režim)
 INSERT IGNORE INTO app_config (config_key, config_value) VALUES
-('allowed_themes', '["classic","dark","darkblue","darkgreen","blue","green","minimal","lightgray","brown"]'),
 ('allowed_langs',  '["cs","en","de","sk","es","fr","pl","it"]'),
-('visible_pages',  '["stats","calendar","heatmap","map_search","nearby","filter","compare","settings"]');
+('visible_pages',  '["stats","calendar","heatmap","photo_heatmap","map_search","nearby","filter","compare","settings","virtual_tracks"]');
 
 SET foreign_key_checks = 1;
 

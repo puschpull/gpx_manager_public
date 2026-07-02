@@ -50,13 +50,13 @@ if (!function_exists('t')) {
 
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
-    <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>
 
     <!-- Alpine.js (pro interaktivitu) -->
-    <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh" crossorigin="anonymous"></script>
 
     <!-- Lucide icons -->
-    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/img/logo-mountain.svg">

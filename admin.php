@@ -70,7 +70,7 @@ $withoutActivity = $totalTracks - $withActivity;
 // Náhledy — počítáme trasy, kterým reálně chybí PNG náhled.
 // (Dříve: $totalTracks - počet .png ve složce → mohlo jít do záporu kvůli
 //  osiřelým náhledům po smazaných trasách.)
-$thumbDir = __DIR__ . '/uploads/thumbs/';
+$thumbDir = uploads_fs('thumbs/');
 $withoutThumbs = 0;
 $orphanThumbs  = 0;
 if (is_dir($thumbDir)) {
@@ -95,7 +95,7 @@ if (is_dir($thumbDir)) {
 
 // Velikost uploads
 $uploadsSize = 0;
-$uploadDir = __DIR__ . '/uploads/';
+$uploadDir = uploads_fs();
 if (is_dir($uploadDir)) {
     foreach (glob($uploadDir . '*.gpx') as $f) {
         $uploadsSize += filesize($f);

@@ -22,11 +22,17 @@ ajax_endpoint(function () use ($pdo): array {
         return ['photos' => []];
     }
 
+    // Skryté fotky vidí jen admin (stejný filtr jako photos_data.php)
+    $visibleFilter = empty($_SESSION['is_admin'])
+        ? 'AND (visible IS NULL OR visible = 1)'
+        : '';
+
     $stmt = $pdo->prepare("
         SELECT id, filename, lat, lon, altitude, taken_at
         FROM   track_photos
         WHERE  lat BETWEEN :minlat AND :maxlat
           AND  lon BETWEEN :minlon AND :maxlon
+          $visibleFilter
         ORDER  BY taken_at ASC
         LIMIT  200
     ");

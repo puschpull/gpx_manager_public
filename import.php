@@ -125,8 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['ajax'] ?? '') === '1') {
         exit;
     }
 
-    $uploadDir = __DIR__ . '/uploads/';
-    $thumbDir  = __DIR__ . '/uploads/thumbs/';
+    $uploadDir = uploads_fs();
+    $thumbDir  = uploads_fs('thumbs/');
     if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
     if (!is_dir($thumbDir))  mkdir($thumbDir,  0755, true);
 

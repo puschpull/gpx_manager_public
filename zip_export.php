@@ -34,7 +34,7 @@ if (!class_exists('ZipArchive')) {
 }
 
 /* ===== Sestavení ZIP ===== */
-$uploadDir = __DIR__ . '/uploads/';
+$uploadDir = uploads_fs();
 $zipName   = 'gpx_export_' . date('Y-m-d_His') . '_(' . count($rows) . 'tras).zip';
 $tmpZip    = sys_get_temp_dir() . '/' . $zipName;
 

@@ -32,7 +32,7 @@ ajax_endpoint(function () use ($pdo): array {
         }
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $rows = $pdo->prepare("SELECT id, filename FROM track_photos WHERE id IN ($placeholders)");
+        $rows = $pdo->prepare("SELECT id, filename, virtual_track_id FROM track_photos WHERE id IN ($placeholders)");
         $rows->execute($ids);
         $toDelete = $rows->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -41,6 +41,16 @@ ajax_endpoint(function () use ($pdo): array {
             @unlink(uploads_fs('photos/thumbs/' . $row['filename']));
         }
         $pdo->prepare("DELETE FROM track_photos WHERE id IN ($placeholders)")->execute($ids);
+
+        // Dotčené virtuální trasy → přepočítat statistiky + náhledy
+        $affectedVts = array_unique(array_filter(array_map(
+            static fn($r) => (int)($r['virtual_track_id'] ?? 0),
+            $toDelete
+        )));
+        foreach ($affectedVts as $vt) {
+            vt_recompute_and_save($pdo, $vt);
+            @vt_generate_thumb($pdo, $vt);
+        }
 
         return ['ok' => true, 'deleted' => count($toDelete)];
     }

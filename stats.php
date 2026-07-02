@@ -267,10 +267,9 @@ require __DIR__ . '/includes/layout_header.php';
 <style>.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }</style>
 
 <!-- Chart.js + outdoor theme -->
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-        integrity=""
+        integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 <script src="js/chart-theme.js"></script>
 <script>

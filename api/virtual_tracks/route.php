@@ -9,7 +9,9 @@ declare(strict_types=1);
  * trasu po reálných cestách a vrátí geometrii pro vykreslení. Volání běží
  * server-side (API klíč zůstává na serveru). Výsledek je ODHAD.
  *
- * csrf: no | admin: no  (read-only; volá se jen na vyžádání)
+ * csrf: no | admin: yes — read-only, ale každé volání utrácí Mapy.com API
+ * kvótu; routing UI je ve virtual_track_detail.php jen pro adminy, takže
+ * admin gate nic neomezuje a brání anonymnímu vyčerpání klíče.
  */
 
 require_once __DIR__ . '/../../includes/public_access.php';
@@ -148,7 +150,7 @@ ajax_endpoint(function () use ($pdo): array {
         'from'       => $from,
         'to'         => $to,
     ];
-}, ['csrf' => false, 'admin' => false, 'name' => 'virtual_tracks/route']);
+}, ['csrf' => false, 'admin' => true, 'name' => 'virtual_tracks/route']);
 
 /**
  * Rekurzivně najde první LineString (pole [lon,lat] dvojic) v dekódovaném JSON.

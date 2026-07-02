@@ -11,7 +11,7 @@ check_page_access('heatmap');
 $allowedLangs = available_langs();
 
 /* ===== Cache soubor pro heatmapu ===== */
-$cacheFile = __DIR__ . '/uploads/heatmap_cache.json';
+$cacheFile = uploads_fs('heatmap_cache.json');
 
 /* ===== AJAX endpoint — vrátí souřadnice ===== */
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'heatdata') {
@@ -139,8 +139,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'rebuild') {
 $page_title = 'Heatmapa tras';
 require __DIR__ . '/includes/layout_header.php';
 ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" integrity="sha384-weDCJ80JNrg6W2Dha8CBrQyz5PZVPOZ39Lw7vWOzm65zqKvZZfSq/3rR77RY5TWm" crossorigin="anonymous">
     <style>
         #map { height: calc(100vh - 200px) !important; min-height: 400px; }
         .heatmap-controls {
@@ -214,27 +214,23 @@ require __DIR__ . '/includes/layout_header.php';
      aria-label="<?= htmlspecialchars(t('map_aria_generic', 'Interaktivní mapa')) ?>"></div>
 
 <!-- Leaflet -->
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity=""
+        integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"
-        integrity=""
+        integrity="sha384-FON5fTjCTtPuBgUS1r2H/PGXstH0Rk23YKjZmB6qITkbFqBcqtey/rPo9eXwOWpx"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"
-        integrity=""
+        integrity="sha384-Kigx+fLsY5TWX5hU/QUxy7tQh2bUzeIuoHUZTj2O056ByEtnhW6gi9ib8h6r5yb8"
         crossorigin="anonymous"></script>
 
 <!-- Leaflet.heat plugin -->
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"
-        integrity=""
+        integrity="sha384-mFKkGiGvT5vo1fEyGCD3hshDdKmW3wzXW/x+fWriYJArD0R3gawT6lMvLboM22c0"
         crossorigin="anonymous"></script>
 
 <script>

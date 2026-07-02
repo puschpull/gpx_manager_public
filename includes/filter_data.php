@@ -2,19 +2,11 @@
 require_once __DIR__ . '/../includes/helpers.php';
 
 // ====== AJAX endpointy pro presety ======
+// Tabulka filter_presets vzniká přes migrations/0016_filter_presets.sql
+// (dřív runtime CREATE TABLE IF NOT EXISTS na každém requestu — odstraněno).
 $ajax = $_GET['ajax'] ?? '';
 if ($ajax !== '') {
     header('Content-Type: application/json; charset=utf-8');
-
-    // Vytvoření tabulky pokud neexistuje
-    $pdo->exec("CREATE TABLE IF NOT EXISTS filter_presets (
-        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        description TEXT DEFAULT NULL,
-        settings JSON NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
     if ($ajax === 'presets' && $_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->query('SELECT id, name, description, settings FROM filter_presets ORDER BY name');
@@ -135,20 +127,29 @@ if ($ajax !== '') {
             exit;
         }
         $fileHash = sha1_file($targetPath);
+
+        // Centroid z bounds (pro geo dotazy — nearby/similar BBOX prefiltr)
+        $centroidLat = null; $centroidLon = null;
+        $b = $parsed['bounds'] ? json_decode((string)$parsed['bounds'], true) : null;
+        if (is_array($b) && isset($b['minlat'], $b['maxlat'], $b['minlon'], $b['maxlon'])) {
+            $centroidLat = ((float)$b['minlat'] + (float)$b['maxlat']) / 2;
+            $centroidLon = ((float)$b['minlon'] + (float)$b['maxlon']) / 2;
+        }
+
         $stmt = $pdo->prepare('INSERT INTO tracks (
             filename, track_name, color, device, date_start, date_end,
             duration, moving_time, stopped_time, distance_km,
             ascent, descent, elevation_min, elevation_max,
             speed_max, speed_avg, speed_avg_total,
             avg_ascent_rate, avg_descent_rate, max_ascent_rate, max_descent_rate,
-            bounds, trackpoints_count, file_hash
+            bounds, trackpoints_count, file_hash, centroid_lat, centroid_lon
         ) VALUES (
             :filename, :track_name, :color, :device, :date_start, :date_end,
             :duration, :moving_time, :stopped_time, :distance_km,
             :ascent, :descent, :elevation_min, :elevation_max,
             :speed_max, :speed_avg, :speed_avg_total,
             :avg_ascent_rate, :avg_descent_rate, :max_ascent_rate, :max_descent_rate,
-            :bounds, :trackpoints_count, :file_hash
+            :bounds, :trackpoints_count, :file_hash, :centroid_lat, :centroid_lon
         )');
         $stmt->execute([
             ':filename'       => $newName,
@@ -175,6 +176,8 @@ if ($ajax !== '') {
             ':bounds'         => $parsed['bounds'],
             ':trackpoints_count' => $parsed['trackpoints_count'],
             ':file_hash'      => $fileHash,
+            ':centroid_lat'   => $centroidLat,
+            ':centroid_lon'   => $centroidLon,
         ]);
         $newId = (int)$pdo->lastInsertId();
 

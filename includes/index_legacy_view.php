@@ -36,7 +36,7 @@ require __DIR__ . '/layout_header.php';
 
 
 <?php
-$_visiblePages = get_app_config('visible_pages', ['stats','calendar','heatmap','map_search','nearby','filter','compare','settings']);
+$_visiblePages = get_app_config('visible_pages', all_pages());
 $_isAdmin = !empty($_SESSION['is_admin']);
 ?>
 <!-- Topbar -->
@@ -520,10 +520,9 @@ $_isAdmin = !empty($_SESSION['is_admin']);
 </div><!-- /index-layout -->
 
 <!-- JS knihovny -->
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-        integrity=""
+        integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 
 <!-- Data pro graf -->

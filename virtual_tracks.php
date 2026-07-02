@@ -113,7 +113,7 @@ require __DIR__ . '/includes/layout_header.php';
         // Náhled mapy — lazy generování chybějícího (jen admin, jednorázově)
         $vtThumb = vt_thumb_path((int)$vt['id']);
         if (!is_file($vtThumb) && $_isAdmin) { @vt_generate_thumb($pdo, (int)$vt['id']); }
-        $vtThumbUrl = is_file($vtThumb) ? ('uploads/vt_thumbs/' . (int)$vt['id'] . '.png?t=' . filemtime($vtThumb)) : null;
+        $vtThumbUrl = is_file($vtThumb) ? (uploads_url('vt_thumbs/' . (int)$vt['id'] . '.png') . '?t=' . filemtime($vtThumb)) : null;
         ?>
         <div class="vt-list-item" id="vt-row-<?= (int)$vt['id'] ?>">
             <div style="display:flex; align-items:center; gap:12px;">

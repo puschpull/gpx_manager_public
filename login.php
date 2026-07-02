@@ -34,6 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
 // ----- IP-based rate limiting (SEC-009, SEC-030) -----
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
+// Úklid: záznamy starší 7 dnů už rate-limit okno (15 min) nikdy nepotřebuje —
+// bez tohoto DELETE by tabulka rostla donekonečna. Běží jen na login POSTech.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $pdo->exec("DELETE FROM login_attempts WHERE attempted_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+}
+
 $stmtCount = $pdo->prepare(
     "SELECT COUNT(*) FROM login_attempts
      WHERE ip = ? AND success = 0
@@ -83,15 +89,14 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/app.css">
-    <!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
     <script defer
             src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"
-            integrity=""
+            integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh"
             crossorigin="anonymous"></script>
-    <!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
+    <!-- lucide@0.516.0 nemá UMD build (404) — sjednoceno na 0.469.0 jako v layout_header.php -->
     <script defer
-            src="https://unpkg.com/lucide@0.516.0/dist/umd/lucide.min.js"
-            integrity=""
+            src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"
+            integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM"
             crossorigin="anonymous"></script>
     <link rel="icon" type="image/svg+xml" href="assets/img/logo-mountain.svg">
 </head>

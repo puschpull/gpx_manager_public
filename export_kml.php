@@ -15,7 +15,7 @@ $stmt->execute([$id]);
 $track = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$track) { http_response_code(404); exit('Track not found'); }
 
-$gpxPath = __DIR__ . '/uploads/' . $track['filename'];
+$gpxPath = uploads_fs($track['filename']);
 if (!file_exists($gpxPath)) { http_response_code(404); exit('GPX file not found'); }
 
 $gpx = safe_load_gpx($gpxPath);

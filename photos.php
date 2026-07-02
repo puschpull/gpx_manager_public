@@ -15,21 +15,11 @@ require_once __DIR__ . '/includes/photo_helper.php';
 require_once __DIR__ . '/includes/photos_data.php';
 
 /* =====================================================================
-   Access gate
+   Access gate — standardní check_page_access ('photos' není v all_pages(),
+   takže default = pro návštěvníky skryto; admin.php ji nabízí zvlášť)
    ===================================================================== */
+check_page_access('photos');
 $_isAdmin = !empty($_SESSION['is_admin']);
-
-// Visitors need the page whitelisted; admins always get through
-if (!$_isAdmin) {
-    $visiblePages = get_app_config(
-        'visible_pages',
-        ['stats','calendar','heatmap','map_search','nearby','filter','compare','settings']
-    );
-    if (!in_array('photos', $visiblePages)) {
-        header('Location: index.php');
-        exit;
-    }
-}
 
 $allowedLangs    = available_langs();
 

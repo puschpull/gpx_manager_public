@@ -1,10 +1,53 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 26. června 2026
+  Poslední aktualizace: 2. července 2026
 
 ================================================================================
 
+
+── 2. července 2026 ────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOSTNÍ A KONZISTENČNÍ AUDIT — 12 OPRAV                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Interní audit logiky aplikace; opraveno všech 12 nálezů:
+
+  Logika:
+  - api/photos/bounds.php filtruje skryté fotky pro nepřihlášené (dřív je
+    mapa podle výřezu vracela komukoli).
+  - Smazání fotky (single i bulk) přepočítá statistiky + náhled dotčené
+    virtuální trasy (photo_count, vzdálenost, bounds).
+  - vt_recompute_and_save() při 0 GPS fotkách vynuluje geometrii VT a smaže
+    osiřelý náhled (dřív zůstala stará čísla).
+  - save_cleaned (filtrace → „Uložit jako novou trasu") ukládá centroid —
+    nové trasy nepadají do pomalého fallbacku v nearby/similar.
+
+  Bezpečnost:
+  - recalc_activity.php, recalc_difficulty.php a rebuild_thumbs.php už
+    nemutují na GET — potvrzovací POST formulář + CSRF token.
+    recalc_activity má výchozí mód „jen trasy bez aktivity" (nepřepíše
+    ručně nastavené typy). rebuild_thumbs pokračuje mezi dávkami přes
+    auto-odesílaný POST formulář.
+  - api/virtual_tracks/route.php (Mapy.com routing) je admin-only — brání
+    anonymnímu vyčerpání API kvóty klíče.
+  - SRI hashe (sha384 + crossorigin) pro všechny CDN zdroje — Leaflet
+    + pluginy, Chart.js, Alpine.js, Lucide, leaflet-gpx, včetně CSS.
+  - login.php: opraven mrtvý odkaz na lucide@0.516.0 (UMD build neexistuje,
+    404 — ikony na loginu se tiše nenačítaly) → lucide@0.469.0 z jsdelivr.
+  - login_attempts: při login POSTu se mažou záznamy starší 7 dnů.
+
+  Konzistence:
+  - photos.php používá standardní check_page_access('photos').
+  - Sjednocení na uploads_fs()/uploads_url() ve všech webových souborech
+    (import, exporty, heatmap cache, admin statistiky, VT náhledy…).
+  - Tabulka filter_presets: nová migrace migrations/0016_filter_presets.sql,
+    runtime CREATE TABLE odstraněn z filter_data.php. Na existující instalaci
+    spusť migraci (php migrate.php) — na čerstvé ji založí install.sql.
+  - install.sql: výchozí visible_pages sjednoceno s all_pages(), odstraněn
+    mrtvý allowed_themes.
+  - delete.php maže i zálohu <soubor>.gpx.bak z in-place filtrace.
 
 ── 26. června 2026 ─────────────────────────────────────────────────────────────
 

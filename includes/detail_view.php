@@ -48,8 +48,8 @@ require __DIR__ . '/layout_header.php';
 <link rel="stylesheet" href="css/detail.css">
 
 <!-- Leaflet a fullscreen control CSS (jen pro detail) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" integrity="sha384-weDCJ80JNrg6W2Dha8CBrQyz5PZVPOZ39Lw7vWOzm65zqKvZZfSq/3rR77RY5TWm" crossorigin="anonymous">
 
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6 anim-fade-up anim-fade-up-1">
     <!-- Breadcrumb / back -->
@@ -323,30 +323,25 @@ require __DIR__ . '/layout_header.php';
 </style>
 
 <!-- JS knihovny -->
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity=""
+        integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"
-        integrity=""
+        integrity="sha384-FON5fTjCTtPuBgUS1r2H/PGXstH0Rk23YKjZmB6qITkbFqBcqtey/rPo9eXwOWpx"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"
-        integrity=""
+        integrity="sha384-Kigx+fLsY5TWX5hU/QUxy7tQh2bUzeIuoHUZTj2O056ByEtnhW6gi9ib8h6r5yb8"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"
-        integrity=""
+        integrity="sha384-FlFKgUqOEwuywgVc0+0QrDWcRsIzuyedLe+yUpC1jG4WgtdhJGvWf9mKm6GShpJv"
         crossorigin="anonymous"></script>
-<!-- TODO: SRI hash via openssl dgst -sha384 -binary <url> | openssl base64 -A -->
 <script defer
         src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
-        integrity=""
+        integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 <!-- Lightbox pro fotky v mapových vrstvách "Moje fotografie" a "Polohy fotek na trase" -->
 <script src="js/lightbox.js"></script>

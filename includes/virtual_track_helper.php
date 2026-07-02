@@ -16,7 +16,7 @@ require_once __DIR__ . '/generate_thumb.php';  // generate_thumb()
 
 /** Adresář s náhledy virtuálních tras. */
 function vt_thumb_dir(): string {
-    return __DIR__ . '/../uploads/vt_thumbs/';
+    return uploads_fs('vt_thumbs/');
 }
 
 /** Cesta k PNG náhledu virtuální trasy. */
@@ -36,7 +36,11 @@ function vt_generate_thumb(\PDO $pdo, int $vtId): bool {
     ");
     $stmt->execute([$vtId]);
     $pts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    if (count($pts) < 2) return false;
+    if (count($pts) < 2) {
+        // Trasa už nemá dost bodů — starý náhled by neodpovídal, smazat
+        @unlink(vt_thumb_path($vtId));
+        return false;
+    }
 
     $dir = vt_thumb_dir();
     if (!is_dir($dir)) @mkdir($dir, 0755, true);
@@ -294,8 +298,10 @@ function vt_compute_stats(array $clusterPhotos): array
 
 /**
  * Přepočítá a uloží statistiky virtuální trasy z jejích fotek
- * (po posunu/úpravě polohy fotky). Název (name) se NEMĚNÍ.
- * Vrátí přepočítané statistiky, nebo null pokud trasa nemá body.
+ * (po posunu/úpravě polohy fotky, přiřazení/odebrání/smazání fotky).
+ * Název (name) se NEMĚNÍ.
+ * Pokud trasa už nemá žádné GPS body, geometrii vynuluje (photo_count
+ * zůstane počtem zbylých fotek bez GPS) a vrátí null.
  *
  * @return array<string,mixed>|null
  */
@@ -310,6 +316,27 @@ function vt_recompute_and_save(\PDO $pdo, int $vtId): ?array
     $stmt->execute([$vtId]);
     $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     if (!$rows) {
+        // Žádné GPS body — geometrii vynulovat, ať v přehledu nezůstanou
+        // zastaralé statistiky. photo_count = fotky bez GPS (může být > 0),
+        // datumy z taken_at zbývajících fotek (pokud nějaké mají čas).
+        $meta = $pdo->prepare("
+            SELECT COUNT(*) AS cnt, MIN(taken_at) AS dmin, MAX(taken_at) AS dmax
+            FROM track_photos WHERE virtual_track_id = ?
+        ");
+        $meta->execute([$vtId]);
+        $m = $meta->fetch(\PDO::FETCH_ASSOC);
+        $pdo->prepare("
+            UPDATE virtual_tracks SET
+                date_start = :date_start, date_end = :date_end, photo_count = :photo_count,
+                distance_km = NULL, ascent = NULL, descent = NULL,
+                bounds = NULL, centroid_lat = NULL, centroid_lon = NULL
+            WHERE id = :id
+        ")->execute([
+            ':date_start'  => $m['dmin'],
+            ':date_end'    => $m['dmax'],
+            ':photo_count' => (int)$m['cnt'],
+            ':id'          => $vtId,
+        ]);
         return null;
     }
     $s = vt_compute_stats($rows);
