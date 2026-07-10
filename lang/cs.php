@@ -572,4 +572,17 @@ return [
     'preview_as_visitor_desc'     => 'vidíte stránku bez admin oprávnění',
     'exit_visitor_preview'        => 'Zpět na admin pohled',
     'exit_visitor_preview_aria'   => 'Ukončit náhled návštěvníka a přepnout zpět na admin pohled',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Fotografie v okolí',
+    'nav_photo_nearby'     => 'Fotky v okolí',
+    'pn_click_prompt'      => 'Klikněte na mapu — najdu nejbližší fotografie z vašich výletů.',
+    'pn_searching'         => 'Hledám fotografie v okolí…',
+    'pn_found'             => 'Nalezeno fotografií: {n}',
+    'pn_none'              => 'V okolí zvoleného bodu nejsou žádné fotografie.',
+    'pn_error'             => 'Chyba při komunikaci se serverem.',
+    'pn_radius'            => 'Okruh',
+    'pn_limit'             => 'Max. fotek',
+    'pn_results'           => 'Nejbližší fotografie',
+    'pn_distance'          => 'Vzdálenost',
 ];

@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Perfil de elevación de la ruta',
     'elev_data_table'   => 'Tabla de datos del perfil de elevación',
     'elev_data_caption' => 'Valores de altitud a lo largo de la ruta',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Fotos cercanas',
+    'nav_photo_nearby'     => 'Fotos cercanas',
+    'pn_click_prompt'      => 'Haga clic en el mapa para encontrar las fotos más cercanas de sus viajes.',
+    'pn_searching'         => 'Buscando fotos cercanas…',
+    'pn_found'             => 'Fotos encontradas: {n}',
+    'pn_none'              => 'No hay fotos cerca del punto seleccionado.',
+    'pn_error'             => 'Error de comunicación con el servidor.',
+    'pn_radius'            => 'Radio',
+    'pn_limit'             => 'Máx. fotos',
+    'pn_results'           => 'Fotos más cercanas',
+    'pn_distance'          => 'Distancia',
 ];

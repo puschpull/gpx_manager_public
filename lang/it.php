@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Profilo altimetrico del percorso',
     'elev_data_table'   => 'Tabella dei dati del profilo altimetrico',
     'elev_data_caption' => 'Valori di quota lungo il percorso',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Foto nei dintorni',
+    'nav_photo_nearby'     => 'Foto vicine',
+    'pn_click_prompt'      => 'Fai clic sulla mappa per trovare le foto più vicine delle tue gite.',
+    'pn_searching'         => 'Ricerca foto nei dintorni…',
+    'pn_found'             => 'Foto trovate: {n}',
+    'pn_none'              => 'Nessuna foto vicino al punto selezionato.',
+    'pn_error'             => 'Errore di comunicazione con il server.',
+    'pn_radius'            => 'Raggio',
+    'pn_limit'             => 'Max foto',
+    'pn_results'           => 'Foto più vicine',
+    'pn_distance'          => 'Distanza',
 ];

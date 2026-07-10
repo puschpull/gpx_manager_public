@@ -1,10 +1,38 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager
-  Poslední aktualizace: 2. července 2026
+  Poslední aktualizace: 10. července 2026
 
 ================================================================================
 
+
+── 10. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ STRÁNKA: FOTOGRAFIE V OKOLÍ                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nová stránka „Fotografie v okolí" (photo_nearby.php) — obdoba „Tras v okolí"
+  pro fotky: kliknutím na mapu se najdou nejbližší fotografie z výletů.
+
+  - Ovládání: okruh (5/10/25/50 km) + max. počet fotek (20/50/100); změna
+    voleb přepočítá výsledek pro poslední kliknutý bod.
+  - Na mapě: osový kříž v kliknutém bodě, čárkovaný kruh okruhu, piny
+    s miniaturami fotek (stejný vzhled jako foto-heatmapa).
+  - Pod mapou: mřížka fotek seřazená podle vzdálenosti — vzdálenost, datum,
+    popisek a odkaz na trasu/virtuální trasu, ke které fotka patří.
+  - Klik na fotku (pin i kartu) otevře lightbox se všemi výsledky.
+  - API: api/photos/nearby.php (ajax_endpoint, public read-only) — BBOX
+    prefiltr na idx_tp_coords + přesný haversine; skryté fotky vidí jen admin.
+  - Integrace: položka v menu (i mobilním), stránka ve „Viditelné stránky
+    pro návštěvníky" (výchozí: pro návštěvníky vypnuto — zapni v Administraci),
+    11 nových i18n klíčů v 8 jazycích, SRI hashe, světlý/tmavý režim,
+    prefers-reduced-motion.
+
+  Nové soubory: photo_nearby.php, includes/photo_nearby_view.php,
+                api/photos/nearby.php, js/photo-nearby.js, css/photo_nearby.css
+  Upravené: includes/app_constants.php (all_pages), includes/layout_header.php,
+            admin.php (pageLabels), install.sql, lang/*.php (8×)
 
 ── 2. července 2026 ────────────────────────────────────────────────────────────
 

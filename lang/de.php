@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Höhenprofil der Strecke',
     'elev_data_table'   => 'Datentabelle des Höhenprofils',
     'elev_data_caption' => 'Höhenwerte entlang der Strecke',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Fotos in der Umgebung',
+    'nav_photo_nearby'     => 'Fotos in der Nähe',
+    'pn_click_prompt'      => 'Klicken Sie auf die Karte, um die nächsten Fotos Ihrer Ausflüge zu finden.',
+    'pn_searching'         => 'Suche Fotos in der Umgebung…',
+    'pn_found'             => 'Gefundene Fotos: {n}',
+    'pn_none'              => 'Keine Fotos in der Nähe des gewählten Punkts.',
+    'pn_error'             => 'Fehler bei der Serverkommunikation.',
+    'pn_radius'            => 'Umkreis',
+    'pn_limit'             => 'Max. Fotos',
+    'pn_results'           => 'Nächste Fotos',
+    'pn_distance'          => 'Entfernung',
 ];

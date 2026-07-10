@@ -1,0 +1,112 @@
+/* ====== Fotografie v okolí – styly ======
+   Mapa a stavový panel se přebírají z css/nearby.css (#map, .nearby-status). */
+
+/* Ovládací panel (okruh + max. fotek) */
+.pn-controls {
+    display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 12px; padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.pn-controls label {
+    font-size: 13px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+}
+
+.pn-controls select {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+/* Pin fotky na mapě (shodný vzhled s foto-heatmapou) */
+.photo-pin {
+    width: 30px; height: 30px; border-radius: 50% 50% 50% 0;
+    background: var(--accent-color, #2d4a3e); transform: rotate(-45deg);
+    border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.4);
+    background-size: cover; background-position: center;
+}
+
+/* Výsledky */
+.pn-results {
+    margin-top: 8px;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.pn-results h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: var(--header-text, var(--text-color));
+}
+
+/* Mřížka fotek */
+.pn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.pn-card {
+    background: var(--bg-secondary, var(--card-bg));
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.pn-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pn-card { transition: none; }
+    .pn-card:hover { transform: none; }
+}
+
+.pn-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.pn-meta {
+    padding: 7px 9px;
+    font-size: 12px;
+    color: var(--text-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+}
+
+.pn-dist { font-weight: 600; }
+.pn-date { color: var(--text-muted); }
+
+.pn-caption {
+    flex-basis: 100%;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pn-track { flex-basis: 100%; }
+
+.pn-track a {
+    color: var(--link-color, #0078d7);
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.pn-track a:hover { text-decoration: underline; }

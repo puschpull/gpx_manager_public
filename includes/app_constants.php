@@ -22,7 +22,7 @@ function all_langs(): array {
  * Toto je jediné místo, kde se tento seznam definuje.
  */
 function all_pages(): array {
-    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'filter', 'compare', 'settings', 'virtual_tracks'];
+    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks'];
 }
 
 /**

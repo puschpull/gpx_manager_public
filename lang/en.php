@@ -572,4 +572,17 @@ return [
     'preview_as_visitor_desc'     => 'you are viewing the page without admin privileges',
     'exit_visitor_preview'        => 'Back to admin view',
     'exit_visitor_preview_aria'   => 'Exit visitor preview and switch back to admin view',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Photos nearby',
+    'nav_photo_nearby'     => 'Nearby photos',
+    'pn_click_prompt'      => 'Click the map to find the nearest photos from your trips.',
+    'pn_searching'         => 'Searching for nearby photos…',
+    'pn_found'             => 'Photos found: {n}',
+    'pn_none'              => 'No photos near the selected point.',
+    'pn_error'             => 'Server communication error.',
+    'pn_radius'            => 'Radius',
+    'pn_limit'             => 'Max photos',
+    'pn_results'           => 'Nearest photos',
+    'pn_distance'          => 'Distance',
 ];

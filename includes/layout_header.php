@@ -148,6 +148,9 @@ if (!function_exists('t')) {
             if ($isAdmin || in_array('virtual_tracks', $_visPages, true)) {
                 $navItems[] = ['virtual_tracks.php', 'route', t('nav_virtual_tracks', 'Virtuální trasy')];
             }
+            if ($isAdmin || in_array('photo_nearby', $_visPages, true)) {
+                $navItems[] = ['photo_nearby.php', 'aperture', t('nav_photo_nearby', 'Fotky v okolí')];
+            }
             foreach ($navItems as [$href, $icon, $label]):
                 $active = ($currentScript === $href);
             ?>

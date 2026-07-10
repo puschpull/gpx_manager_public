@@ -415,7 +415,7 @@ $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
 $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
     'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě',
-    'nearby'=>'📍 Nejbližší trasy','filter'=>'🧹 GPX Cleaner',
+    'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení',
     'photos'=>'📸 Fotografie (jen prohlížení)'];
 ?>

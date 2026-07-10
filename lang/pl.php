@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Profil wysokości trasy',
     'elev_data_table'   => 'Tabela danych profilu wysokości',
     'elev_data_caption' => 'Wartości wysokości wzdłuż trasy',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Zdjęcia w okolicy',
+    'nav_photo_nearby'     => 'Zdjęcia w pobliżu',
+    'pn_click_prompt'      => 'Kliknij mapę, aby znaleźć najbliższe zdjęcia z Twoich wycieczek.',
+    'pn_searching'         => 'Szukam zdjęć w okolicy…',
+    'pn_found'             => 'Znalezione zdjęcia: {n}',
+    'pn_none'              => 'Brak zdjęć w pobliżu wybranego punktu.',
+    'pn_error'             => 'Błąd komunikacji z serwerem.',
+    'pn_radius'            => 'Promień',
+    'pn_limit'             => 'Maks. zdjęć',
+    'pn_results'           => 'Najbliższe zdjęcia',
+    'pn_distance'          => 'Odległość',
 ];

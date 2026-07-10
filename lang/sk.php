@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Výškový profil trasy',
     'elev_data_table'   => 'Tabuľka dát výškového profilu',
     'elev_data_caption' => 'Hodnoty nadmorskej výšky pozdĺž trasy',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Fotografie v okolí',
+    'nav_photo_nearby'     => 'Fotky v okolí',
+    'pn_click_prompt'      => 'Kliknite na mapu — nájdem najbližšie fotografie z vašich výletov.',
+    'pn_searching'         => 'Hľadám fotografie v okolí…',
+    'pn_found'             => 'Nájdených fotografií: {n}',
+    'pn_none'              => 'V okolí zvoleného bodu nie sú žiadne fotografie.',
+    'pn_error'             => 'Chyba pri komunikácii so serverom.',
+    'pn_radius'            => 'Okruh',
+    'pn_limit'             => 'Max. fotiek',
+    'pn_results'           => 'Najbližšie fotografie',
+    'pn_distance'          => 'Vzdialenosť',
 ];

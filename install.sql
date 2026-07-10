@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 -- (allowed_themes odstraněno — barevná témata zrušena 6/2026, zůstal světlý/tmavý režim)
 INSERT IGNORE INTO app_config (config_key, config_value) VALUES
 ('allowed_langs',  '["cs","en","de","sk","es","fr","pl","it"]'),
-('visible_pages',  '["stats","calendar","heatmap","photo_heatmap","map_search","nearby","filter","compare","settings","virtual_tracks"]');
+('visible_pages',  '["stats","calendar","heatmap","photo_heatmap","map_search","nearby","photo_nearby","filter","compare","settings","virtual_tracks"]');
 
 SET foreign_key_checks = 1;
 

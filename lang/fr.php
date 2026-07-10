@@ -566,4 +566,17 @@ return [
     'elev_chart_aria'   => 'Profil altimétrique du parcours',
     'elev_data_table'   => 'Tableau de données du profil altimétrique',
     'elev_data_caption' => 'Valeurs d\'altitude le long du parcours',
+
+    // ===== Fotografie v okolí (photo_nearby) =====
+    'h1_photo_nearby'      => 'Photos à proximité',
+    'nav_photo_nearby'     => 'Photos proches',
+    'pn_click_prompt'      => 'Cliquez sur la carte pour trouver les photos les plus proches de vos sorties.',
+    'pn_searching'         => 'Recherche de photos à proximité…',
+    'pn_found'             => 'Photos trouvées : {n}',
+    'pn_none'              => 'Aucune photo à proximité du point choisi.',
+    'pn_error'             => 'Erreur de communication avec le serveur.',
+    'pn_radius'            => 'Rayon',
+    'pn_limit'             => 'Max photos',
+    'pn_results'           => 'Photos les plus proches',
+    'pn_distance'          => 'Distance',
 ];
