@@ -1,6 +1,6 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
-  Projekt: https://github.com/puschpull/gpx_manager
+  Projekt: https://github.com/puschpull/gpx_manager_public
   Poslední aktualizace: 10. července 2026
 
 ================================================================================

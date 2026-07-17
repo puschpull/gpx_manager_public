@@ -8,7 +8,7 @@
             <span class="opacity-60">— outdoor edition</span>
         </div>
         <div class="flex items-center gap-4">
-            <a href="https://github.com/puschpull/gpx_manager_claude" target="_blank" rel="noopener" class="hover:text-forest-600 dark:hover:text-terracotta-300 transition-colors">GitHub</a>
+            <a href="https://github.com/puschpull/gpx_manager_public" target="_blank" rel="noopener" class="hover:text-forest-600 dark:hover:text-terracotta-300 transition-colors">GitHub</a>
             <span class="opacity-60">© <?= date('Y') ?></span>
         </div>
     </div>
