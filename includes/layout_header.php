@@ -131,25 +131,20 @@ if (!function_exists('t')) {
         <!-- Desktop nav -->
         <nav class="hidden md:flex items-center gap-1 ml-4 text-sm">
             <?php
-            $navItems = [
-                ['nearby.php',   'map-pin',     t('h1_nearby',    'Nejbližší trasy')],
-                ['photos.php',   'image',        t('nav_photos',   'Fotografie')],
-                ['stats.php',    'bar-chart-2',  t('nav_stats',    'Statistiky')],
-                ['calendar.php', 'calendar',     t('nav_calendar', 'Kalendář')],
-                ['heatmap.php',  'flame',        t('nav_heatmap',  'Heatmapa')],
-            ];
-            // Foto-heatmapa — v menu jen pokud je viditelná (admin vždy, návštěvník dle konfigurace)
+            // Položky + výchozí pořadí definuje nav_menu_items() (app_constants.php),
+            // pořadí si admin mění v Administraci (app_config 'nav_order').
             $_visPages = function_exists('get_app_config')
                 ? (array)get_app_config('visible_pages', function_exists('all_pages') ? all_pages() : [])
                 : [];
-            if ($isAdmin || in_array('photo_heatmap', $_visPages, true)) {
-                $navItems[] = ['photo_heatmap.php', 'camera', t('nav_photo_heatmap', 'Foto-heatmapa')];
-            }
-            if ($isAdmin || in_array('virtual_tracks', $_visPages, true)) {
-                $navItems[] = ['virtual_tracks.php', 'route', t('nav_virtual_tracks', 'Virtuální trasy')];
-            }
-            if ($isAdmin || in_array('photo_nearby', $_visPages, true)) {
-                $navItems[] = ['photo_nearby.php', 'aperture', t('nav_photo_nearby', 'Fotky v okolí')];
+            $_navReg  = nav_menu_items();
+            $navItems = [];
+            foreach (nav_menu_order() as $_navKey) {
+                [$_nHref, $_nIcon, $_nLabel, $_nVisKey] = $_navReg[$_navKey];
+                // Podmíněné položky: návštěvník je vidí jen pokud je stránka viditelná
+                if ($_nVisKey !== null && !$isAdmin && !in_array($_nVisKey, $_visPages, true)) {
+                    continue;
+                }
+                $navItems[] = [$_nHref, $_nIcon, $_nLabel];
             }
             foreach ($navItems as [$href, $icon, $label]):
                 $active = ($currentScript === $href);

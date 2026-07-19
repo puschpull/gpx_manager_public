@@ -579,4 +579,10 @@ return [
     'pn_limit'             => 'Max. Fotos',
     'pn_results'           => 'Nächste Fotos',
     'pn_distance'          => 'Entfernung',
+
+    // ===== Pořadí horního menu (admin) =====
+    'admin_nav_order'        => 'Reihenfolge des Hauptmenüs',
+    'admin_nav_order_hint'   => 'Mit den Pfeilen die Reihenfolge der Menüpunkte ändern. Gilt für Admin und Besucher.',
+    'move_up'                => 'Nach oben',
+    'move_down'              => 'Nach unten',
 ];

@@ -9,6 +9,27 @@
 ── 10. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  KONFIGUROVATELNÉ POŘADÍ HORNÍHO MENU                                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Pořadí položek horního menu si admin nově nastaví v Administraci →
+  Konfigurace přístupu → „Pořadí horního menu" (šipky ▲▼, uloží se s ostatním
+  nastavením přístupu). Platí pro desktop i mobilní menu, pro admina
+  i návštěvníky; viditelnost podmíněných položek (Foto-heatmapa, Virtuální
+  trasy, Fotky v okolí) se řídí stále přes „Viditelné stránky".
+
+  Výchozí pořadí změněno na: Statistiky, Kalendář, Trasy v okolí, Heatmapa,
+  Virtuální trasy, Fotografie, Fotky v okolí, Foto-heatmapa.
+
+  Technicky: master registr nav_menu_items() + nav_menu_order()
+  v includes/app_constants.php (jediné místo definice menu), pořadí
+  v app_config 'nav_order' (bez migrace — klíč vznikne prvním uložením).
+  Nové stránky se v budoucnu automaticky zařadí na konec.
+
+  Upravené: includes/app_constants.php, includes/layout_header.php,
+            admin.php, lang/*.php (8× — 4 nové klíče)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  NOVÁ STRÁNKA: FOTOGRAFIE V OKOLÍ                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
 

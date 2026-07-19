@@ -579,4 +579,10 @@ return [
     'pn_limit'             => 'Max foto',
     'pn_results'           => 'Foto più vicine',
     'pn_distance'          => 'Distanza',
+
+    // ===== Pořadí horního menu (admin) =====
+    'admin_nav_order'        => 'Ordine del menu principale',
+    'admin_nav_order_hint'   => 'Usa le frecce per riordinare il menu principale. Vale per admin e visitatori.',
+    'move_up'                => 'Sposta su',
+    'move_down'              => 'Sposta giù',
 ];

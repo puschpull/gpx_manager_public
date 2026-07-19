@@ -23,8 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])
 
     if (empty($langs))  $langs  = ['cs'];
 
+    // Pořadí horního menu — jen známé klíče, chybějící (nové stránky) na konec
+    $navKeys  = array_keys(nav_menu_items());
+    $navOrder = array_values(array_intersect((array)($_POST['nav_order'] ?? []), $navKeys));
+    foreach ($navKeys as $k) {
+        if (!in_array($k, $navOrder, true)) $navOrder[] = $k;
+    }
+
     set_app_config('allowed_langs',  $langs);
     set_app_config('visible_pages',  $pages);
+    set_app_config('nav_order',      $navOrder);
 
     header('Location: admin.php?saved=access');
     exit;
@@ -451,6 +459,45 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
                 </label>
             <?php endforeach; ?>
             </div>
+        </div>
+
+        <div class="admin-card">
+            <h3>☰ <?= htmlspecialchars(t('admin_nav_order', 'Pořadí horního menu')) ?></h3>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+                <?= htmlspecialchars(t('admin_nav_order_hint', 'Šipkami změň pořadí položek v horním menu. Platí pro admina i návštěvníky.')) ?>
+            </p>
+            <ul id="navOrderList" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;">
+            <?php $_navReg = nav_menu_items(); foreach (nav_menu_order() as $_nk): ?>
+                <li style="display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-secondary,var(--card-bg));">
+                    <input type="hidden" name="nav_order[]" value="<?= htmlspecialchars($_nk) ?>">
+                    <span style="flex:1;"><?= htmlspecialchars($_navReg[$_nk][2]) ?></span>
+                    <button type="button" class="nav-order-up" style="padding:2px 8px;cursor:pointer;"
+                            aria-label="<?= htmlspecialchars(t('move_up', 'Posunout nahoru')) ?>"
+                            title="<?= htmlspecialchars(t('move_up', 'Posunout nahoru')) ?>">▲</button>
+                    <button type="button" class="nav-order-down" style="padding:2px 8px;cursor:pointer;"
+                            aria-label="<?= htmlspecialchars(t('move_down', 'Posunout dolů')) ?>"
+                            title="<?= htmlspecialchars(t('move_down', 'Posunout dolů')) ?>">▼</button>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+            <script>
+            (function () {
+                const list = document.getElementById('navOrderList');
+                if (!list) return;
+                list.addEventListener('click', function (e) {
+                    const btn = e.target.closest('button');
+                    if (!btn) return;
+                    const li = btn.closest('li');
+                    if (btn.classList.contains('nav-order-up') && li.previousElementSibling) {
+                        li.parentNode.insertBefore(li, li.previousElementSibling);
+                        btn.focus();
+                    } else if (btn.classList.contains('nav-order-down') && li.nextElementSibling) {
+                        li.parentNode.insertBefore(li.nextElementSibling, li);
+                        btn.focus();
+                    }
+                });
+            })();
+            </script>
         </div>
 
         <div style="grid-column:1/-1;">
