@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     // ===== Obnova uložené vrstvy (stejný mechanismus jako nearby/heatmapa) =====
     const savedLayer = localStorage.getItem("gpx_map_layer");

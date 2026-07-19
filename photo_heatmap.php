@@ -182,6 +182,7 @@ require __DIR__ . '/includes/layout_header.php';
 <script defer src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js" integrity="sha384-FON5fTjCTtPuBgUS1r2H/PGXstH0Rk23YKjZmB6qITkbFqBcqtey/rPo9eXwOWpx" crossorigin="anonymous"></script>
 <script defer src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js" integrity="sha384-Kigx+fLsY5TWX5hU/QUxy7tQh2bUzeIuoHUZTj2O056ByEtnhW6gi9ib8h6r5yb8" crossorigin="anonymous"></script>
 <script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js" integrity="sha384-mFKkGiGvT5vo1fEyGCD3hshDdKmW3wzXW/x+fWriYJArD0R3gawT6lMvLboM22c0" crossorigin="anonymous"></script>
+<script src="js/lib/map-factory.js"></script>
 
 <script>
 window.gpxHeatmapData = {
@@ -275,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
     heatLayer.addTo(map);
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory && window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     const statusEl = document.getElementById('heatmap-status');
     const radiusSlider = document.getElementById('heatRadius');

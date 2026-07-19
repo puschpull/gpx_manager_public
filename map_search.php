@@ -176,6 +176,9 @@ require __DIR__ . '/includes/layout_header.php';
         integrity="sha384-Kigx+fLsY5TWX5hU/QUxy7tQh2bUzeIuoHUZTj2O056ByEtnhW6gi9ib8h6r5yb8"
         crossorigin="anonymous"></script>
 
+<!-- Sdílená map factory (geolokační tlačítko) -->
+<script src="js/lib/map-factory.js"></script>
+
 <script>
 window.gpxMapSearchData = {
     apiKeys: {
@@ -329,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on("baselayerchange", e => { localStorage.setItem("gpx_map_layer", e.name); });
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory && window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     let firstCorner = null;
     let rectangle = null;

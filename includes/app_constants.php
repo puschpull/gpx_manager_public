@@ -41,6 +41,9 @@ function nav_menu_items(): array {
         'photos'         => ['photos.php',         'image',       t('nav_photos',         'Fotografie'),      null],
         'photo_nearby'   => ['photo_nearby.php',   'aperture',    t('nav_photo_nearby',   'Fotky v okolí'),   'photo_nearby'],
         'photo_heatmap'  => ['photo_heatmap.php',  'camera',      t('nav_photo_heatmap',  'Foto-heatmapa'),   'photo_heatmap'],
+        // 'planner' není v all_pages() → návštěvník ho nikdy nevidí (jen admin);
+        // samotná stránka je navíc za auth.php.
+        'planner'        => ['planner.php',        'signpost',    t('nav_planner',        'Plánovač'),        'planner'],
     ];
 }
 

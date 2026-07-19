@@ -1,0 +1,96 @@
+/* ====== Plánovač výšlapu – styly ======
+   Mapa a stavový panel se přebírají z css/nearby.css (#map, .nearby-status). */
+
+/* Ovládací panel */
+.plan-controls {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 12px; padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.plan-controls label {
+    font-size: 13px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+}
+
+.plan-controls select,
+.plan-controls input[type="text"] {
+    padding: 5px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+.plan-controls input[type="text"] { min-width: 220px; flex: 1; }
+
+.plan-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary, var(--card-bg));
+    color: var(--text-color);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.plan-btn:hover:not(:disabled) { border-color: var(--link-color, #0078d7); }
+.plan-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.plan-btn-primary {
+    background: #2e7d32; border-color: #2e7d32; color: #fff; font-weight: 600;
+}
+.plan-btn-primary:hover:not(:disabled) { background: #256a29; border-color: #256a29; }
+
+/* Statistiky plánu */
+.plan-stats {
+    display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 12px; padding: 8px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px; font-weight: 600; color: var(--text-color);
+}
+
+/* Waypoint marker */
+.plan-wpt {
+    width: 26px; height: 26px; border-radius: 50%;
+    color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+    cursor: grab;
+}
+
+/* Počasí pro plánovaný den */
+.plan-weather {
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 12px; padding: 8px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 13px; color: var(--text-color);
+}
+
+.plan-weather .pw-emoji { font-size: 22px; }
+
+/* Výškový profil */
+.plan-elev-wrap {
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    height: 220px;
+}
+
+.plan-elev-wrap h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--header-text, var(--text-color));
+}
+
+.plan-elev-wrap canvas { max-height: 160px; }

@@ -81,6 +81,7 @@ window.FilterMap = (function () {
         });
 
         layerControl = L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+        if (window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
         return map;
     }

@@ -1,10 +1,48 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 10. července 2026
+  Poslední aktualizace: 19. července 2026
 
 ================================================================================
 
+
+── 19. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ STRÁNKA: PLÁNOVAČ VÝŠLAPU + EXPORT GPX PRO GARMIN                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nová stránka „Plánovač" (planner.php, jen pro admina) — klikáním do mapy
+  naplánuješ trasu po skutečných cestách:
+
+  - Číslované waypointy (tažení = přesun, klik = smazání), až 30 bodů;
+    Mapy.com routing se 6 profily (pěší/cyklo/auto), řetězení úseků přes
+    limit 15 mezibodů, debounce kvůli API kvótě.
+  - Statistiky: vzdálenost, odhad času (Mapy.com) + odhad „tvým tempem"
+    z vlastních historických rychlostí (Naismithova korekce na stoupání).
+  - Výškový profil (Chart.js) a stoupání/klesání z Open-Meteo elevation.
+  - Ukládání plánů: tabulka planned_routes (migrace 0017) — plán se ukládá
+    vč. geometrie, načtení nevolá routing. Uložit / Moje plány / Smazat.
+  - Datum výletu + předpověď počasí ze středu trasy (dnes až +15 dní):
+    teploty, srážky, vítr, východ/západ slunce.
+  - Export GPX (Garmin): import v Garmin Connect → Courses, nebo USB
+    do Garmin/NewFiles.
+
+  Na existující instalaci spusť migraci: php migrate.php (nebo obsah
+  migrations/0017_planned_routes.sql ručně).
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÉ MAPOVÉ VRSTVY + TLAČÍTKO „MOJE POLOHA"                                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  - ⛰️ Stínování terénu (Esri) — poloprůhledný reliéf nad libovolným
+    podkladem; 🚴 Cyklotrasy a 🚵 MTB trasy (Waymarked).
+  - 📌 Turistické body (OSM) — vrcholy s výškou, rozhledny a vyhlídky,
+    přístřešky, prameny, hrady a zříceniny; od zoomu 11 pro aktuální
+    výřez. Serverová proxy api/poi/bbox.php (Overpass) s diskovou cache
+    7 dní — žádná změna CSP.
+  - 📍 „Moje poloha" na všech 9 mapových stránkách — aktuální poloha
+    s kruhem přesnosti (vyžaduje HTTPS).
 
 ── 10. července 2026 ───────────────────────────────────────────────────────────
 

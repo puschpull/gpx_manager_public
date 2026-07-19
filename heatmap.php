@@ -233,6 +233,9 @@ require __DIR__ . '/includes/layout_header.php';
         integrity="sha384-mFKkGiGvT5vo1fEyGCD3hshDdKmW3wzXW/x+fWriYJArD0R3gawT6lMvLboM22c0"
         crossorigin="anonymous"></script>
 
+<!-- Sdílená map factory (geolokační tlačítko) -->
+<script src="js/lib/map-factory.js"></script>
+
 <script>
 window.gpxHeatmapData = {
     apiKeys: {
@@ -387,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on("baselayerchange", e => { localStorage.setItem("gpx_map_layer", e.name); });
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory && window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     // Load heatmap data
     let heatLayer = null;

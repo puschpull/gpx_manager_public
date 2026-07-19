@@ -1,6 +1,6 @@
 /**
  * GPX Manager — shared Leaflet map factory
- * Exposes: window.GpxMapFactory.{ createBaseLayers, createMapillaryOverlay, createWikimediaLayer }
+ * Exposes: window.GpxMapFactory.{ createBaseLayers, createMapillaryOverlay, createWikimediaLayer, createLocateControl }
  *
  * Dependencies (must be loaded before this file):
  *   - Leaflet 1.9.x
@@ -65,6 +65,22 @@ window.GpxMapFactory = (function () {
             { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
         );
 
+        var overlayWaymarkedCycling = L.tileLayer(
+            "https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png",
+            { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
+        );
+
+        var overlayWaymarkedMtb = L.tileLayer(
+            "https://tile.waymarkedtrails.org/mtb/{z}/{x}/{y}.png",
+            { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
+        );
+
+        // Stínování terénu — poloprůhledný overlay nad libovolným podkladem
+        var overlayHillshade = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+            { maxZoom: 19, maxNativeZoom: 15, opacity: 0.35, attribution: "© Esri" }
+        );
+
         var baseLayers = {
             "🗺️ OSM":                 baseOSM,
             "🏞️ Topo":                baseTopo,
@@ -78,9 +94,154 @@ window.GpxMapFactory = (function () {
 
         var overlayLayers = {
             "🤾 Turistické značení (Waymarked)": overlayWaymarked,
+            "🚴 Cyklotrasy (Waymarked)": overlayWaymarkedCycling,
+            "🚵 MTB trasy (Waymarked)": overlayWaymarkedMtb,
+            "⛰️ Stínování terénu (Esri)": overlayHillshade,
+            "📌 Turistické body (OSM)": createPoiLayer(map),
         };
 
         return { baseLayers: baseLayers, overlayLayers: overlayLayers, baseOSM: baseOSM };
+    }
+
+    /**
+     * Turistické body zájmu z OSM (vrcholy, rozhledny, přístřešky, prameny,
+     * hrady/zříceniny) — načítá se přes serverovou proxy api/poi/bbox.php
+     * (Overpass s diskovou cache). Zobrazuje se od zoomu 11.
+     *
+     * @param {L.Map} map
+     * @returns {L.LayerGroup}
+     */
+    function createPoiLayer(map) {
+        var POI_MIN_ZOOM = 11;
+        var poiIcons = {
+            peak:      "⛰️",
+            viewpoint: "🔭",
+            shelter:   "🛖",
+            spring:    "💧",
+            castle:    "🏰",
+            ruins:     "🏚️",
+            tower:     "🗼"
+        };
+        var poiLabels = {
+            peak:      "vrchol",
+            viewpoint: "vyhlídka",
+            shelter:   "přístřešek",
+            spring:    "pramen",
+            castle:    "hrad/zámek",
+            ruins:     "zřícenina",
+            tower:     "rozhledna"
+        };
+
+        var group   = L.layerGroup();
+        var loading = false;
+
+        async function load() {
+            if (loading || !map.hasLayer(group)) return;
+            if (map.getZoom() < POI_MIN_ZOOM) { group.clearLayers(); return; }
+
+            loading = true;
+            var b = map.getBounds();
+            var url = "api/poi/bbox.php?s=" + b.getSouth().toFixed(4)
+                + "&w=" + b.getWest().toFixed(4)
+                + "&n=" + b.getNorth().toFixed(4)
+                + "&e=" + b.getEast().toFixed(4);
+            try {
+                var res  = await fetch(url);
+                var data = await res.json();
+                if (!data.ok || !Array.isArray(data.pois)) return;
+
+                group.clearLayers();
+                data.pois.forEach(function (p) {
+                    var icon = L.divIcon({
+                        className: "",
+                        html: "<div class=\"gpx-poi\">" + (poiIcons[p.type] || "📌") + "</div>",
+                        iconSize: [22, 22], iconAnchor: [11, 11]
+                    });
+                    var label = (p.name ? p.name : (poiLabels[p.type] || p.type))
+                        + (p.ele !== null && p.ele !== undefined ? " (" + p.ele + " m)" : "");
+                    group.addLayer(
+                        L.marker([p.lat, p.lon], { icon: icon, keyboard: false })
+                            .bindTooltip(label, { direction: "top", offset: [0, -10] })
+                    );
+                });
+            } catch (err) {
+                if (window.GPX_DEBUG) console.error("POI chyba:", err);
+            } finally {
+                loading = false;
+            }
+        }
+
+        map.on("moveend zoomend", function () {
+            if (map.hasLayer(group)) load();
+        });
+        map.on("overlayadd", function (ev) {
+            if (ev.layer === group) load();
+        });
+
+        return group;
+    }
+
+    /**
+     * Add a "my location" control (📍) to the map.
+     * Uses browser geolocation — works only in a secure context (HTTPS);
+     * on plain HTTP the browser rejects the request and an alert is shown.
+     *
+     * @param {L.Map} map
+     * @returns {L.Control|null}
+     */
+    function createLocateControl(map) {
+        if (!("geolocation" in navigator)) return null;
+
+        var marker = null;
+        var circle = null;
+
+        var LocateControl = L.Control.extend({
+            options: { position: "topleft" },
+            onAdd: function () {
+                var container = L.DomUtil.create("div", "leaflet-bar");
+                var btn = L.DomUtil.create("a", "", container);
+                btn.href = "#";
+                btn.title = "Moje poloha";
+                btn.setAttribute("role", "button");
+                btn.setAttribute("aria-label", "Moje poloha");
+                btn.innerHTML = "📍";
+                btn.style.cssText = "font-size:15px; text-align:center;";
+
+                L.DomEvent.on(btn, "click", function (e) {
+                    L.DomEvent.stop(e);
+                    btn.innerHTML = "⏳";
+                    navigator.geolocation.getCurrentPosition(function (pos) {
+                        btn.innerHTML = "📍";
+                        var ll  = [pos.coords.latitude, pos.coords.longitude];
+                        var acc = pos.coords.accuracy || 0;
+                        if (!marker) {
+                            circle = L.circle(ll, {
+                                radius: acc, color: "#1565c0", weight: 1, fillColor: "#1565c0", fillOpacity: 0.08
+                            }).addTo(map);
+                            marker = L.circleMarker(ll, {
+                                radius: 7, color: "#fff", weight: 2, fillColor: "#1565c0", fillOpacity: 1
+                            }).addTo(map);
+                        } else {
+                            marker.setLatLng(ll);
+                            circle.setLatLng(ll).setRadius(acc);
+                        }
+                        marker.bindTooltip("Moje poloha (±" + Math.round(acc) + " m)");
+                        map.setView(ll, Math.max(map.getZoom(), 15));
+                    }, function (err) {
+                        btn.innerHTML = "📍";
+                        alert("Polohu se nepodařilo zjistit"
+                            + (err && err.message ? ": " + err.message : ".")
+                            + " (Vyžaduje HTTPS a povolení polohy v prohlížeči.)");
+                    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
+                });
+
+                return container;
+            }
+        });
+
+        var control = new LocateControl();
+        control.addTo(map);
+        return control;
     }
 
     /**
@@ -228,5 +389,6 @@ window.GpxMapFactory = (function () {
         createBaseLayers:      createBaseLayers,
         createMapillaryOverlay: createMapillaryOverlay,
         createWikimediaLayer:  createWikimediaLayer,
+        createLocateControl:   createLocateControl,
     };
 })();

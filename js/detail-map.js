@@ -318,6 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const layerControl = L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     // ===== Obnova uložené vrstvy =====
     const savedLayer = localStorage.getItem("gpx_map_layer");

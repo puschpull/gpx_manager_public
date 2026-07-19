@@ -8,9 +8,14 @@
 /uploads/*.gpx
 /uploads/photos/
 /uploads/thumbs/
+/uploads/vt_thumbs/
 /uploads/_tile_cache/
+/uploads/_poi_cache/
 /uploads/_errors.log
 /uploads/heatmap_cache.json
+/uploads/photo_heatmap_cache.json
+/uploads/_heatmap_rebuild.marker
+/uploads/*.gpx.bak
 logs/*.log
 
 # IDE a systémové soubory

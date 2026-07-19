@@ -406,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Ovladač vrstev ===
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+    if (window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     // === Obnova / výchozí stav overlay vrstev (vlastní klíč pro virtuální trasy) ===
     // První návštěva → zapnuté: čárkovaná spojnice + odhad trasy + náhledy fotek.

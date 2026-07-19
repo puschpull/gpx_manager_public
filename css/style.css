@@ -854,6 +854,15 @@ form textarea { min-height: 120px; }
     box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     cursor: pointer;
 }
+
+/* Turistické body zájmu z OSM (vrstva 📌 Turistické body) */
+.gpx-poi {
+    font-size: 15px;
+    line-height: 22px;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), 0 0 2px #fff;
+    cursor: pointer;
+}
 /* ===========================================================
    MOBILNÍ STYLY — style.css doplněk
    Pouze přidává/přepisuje pro max-width: 900px.
