@@ -179,4 +179,4 @@ window.gpxPlannerData = {
 <!-- JS modul stránky -->
 <script src="js/planner.js"></script>
 
-</div><?php require __DIR__ . '/includes/layout_footer.php'; ?>
+</div><?php require __DIR__ . '/layout_footer.php'; ?>
