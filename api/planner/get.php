@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 /**
  * api/planner/get.php — načtení jednoho plánu vč. waypointů a geometrie
- * GET ?id= | csrf: no | admin: yes
+ * GET ?id= | csrf: no | admin: ne — návštěvník smí číst jen s povoleným
+ * plánovačem ve Viditelných stránkách (viz list.php).
  */
 
 require_once __DIR__ . '/../../includes/public_access.php';
@@ -11,6 +12,11 @@ require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/ajax.php';
 
 ajax_endpoint(function () use ($pdo): array {
+    if (empty($_SESSION['is_admin'])
+        && !in_array('planner', (array)get_app_config('visible_pages', all_pages()), true)) {
+        http_response_code(403);
+        return ['ok' => false, 'error' => 'Forbidden'];
+    }
     $id = (int)($_GET['id'] ?? 0);
     if ($id <= 0) {
         http_response_code(400);
@@ -38,4 +44,4 @@ ajax_endpoint(function () use ($pdo): array {
         'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
         'note'       => $r['note'],
     ]];
-}, ['csrf' => false, 'admin' => true, 'name' => 'planner/get']);
+}, ['csrf' => false, 'admin' => false, 'name' => 'planner/get']);

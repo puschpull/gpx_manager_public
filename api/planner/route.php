@@ -9,8 +9,9 @@ declare(strict_types=1);
  * + 15 mezibodů na požadavek → delší seznamy se řetězí po úsecích a
  * geometrie se spojí. Volání běží server-side (API klíč zůstává na serveru).
  *
- * csrf: no | admin: yes — každé volání utrácí Mapy.com API kvótu,
- * plánovač je jen pro admina (stejně jako VT routing).
+ * csrf: no | admin: ne — návštěvník smí routovat JEN pokud admin povolil
+ * stránku 'planner' ve Viditelných stránkách; navíc per-IP rate limit
+ * (každé volání utrácí Mapy.com API kvótu).
  */
 
 require_once __DIR__ . '/../../includes/public_access.php';
@@ -18,6 +19,31 @@ require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/ajax.php';
 
 ajax_endpoint(function (): array {
+    // Gate: admin vždy; návštěvník jen s povoleným plánovačem + rate limit
+    if (empty($_SESSION['is_admin'])) {
+        $visible = (array)get_app_config('visible_pages', all_pages());
+        if (!in_array('planner', $visible, true)) {
+            http_response_code(403);
+            return ['ok' => false, 'error' => 'Forbidden'];
+        }
+        // Per-IP rate limit: max 20 routingů / minutu (vzor nearby, SEC-026)
+        $ip       = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $rateFile = sys_get_temp_dir() . '/gpx_planner_route_' . md5($ip) . '.txt';
+        $now      = time();
+        $hits = is_file($rateFile)
+            ? array_filter(
+                explode("\n", (string)file_get_contents($rateFile)),
+                static fn($t) => (int)$t > $now - 60
+              )
+            : [];
+        if (count($hits) >= 20) {
+            http_response_code(429);
+            return ['ok' => false, 'error' => 'Příliš mnoho požadavků — chvíli počkejte.'];
+        }
+        $hits[] = (string)$now;
+        file_put_contents($rateFile, implode("\n", array_values($hits)), LOCK_EX);
+    }
+
     if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
         return ['ok' => false, 'error' => 'Chybí Mapy.com API klíč.'];
     }
@@ -142,7 +168,7 @@ ajax_endpoint(function (): array {
         'duration_s' => round($durationS),
         'segments'   => count($chunks),
     ];
-}, ['csrf' => false, 'admin' => true, 'name' => 'planner/route']);
+}, ['csrf' => false, 'admin' => false, 'name' => 'planner/route']);
 
 /**
  * Rekurzivně najde první LineString (pole [lon,lat] dvojic) v dekódovaném JSON.

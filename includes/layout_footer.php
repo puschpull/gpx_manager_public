@@ -8,6 +8,13 @@
             <span class="opacity-60">— outdoor edition</span>
         </div>
         <div class="flex items-center gap-4">
+            <?php if (empty($_SESSION['is_admin'])): ?>
+            <!-- Přihlášení admina z cizí IP (terén, mobil) — heslo z .env ADMIN_PASS_HASH -->
+            <a href="login.php" class="hover:text-forest-600 dark:hover:text-terracotta-300 transition-colors inline-flex items-center gap-1">
+                <i data-lucide="log-in" class="w-3.5 h-3.5" aria-hidden="true"></i>
+                <?= htmlspecialchars(function_exists('t') ? t('btn_login', 'Přihlásit se') : 'Přihlásit se') ?>
+            </a>
+            <?php endif; ?>
             <a href="https://github.com/puschpull/gpx_manager_public" target="_blank" rel="noopener" class="hover:text-forest-600 dark:hover:text-terracotta-300 transition-colors">GitHub</a>
             <span class="opacity-60">© <?= date('Y') ?></span>
         </div>

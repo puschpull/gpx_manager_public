@@ -125,6 +125,25 @@ document.addEventListener("gpxDataReady", (ev) => {
         walker = L.marker([p.lat, p.lon], { icon, zIndexOffset: 1500, keyboard: false }).addTo(map);
     }
 
+    // Souběžný ukazatel na výškovém profilu (globální `chart` + `sampled`
+    // z detail-elevation.js — zvýrazní bod grafu odpovídající pozici turisty)
+    function updateChartMarker(distKmCur) {
+        if (typeof chart === "undefined" || !chart) return;
+        if (typeof sampled === "undefined" || !sampled.distKm || !sampled.distKm.length) return;
+        let lo = 0, hi = sampled.distKm.length - 1;
+        while (lo < hi) {
+            const mid = (lo + hi + 1) >> 1;
+            if (sampled.distKm[mid] <= distKmCur) lo = mid; else hi = mid - 1;
+        }
+        try {
+            chart.setActiveElements([{ datasetIndex: 0, index: lo }]);
+            chart.tooltip.setActiveElements([{ datasetIndex: 0, index: lo }], { x: 0, y: 0 });
+            chart.update("none");
+        } catch (e) {
+            if (window.GPX_DEBUG) console.warn("replay chart sync:", e);
+        }
+    }
+
     function update() {
         tCur = Math.min(Math.max(tCur, t0), tEnd);
         const p = posAt(tCur);
@@ -133,6 +152,7 @@ document.addEventListener("gpxDataReady", (ev) => {
         outDist.textContent = (p.dist / 1000).toFixed(2).replace(".", ",") + " km";
         outEle.textContent  = Math.round(p.ele) + " m";
         slider.value = Math.round(((tCur - t0) / (tEnd - t0)) * 1000);
+        updateChartMarker(p.dist / 1000);
         updateWeather(p);
         updateRadar();
         if (tCur >= tEnd && playing) pause();

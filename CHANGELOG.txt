@@ -1,10 +1,29 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 19. července 2026
+  Poslední aktualizace: 20. července 2026
 
 ================================================================================
 
+
+── 20. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PŘIHLÁŠENÍ ODKUDKOLI, PLÁNOVAČ PRO NÁVŠTĚVNÍKY, VRSTVY VŠUDE                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1) V zápatí je pro nepřihlášené odkaz „Přihlásit se" — přístup
+     k administraci z mobilu/notebooku mimo domácí IP.
+  2) Plánovač lze zpřístupnit návštěvníkům (Administrace → Viditelné
+     stránky, výchozí vypnuto): mohou plánovat (routing s per-IP limitem
+     20/min), prohlížet uložené plány a exportovat GPX; ukládání a mazání
+     zůstává jen adminovi.
+  3) Heatmapa, foto-heatmapa a Hledat na mapě přešly na sdílenou map
+     factory — všech 10 podkladů a všechny překryvné vrstvy (CyclOSM,
+     ZTM ČÚZK, Cyklotrasy + MTB, Stínování terénu, Turistické body OSM)
+     jsou nyní na všech mapových zobrazeních aplikace.
+  4) Přehrávač výšlapu: turista se souběžně pohybuje i po výškovém
+     profilu (zvýrazněný bod na grafu).
 
 ── 19. července 2026 (večer) ───────────────────────────────────────────────────
 

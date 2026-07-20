@@ -198,54 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { fullscreenControl: true, preferCanvas: true }).setView([50.0, 14.5], 8);
     const dotsRenderer = L.canvas({ padding: 0.5 });
 
-    // === Tile layers (stejné jako heatmapa tras) ===
+    // === Vrstvy via shared factory (js/lib/map-factory.js) ===
     const keys = window.gpxHeatmapData.apiKeys;
-    const tfApiKey       = keys.tf       || "";
-    const mapyCOMApiKey  = keys.mapycom  || "";
-    const mapillaryToken = keys.mapillary || "";
-
-    const baseOSM = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" });
-    const baseTopo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 17, attribution: "© OpenTopoMap" });
-    const baseSat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "© Esri" });
-    const baseMapyCOMBasic  = L.tileLayer(`https://api.mapy.com/v1/maptiles/basic/256/{z}/{x}/{y}?apikey=${mapyCOMApiKey}`,   { maxZoom: 19, attribution: '© <a href="https://mapy.com" target="_blank">Mapy.com</a>, © OpenStreetMap' });
-    const baseMapyCOMTurist = L.tileLayer(`https://api.mapy.com/v1/maptiles/outdoor/256/{z}/{x}/{y}?apikey=${mapyCOMApiKey}`, { maxZoom: 19, attribution: '© <a href="https://mapy.com" target="_blank">Mapy.com</a>, © OpenStreetMap' });
-    const baseMapyCOMWinter = L.tileLayer(`https://api.mapy.com/v1/maptiles/winter/256/{z}/{x}/{y}?apikey=${mapyCOMApiKey}`,  { maxZoom: 19, attribution: '© <a href="https://mapy.com" target="_blank">Mapy.com</a>, © OpenStreetMap' });
-    const baseMapyCOMAerial = L.tileLayer(`https://api.mapy.com/v1/maptiles/aerial/256/{z}/{x}/{y}?apikey=${mapyCOMApiKey}`,  { maxZoom: 20, attribution: '© <a href="https://mapy.com" target="_blank">Mapy.com</a>' });
-    const baseThunderforest = L.tileLayer(`https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${tfApiKey}`,    { maxZoom: 22, attribution: "© Thunderforest, © OpenStreetMap" });
-
-    const overlayWaymarked = L.tileLayer("https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png", { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" });
-
-    let overlayMapillary = null;
-    if (mapillaryToken && typeof L.vectorGrid !== "undefined") {
-        overlayMapillary = L.vectorGrid.protobuf(
-            `https://tiles.mapillary.com/maps/vtp/mly1_public/2/{z}/{x}/{y}?access_token=${mapillaryToken}`,
-            {
-                vectorTileLayerStyles: {
-                    sequence: { weight: 2, color: "#05CB63", opacity: 0.8, fill: false },
-                    image:    { radius: 3, fillColor: "#05CB63", fillOpacity: 0.8, color: "#fff", weight: 1, fill: true },
-                    overview: { weight: 2, color: "#05CB63", opacity: 0.6, fill: false }
-                },
-                interactive: true, maxNativeZoom: 14
-            }
-        );
-        overlayMapillary.on("click", e => {
-            const props = e.layer.properties;
-            if (props?.image_id) {
-                window.open(`https://www.mapillary.com/app/?focus=photo&pKey=${props.image_id}`, "mapillary_photo", "width=800,height=600,resizable=yes,scrollbars=yes");
-            }
-        });
-    }
-
-    const baseLayers = {
-        "🗺️ OSM":                 baseOSM,
-        "🏞️ Topo":                baseTopo,
-        "🌍 Satelit (Esri)":      baseSat,
-        "🗺️ Mapy.com základní":   baseMapyCOMBasic,
-        "🧭 Mapy.com turistická": baseMapyCOMTurist,
-        "❄️ Mapy.com zimní":      baseMapyCOMWinter,
-        "✈️ Mapy.com letecká":    baseMapyCOMAerial,
-        "🥾 Thunderforest":       baseThunderforest,
-    };
+    const { baseLayers, overlayLayers: _overlayBase, baseOSM } = window.GpxMapFactory.createBaseLayers(keys, map);
+    const overlayMapillary = window.GpxMapFactory.createMapillaryOverlay(keys.mapillary || "");
 
     // === Vrstvy fotek ===
     //  - Heatmapa hustoty (přepínatelná vrstva, výchozí ZAP)
@@ -262,14 +218,16 @@ document.addEventListener('DOMContentLoaded', () => {
         "🔥 Heatmapa hustoty": heatLayer,
         "📍 Polohy fotek – tečky": photoDots,
         "📸 Moje fotky – náhledy (při přiblížení)": photoMarkers,
-        "🥾 Turistické značení (Waymarked)": overlayWaymarked,
+        ..._overlayBase,
         ...(overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {}),
     };
 
-    // Obnovit uloženou základní vrstvu
+    // Obnovit uloženou základní vrstvu (factory přidala OSM automaticky)
     const savedLayer = localStorage.getItem("gpx_map_layer");
-    if (savedLayer && baseLayers[savedLayer]) { baseLayers[savedLayer].addTo(map); }
-    else { baseOSM.addTo(map); }
+    if (savedLayer && baseLayers[savedLayer]) {
+        map.removeLayer(baseOSM);
+        baseLayers[savedLayer].addTo(map);
+    }
     map.on("baselayerchange", e => { localStorage.setItem("gpx_map_layer", e.name); });
 
     // Výchozí stav: heatmapa zapnutá

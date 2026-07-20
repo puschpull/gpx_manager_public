@@ -15,8 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_verify()) {
 
 /* ===== POST: uložení konfigurace přístupu návštěvníků ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])) {
-    // all_pages() does not include 'photos' — photos is a special extra page for visitors
-    $allPagesWithPhotos = array_merge(all_pages(), ['photos']);
+    // all_pages() does not include 'photos' + 'planner' — special extra pages
+    // for visitors (planner burns Mapy.com quota → never visible by default)
+    $allPagesWithPhotos = array_merge(all_pages(), ['photos', 'planner']);
 
     $langs  = array_values(array_intersect($_POST['allowed_langs']  ?? [], all_langs()));
     $pages  = array_values(array_intersect($_POST['allowed_pages']  ?? [], $allPagesWithPhotos));
@@ -433,7 +434,8 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
     'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě',
     'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení',
-    'photos'=>'📸 Fotografie (jen prohlížení)'];
+    'photos'=>'📸 Fotografie (jen prohlížení)',
+    'planner'=>'🥾 Plánovač (bez ukládání — čerpá mapovou API kvótu!)'];
 ?>
 <div style="margin:24px 0;">
     <h2 style="font-size:17px;margin-bottom:12px;color:var(--text-color);">🔐 <?= htmlspecialchars(t('admin_access_config', 'Konfigurace přístupu pro návštěvníky')) ?></h2>

@@ -75,18 +75,23 @@ require __DIR__ . '/layout_header.php';
     <button type="button" id="planExport" class="plan-btn plan-btn-primary" disabled>💾 <?= htmlspecialchars(t('planner_export', 'Export GPX (Garmin)')) ?></button>
 </div>
 
-<!-- Uložené plány + datum výletu -->
+<!-- Uložené plány + datum výletu (ukládání/mazání jen admin) -->
+<?php $_plannerIsAdmin = $_isAdmin ?? !empty($_SESSION['is_admin']); ?>
 <div class="plan-controls">
     <label for="planDate">📅 <?= htmlspecialchars(t('planner_date', 'Datum výletu')) ?>:
         <input type="date" id="planDate">
     </label>
+    <?php if ($_plannerIsAdmin): ?>
     <button type="button" id="planSave" class="plan-btn" disabled>💾 <?= htmlspecialchars(t('planner_save', 'Uložit plán')) ?></button>
+    <?php endif; ?>
     <label for="planList">📂 <?= htmlspecialchars(t('planner_my_plans', 'Moje plány')) ?>:
         <select id="planList">
             <option value=""><?= htmlspecialchars(t('planner_select_plan', '— vyber plán —')) ?></option>
         </select>
     </label>
+    <?php if ($_plannerIsAdmin): ?>
     <button type="button" id="planDelete" class="plan-btn" disabled>🗑 <?= htmlspecialchars(t('planner_delete', 'Smazat')) ?></button>
+    <?php endif; ?>
 </div>
 
 <!-- Stav -->

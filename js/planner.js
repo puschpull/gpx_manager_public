@@ -79,8 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
         btnUndo.disabled   = waypoints.length === 0;
         btnClear.disabled  = waypoints.length === 0;
         btnExport.disabled = !hasRoute;
-        btnSave.disabled   = !hasRoute;
-        btnDelete.disabled = !(planListEl.value);
+        if (btnSave)   btnSave.disabled   = !hasRoute;          // návštěvník tlačítko nemá
+        if (btnDelete) btnDelete.disabled = !(planListEl && planListEl.value);
     }
 
     // ===== Waypoint markery (číslované, tažitelné, klik = smazat) =====
@@ -494,14 +494,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    btnSave.addEventListener("click", savePlan);
-    btnDelete.addEventListener("click", deletePlan);
-    planListEl.addEventListener("change", () => {
-        updateButtons();
-        if (planListEl.value) loadPlan(planListEl.value);
-    });
-
-    refreshPlansList();
+    if (btnSave)   btnSave.addEventListener("click", savePlan);
+    if (btnDelete) btnDelete.addEventListener("click", deletePlan);
+    if (planListEl) {
+        planListEl.addEventListener("change", () => {
+            updateButtons();
+            if (planListEl.value) loadPlan(planListEl.value);
+        });
+        refreshPlansList();
+    }
 
     // ===== Klik do mapy = nový waypoint =====
     map.on("click", e => addWaypoint(e.latlng));
