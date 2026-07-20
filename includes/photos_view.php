@@ -17,10 +17,10 @@ $_isAdmin = !empty($_SESSION['is_admin']);
 ?>
 
 <!-- Photos page styling — outdoor tokenizovaný (přebíjí potřebné proměnné) -->
-<link rel="stylesheet" href="css/photos-outdoor.css">
+<link rel="stylesheet" href="<?= asset('css/photos-outdoor.css') ?>">
 <!-- Lightbox z původního systému -->
-<script src="js/lib/format-utils.js" defer></script>
-<script src="js/lightbox.js" defer></script>
+<script src="<?= asset('js/lib/format-utils.js') ?>" defer></script>
+<script src="<?= asset('js/lightbox.js') ?>" defer></script>
 
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
@@ -482,6 +482,6 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     </div>
 </div>
 
-<script src="js/photos.js" defer></script>
+<script src="<?= asset('js/photos.js') ?>" defer></script>
 
 </div><!-- /content wrapper -->

@@ -29,9 +29,9 @@ require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" integrity="sha384-weDCJ80JNrg6W2Dha8CBrQyz5PZVPOZ39Lw7vWOzm65zqKvZZfSq/3rR77RY5TWm" crossorigin="anonymous">
-<link rel="stylesheet" href="css/style.css">
-<script src="js/lib/format-utils.js" defer></script>
-<script src="js/lightbox.js" defer></script>
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
+<script src="<?= asset('js/lib/format-utils.js') ?>" defer></script>
+<script src="<?= asset('js/lightbox.js') ?>" defer></script>
 <style>
     #map { height: 60vh; min-height: 380px; border-radius: 10px; }
     .vt-meta { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--text-muted); margin:8px 0 16px; }
@@ -217,8 +217,8 @@ require __DIR__ . '/includes/layout_header.php';
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script defer src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js" integrity="sha384-FON5fTjCTtPuBgUS1r2H/PGXstH0Rk23YKjZmB6qITkbFqBcqtey/rPo9eXwOWpx" crossorigin="anonymous"></script>
 <script defer src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js" integrity="sha384-Kigx+fLsY5TWX5hU/QUxy7tQh2bUzeIuoHUZTj2O056ByEtnhW6gi9ib8h6r5yb8" crossorigin="anonymous"></script>
-<script defer src="js/lib/map-factory.js"></script>
-<script src="js/detail-weather.js" defer></script>
+<script defer src="<?= asset('js/lib/map-factory.js') ?>"></script>
+<script src="<?= asset('js/detail-weather.js') ?>" defer></script>
 
 <script>
 window.gpxVtData = {

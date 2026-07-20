@@ -4,8 +4,8 @@ $page_title = t('h1_my_tracks');
 $show_admin_banner = false;
 require __DIR__ . '/layout_header.php';
 ?>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
+<link rel="stylesheet" href="<?= asset('css/index.css') ?>">
 
 <!-- Okamžité načtení cookie visible_cols -->
 <script>
@@ -537,11 +537,11 @@ window.gpxChartData = {
 </script>
 
 <!-- JS moduly -->
-<script src="js/index-chart.js" defer></script>
-<script src="js/index-ui.js" defer></script>
-<script src="js/index-ajax.js" defer></script>
-<script src="js/index-columns.js" defer></script>
-<script src="js/mobile-init.js" defer></script>
+<script src="<?= asset('js/index-chart.js') ?>" defer></script>
+<script src="<?= asset('js/index-ui.js') ?>" defer></script>
+<script src="<?= asset('js/index-ajax.js') ?>" defer></script>
+<script src="<?= asset('js/index-columns.js') ?>" defer></script>
+<script src="<?= asset('js/mobile-init.js') ?>" defer></script>
 
 <!-- Oblíbené — AJAX toggle -->
 <script>

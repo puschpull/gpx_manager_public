@@ -129,7 +129,7 @@ $dbVersion = $pdo->query("SELECT VERSION()")->fetchColumn();
 $page_title = t('h1_admin');
 require __DIR__ . '/includes/layout_header.php';
 ?>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
     <style>
         .admin-grid {
             display: grid;

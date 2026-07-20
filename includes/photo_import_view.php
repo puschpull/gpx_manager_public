@@ -17,8 +17,8 @@
     <!-- CSRF token for AJAX requests (read by photo-import.js via meta[name=csrf-token]) -->
     <meta name="csrf-token" content="<?= h(csrf_token()) ?>">
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/photo-import.css">
+    <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/photo-import.css') ?>">
 </head>
 <body>
 <?php render_admin_banner(); ?>
@@ -82,7 +82,7 @@
 
 </div><!-- .imp-wrap -->
 
-<script src="js/lib/format-utils.js"></script>
-<script src="js/photo-import.js"></script>
+<script src="<?= asset('js/lib/format-utils.js') ?>"></script>
+<script src="<?= asset('js/photo-import.js') ?>"></script>
 </body>
 </html>

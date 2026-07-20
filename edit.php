@@ -293,7 +293,7 @@ $editBackLabel  = t($_fromLegacy ? 'back_to_table' : 'back_to_list');
 $page_title = t('h1_edit_track');
 require __DIR__ . '/includes/layout_header.php';
 ?>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="<?= h($editBackUrl) ?>" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">

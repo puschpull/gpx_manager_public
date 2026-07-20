@@ -29,7 +29,7 @@ $candidateCount = (int)$pdo->query("
 $page_title = 'Virtuální trasy';
 require __DIR__ . '/includes/layout_header.php';
 ?>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 <style>
     .vt-wrap { max-width: 1100px; }
     .vt-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; margin-bottom: 14px; }

@@ -81,6 +81,17 @@ function photo_full_url(string $filename): string {
 }
 
 /**
+ * Cache-busting pro lokální JS/CSS: vrátí "cesta?v=<mtime souboru>".
+ * Po nasazení nové verze se změní URL → prohlížeč si stáhne aktuální
+ * soubor bez tvrdého refreshe (žádné zastaralé skripty v cache).
+ */
+function asset(string $relative): string {
+    $fs = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR
+        . str_replace('/', DIRECTORY_SEPARATOR, ltrim($relative, '/'));
+    return $relative . (is_file($fs) ? '?v=' . filemtime($fs) : '');
+}
+
+/**
  * Vrátí "?v=<mtime>" pro cache-busting, pokud soubor v uploads existuje (jinak "").
  * Díky tomu se po přepsání souboru se stejným názvem (in-place úprava trasy,
  * přegenerování náhledu) změní URL a prohlížeč načte novou verzi bez tvrdého refreshe.

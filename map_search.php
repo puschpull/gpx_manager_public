@@ -177,7 +177,7 @@ require __DIR__ . '/includes/layout_header.php';
         crossorigin="anonymous"></script>
 
 <!-- Sdílená map factory (geolokační tlačítko) -->
-<script src="js/lib/map-factory.js"></script>
+<script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
 <script>
 window.gpxMapSearchData = {

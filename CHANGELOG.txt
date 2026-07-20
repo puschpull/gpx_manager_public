@@ -9,6 +9,15 @@
 ── 20. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  CACHE-BUSTING PRO JS/CSS (asset() helper)                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Všechny lokální skripty a styly se načítají přes asset('js/…') →
+  URL obsahuje ?v=<čas změny souboru>. Po nasazení nové verze si
+  prohlížeč automaticky stáhne aktuální soubory — žádné zastaralé
+  skripty v cache, Ctrl+Shift+R už není potřeba.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  PŘIHLÁŠENÍ ODKUDKOLI, PLÁNOVAČ PRO NÁVŠTĚVNÍKY, VRSTVY VŠUDE                  │
 └──────────────────────────────────────────────────────────────────────────────┘
 

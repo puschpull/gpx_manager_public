@@ -6,8 +6,8 @@ require_once __DIR__ . '/../includes/helpers.php';
 $page_title = t('h1_nearby');
 require __DIR__ . '/layout_header.php';
 ?>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/nearby.css">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>">
+<link rel="stylesheet" href="<?= asset('css/nearby.css') ?>">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" integrity="sha384-weDCJ80JNrg6W2Dha8CBrQyz5PZVPOZ39Lw7vWOzm65zqKvZZfSq/3rR77RY5TWm" crossorigin="anonymous">
 
@@ -89,13 +89,13 @@ window.gpxNearbyData = {
 </script>
 
 <!-- Sdílené lib moduly — musí být načteny jako první -->
-<script src="js/lib/event-bus.js"></script>
-<script src="js/lib/geo-utils.js"></script>
-<script src="js/lib/format-utils.js"></script>
-<script src="js/lib/map-factory.js"></script>
+<script src="<?= asset('js/lib/event-bus.js') ?>"></script>
+<script src="<?= asset('js/lib/geo-utils.js') ?>"></script>
+<script src="<?= asset('js/lib/format-utils.js') ?>"></script>
+<script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
 <!-- JS moduly -->
-<script src="js/nearby-data.js"></script>
-<script src="js/nearby-map.js"></script>
+<script src="<?= asset('js/nearby-data.js') ?>"></script>
+<script src="<?= asset('js/nearby-map.js') ?>"></script>
 
 </div><?php require __DIR__ . '/layout_footer.php'; ?>

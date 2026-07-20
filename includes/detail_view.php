@@ -45,8 +45,8 @@ require __DIR__ . '/layout_header.php';
 ?>
 
 <!-- Detail-specific styles (slope legend, tooltip toggle — FE-12 / TASK-24) -->
-<link rel="stylesheet" href="css/detail.css">
-<?php if (feature_enabled('replay')): ?><link rel="stylesheet" href="css/replay.css"><?php endif; ?>
+<link rel="stylesheet" href="<?= asset('css/detail.css') ?>">
+<?php if (feature_enabled('replay')): ?><link rel="stylesheet" href="<?= asset('css/replay.css') ?>"><?php endif; ?>
 
 <!-- Leaflet a fullscreen control CSS (jen pro detail) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -388,7 +388,7 @@ require __DIR__ . '/layout_header.php';
         integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 <!-- Lightbox pro fotky v mapových vrstvách "Moje fotografie" a "Polohy fotek na trase" -->
-<script src="js/lightbox.js"></script>
+<script src="<?= asset('js/lightbox.js') ?>"></script>
 
 <!-- Data z PHP pro JS -->
 <script>
@@ -435,18 +435,18 @@ window.gpxDetailData = {
 </script>
 
 <!-- Sdílené lib moduly — musí být načteny jako první -->
-<script src="js/lib/event-bus.js"></script>
-<script src="js/lib/geo-utils.js"></script>
-<script src="js/lib/format-utils.js"></script>
-<script src="js/lib/map-factory.js"></script>
+<script src="<?= asset('js/lib/event-bus.js') ?>"></script>
+<script src="<?= asset('js/lib/geo-utils.js') ?>"></script>
+<script src="<?= asset('js/lib/format-utils.js') ?>"></script>
+<script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
 <!-- JS moduly -->
-<script src="js/detail-data.js"></script>
-<script src="js/detail-map.js"></script>
-<script src="js/detail-elevation.js"></script>
-<?php if (feature_enabled('replay')): ?><script src="js/detail-replay.js"></script><?php endif; ?>
-<script src="js/detail-ui.js"></script>
-<script src="js/detail-weather.js"></script>
+<script src="<?= asset('js/detail-data.js') ?>"></script>
+<script src="<?= asset('js/detail-map.js') ?>"></script>
+<script src="<?= asset('js/detail-elevation.js') ?>"></script>
+<?php if (feature_enabled('replay')): ?><script src="<?= asset('js/detail-replay.js') ?>"></script><?php endif; ?>
+<script src="<?= asset('js/detail-ui.js') ?>"></script>
+<script src="<?= asset('js/detail-weather.js') ?>"></script>
 
 <!-- Podobné trasy -->
 <script>

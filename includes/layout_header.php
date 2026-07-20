@@ -43,7 +43,7 @@ if (!function_exists('t')) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
     <!-- Tailwind generated CSS -->
-    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">
 
     <!-- x-cloak: skryje Alpine elementy před inicializací (jinak jsou vidět při načtení stránky) -->
     <style>[x-cloak] { display: none !important; }</style>
