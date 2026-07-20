@@ -67,6 +67,13 @@ window.GpxMapFactory = (function () {
             { maxZoom: 20, maxNativeZoom: 19, attribution: "© CyclOSM, © OpenStreetMap" }
         );
 
+        // ZTM ČÚZK — Základní topografická mapa ČR (státní mapové dílo).
+        // Extrémně detailní vč. polních a lesních cest; pokrývá JEN Česko.
+        var baseZTM = L.tileLayer(
+            "https://ags.cuzk.cz/arcgis1/rest/services/ZTM_WM/MapServer/tile/{z}/{y}/{x}",
+            { maxZoom: 20, maxNativeZoom: 19, attribution: "© ČÚZK" }
+        );
+
         var overlayWaymarked = L.tileLayer(
             "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
             { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
@@ -98,6 +105,7 @@ window.GpxMapFactory = (function () {
             "✈️ Mapy.com letecká":     baseMapyCOMAerial,
             "🤾 Thunderforest":              baseThunderforest,
             "🌲 CyclOSM (všechny cesty)":    baseCyclOSM,
+            "🇨🇿 ZTM ČÚZK (jen Česko)":       baseZTM,
         };
 
         var overlayLayers = {

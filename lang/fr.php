@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'coucher',
     'planner_precip'             => 'précipitations',
     'planner_wind'               => 'vent',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Fonctions optionnelles',
+    'admin_features_hint'    => 'Activer/désactiver les fonctions optionnelles du détail de la trace. Par défaut : activées.',
+    'ft_replay'              => 'Lecture de la randonnée (détail)',
+    'ft_replay_weather'      => 'Météo du randonneur (pendant la lecture)',
+    'ft_replay_radar'        => 'Champ de précipitations (animation de pluie)',
+    'rp_play'                => 'Lire la randonnée',
+    'rp_pause'               => 'Pause',
+    'rp_speed'               => 'Vitesse',
+    'rp_progress'            => 'Progression de la randonnée',
+    'rp_no_times'            => 'La trace n\'a pas d\'horodatage — lecture par distance (4 km/h).',
+    'rp_radar'               => 'Champ de précipitations',
+    'rp_radar_opacity'       => 'Opacité',
+    'rp_radar_none'          => 'Pas de pluie dans la zone le jour de la sortie.',
+    'rp_radar_loading'       => 'Chargement des données de précipitations…',
+    'rp_radar_error'         => 'Impossible de charger les données de précipitations.',
+    'rp_weather_na'          => 'Météo non disponible.',
 ];

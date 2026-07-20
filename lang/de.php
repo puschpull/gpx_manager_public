@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'Sonnenuntergang',
     'planner_precip'             => 'Niederschlag',
     'planner_wind'               => 'Wind',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Optionale Funktionen',
+    'admin_features_hint'    => 'Optionale Funktionen der Tourendetailseite ein-/ausschalten. Standard: eingeschaltet.',
+    'ft_replay'              => 'Tour-Wiedergabe (Tourendetail)',
+    'ft_replay_weather'      => 'Wetter beim Wanderer (bei Wiedergabe)',
+    'ft_replay_radar'        => 'Niederschlagsfeld (Regenanimation)',
+    'rp_play'                => 'Tour abspielen',
+    'rp_pause'               => 'Pause',
+    'rp_speed'               => 'Tempo',
+    'rp_progress'            => 'Tourfortschritt',
+    'rp_no_times'            => 'Die Tour hat keine Zeitstempel — Wiedergabe nach Distanz (4 km/h).',
+    'rp_radar'               => 'Niederschlagsfeld',
+    'rp_radar_opacity'       => 'Deckkraft',
+    'rp_radar_none'          => 'Am Tourtag hat es in der Gegend nicht geregnet.',
+    'rp_radar_loading'       => 'Niederschlagsdaten werden geladen…',
+    'rp_radar_error'         => 'Niederschlagsdaten konnten nicht geladen werden.',
+    'rp_weather_na'          => 'Wetter nicht verfügbar.',
 ];

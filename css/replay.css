@@ -1,0 +1,88 @@
+/* ====== Přehrávač výšlapu (detail trasy) ====== */
+
+.replay-panel {
+    padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-color);
+}
+
+.replay-controls {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+
+.rp-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary, var(--card-bg));
+    color: var(--text-color);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.rp-btn:hover { border-color: var(--link-color, #0078d7); }
+
+.rp-btn-play {
+    font-size: 16px; font-weight: 700;
+    padding: 5px 16px;
+    background: #2e7d32; border-color: #2e7d32; color: #fff;
+}
+.rp-btn-play:hover { background: #256a29; }
+
+.rp-btn-active { border-color: #1565c0; color: #1565c0; font-weight: 600; }
+
+.rp-speed { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+
+.rp-speed select {
+    padding: 3px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+.rp-readout { font-size: 13px; font-weight: 600; margin-left: auto; white-space: nowrap; }
+
+#rpSlider { width: 100%; margin-top: 8px; accent-color: #2e7d32; }
+
+.rp-weather {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-color);
+}
+
+.rp-radar-controls {
+    margin-top: 6px;
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    font-size: 13px; color: var(--text-muted);
+}
+
+.rp-radar-controls input[type="range"] { width: 110px; accent-color: #1565c0; vertical-align: middle; }
+
+.rp-radar-status { font-size: 12px; color: var(--text-muted); }
+
+.rp-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Ikona turisty na mapě */
+.replay-walker {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 2px solid #2e7d32;
+    border-radius: 50%;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rp-btn { transition: none; }
+}

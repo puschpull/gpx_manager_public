@@ -6,6 +6,25 @@
 ================================================================================
 
 
+── 19. července 2026 (večer) ───────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PŘEHRÁVAČ VÝŠLAPU + POČASÍ U TURISTY + SRÁŽKOVÉ POLE                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Detail trasy má nový panel „Přehrávač výšlapu": ikona turisty 🚶 jede po
+  trase podle časových značek GPX (rychlost 30×–300×, skoky ±5 min / ±1 km,
+  posuvník). Při přehrávání živý řádek s počasím pro aktuální pozici
+  a hodinu (Open-Meteo) a volitelné průhledné srážkové pole — animace
+  deště nad mapou (mřížka 5×5, hodinové kroky synchronně s přehrávačem).
+  Trasy bez časů se přehrávají po vzdálenosti.
+
+  Vše vypínatelné v Administraci → „🧩 Volitelné funkce" (3 nezávislé
+  přepínače, výchozí zapnuto). Bez migrace (app_config feature_flags).
+
+  Nový podklad: 🇨🇿 ZTM ČÚZK (jen Česko) — Základní topografická mapa ČR,
+  velmi detailní vč. polních cest. Celkem 10 podkladových map.
+
 ── 19. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐

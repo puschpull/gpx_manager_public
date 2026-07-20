@@ -63,6 +63,30 @@ function nav_menu_order(): array {
 }
 
 /**
+ * Volitelné funkce aplikace (Administrace → Volitelné funkce).
+ * Uloženo v app_config 'feature_flags' jako {klíč: bool}. Když klíč
+ * v konfiguraci chybí (nová funkce, čistá instalace), je ZAPNUTO.
+ */
+function feature_enabled(string $key): bool {
+    $cfg = get_app_config('feature_flags', null);
+    if (!is_array($cfg) || !array_key_exists($key, $cfg)) {
+        return true;
+    }
+    return (bool)$cfg[$key];
+}
+
+/**
+ * Seznam volitelných funkcí pro admin UI: klíč => popisek (t()).
+ */
+function feature_flag_labels(): array {
+    return [
+        'replay'         => '▶️ ' . t('ft_replay', 'Přehrávač výšlapu (detail trasy)'),
+        'replay_weather' => '🌦️ ' . t('ft_replay_weather', 'Počasí u turisty (při přehrávání)'),
+        'replay_radar'   => '🌧️ ' . t('ft_replay_radar', 'Srážkové pole (animace deště)'),
+    ];
+}
+
+/**
  * Vrátí seznam jazyků povolených administrátorem (průnik DB konfigurace a all_langs()).
  * Pokud DB neobsahuje platnou hodnotu, vrátí all_langs().
  */

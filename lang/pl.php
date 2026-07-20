@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'zachód',
     'planner_precip'             => 'opady',
     'planner_wind'               => 'wiatr',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Funkcje opcjonalne',
+    'admin_features_hint'    => 'Włączanie/wyłączanie funkcji opcjonalnych na stronie szczegółów trasy. Domyślnie: włączone.',
+    'ft_replay'              => 'Odtwarzanie wycieczki (szczegóły trasy)',
+    'ft_replay_weather'      => 'Pogoda przy turyście (podczas odtwarzania)',
+    'ft_replay_radar'        => 'Pole opadów (animacja deszczu)',
+    'rp_play'                => 'Odtwórz wycieczkę',
+    'rp_pause'               => 'Pauza',
+    'rp_speed'               => 'Prędkość',
+    'rp_progress'            => 'Postęp wycieczki',
+    'rp_no_times'            => 'Trasa nie ma znaczników czasu — odtwarzanie według odległości (4 km/h).',
+    'rp_radar'               => 'Pole opadów',
+    'rp_radar_opacity'       => 'Intensywność',
+    'rp_radar_none'          => 'W dniu wycieczki w okolicy nie padało.',
+    'rp_radar_loading'       => 'Wczytywanie danych o opadach…',
+    'rp_radar_error'         => 'Nie udało się wczytać danych o opadach.',
+    'rp_weather_na'          => 'Pogoda niedostępna.',
 ];

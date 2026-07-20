@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'západ',
     'planner_precip'             => 'zrážky',
     'planner_wind'               => 'vietor',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Voliteľné funkcie',
+    'admin_features_hint'    => 'Zapnutie/vypnutie voliteľných funkcií v detaile trasy. Predvolené: zapnuté.',
+    'ft_replay'              => 'Prehrávač výšľapu (detail trasy)',
+    'ft_replay_weather'      => 'Počasie u turistu (pri prehrávaní)',
+    'ft_replay_radar'        => 'Zrážkové pole (animácia dažďa)',
+    'rp_play'                => 'Prehrať výšľap',
+    'rp_pause'               => 'Pauza',
+    'rp_speed'               => 'Rýchlosť',
+    'rp_progress'            => 'Priebeh výšľapu',
+    'rp_no_times'            => 'Trasa nemá časové značky — prehrávanie ide po vzdialenosti (4 km/h).',
+    'rp_radar'               => 'Zrážkové pole',
+    'rp_radar_opacity'       => 'Sýtosť',
+    'rp_radar_none'          => 'V deň výletu v okolí nepršalo.',
+    'rp_radar_loading'       => 'Načítavam zrážkové dáta…',
+    'rp_radar_error'         => 'Zrážkové dáta sa nepodarilo načítať.',
+    'rp_weather_na'          => 'Počasie nie je k dispozícii.',
 ];

@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'atardecer',
     'planner_precip'             => 'precipitación',
     'planner_wind'               => 'viento',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Funciones opcionales',
+    'admin_features_hint'    => 'Activar/desactivar funciones opcionales en el detalle de la ruta. Por defecto: activadas.',
+    'ft_replay'              => 'Reproducción de la ruta (detalle)',
+    'ft_replay_weather'      => 'Tiempo junto al senderista (durante la reproducción)',
+    'ft_replay_radar'        => 'Campo de precipitación (animación de lluvia)',
+    'rp_play'                => 'Reproducir ruta',
+    'rp_pause'               => 'Pausa',
+    'rp_speed'               => 'Velocidad',
+    'rp_progress'            => 'Progreso de la ruta',
+    'rp_no_times'            => 'La ruta no tiene marcas de tiempo — la reproducción va por distancia (4 km/h).',
+    'rp_radar'               => 'Campo de precipitación',
+    'rp_radar_opacity'       => 'Intensidad',
+    'rp_radar_none'          => 'No llovió en la zona el día de la ruta.',
+    'rp_radar_loading'       => 'Cargando datos de precipitación…',
+    'rp_radar_error'         => 'No se pudieron cargar los datos de precipitación.',
+    'rp_weather_na'          => 'Tiempo no disponible.',
 ];

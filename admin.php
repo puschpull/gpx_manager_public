@@ -30,9 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])
         if (!in_array($k, $navOrder, true)) $navOrder[] = $k;
     }
 
+    // Volitelné funkce — nezaškrtnutý checkbox = vypnuto
+    $posted = (array)($_POST['features'] ?? []);
+    $flags  = [];
+    foreach (array_keys(feature_flag_labels()) as $fk) {
+        $flags[$fk] = in_array($fk, $posted, true);
+    }
+
     set_app_config('allowed_langs',  $langs);
     set_app_config('visible_pages',  $pages);
     set_app_config('nav_order',      $navOrder);
+    set_app_config('feature_flags',  $flags);
 
     header('Location: admin.php?saved=access');
     exit;
@@ -480,6 +488,22 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
                 </li>
             <?php endforeach; ?>
             </ul>
+        </div>
+
+        <div class="admin-card">
+            <h3>🧩 <?= htmlspecialchars(t('admin_features', 'Volitelné funkce')) ?></h3>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+                <?= htmlspecialchars(t('admin_features_hint', 'Zapnutí/vypnutí volitelných funkcí v detailu trasy. Výchozí stav: zapnuto.')) ?>
+            </p>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+            <?php foreach (feature_flag_labels() as $fk => $flabel): ?>
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+                    <input type="checkbox" name="features[]" value="<?= $fk ?>"
+                        <?= feature_enabled($fk) ? 'checked' : '' ?>>
+                    <?= htmlspecialchars($flabel, ENT_QUOTES, 'UTF-8') ?>
+                </label>
+            <?php endforeach; ?>
+            </div>
             <script>
             (function () {
                 const list = document.getElementById('navOrderList');

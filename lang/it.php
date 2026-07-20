@@ -619,4 +619,22 @@ return [
     'planner_sunset'             => 'tramonto',
     'planner_precip'             => 'precipitazioni',
     'planner_wind'               => 'vento',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Funzioni opzionali',
+    'admin_features_hint'    => 'Attiva/disattiva le funzioni opzionali nel dettaglio della traccia. Predefinito: attive.',
+    'ft_replay'              => 'Riproduzione dell\'escursione (dettaglio)',
+    'ft_replay_weather'      => 'Meteo presso l\'escursionista (durante la riproduzione)',
+    'ft_replay_radar'        => 'Campo di precipitazione (animazione pioggia)',
+    'rp_play'                => 'Riproduci escursione',
+    'rp_pause'               => 'Pausa',
+    'rp_speed'               => 'Velocità',
+    'rp_progress'            => 'Avanzamento dell\'escursione',
+    'rp_no_times'            => 'La traccia non ha marcatura temporale — riproduzione per distanza (4 km/h).',
+    'rp_radar'               => 'Campo di precipitazione',
+    'rp_radar_opacity'       => 'Intensità',
+    'rp_radar_none'          => 'Il giorno della gita non è piovuto nella zona.',
+    'rp_radar_loading'       => 'Caricamento dati di precipitazione…',
+    'rp_radar_error'         => 'Impossibile caricare i dati di precipitazione.',
+    'rp_weather_na'          => 'Meteo non disponibile.',
 ];

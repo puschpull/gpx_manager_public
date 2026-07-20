@@ -625,4 +625,22 @@ return [
     'planner_sunset'             => 'sunset',
     'planner_precip'             => 'precipitation',
     'planner_wind'               => 'wind',
+
+    // ===== Přehrávač výšlapu + volitelné funkce =====
+    'admin_features'         => 'Optional features',
+    'admin_features_hint'    => 'Enable/disable optional features on the track detail page. Default: enabled.',
+    'ft_replay'              => 'Hike replay (track detail)',
+    'ft_replay_weather'      => 'Weather at the hiker (during replay)',
+    'ft_replay_radar'        => 'Precipitation field (rain animation)',
+    'rp_play'                => 'Play hike',
+    'rp_pause'               => 'Pause',
+    'rp_speed'               => 'Speed',
+    'rp_progress'            => 'Hike progress',
+    'rp_no_times'            => 'The track has no timestamps — replay runs by distance (4 km/h).',
+    'rp_radar'               => 'Precipitation field',
+    'rp_radar_opacity'       => 'Intensity',
+    'rp_radar_none'          => 'No rain in the area on the trip day.',
+    'rp_radar_loading'       => 'Loading precipitation data…',
+    'rp_radar_error'         => 'Failed to load precipitation data.',
+    'rp_weather_na'          => 'Weather not available.',
 ];

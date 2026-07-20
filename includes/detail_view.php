@@ -46,6 +46,7 @@ require __DIR__ . '/layout_header.php';
 
 <!-- Detail-specific styles (slope legend, tooltip toggle — FE-12 / TASK-24) -->
 <link rel="stylesheet" href="css/detail.css">
+<?php if (feature_enabled('replay')): ?><link rel="stylesheet" href="css/replay.css"><?php endif; ?>
 
 <!-- Leaflet a fullscreen control CSS (jen pro detail) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -231,6 +232,49 @@ require __DIR__ . '/layout_header.php';
          class="w-full h-[60vh] min-h-[400px] rounded-2xl overflow-hidden shadow-card border border-sand-200 dark:border-forest-800"></div>
 </section>
 
+<?php if (feature_enabled('replay')): ?>
+<!-- PŘEHRÁVAČ VÝŠLAPU (volitelná funkce — Administrace → Volitelné funkce) -->
+<section class="mx-auto max-w-7xl px-4 sm:px-6 mt-3">
+    <div id="replay-panel" class="replay-panel" style="display:none;">
+        <div class="replay-controls">
+            <button type="button" id="rpBackKm"  class="rp-btn" title="−1 km">⏮ 1 km</button>
+            <button type="button" id="rpBackMin" class="rp-btn" title="−5 min">⏪ 5 min</button>
+            <button type="button" id="rpPlay"    class="rp-btn rp-btn-play"
+                    aria-label="<?= htmlspecialchars(t('rp_play', 'Přehrát výšlap')) ?>"
+                    title="<?= htmlspecialchars(t('rp_play', 'Přehrát výšlap')) ?>">▶</button>
+            <button type="button" id="rpFwdMin"  class="rp-btn" title="+5 min">5 min ⏩</button>
+            <button type="button" id="rpFwdKm"   class="rp-btn" title="+1 km">1 km ⏭</button>
+            <label class="rp-speed"><?= htmlspecialchars(t('rp_speed', 'Rychlost')) ?>:
+                <select id="rpSpeed">
+                    <option value="30">30×</option>
+                    <option value="60" selected>60×</option>
+                    <option value="120">120×</option>
+                    <option value="300">300×</option>
+                </select>
+            </label>
+            <span class="rp-readout">
+                🕐 <span id="rpTime">–</span> · 📏 <span id="rpDist">–</span> · ⛰️ <span id="rpEle">–</span>
+            </span>
+        </div>
+        <input type="range" id="rpSlider" min="0" max="1000" value="0"
+               aria-label="<?= htmlspecialchars(t('rp_progress', 'Průběh výšlapu')) ?>">
+        <?php if (feature_enabled('replay_weather')): ?>
+        <div id="rpWeather" class="rp-weather" style="display:none;"></div>
+        <?php endif; ?>
+        <?php if (feature_enabled('replay_radar')): ?>
+        <div class="rp-radar-controls">
+            <button type="button" id="rpRadarToggle" class="rp-btn">🌧️ <?= htmlspecialchars(t('rp_radar', 'Srážkové pole')) ?></button>
+            <label id="rpRadarOpacityWrap" style="display:none;"><?= htmlspecialchars(t('rp_radar_opacity', 'Sytost')) ?>:
+                <input type="range" id="rpRadarOpacity" min="10" max="90" value="55">
+            </label>
+            <span id="rpRadarStatus" class="rp-radar-status"></span>
+        </div>
+        <?php endif; ?>
+        <div id="rpNote" class="rp-note" style="display:none;"></div>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- ACTIONS BAR -->
 <section class="mx-auto max-w-7xl px-4 sm:px-6 mt-4">
     <div class="flex flex-wrap items-center gap-2">
@@ -360,6 +404,19 @@ window.gpxDetailData = {
     dbAvgSpeed:   <?= js_safe_json(round($track['speed_avg']       ?? 0, 3)) ?>,
     dbAvgMoving:  <?= js_safe_json(round($track['speed_avg_total'] ?? 0, 3)) ?>,
     garminColor:  <?= js_safe_json($track['color'] ?? '') ?>,
+    replayFlags: {
+        weather: <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_weather')) ?>,
+        radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>
+    },
+    replayI18n: {
+        play:      <?= js_safe_json(t('rp_play', 'Přehrát výšlap')) ?>,
+        pause:     <?= js_safe_json(t('rp_pause', 'Pauza')) ?>,
+        noTimes:   <?= js_safe_json(t('rp_no_times', 'Trasa nemá časové značky — přehrávání jede po vzdálenosti (4 km/h).')) ?>,
+        radarNone: <?= js_safe_json(t('rp_radar_none', 'V den výletu v okolí nepršelo.')) ?>,
+        radarLoad: <?= js_safe_json(t('rp_radar_loading', 'Načítám srážková data…')) ?>,
+        radarErr:  <?= js_safe_json(t('rp_radar_error', 'Srážková data se nepodařilo načíst.')) ?>,
+        weatherNA: <?= js_safe_json(t('rp_weather_na', 'Počasí není k dispozici.')) ?>
+    },
     apiKeys: {
         tf:        <?= js_safe_json(defined('TF_API_KEY') ? TF_API_KEY : '') ?>,
         mapycom:   <?= js_safe_json(defined('MAPYCOM_API_KEY') ? MAPYCOM_API_KEY : '') ?>,
@@ -387,6 +444,7 @@ window.gpxDetailData = {
 <script src="js/detail-data.js"></script>
 <script src="js/detail-map.js"></script>
 <script src="js/detail-elevation.js"></script>
+<?php if (feature_enabled('replay')): ?><script src="js/detail-replay.js"></script><?php endif; ?>
 <script src="js/detail-ui.js"></script>
 <script src="js/detail-weather.js"></script>
 
