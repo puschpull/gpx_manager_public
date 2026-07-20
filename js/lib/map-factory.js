@@ -60,6 +60,13 @@ window.GpxMapFactory = (function () {
             { maxZoom: 22, attribution: "© Thunderforest, © OpenStreetMap" }
         );
 
+        // CyclOSM — velmi detailní OSM render: VŠECHNY cesty vč. neznačených
+        // pěšin a lesních/polních cest (čárkovaně, s povrchem). Zdarma, bez klíče.
+        var baseCyclOSM = L.tileLayer(
+            "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
+            { maxZoom: 20, maxNativeZoom: 19, attribution: "© CyclOSM, © OpenStreetMap" }
+        );
+
         var overlayWaymarked = L.tileLayer(
             "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
             { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
@@ -90,6 +97,7 @@ window.GpxMapFactory = (function () {
             "❄️ Mapy.com zimní":       baseMapyCOMWinter,
             "✈️ Mapy.com letecká":     baseMapyCOMAerial,
             "🤾 Thunderforest":              baseThunderforest,
+            "🌲 CyclOSM (všechny cesty)":    baseCyclOSM,
         };
 
         var overlayLayers = {

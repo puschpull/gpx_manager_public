@@ -9,6 +9,14 @@
 ── 19. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÝ PODKLAD: 🌲 CYCLOSM (VŠECHNY CESTY)                                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nová základní mapa CyclOSM — velmi detailní OSM render: VŠECHNY cesty
+  včetně neznačených pěšin a lesních/polních cest (čárkovaně, s povrchem).
+  Ideální pro Plánovač. Zdarma, bez API klíče.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  NOVÁ STRÁNKA: PLÁNOVAČ VÝŠLAPU + EXPORT GPX PRO GARMIN                        │
 └──────────────────────────────────────────────────────────────────────────────┘
 
