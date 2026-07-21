@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Chargement des données de précipitations…',
     'rp_radar_error'         => 'Impossible de charger les données de précipitations.',
     'rp_weather_na'          => 'Météo non disponible.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Tronçon manuel',
+    'planner_manual_title'     => 'Tronçon manuel — cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci)',
+    'planner_manual_on'        => 'Mode manuel : cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci). Cliquez à nouveau sur « ✏️ Tronçon manuel » pour revenir au calcul par les chemins.',
+    'planner_auto_on'          => 'Mode automatique : l\'itinéraire suit les chemins réels.',
 ];

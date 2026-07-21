@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Wczytywanie danych o opadach…',
     'rp_radar_error'         => 'Nie udało się wczytać danych o opadach.',
     'rp_weather_na'          => 'Pogoda niedostępna.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Odcinek ręczny',
+    'planner_manual_title'     => 'Odcinek ręczny — klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót)',
+    'planner_manual_on'        => 'Tryb ręczny: klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót). Kliknij ponownie „✏️ Odcinek ręczny“, aby wrócić do trasowania po ścieżkach.',
+    'planner_auto_on'          => 'Tryb automatyczny: trasa biegnie po prawdziwych ścieżkach.',
 ];

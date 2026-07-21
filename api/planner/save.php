@@ -44,7 +44,10 @@ ajax_endpoint(function () use ($pdo): array {
             http_response_code(400);
             return ['ok' => false, 'error' => 'Neplatný formát waypointů.'];
         }
-        $cleanWpts[] = [round((float)$w[0], 6), round((float)$w[1], 6)];
+        // 3. prvek (volitelný) = příznak ručního úseku (0/1): segment vedoucí
+        // DO tohoto bodu je rovná čára místo routingu (přechod pole/lesa).
+        $manual = (isset($w[2]) && $w[2]) ? 1 : 0;
+        $cleanWpts[] = [round((float)$w[0], 6), round((float)$w[1], 6), $manual];
     }
 
     // Geometrie: volitelná cache spočítané trasy (max ~2 MB)

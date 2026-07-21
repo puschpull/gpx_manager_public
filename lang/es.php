@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Cargando datos de precipitación…',
     'rp_radar_error'         => 'No se pudieron cargar los datos de precipitación.',
     'rp_weather_na'          => 'Tiempo no disponible.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Tramo manual',
+    'planner_manual_title'     => 'Tramo manual — haz clic para trazar la ruta en línea recta (campo, bosque, atajo)',
+    'planner_manual_on'        => 'Modo manual: haz clic para trazar la ruta en línea recta (campo, bosque, atajo). Vuelve a hacer clic en «✏️ Tramo manual» para volver al trazado por caminos.',
+    'planner_auto_on'          => 'Modo automático: la ruta sigue los caminos reales.',
 ];

@@ -35,20 +35,22 @@ document.addEventListener("DOMContentLoaded", () => {
     map.on("baselayerchange", e => localStorage.setItem("gpx_map_layer", e.name));
 
     // ===== Stav =====
-    let waypoints  = [];        // [{lat, lng, marker}]
-    let routeLine  = null;      // L.polyline
-    let routeData  = null;      // poslední odpověď routingu (+ ascent/descent po elevaci)
+    let waypoints  = [];        // [{lat, lng, marker, manual}] — manual = segment DO tohoto bodu je rovná čára
+    let routeLayers = [];       // pole L.polyline (auto úseky modré, ruční oranžové čárkované)
+    let routeData  = null;      // poslední výsledek (coords/length/duration + ascent/descent po elevaci)
     let elevChart  = null;      // Chart.js instance
     let computeSeq = 0;         // ochrana proti závodům odpovědí
     let debounceT  = null;
     let currentPlanId = 0;      // 0 = neuložený plán
     let restoring  = false;     // načítání uloženého plánu → nepřepočítávat routing
+    let manualMode = false;     // ruční režim: nové body se spojují rovnou čarou (přechod pole/lesa)
 
     const statusEl   = document.getElementById("plan-status");
     const statsEl    = document.getElementById("plan-stats");
     const elevWrap   = document.getElementById("plan-elev-wrap");
     const profileSel = document.getElementById("planProfile");
     const nameInput  = document.getElementById("planName");
+    const btnManual  = document.getElementById("planManual");
     const btnUndo    = document.getElementById("planUndo");
     const btnClear   = document.getElementById("planClear");
     const btnExport  = document.getElementById("planExport");
@@ -84,8 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ===== Waypoint markery (číslované, tažitelné, klik = smazat) =====
-    function wptIcon(n, isLast) {
-        const bg = n === 1 ? "#2e7d32" : (isLast ? "#c62828" : "#1565c0");
+    //  start = zelený, cíl = červený, ruční bod = oranžový, ostatní = modrý
+    function wptIcon(n, isLast, isManual) {
+        let bg = "#1565c0";
+        if (n === 1) bg = "#2e7d32";
+        else if (isLast) bg = "#c62828";
+        else if (isManual) bg = "#ef6c00";
         return L.divIcon({
             className: "",
             html: `<div class="plan-wpt" style="background:${bg}">${n}</div>`,
@@ -95,16 +101,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function refreshMarkers() {
         waypoints.forEach((w, i) => {
-            w.marker.setIcon(wptIcon(i + 1, i === waypoints.length - 1));
+            w.marker.setIcon(wptIcon(i + 1, i === waypoints.length - 1, !!w.manual));
         });
         const el = document.getElementById("planWpts");
         if (el) el.textContent = waypoints.length;
     }
 
-    function addWaypoint(latlng, skipCompute) {
-        const w = { lat: latlng.lat, lng: latlng.lng, marker: null };
+    function addWaypoint(latlng, skipCompute, manualFlag) {
+        // manual = segment vedoucí DO tohoto bodu je rovná čára (u 1. bodu bez významu)
+        const isManual = (manualFlag !== undefined) ? !!manualFlag : manualMode;
+        const w = { lat: latlng.lat, lng: latlng.lng, marker: null, manual: isManual };
         const m = L.marker([latlng.lat, latlng.lng], {
-            icon: wptIcon(waypoints.length + 1, true),
+            icon: wptIcon(waypoints.length + 1, true, isManual),
             draggable: true
         }).addTo(map);
         m.on("dragend", () => {
@@ -128,12 +136,73 @@ document.addEventListener("DOMContentLoaded", () => {
         scheduleCompute();
     }
 
+    function clearRouteLayers() {
+        routeLayers.forEach(l => map.removeLayer(l));
+        routeLayers = [];
+    }
+
     function clearRoute() {
-        if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+        clearRouteLayers();
         routeData = null;
         statsEl.style.display = "none";
         elevWrap.style.display = "none";
         if (elevChart) { elevChart.destroy(); elevChart = null; }
+    }
+
+    // ===== Ruční režim (rovné úseky přes pole/les) =====
+    function setManualMode(on) {
+        manualMode = on;
+        if (btnManual) {
+            btnManual.classList.toggle("plan-btn-active", on);
+            btnManual.setAttribute("aria-pressed", on ? "true" : "false");
+        }
+        if (on) {
+            setStatus(i18n.manualOn || "Ruční režim.", "");
+        } else if (routeData) {
+            setStatus(i18n.done || "", "done");
+        } else {
+            setStatus(waypoints.length === 1 ? (i18n.onePoint || "") : (i18n.clickHint || ""), "");
+        }
+    }
+    if (btnManual) btnManual.addEventListener("click", () => setManualMode(!manualMode));
+
+    // Nominální rychlost (m/s) pro odhad času ručních úseků dle profilu
+    function nominalSpeedMs(profile) {
+        if (profile.indexOf("car") === 0)  return 50000 / 3600;
+        if (profile.indexOf("bike") === 0) return 15000 / 3600;
+        return 4500 / 3600; // pěšky
+    }
+
+    // Rovný úsek A→B rozdělený na body ~po 80 m (hladší výškový profil i GPX).
+    // Vrací body VČETNĚ B, BEZ A.
+    function densify(A, B, stepM) {
+        const d = window.GpxGeo.haversine(A[0], A[1], B[0], B[1]);
+        const n = Math.max(1, Math.round(d / stepM));
+        const out = [];
+        for (let k = 1; k <= n; k++) {
+            const f = k / n;
+            out.push([A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f]);
+        }
+        return out;
+    }
+
+    // Rozdělí waypointy na úseky: souvislé auto body → jeden routing požadavek,
+    // ruční bod → samostatný rovný úsek.
+    function buildParts() {
+        const parts = [];
+        let i = 1;
+        while (i < waypoints.length) {
+            if (waypoints[i].manual) {
+                parts.push({ type: "manual", a: waypoints[i - 1], b: waypoints[i] });
+                i++;
+            } else {
+                const run = [waypoints[i - 1], waypoints[i]];
+                i++;
+                while (i < waypoints.length && !waypoints[i].manual) { run.push(waypoints[i]); i++; }
+                parts.push({ type: "auto", pts: run });
+            }
+        }
+        return parts;
     }
 
     // ===== Výpočet trasy (debounce — šetří Mapy.com kvótu při rychlém klikání) =====
@@ -155,34 +224,83 @@ document.addEventListener("DOMContentLoaded", () => {
         const seq = ++computeSeq;
         setStatus(i18n.computing || "Počítám…", "loading");
 
-        const pts = waypoints.map(w => `${w.lat.toFixed(6)},${w.lng.toFixed(6)}`).join(";");
         const profile = profileSel.value || "foot_hiking";
+        const parts = buildParts();
 
         try {
-            const res  = await fetch(`api/planner/route.php?points=${encodeURIComponent(pts)}&profile=${encodeURIComponent(profile)}`);
-            const data = await res.json();
+            // Auto úseky routujeme paralelně (Mapy.com); ruční jsou rovné čáry bez API.
+            const results = await Promise.all(parts.map(part => {
+                if (part.type !== "auto") return Promise.resolve(null);
+                const pts = part.pts.map(w => `${w.lat.toFixed(6)},${w.lng.toFixed(6)}`).join(";");
+                return fetch(`api/planner/route.php?points=${encodeURIComponent(pts)}&profile=${encodeURIComponent(profile)}`)
+                    .then(r => r.json());
+            }));
             if (seq !== computeSeq) return;   // mezitím přišel novější požadavek
 
-            if (!data.ok || !Array.isArray(data.coords) || data.coords.length < 2) {
+            // Poskládat úseky v pořadí do jedné geometrie + spočítat délku/čas
+            const fullCoords = [];
+            const rendered   = [];   // {coords, manual} — pro vykreslení
+            const nomSpeed   = nominalSpeedMs(profile);
+            let totalLen = 0, totalDur = 0;
+
+            const pushCoord = c => {
+                const last = fullCoords[fullCoords.length - 1];
+                if (!last || last[0] !== c[0] || last[1] !== c[1]) fullCoords.push(c);
+            };
+
+            for (let pi = 0; pi < parts.length; pi++) {
+                const part = parts[pi];
+                if (part.type === "manual") {
+                    const A = [part.a.lat, part.a.lng], B = [part.b.lat, part.b.lng];
+                    if (fullCoords.length === 0) pushCoord(A);
+                    densify(A, B, 80).forEach(pushCoord);
+                    const d = window.GpxGeo.haversine(A[0], A[1], B[0], B[1]);
+                    totalLen += d;
+                    totalDur += nomSpeed > 0 ? d / nomSpeed : 0;
+                    rendered.push({ coords: [A, B], manual: true });
+                } else {
+                    const r = results[pi];
+                    if (!r || !r.ok || !Array.isArray(r.coords) || r.coords.length < 2) {
+                        clearRoute();
+                        updateButtons();
+                        setStatus((i18n.error || "Chyba") + ": " + ((r && r.error) || "?"), "error");
+                        return;
+                    }
+                    r.coords.forEach(pushCoord);
+                    totalLen += r.length_m   || 0;
+                    totalDur += r.duration_s || 0;
+                    rendered.push({ coords: r.coords, manual: false });
+                }
+            }
+
+            if (fullCoords.length < 2) {
                 clearRoute();
                 updateButtons();
-                setStatus((i18n.error || "Chyba") + ": " + (data.error || "?"), "error");
+                setStatus((i18n.error || "Chyba") + ".", "error");
                 return;
             }
 
-            routeData = data;
-            if (routeLine) map.removeLayer(routeLine);
-            routeLine = L.polyline(data.coords, { color: "#1565c0", weight: 4, opacity: 0.85 }).addTo(map);
+            routeData = { ok: true, coords: fullCoords, length_m: totalLen, duration_s: totalDur };
 
-            document.getElementById("planDist").textContent = fmtKm(data.length_m);
-            document.getElementById("planDur").textContent  = "~" + fmtDur(data.duration_s);
+            // Vykreslit: auto úseky plnou modrou, ruční oranžovou čárkovanou
+            clearRouteLayers();
+            rendered.forEach(seg => {
+                const line = seg.manual
+                    ? L.polyline(seg.coords, { color: "#ef6c00", weight: 3, opacity: 0.9, dashArray: "6 8" })
+                    : L.polyline(seg.coords, { color: "#1565c0", weight: 4, opacity: 0.85 });
+                line.addTo(map);
+                routeLayers.push(line);
+            });
+
+            document.getElementById("planDist").textContent = fmtKm(totalLen);
+            document.getElementById("planDur").textContent  = "~" + fmtDur(totalDur);
             document.getElementById("planAsc").textContent  = "…";
             document.getElementById("planDesc").textContent = "…";
             statsEl.style.display = "flex";
             setStatus(i18n.done || "Hotovo.", "done");
             updateButtons();
 
-            loadElevation(data.coords, seq);
+            loadElevation(fullCoords, seq);
             loadWeather();
         } catch (err) {
             if (seq !== computeSeq) return;
@@ -403,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("name", name);
         fd.append("profile", profileSel.value || "foot_hiking");
         fd.append("plan_date", dateInput.value || "");
-        fd.append("waypoints", JSON.stringify(waypoints.map(w => [+w.lat.toFixed(6), +w.lng.toFixed(6)])));
+        fd.append("waypoints", JSON.stringify(waypoints.map(w => [+w.lat.toFixed(6), +w.lng.toFixed(6), w.manual ? 1 : 0])));
         fd.append("geometry", JSON.stringify(routeData.coords.map(c => [+c[0].toFixed(6), +c[1].toFixed(6)])));
         if (routeData.length_m   != null) fd.append("length_m",   String(Math.round(routeData.length_m)));
         if (routeData.duration_s != null) fd.append("duration_s", String(Math.round(routeData.duration_s)));
@@ -437,7 +555,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clearRoute();
 
             restoring = true;
-            (p.waypoints || []).forEach(c => addWaypoint({ lat: c[0], lng: c[1] }, true));
+            (p.waypoints || []).forEach(c => addWaypoint({ lat: c[0], lng: c[1] }, true, c[2] ? 1 : 0));
             restoring = false;
 
             nameInput.value  = p.name || "";
@@ -452,7 +570,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     length_m: p.length_m || 0, duration_s: p.duration_s || 0,
                     ascent: p.ascent, descent: p.descent
                 };
-                routeLine = L.polyline(p.geometry, { color: "#1565c0", weight: 4, opacity: 0.85 }).addTo(map);
+                clearRouteLayers();
+                routeLayers.push(L.polyline(p.geometry, { color: "#1565c0", weight: 4, opacity: 0.85 }).addTo(map));
                 document.getElementById("planDist").textContent = fmtKm(routeData.length_m);
                 document.getElementById("planDur").textContent  = "~" + fmtDur(routeData.duration_s);
                 document.getElementById("planAsc").textContent  = p.ascent  != null ? p.ascent  + " m" : "–";
@@ -519,6 +638,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentPlanId = 0;
         if (planListEl) planListEl.value = "";
         if (weatherEl) weatherEl.style.display = "none";
+        if (manualMode) setManualMode(false);
         refreshMarkers();
         clearRoute();
         updateButtons();

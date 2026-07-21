@@ -70,6 +70,8 @@ require __DIR__ . '/layout_header.php';
     </label>
     <input type="text" id="planName" maxlength="80"
            placeholder="<?= htmlspecialchars(t('planner_name_placeholder', 'Název plánu (pro export)')) ?>">
+    <button type="button" id="planManual" class="plan-btn" aria-pressed="false"
+            title="<?= htmlspecialchars(t('planner_manual_title', 'Ruční úsek — klikáním veď trasu rovnou čarou (pole, les, zkratka)')) ?>">✏️ <?= htmlspecialchars(t('planner_manual', 'Ruční úsek')) ?></button>
     <button type="button" id="planUndo" class="plan-btn" disabled>↩ <?= htmlspecialchars(t('planner_undo', 'Zpět')) ?></button>
     <button type="button" id="planClear" class="plan-btn" disabled>✕ <?= htmlspecialchars(t('planner_clear', 'Vyčistit')) ?></button>
     <button type="button" id="planExport" class="plan-btn plan-btn-primary" disabled>💾 <?= htmlspecialchars(t('planner_export', 'Export GPX (Garmin)')) ?></button>
@@ -170,7 +172,9 @@ window.gpxPlannerData = {
         sunrise:    <?= js_safe_json(t('planner_sunrise', 'východ')) ?>,
         sunset:     <?= js_safe_json(t('planner_sunset', 'západ')) ?>,
         precip:     <?= js_safe_json(t('planner_precip', 'srážky')) ?>,
-        wind:       <?= js_safe_json(t('planner_wind', 'vítr')) ?>
+        wind:       <?= js_safe_json(t('planner_wind', 'vítr')) ?>,
+        manualOn:   <?= js_safe_json(t('planner_manual_on', 'Ruční režim: klikáním veď trasu rovnou čarou (pole, les, zkratka). Dalším klikem na „✏️ Ruční úsek“ se vrátíš k automatu po cestách.')) ?>,
+        autoOn:     <?= js_safe_json(t('planner_auto_on', 'Automatický režim: trasa se počítá po cestách.')) ?>
     }
 };
 </script>

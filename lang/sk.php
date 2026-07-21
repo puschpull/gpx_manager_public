@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Načítavam zrážkové dáta…',
     'rp_radar_error'         => 'Zrážkové dáta sa nepodarilo načítať.',
     'rp_weather_na'          => 'Počasie nie je k dispozícii.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Ručný úsek',
+    'planner_manual_title'     => 'Ručný úsek — klikaním veď trasu rovnou čiarou (pole, les, skratka)',
+    'planner_manual_on'        => 'Ručný režim: klikaním veď trasu rovnou čiarou (pole, les, skratka). Ďalším klikom na „✏️ Ručný úsek“ sa vrátiš k automatu po cestách.',
+    'planner_auto_on'          => 'Automatický režim: trasa sa počíta po cestách.',
 ];

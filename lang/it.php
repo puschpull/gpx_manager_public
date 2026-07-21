@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Caricamento dati di precipitazione…',
     'rp_radar_error'         => 'Impossibile caricare i dati di precipitazione.',
     'rp_weather_na'          => 'Meteo non disponibile.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Tratto manuale',
+    'planner_manual_title'     => 'Tratto manuale — fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia)',
+    'planner_manual_on'        => 'Modalità manuale: fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia). Fai di nuovo clic su «✏️ Tratto manuale» per tornare al calcolo lungo i sentieri.',
+    'planner_auto_on'          => 'Modalità automatica: il percorso segue i sentieri reali.',
 ];

@@ -637,4 +637,10 @@ return [
     'rp_radar_loading'       => 'Niederschlagsdaten werden geladen…',
     'rp_radar_error'         => 'Niederschlagsdaten konnten nicht geladen werden.',
     'rp_weather_na'          => 'Wetter nicht verfügbar.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Manueller Abschnitt',
+    'planner_manual_title'     => 'Manueller Abschnitt — Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung)',
+    'planner_manual_on'        => 'Manueller Modus: Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung). Erneut auf „✏️ Manueller Abschnitt“ klicken, um zur Routenführung zurückzukehren.',
+    'planner_auto_on'          => 'Automatischer Modus: die Route folgt echten Wegen.',
 ];

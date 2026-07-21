@@ -643,4 +643,10 @@ return [
     'rp_radar_loading'       => 'Loading precipitation data…',
     'rp_radar_error'         => 'Failed to load precipitation data.',
     'rp_weather_na'          => 'Weather not available.',
+
+    // ===== Plánovač — ruční úseky =====
+    'planner_manual'           => 'Manual segment',
+    'planner_manual_title'     => 'Manual segment — click to draw the route as a straight line (field, forest, shortcut)',
+    'planner_manual_on'        => 'Manual mode: click to draw the route as a straight line (field, forest, shortcut). Click "✏️ Manual segment" again to return to routing along paths.',
+    'planner_auto_on'          => 'Automatic mode: the route follows real paths.',
 ];

@@ -6,6 +6,20 @@
 ================================================================================
 
 
+── 21. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PLÁNOVAČ: RUČNÍ ÚSEKY (rovné zkratky přes pole/les)                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nové tlačítko „✏️ Ruční úsek" v Plánovači: klikáním vedeš trasu rovnou
+  čarou mezi body (přechod pole, louky, zkratka lesem) bez routingu.
+  Dalším klikem se vrátíš k automatickému vykreslení po cestách; oba
+  režimy lze v jedné trase střídat. Ruční úseky jsou oranžové čárkované,
+  započítají se do vzdálenosti, výškového profilu i exportu GPX a uloží
+  se s plánem.
+
+
 ── 20. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
