@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'dodaj wszystko',
     'planner_import_mode_replace'    => 'zastąp wszystko',
     'planner_import_dup'             => 'pominięto duplikaty: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Mijane zdjęcia (podczas odtwarzania)',
+    'rp_photos'            => 'Mijane zdjęcia',
+    'rp_photos_title'      => 'Pokaż w rogu mapy zdjęcie, które turysta właśnie mija',
+    'rp_photos_on'         => 'Mijane zdjęcia: włączone',
+    'rp_photos_none'       => 'Trasa nie ma zdjęć z pozycją GPS.',
 ];

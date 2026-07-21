@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'tout ajouter',
     'planner_import_mode_replace'    => 'tout remplacer',
     'planner_import_dup'             => 'doublons ignorés : {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Photos rencontrées (pendant la lecture)',
+    'rp_photos'            => 'Photos rencontrées',
+    'rp_photos_title'      => 'Afficher dans le coin de la carte la photo que le randonneur croise',
+    'rp_photos_on'         => 'Photos rencontrées : activé',
+    'rp_photos_none'       => 'La trace n\'a pas de photos géolocalisées.',
 ];

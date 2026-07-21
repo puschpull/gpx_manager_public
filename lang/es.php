@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'añadir todo',
     'planner_import_mode_replace'    => 'reemplazar todo',
     'planner_import_dup'             => 'duplicados omitidos: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Fotos al pasar (durante la reproducción)',
+    'rp_photos'            => 'Fotos al pasar',
+    'rp_photos_title'      => 'Mostrar en la esquina del mapa la foto por la que pasa el excursionista',
+    'rp_photos_on'         => 'Fotos al pasar: activado',
+    'rp_photos_none'       => 'La ruta no tiene fotos con posición GPS.',
 ];

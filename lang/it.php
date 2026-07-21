@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'aggiungi tutto',
     'planner_import_mode_replace'    => 'sostituisci tutto',
     'planner_import_dup'             => 'duplicati saltati: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Foto incontrate (durante la riproduzione)',
+    'rp_photos'            => 'Foto incontrate',
+    'rp_photos_title'      => 'Mostra nell\'angolo della mappa la foto che l\'escursionista sta passando',
+    'rp_photos_on'         => 'Foto incontrate: attivo',
+    'rp_photos_none'       => 'La traccia non ha foto con posizione GPS.',
 ];

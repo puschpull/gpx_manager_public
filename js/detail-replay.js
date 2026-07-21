@@ -155,6 +155,7 @@ document.addEventListener("gpxDataReady", (ev) => {
         updateChartMarker(p.dist / 1000);
         updateWeather(p);
         updateRadar();
+        updatePhotoBox(p);
         if (tCur >= tEnd && playing) pause();
     }
 
@@ -426,7 +427,132 @@ document.addEventListener("gpxDataReady", (ev) => {
         });
     }
 
+    // ===== Míjené fotky (náhled v levém dolním rohu mapy) =====
+    const photoBtn    = document.getElementById("rpPhotoToggle");
+    const photoStatus = document.getElementById("rpPhotoStatus");
+    const PHOTO_THRESHOLD_M = 120;   // do jaké vzdálenosti od fotky ji ukázat
+
+    let photosOn      = false;
+    let photoList     = [];   // [{triggerDist, thumb_url, full_url, caption, taken_at, filename}], seřazeno dle triggerDist
+    let photoControl  = null;
+    let photoBoxEl    = null;
+    let photoImgEl    = null;
+    let photoCapEl    = null;
+    let shownPhotoIdx = -1;
+
+    function buildPhotoControl() {
+        if (photoControl) return;
+        const Ctl = L.Control.extend({
+            options: { position: "bottomleft" },
+            onAdd: function () {
+                const div = L.DomUtil.create("div", "rp-photo-box");
+                div.style.display = "none";
+                div.innerHTML = '<img class="rp-photo-thumb" alt=""><div class="rp-photo-cap"></div>';
+                L.DomEvent.disableClickPropagation(div);
+                L.DomEvent.on(div, "click", function () {
+                    if (shownPhotoIdx < 0 || !window.gpxLightbox) return;
+                    window.gpxLightbox.open(photoList.map(ph => ({
+                        full_url: ph.full_url, caption: ph.caption,
+                        taken_at: ph.taken_at, filename: ph.filename
+                    })), shownPhotoIdx);
+                });
+                return div;
+            }
+        });
+        photoControl = new Ctl();
+        photoControl.addTo(map);
+        photoBoxEl = photoControl.getContainer();
+        photoImgEl = photoBoxEl.querySelector(".rp-photo-thumb");
+        photoCapEl = photoBoxEl.querySelector(".rp-photo-cap");
+    }
+
+    function hidePhotoBox() {
+        if (photoBoxEl) photoBoxEl.style.display = "none";
+        shownPhotoIdx = -1;
+    }
+
+    // Nejbližší fotka (index v photoList) podle ujeté vzdálenosti na trase (binárně).
+    function nearestPhotoIdx(d) {
+        if (!photoList.length) return -1;
+        let lo = 0, hi = photoList.length - 1;
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1;
+            if (photoList[mid].triggerDist < d) lo = mid + 1; else hi = mid;
+        }
+        if (lo > 0 && Math.abs(photoList[lo - 1].triggerDist - d) < Math.abs(photoList[lo].triggerDist - d)) return lo - 1;
+        return lo;
+    }
+
+    function updatePhotoBox(p) {
+        if (!photosOn || !photoList.length) return;
+        const idx = nearestPhotoIdx(p.dist);
+        if (idx < 0 || Math.abs(photoList[idx].triggerDist - p.dist) > PHOTO_THRESHOLD_M) {
+            if (shownPhotoIdx !== -1) hidePhotoBox();
+            return;
+        }
+        if (idx === shownPhotoIdx) return;   // stejná fotka → nepřekreslovat
+        shownPhotoIdx = idx;
+        buildPhotoControl();
+        const ph = photoList[idx];
+        photoImgEl.src = ph.thumb_url;
+        photoImgEl.alt = ph.caption || "";
+        photoCapEl.textContent = ph.caption || "";
+        photoCapEl.style.display = ph.caption ? "" : "none";
+        photoBoxEl.style.display = "block";
+    }
+
+    function setPhotosMode(on) {
+        photosOn = on && photoList.length > 0;
+        try { localStorage.setItem("gpx_replay_photos", on ? "1" : "0"); } catch (e) {}
+        if (photoBtn) photoBtn.classList.toggle("rp-btn-active", photosOn);
+        if (photoStatus) photoStatus.textContent = photosOn ? (i18n.photosOn || "") : "";
+        if (!photosOn) hidePhotoBox();
+        else updatePhotoBox(posAt(tCur));
+    }
+
+    async function loadTrackPhotos() {
+        const trackId = cfg.trackId;
+        if (!trackId) return;
+        try {
+            const res  = await fetch("api/photos/track.php?id=" + encodeURIComponent(trackId));
+            const data = await res.json();
+            const photos = (data && data.photos) || [];
+            if (!photos.length) {
+                // žádné fotky s GPS → přepínač skrýt (nemá co ukazovat)
+                const wrap = photoBtn ? photoBtn.closest(".rp-photo-controls") : null;
+                if (wrap) wrap.style.display = "none";
+                return;
+            }
+            // Ke každé fotce najít nejbližší bod trasy → vzdálenost na trase (triggerDist)
+            const n = lat.length;
+            const step = n > 3000 ? Math.ceil(n / 3000) : 1;
+            photoList = photos.map(ph => {
+                let bestD = Infinity, bestIdx = 0;
+                for (let i = 0; i < n; i += step) {
+                    const d = window.GpxGeo.haversine(ph.lat, ph.lon, lat[i], lon[i]);
+                    if (d < bestD) { bestD = d; bestIdx = i; }
+                }
+                return {
+                    triggerDist: distM[bestIdx],
+                    thumb_url: ph.thumb_url, full_url: ph.full_url,
+                    caption: ph.caption || "", taken_at: ph.taken_at || "",
+                    filename: ph.filename || ph.caption || ""
+                };
+            }).sort((a, b) => a.triggerDist - b.triggerDist);
+
+            // Obnovit uložený stav přepínače (přežije reload)
+            let saved = null;
+            try { saved = localStorage.getItem("gpx_replay_photos"); } catch (e) {}
+            if (saved === "1") setPhotosMode(true);
+        } catch (err) {
+            if (window.GPX_DEBUG) console.error("replay photos:", err);
+        }
+    }
+
+    if (photoBtn) photoBtn.addEventListener("click", () => setPhotosMode(!photosOn));
+
     // ===== Výchozí stav =====
     update();
     if (flags.weather && hasTimes) prefetchWeather();
+    if (flags.photos && photoBtn) loadTrackPhotos();
 });

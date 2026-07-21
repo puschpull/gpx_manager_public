@@ -83,6 +83,7 @@ function feature_flag_labels(): array {
         'replay'         => '▶️ ' . t('ft_replay', 'Přehrávač výšlapu (detail trasy)'),
         'replay_weather' => '🌦️ ' . t('ft_replay_weather', 'Počasí u turisty (při přehrávání)'),
         'replay_radar'   => '🌧️ ' . t('ft_replay_radar', 'Srážkové pole (animace deště)'),
+        'replay_photos'  => '📷 ' . t('ft_replay_photos', 'Míjené fotky (při přehrávání)'),
     ];
 }
 

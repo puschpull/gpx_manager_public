@@ -1,9 +1,23 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 20. července 2026
+  Poslední aktualizace: 22. července 2026
 
 ================================================================================
+
+
+── 22. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PŘEHRÁVAČ: NÁHLED MÍJENÉ FOTKY V ROHU MAPY                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Při přehrávání výšlapu se v levém dolním rohu mapy může objevit malé
+  okénko s náhledem fotky, kterou panáček zrovna míjí. Kliknutím se fotka
+  otevře na celou obrazovku. Zapíná se přepínačem „📷 Míjené fotky" přímo
+  v ovládacím poli přehrávače (volba se pamatuje); když trasa nemá fotky
+  s GPS polohou, přepínač se skryje. Párování je podle vzdálenosti na
+  trase. Lze vypnout v Administraci → Volitelné funkce.
 
 
 ── 21. července 2026 ───────────────────────────────────────────────────────────

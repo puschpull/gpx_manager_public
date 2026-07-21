@@ -270,6 +270,13 @@ require __DIR__ . '/layout_header.php';
             <span id="rpRadarStatus" class="rp-radar-status"></span>
         </div>
         <?php endif; ?>
+        <?php if (feature_enabled('replay_photos')): ?>
+        <div class="rp-photo-controls">
+            <button type="button" id="rpPhotoToggle" class="rp-btn"
+                    title="<?= htmlspecialchars(t('rp_photos_title', 'Zobrazovat v rohu mapy fotku, kterou panáček zrovna míjí')) ?>">📷 <?= htmlspecialchars(t('rp_photos', 'Míjené fotky')) ?></button>
+            <span id="rpPhotoStatus" class="rp-radar-status"></span>
+        </div>
+        <?php endif; ?>
         <div id="rpNote" class="rp-note" style="display:none;"></div>
     </div>
 </section>
@@ -406,7 +413,8 @@ window.gpxDetailData = {
     garminColor:  <?= js_safe_json($track['color'] ?? '') ?>,
     replayFlags: {
         weather: <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_weather')) ?>,
-        radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>
+        radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>,
+        photos:  <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_photos')) ?>
     },
     replayI18n: {
         play:      <?= js_safe_json(t('rp_play', 'Přehrát výšlap')) ?>,
@@ -415,7 +423,9 @@ window.gpxDetailData = {
         radarNone: <?= js_safe_json(t('rp_radar_none', 'V den výletu v okolí nepršelo.')) ?>,
         radarLoad: <?= js_safe_json(t('rp_radar_loading', 'Načítám srážková data…')) ?>,
         radarErr:  <?= js_safe_json(t('rp_radar_error', 'Srážková data se nepodařilo načíst.')) ?>,
-        weatherNA: <?= js_safe_json(t('rp_weather_na', 'Počasí není k dispozici.')) ?>
+        weatherNA: <?= js_safe_json(t('rp_weather_na', 'Počasí není k dispozici.')) ?>,
+        photosOn:  <?= js_safe_json(t('rp_photos_on', 'Míjené fotky: zapnuto')) ?>,
+        photosNone:<?= js_safe_json(t('rp_photos_none', 'Trasa nemá fotky s GPS polohou.')) ?>
     },
     apiKeys: {
         tf:        <?= js_safe_json(defined('TF_API_KEY') ? TF_API_KEY : '') ?>,

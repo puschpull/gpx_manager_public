@@ -670,4 +670,11 @@ return [
     'planner_import_mode_append'     => 'add all',
     'planner_import_mode_replace'    => 'replace all',
     'planner_import_dup'             => 'duplicates skipped: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Passing photos (during replay)',
+    'rp_photos'            => 'Passing photos',
+    'rp_photos_title'      => 'Show the photo the hiker is currently passing in the map corner',
+    'rp_photos_on'         => 'Passing photos: on',
+    'rp_photos_none'       => 'The track has no geotagged photos.',
 ];

@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'pridať všetko',
     'planner_import_mode_replace'    => 'nahradiť všetko',
     'planner_import_dup'             => 'preskočené duplicity: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Míňané fotky (pri prehrávaní)',
+    'rp_photos'            => 'Míňané fotky',
+    'rp_photos_title'      => 'Zobrazovať v rohu mapy fotku, ktorú panáčik práve míňa',
+    'rp_photos_on'         => 'Míňané fotky: zapnuté',
+    'rp_photos_none'       => 'Trasa nemá fotky s GPS polohou.',
 ];

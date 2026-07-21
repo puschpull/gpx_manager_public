@@ -664,4 +664,11 @@ return [
     'planner_import_mode_append'     => 'alle hinzufügen',
     'planner_import_mode_replace'    => 'alles ersetzen',
     'planner_import_dup'             => 'Duplikate übersprungen: {n}',
+
+    // ===== Přehrávač — míjené fotky =====
+    'ft_replay_photos'     => 'Passierte Fotos (bei Wiedergabe)',
+    'rp_photos'            => 'Passierte Fotos',
+    'rp_photos_title'      => 'Das gerade passierte Foto in der Kartenecke anzeigen',
+    'rp_photos_on'         => 'Passierte Fotos: ein',
+    'rp_photos_none'       => 'Die Tour hat keine Fotos mit GPS-Position.',
 ];
