@@ -643,4 +643,17 @@ return [
     'planner_manual_title'     => 'Tronçon manuel — cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci)',
     'planner_manual_on'        => 'Mode manuel : cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci). Cliquez à nouveau sur « ✏️ Tronçon manuel » pour revenir au calcul par les chemins.',
     'planner_auto_on'          => 'Mode automatique : l\'itinéraire suit les chemins réels.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Exporter les plans',
+    'planner_export_all_title'     => 'Télécharger tous les plans enregistrés dans un fichier (.json)',
+    'planner_import'               => 'Importer des plans',
+    'planner_import_title'         => 'Charger des plans depuis un fichier .json',
+    'planner_import_replace'       => 'tout remplacer',
+    'planner_import_replace_title' => 'Supprimer les plans existants avant l\'import (sinon ils sont ajoutés)',
+    'planner_export_none'          => 'Aucun plan enregistré à exporter.',
+    'planner_export_done'          => 'Plans téléchargés : {n}',
+    'planner_import_bad'           => 'Impossible de lire le fichier.',
+    'planner_import_done'          => 'Plans importés : {n}',
+    'planner_import_confirm'       => 'Remplacer tous les plans enregistrés par le contenu du fichier ? Cette action est irréversible.',
 ];

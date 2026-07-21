@@ -643,4 +643,17 @@ return [
     'planner_manual_title'     => 'Manueller Abschnitt — Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung)',
     'planner_manual_on'        => 'Manueller Modus: Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung). Erneut auf „✏️ Manueller Abschnitt“ klicken, um zur Routenführung zurückzukehren.',
     'planner_auto_on'          => 'Automatischer Modus: die Route folgt echten Wegen.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Pläne exportieren',
+    'planner_export_all_title'     => 'Alle gespeicherten Pläne als Datei herunterladen (.json)',
+    'planner_import'               => 'Pläne importieren',
+    'planner_import_title'         => 'Pläne aus einer .json-Datei laden',
+    'planner_import_replace'       => 'alles ersetzen',
+    'planner_import_replace_title' => 'Vorhandene Pläne vor dem Import löschen (sonst werden sie hinzugefügt)',
+    'planner_export_none'          => 'Keine gespeicherten Pläne zum Export.',
+    'planner_export_done'          => 'Heruntergeladene Pläne: {n}',
+    'planner_import_bad'           => 'Datei konnte nicht gelesen werden.',
+    'planner_import_done'          => 'Importierte Pläne: {n}',
+    'planner_import_confirm'       => 'Alle vorhandenen gespeicherten Pläne durch den Dateiinhalt ersetzen? Dies kann nicht rückgängig gemacht werden.',
 ];

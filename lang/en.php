@@ -649,4 +649,17 @@ return [
     'planner_manual_title'     => 'Manual segment — click to draw the route as a straight line (field, forest, shortcut)',
     'planner_manual_on'        => 'Manual mode: click to draw the route as a straight line (field, forest, shortcut). Click "✏️ Manual segment" again to return to routing along paths.',
     'planner_auto_on'          => 'Automatic mode: the route follows real paths.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Export plans',
+    'planner_export_all_title'     => 'Download all saved plans as a file (.json)',
+    'planner_import'               => 'Import plans',
+    'planner_import_title'         => 'Load plans from a .json file',
+    'planner_import_replace'       => 'replace all',
+    'planner_import_replace_title' => 'Delete existing plans before import (otherwise they are appended)',
+    'planner_export_none'          => 'No saved plans to export.',
+    'planner_export_done'          => 'Plans downloaded: {n}',
+    'planner_import_bad'           => 'Could not read the file.',
+    'planner_import_done'          => 'Plans imported: {n}',
+    'planner_import_confirm'       => 'Replace all existing saved plans with the file contents? This cannot be undone.',
 ];

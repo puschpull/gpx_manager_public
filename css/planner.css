@@ -51,6 +51,18 @@
 }
 .plan-btn-active:hover:not(:disabled) { background: #d95f00; border-color: #d95f00; }
 
+/* Oddělovač skupin v panelu (např. před Export/Import) */
+.plan-sep {
+    width: 1px; align-self: stretch; min-height: 22px;
+    background: var(--border-color);
+    margin: 0 2px;
+}
+
+.plan-replace {
+    font-size: 12px; color: var(--text-muted);
+    display: inline-flex; align-items: center; gap: 5px;
+}
+
 /* Statistiky plánu */
 .plan-stats {
     display: flex; gap: 18px; flex-wrap: wrap; align-items: center;

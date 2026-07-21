@@ -643,4 +643,17 @@ return [
     'planner_manual_title'     => 'Odcinek ręczny — klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót)',
     'planner_manual_on'        => 'Tryb ręczny: klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót). Kliknij ponownie „✏️ Odcinek ręczny“, aby wrócić do trasowania po ścieżkach.',
     'planner_auto_on'          => 'Tryb automatyczny: trasa biegnie po prawdziwych ścieżkach.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Eksport planów',
+    'planner_export_all_title'     => 'Pobierz wszystkie zapisane plany jako plik (.json)',
+    'planner_import'               => 'Import planów',
+    'planner_import_title'         => 'Wczytaj plany z pliku .json',
+    'planner_import_replace'       => 'zastąp wszystko',
+    'planner_import_replace_title' => 'Usuń istniejące plany przed importem (w przeciwnym razie zostaną dodane)',
+    'planner_export_none'          => 'Brak zapisanych planów do eksportu.',
+    'planner_export_done'          => 'Pobrane plany: {n}',
+    'planner_import_bad'           => 'Nie udało się odczytać pliku.',
+    'planner_import_done'          => 'Zaimportowane plany: {n}',
+    'planner_import_confirm'       => 'Zastąpić wszystkie istniejące zapisane plany zawartością pliku? Tej operacji nie można cofnąć.',
 ];

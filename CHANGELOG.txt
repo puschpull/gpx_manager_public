@@ -9,6 +9,16 @@
 ── 21. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  PLÁNOVAČ: EXPORT / IMPORT PLÁNŮ (přenos mezi instalacemi)                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Admin tlačítka v Plánovači: „⬇ Export plánů" stáhne všechny uložené
+  plány jako soubor .json, „⬆ Import plánů" je nahraje (zaškrtávátko
+  „nahradit vše" před importem smaže stávající). Přenáší se vč. ručních
+  úseků a geometrie; import přiřadí nová id, běží v transakci. Nahrazuje
+  ruční přenos přes databázi. Jen pro admina, CSRF, bez migrace.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  PLÁNOVAČ: RUČNÍ ÚSEKY (rovné zkratky přes pole/les)                           │
 └──────────────────────────────────────────────────────────────────────────────┘
 

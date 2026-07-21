@@ -643,4 +643,17 @@ return [
     'planner_manual_title'     => 'Tramo manual — haz clic para trazar la ruta en línea recta (campo, bosque, atajo)',
     'planner_manual_on'        => 'Modo manual: haz clic para trazar la ruta en línea recta (campo, bosque, atajo). Vuelve a hacer clic en «✏️ Tramo manual» para volver al trazado por caminos.',
     'planner_auto_on'          => 'Modo automático: la ruta sigue los caminos reales.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Exportar planes',
+    'planner_export_all_title'     => 'Descargar todos los planes guardados como archivo (.json)',
+    'planner_import'               => 'Importar planes',
+    'planner_import_title'         => 'Cargar planes desde un archivo .json',
+    'planner_import_replace'       => 'reemplazar todo',
+    'planner_import_replace_title' => 'Eliminar los planes existentes antes de importar (si no, se añaden)',
+    'planner_export_none'          => 'No hay planes guardados para exportar.',
+    'planner_export_done'          => 'Planes descargados: {n}',
+    'planner_import_bad'           => 'No se pudo leer el archivo.',
+    'planner_import_done'          => 'Planes importados: {n}',
+    'planner_import_confirm'       => '¿Reemplazar todos los planes guardados por el contenido del archivo? Esta acción no se puede deshacer.',
 ];

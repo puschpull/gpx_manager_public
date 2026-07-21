@@ -649,4 +649,17 @@ return [
     'planner_manual_title'     => 'Ruční úsek — klikáním veď trasu rovnou čarou (pole, les, zkratka)',
     'planner_manual_on'        => 'Ruční režim: klikáním veď trasu rovnou čarou (pole, les, zkratka). Dalším klikem na „✏️ Ruční úsek“ se vrátíš k automatu po cestách.',
     'planner_auto_on'          => 'Automatický režim: trasa se počítá po cestách.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Export plánů',
+    'planner_export_all_title'     => 'Stáhnout všechny uložené plány jako soubor (.json)',
+    'planner_import'               => 'Import plánů',
+    'planner_import_title'         => 'Načíst plány ze souboru .json',
+    'planner_import_replace'       => 'nahradit vše',
+    'planner_import_replace_title' => 'Před importem smazat stávající plány (jinak se přidají)',
+    'planner_export_none'          => 'Žádné uložené plány k exportu.',
+    'planner_export_done'          => 'Plány staženy: {n}',
+    'planner_import_bad'           => 'Soubor se nepodařilo načíst.',
+    'planner_import_done'          => 'Importováno plánů: {n}',
+    'planner_import_confirm'       => 'Nahradit všechny stávající uložené plány obsahem souboru? Tuto akci nelze vrátit.',
 ];

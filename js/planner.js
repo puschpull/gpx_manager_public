@@ -623,6 +623,73 @@ document.addEventListener("DOMContentLoaded", () => {
         refreshPlansList();
     }
 
+    // ===== Export / Import všech plánů (soubor .json) — admin =====
+    const btnDbExport  = document.getElementById("planDbExport");
+    const btnDbImport  = document.getElementById("planDbImport");
+    const dbImportFile = document.getElementById("planDbImportFile");
+    const dbReplaceCb  = document.getElementById("planDbReplace");
+
+    async function exportPlans() {
+        try {
+            const res  = await fetch("api/planner/export.php");
+            const data = await res.json();
+            if (!data.ok || !data.export || !data.export.plans.length) {
+                setStatus(i18n.exportNone || "Žádné plány.", "");
+                return;
+            }
+            const blob = new Blob([JSON.stringify(data.export, null, 1)], { type: "application/json" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "gpx-manager-plany-" + new Date().toISOString().slice(0, 10) + ".json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+            setStatus((i18n.exportDone || "Staženo: {n}").replace("{n}", data.export.plans.length), "done");
+        } catch (err) {
+            if (window.GPX_DEBUG) console.error("planner export:", err);
+            setStatus((i18n.error || "Chyba") + ".", "error");
+        }
+    }
+
+    function importPlans(file) {
+        if (!file) return;
+        const replace = !!(dbReplaceCb && dbReplaceCb.checked);
+        if (replace && !confirm(i18n.importRepl || "Nahradit všechny plány?")) return;
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const fd = new FormData();
+            fd.append("_csrf_token", CSRF);
+            fd.append("data", String(reader.result || ""));
+            fd.append("replace", replace ? "1" : "0");
+            try {
+                const res  = await fetch("api/planner/import.php", { method: "POST", body: fd });
+                const data = await res.json();
+                if (data.ok) {
+                    setStatus((i18n.importDone || "Importováno: {n}").replace("{n}", data.imported), "done");
+                    if (dbReplaceCb) dbReplaceCb.checked = false;
+                    refreshPlansList();
+                } else {
+                    setStatus((i18n.importBad || "Chyba") + " " + (data.error || ""), "error");
+                }
+            } catch (err) {
+                setStatus(i18n.importBad || "Chyba.", "error");
+            }
+        };
+        reader.onerror = () => setStatus(i18n.importBad || "Chyba.", "error");
+        reader.readAsText(file);
+    }
+
+    if (btnDbExport) btnDbExport.addEventListener("click", exportPlans);
+    if (btnDbImport && dbImportFile) {
+        btnDbImport.addEventListener("click", () => dbImportFile.click());
+        dbImportFile.addEventListener("change", () => {
+            importPlans(dbImportFile.files[0]);
+            dbImportFile.value = "";   // ať jde nahrát stejný soubor znovu
+        });
+    }
+
     // ===== Klik do mapy = nový waypoint =====
     map.on("click", e => addWaypoint(e.latlng));
 

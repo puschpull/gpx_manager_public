@@ -643,4 +643,17 @@ return [
     'planner_manual_title'     => 'Tratto manuale — fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia)',
     'planner_manual_on'        => 'Modalità manuale: fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia). Fai di nuovo clic su «✏️ Tratto manuale» per tornare al calcolo lungo i sentieri.',
     'planner_auto_on'          => 'Modalità automatica: il percorso segue i sentieri reali.',
+
+    // ===== Plánovač — export/import plánů =====
+    'planner_export_all'           => 'Esporta piani',
+    'planner_export_all_title'     => 'Scarica tutti i piani salvati come file (.json)',
+    'planner_import'               => 'Importa piani',
+    'planner_import_title'         => 'Carica piani da un file .json',
+    'planner_import_replace'       => 'sostituisci tutto',
+    'planner_import_replace_title' => 'Elimina i piani esistenti prima dell\'importazione (altrimenti vengono aggiunti)',
+    'planner_export_none'          => 'Nessun piano salvato da esportare.',
+    'planner_export_done'          => 'Piani scaricati: {n}',
+    'planner_import_bad'           => 'Impossibile leggere il file.',
+    'planner_import_done'          => 'Piani importati: {n}',
+    'planner_import_confirm'       => 'Sostituire tutti i piani salvati esistenti con il contenuto del file? Questa azione non può essere annullata.',
 ];

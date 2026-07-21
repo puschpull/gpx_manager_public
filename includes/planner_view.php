@@ -93,6 +93,13 @@ require __DIR__ . '/layout_header.php';
     </label>
     <?php if ($_plannerIsAdmin): ?>
     <button type="button" id="planDelete" class="plan-btn" disabled>🗑 <?= htmlspecialchars(t('planner_delete', 'Smazat')) ?></button>
+    <span class="plan-sep" aria-hidden="true"></span>
+    <button type="button" id="planDbExport" class="plan-btn" title="<?= htmlspecialchars(t('planner_export_all_title', 'Stáhnout všechny uložené plány jako soubor (.json)')) ?>">⬇ <?= htmlspecialchars(t('planner_export_all', 'Export plánů')) ?></button>
+    <button type="button" id="planDbImport" class="plan-btn" title="<?= htmlspecialchars(t('planner_import_title', 'Načíst plány ze souboru .json')) ?>">⬆ <?= htmlspecialchars(t('planner_import', 'Import plánů')) ?></button>
+    <label class="plan-replace" title="<?= htmlspecialchars(t('planner_import_replace_title', 'Před importem smazat stávající plány (jinak se přidají)')) ?>">
+        <input type="checkbox" id="planDbReplace"> <?= htmlspecialchars(t('planner_import_replace', 'nahradit vše')) ?>
+    </label>
+    <input type="file" id="planDbImportFile" accept=".json,application/json" hidden>
     <?php endif; ?>
 </div>
 
@@ -174,7 +181,12 @@ window.gpxPlannerData = {
         precip:     <?= js_safe_json(t('planner_precip', 'srážky')) ?>,
         wind:       <?= js_safe_json(t('planner_wind', 'vítr')) ?>,
         manualOn:   <?= js_safe_json(t('planner_manual_on', 'Ruční režim: klikáním veď trasu rovnou čarou (pole, les, zkratka). Dalším klikem na „✏️ Ruční úsek“ se vrátíš k automatu po cestách.')) ?>,
-        autoOn:     <?= js_safe_json(t('planner_auto_on', 'Automatický režim: trasa se počítá po cestách.')) ?>
+        autoOn:     <?= js_safe_json(t('planner_auto_on', 'Automatický režim: trasa se počítá po cestách.')) ?>,
+        exportNone: <?= js_safe_json(t('planner_export_none', 'Žádné uložené plány k exportu.')) ?>,
+        exportDone: <?= js_safe_json(t('planner_export_done', 'Plány staženy: {n}')) ?>,
+        importBad:  <?= js_safe_json(t('planner_import_bad', 'Soubor se nepodařilo načíst.')) ?>,
+        importDone: <?= js_safe_json(t('planner_import_done', 'Importováno plánů: {n}')) ?>,
+        importRepl: <?= js_safe_json(t('planner_import_confirm', 'Nahradit všechny stávající uložené plány obsahem souboru? Tuto akci nelze vrátit.')) ?>
     }
 };
 </script>
