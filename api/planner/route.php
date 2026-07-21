@@ -63,9 +63,11 @@ ajax_endpoint(function (): array {
         http_response_code(400);
         return ['ok' => false, 'error' => 'Zadejte alespoň 2 body.'];
     }
-    if (count($pts) > 30) {
+    // Auto úsek se interně dělí na kousky po 15 mezibodech (řetězení), zvládne
+    // tedy víc bodů. Limit je jen pojistka proti extrémnímu vstupu.
+    if (count($pts) > 100) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Maximálně 30 bodů.'];
+        return ['ok' => false, 'error' => 'Příliš mnoho bodů v jednom úseku (max 100).'];
     }
 
     $profile = (string)($_GET['profile'] ?? 'foot_hiking');

@@ -31,12 +31,13 @@ ajax_endpoint(function () use ($pdo): array {
         $profile = 'foot_hiking';
     }
 
-    // Waypointy: JSON pole [[lat,lon],...], 2–30 platných bodů
+    // Waypointy: JSON pole [[lat,lon,manual?],...]. Horní limit je velkorysý —
+    // ruční úseky (rovné čáry) mají typicky hodně bodů a nevolají žádné API.
     $wptsRaw = (string)($_POST['waypoints'] ?? '');
     $wpts = json_decode($wptsRaw, true);
-    if (!is_array($wpts) || count($wpts) < 2 || count($wpts) > 30) {
+    if (!is_array($wpts) || count($wpts) < 2 || count($wpts) > 500) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Neplatné waypointy (2–30 bodů).'];
+        return ['ok' => false, 'error' => 'Neplatné waypointy (2–500 bodů).'];
     }
     $cleanWpts = [];
     foreach ($wpts as $w) {
