@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'Impossible de lire le fichier.',
     'planner_import_done'          => 'Plans importés : {n}',
     'planner_import_confirm'       => 'Remplacer tous les plans enregistrés par le contenu du fichier ? Cette action est irréversible.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Mode',
+    'planner_import_mode_title'      => 'Que faire des plans du fichier par rapport aux plans existants',
+    'planner_import_mode_new'        => 'ajouter seulement les nouveaux',
+    'planner_import_mode_append'     => 'tout ajouter',
+    'planner_import_mode_replace'    => 'tout remplacer',
+    'planner_import_dup'             => 'doublons ignorés : {n}',
 ];

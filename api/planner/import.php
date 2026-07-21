@@ -37,14 +37,29 @@ ajax_endpoint(function () use ($pdo): array {
     $allowedProfiles = ['foot_fast', 'foot_hiking', 'bike_road', 'bike_mountain', 'car_fast', 'car_short'];
     $intOrNull = static fn($v) => (is_numeric($v)) ? (int)$v : null;
 
-    $replace  = !empty($_POST['replace']);
-    $imported = 0;
-    $skipped  = 0;
+    // Režim: append = přidat vše | new = přidat jen nové (přeskočit shodné názvy)
+    // | replace = smazat stávající a nahradit. Fallback na starý param 'replace'.
+    $mode = (string)($_POST['mode'] ?? '');
+    if (!in_array($mode, ['append', 'new', 'replace'], true)) {
+        $mode = !empty($_POST['replace']) ? 'replace' : 'append';
+    }
+
+    $imported   = 0;
+    $skipped    = 0;   // neplatné plány (chybný název/body)
+    $duplicates = 0;   // přeskočené kvůli shodě názvu (režim 'new')
 
     $pdo->beginTransaction();
     try {
-        if ($replace) {
+        if ($mode === 'replace') {
             $pdo->exec('DELETE FROM planned_routes');
+        }
+
+        // Režim 'new': množina existujících názvů (case-insensitive) pro přeskočení duplicit
+        $existingNames = [];
+        if ($mode === 'new') {
+            foreach ($pdo->query('SELECT name FROM planned_routes')->fetchAll(\PDO::FETCH_COLUMN) as $en) {
+                $existingNames[mb_strtolower(trim((string)$en))] = true;
+            }
         }
 
         $ins = $pdo->prepare('INSERT INTO planned_routes
@@ -59,6 +74,13 @@ ajax_endpoint(function () use ($pdo): array {
             $name = trim((string)($p['name'] ?? ''));
             if ($name === '') { $skipped++; continue; }
             $name = mb_substr($name, 0, 120);
+
+            // Režim 'new': plán se stejným názvem už existuje → přeskočit
+            if ($mode === 'new') {
+                $key = mb_strtolower(trim($name));
+                if (isset($existingNames[$key])) { $duplicates++; continue; }
+                $existingNames[$key] = true;   // zabrání i duplikátům uvnitř souboru
+            }
 
             // Waypointy: [[lat,lon,manual?],...], 2–500 platných bodů
             $wpts = $p['waypoints'] ?? null;
@@ -104,5 +126,6 @@ ajax_endpoint(function () use ($pdo): array {
         throw $e;
     }
 
-    return ['ok' => true, 'imported' => $imported, 'skipped' => $skipped, 'replaced' => $replace];
+    return ['ok' => true, 'imported' => $imported, 'skipped' => $skipped,
+            'duplicates' => $duplicates, 'mode' => $mode];
 }, ['csrf' => true, 'admin' => true, 'name' => 'planner/import']);

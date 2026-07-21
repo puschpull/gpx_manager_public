@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'Súbor sa nepodarilo načítať.',
     'planner_import_done'          => 'Importované plány: {n}',
     'planner_import_confirm'       => 'Nahradiť všetky existujúce uložené plány obsahom súboru? Túto akciu nie je možné vrátiť.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Režim',
+    'planner_import_mode_title'      => 'Ako naložiť s plánmi zo súboru voči existujúcim',
+    'planner_import_mode_new'        => 'pridať len nové',
+    'planner_import_mode_append'     => 'pridať všetko',
+    'planner_import_mode_replace'    => 'nahradiť všetko',
+    'planner_import_dup'             => 'preskočené duplicity: {n}',
 ];

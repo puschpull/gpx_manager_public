@@ -96,8 +96,13 @@ require __DIR__ . '/layout_header.php';
     <span class="plan-sep" aria-hidden="true"></span>
     <button type="button" id="planDbExport" class="plan-btn" title="<?= htmlspecialchars(t('planner_export_all_title', 'Stáhnout všechny uložené plány jako soubor (.json)')) ?>">⬇ <?= htmlspecialchars(t('planner_export_all', 'Export plánů')) ?></button>
     <button type="button" id="planDbImport" class="plan-btn" title="<?= htmlspecialchars(t('planner_import_title', 'Načíst plány ze souboru .json')) ?>">⬆ <?= htmlspecialchars(t('planner_import', 'Import plánů')) ?></button>
-    <label class="plan-replace" title="<?= htmlspecialchars(t('planner_import_replace_title', 'Před importem smazat stávající plány (jinak se přidají)')) ?>">
-        <input type="checkbox" id="planDbReplace"> <?= htmlspecialchars(t('planner_import_replace', 'nahradit vše')) ?>
+    <label class="plan-replace" title="<?= htmlspecialchars(t('planner_import_mode_title', 'Jak naložit s plány ze souboru vůči stávajícím')) ?>">
+        <?= htmlspecialchars(t('planner_import_mode', 'Režim')) ?>:
+        <select id="planDbMode">
+            <option value="new" selected><?= htmlspecialchars(t('planner_import_mode_new', 'přidat jen nové')) ?></option>
+            <option value="append"><?= htmlspecialchars(t('planner_import_mode_append', 'přidat vše')) ?></option>
+            <option value="replace"><?= htmlspecialchars(t('planner_import_mode_replace', 'nahradit vše')) ?></option>
+        </select>
     </label>
     <input type="file" id="planDbImportFile" accept=".json,application/json" hidden>
     <?php endif; ?>
@@ -186,6 +191,7 @@ window.gpxPlannerData = {
         exportDone: <?= js_safe_json(t('planner_export_done', 'Plány staženy: {n}')) ?>,
         importBad:  <?= js_safe_json(t('planner_import_bad', 'Soubor se nepodařilo načíst.')) ?>,
         importDone: <?= js_safe_json(t('planner_import_done', 'Importováno plánů: {n}')) ?>,
+        importDup:  <?= js_safe_json(t('planner_import_dup', 'přeskočeno duplicit: {n}')) ?>,
         importRepl: <?= js_safe_json(t('planner_import_confirm', 'Nahradit všechny stávající uložené plány obsahem souboru? Tuto akci nelze vrátit.')) ?>
     }
 };

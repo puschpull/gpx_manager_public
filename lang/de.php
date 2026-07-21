@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'Datei konnte nicht gelesen werden.',
     'planner_import_done'          => 'Importierte Pläne: {n}',
     'planner_import_confirm'       => 'Alle vorhandenen gespeicherten Pläne durch den Dateiinhalt ersetzen? Dies kann nicht rückgängig gemacht werden.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Modus',
+    'planner_import_mode_title'      => 'Wie mit den Plänen aus der Datei gegenüber vorhandenen umgegangen wird',
+    'planner_import_mode_new'        => 'nur neue hinzufügen',
+    'planner_import_mode_append'     => 'alle hinzufügen',
+    'planner_import_mode_replace'    => 'alles ersetzen',
+    'planner_import_dup'             => 'Duplikate übersprungen: {n}',
 ];

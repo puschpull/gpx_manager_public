@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'Impossibile leggere il file.',
     'planner_import_done'          => 'Piani importati: {n}',
     'planner_import_confirm'       => 'Sostituire tutti i piani salvati esistenti con il contenuto del file? Questa azione non può essere annullata.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Modalità',
+    'planner_import_mode_title'      => 'Come gestire i piani del file rispetto a quelli esistenti',
+    'planner_import_mode_new'        => 'aggiungi solo nuovi',
+    'planner_import_mode_append'     => 'aggiungi tutto',
+    'planner_import_mode_replace'    => 'sostituisci tutto',
+    'planner_import_dup'             => 'duplicati saltati: {n}',
 ];

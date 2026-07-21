@@ -662,4 +662,12 @@ return [
     'planner_import_bad'           => 'Soubor se nepodařilo načíst.',
     'planner_import_done'          => 'Importováno plánů: {n}',
     'planner_import_confirm'       => 'Nahradit všechny stávající uložené plány obsahem souboru? Tuto akci nelze vrátit.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Režim',
+    'planner_import_mode_title'      => 'Jak naložit s plány ze souboru vůči stávajícím',
+    'planner_import_mode_new'        => 'přidat jen nové',
+    'planner_import_mode_append'     => 'přidat vše',
+    'planner_import_mode_replace'    => 'nahradit vše',
+    'planner_import_dup'             => 'přeskočeno duplicit: {n}',
 ];

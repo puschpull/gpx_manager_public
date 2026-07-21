@@ -662,4 +662,12 @@ return [
     'planner_import_bad'           => 'Could not read the file.',
     'planner_import_done'          => 'Plans imported: {n}',
     'planner_import_confirm'       => 'Replace all existing saved plans with the file contents? This cannot be undone.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Mode',
+    'planner_import_mode_title'      => 'How to handle plans from the file against existing ones',
+    'planner_import_mode_new'        => 'add new only',
+    'planner_import_mode_append'     => 'add all',
+    'planner_import_mode_replace'    => 'replace all',
+    'planner_import_dup'             => 'duplicates skipped: {n}',
 ];

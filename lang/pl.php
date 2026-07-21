@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'Nie udało się odczytać pliku.',
     'planner_import_done'          => 'Zaimportowane plany: {n}',
     'planner_import_confirm'       => 'Zastąpić wszystkie istniejące zapisane plany zawartością pliku? Tej operacji nie można cofnąć.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Tryb',
+    'planner_import_mode_title'      => 'Jak potraktować plany z pliku wobec istniejących',
+    'planner_import_mode_new'        => 'dodaj tylko nowe',
+    'planner_import_mode_append'     => 'dodaj wszystko',
+    'planner_import_mode_replace'    => 'zastąp wszystko',
+    'planner_import_dup'             => 'pominięto duplikaty: {n}',
 ];

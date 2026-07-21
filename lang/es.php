@@ -656,4 +656,12 @@ return [
     'planner_import_bad'           => 'No se pudo leer el archivo.',
     'planner_import_done'          => 'Planes importados: {n}',
     'planner_import_confirm'       => '¿Reemplazar todos los planes guardados por el contenido del archivo? Esta acción no se puede deshacer.',
+
+    // ===== Plánovač — režimy importu =====
+    'planner_import_mode'            => 'Modo',
+    'planner_import_mode_title'      => 'Cómo tratar los planes del archivo frente a los existentes',
+    'planner_import_mode_new'        => 'añadir solo nuevos',
+    'planner_import_mode_append'     => 'añadir todo',
+    'planner_import_mode_replace'    => 'reemplazar todo',
+    'planner_import_dup'             => 'duplicados omitidos: {n}',
 ];

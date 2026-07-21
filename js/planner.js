@@ -627,7 +627,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDbExport  = document.getElementById("planDbExport");
     const btnDbImport  = document.getElementById("planDbImport");
     const dbImportFile = document.getElementById("planDbImportFile");
-    const dbReplaceCb  = document.getElementById("planDbReplace");
+    const dbModeSel    = document.getElementById("planDbMode");
 
     async function exportPlans() {
         try {
@@ -654,21 +654,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function importPlans(file) {
         if (!file) return;
-        const replace = !!(dbReplaceCb && dbReplaceCb.checked);
-        if (replace && !confirm(i18n.importRepl || "Nahradit všechny plány?")) return;
+        const mode = dbModeSel ? dbModeSel.value : "new";
+        if (mode === "replace" && !confirm(i18n.importRepl || "Nahradit všechny plány?")) return;
 
         const reader = new FileReader();
         reader.onload = async () => {
             const fd = new FormData();
             fd.append("_csrf_token", CSRF);
             fd.append("data", String(reader.result || ""));
-            fd.append("replace", replace ? "1" : "0");
+            fd.append("mode", mode);
             try {
                 const res  = await fetch("api/planner/import.php", { method: "POST", body: fd });
                 const data = await res.json();
                 if (data.ok) {
-                    setStatus((i18n.importDone || "Importováno: {n}").replace("{n}", data.imported), "done");
-                    if (dbReplaceCb) dbReplaceCb.checked = false;
+                    let msg = (i18n.importDone || "Importováno: {n}").replace("{n}", data.imported);
+                    if (data.duplicates > 0) {
+                        msg += " (" + (i18n.importDup || "duplicit: {n}").replace("{n}", data.duplicates) + ")";
+                    }
+                    setStatus(msg, "done");
                     refreshPlansList();
                 } else {
                     setStatus((i18n.importBad || "Chyba") + " " + (data.error || ""), "error");
