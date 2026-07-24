@@ -41,7 +41,9 @@ ajax_endpoint(function () use ($pdo): array {
     }
     $cleanWpts = [];
     foreach ($wpts as $w) {
-        if (!is_array($w) || count($w) < 2 || !is_numeric($w[0]) || !is_numeric($w[1])) {
+        // isset() na klíče 0/1 je nutné: asociativní tvar {"lat":…,"lon":…} projde
+        // count($w) >= 2, ale $w[0] neexistuje → PHP warning uprostřed JSON odpovědi.
+        if (!is_array($w) || !isset($w[0], $w[1]) || !is_numeric($w[0]) || !is_numeric($w[1])) {
             http_response_code(400);
             return ['ok' => false, 'error' => 'Neplatný formát waypointů.'];
         }

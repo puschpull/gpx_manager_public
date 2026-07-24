@@ -88,7 +88,9 @@ ajax_endpoint(function () use ($pdo): array {
             $cleanWpts = [];
             $bad = false;
             foreach ($wpts as $w) {
-                if (!is_array($w) || count($w) < 2 || !is_numeric($w[0]) || !is_numeric($w[1])) { $bad = true; break; }
+                // isset() na 0/1: asociativní tvar {"lat":…,"lon":…} projde count() >= 2,
+                // ale $w[0] neexistuje → PHP warning uprostřed JSON odpovědi.
+                if (!is_array($w) || !isset($w[0], $w[1]) || !is_numeric($w[0]) || !is_numeric($w[1])) { $bad = true; break; }
                 $cleanWpts[] = [round((float)$w[0], 6), round((float)$w[1], 6), (isset($w[2]) && $w[2]) ? 1 : 0];
             }
             if ($bad) { $skipped++; continue; }
