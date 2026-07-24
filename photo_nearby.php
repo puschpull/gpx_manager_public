@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Fotografie v okolí — kliknutím na mapu najde nejbližší fotky z výletů.
  * Entry point: access gate + view. Data servíruje api/photos/nearby.php.

@@ -1,4 +1,4 @@
-console.log('📱 mobile-init.js spuštěn');
+if (window.GPX_DEBUG) console.log('📱 mobile-init.js spuštěn');
 
 function mobileInit() {
     const sidebar = document.getElementById('indexSidebar');

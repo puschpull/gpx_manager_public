@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Deutsche Lokalisierung
  * Schlüssel sind nach Seiten / Abschnitten organisiert.
@@ -671,4 +673,27 @@ return [
     'rp_photos_title'      => 'Das gerade passierte Foto in der Kartenecke anzeigen',
     'rp_photos_on'         => 'Passierte Fotos: ein',
     'rp_photos_none'       => 'Die Tour hat keine Fotos mit GPS-Position.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'Max im Gebiet: {v} mm/h',
+    'rp_radar_source'       => 'Quelle',
+    'rp_radar_src_chmi'     => 'CHMI-Radar (5 Min.)',
+    'rp_radar_src_model'    => 'Modell (Schätzung, 1 Std.)',
+    'rp_radar_fetch'        => 'Radar herunterladen',
+    'rp_radar_fetch_title'  => 'CHMI-Radarbilder für die Dauer dieser Route herunterladen (Archiv nur ca. 7 Tage zurück)',
+    'rp_radar_no_frames'    => 'Für diese Route sind keine Radarbilder heruntergeladen.',
+    'rp_radar_fetching'     => 'CHMI-Radarbilder werden heruntergeladen…',
+    'rp_radar_fetched'      => 'Radar: {n} Bilder',
+    'rp_radar_too_old'      => 'Das CHMI-Archiv reicht nur ca. 7 Tage zurück — für diese Route ist kein Radar mehr verfügbar.',
+    'rp_radar_chmi_label'   => 'CHMI-Radar',
+    'wmo_clear'            => 'klar',
+    'wmo_partly'           => 'heiter',
+    'wmo_overcast'         => 'bedeckt',
+    'wmo_fog'              => 'Nebel',
+    'wmo_drizzle'          => 'Nieselregen',
+    'wmo_rain'             => 'Regen',
+    'wmo_snow'             => 'Schneefall',
+    'wmo_showers'          => 'Schauer',
+    'wmo_snow_showers'     => 'Schneeschauer',
+    'wmo_storm'            => 'Gewitter',
 ];

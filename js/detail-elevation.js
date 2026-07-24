@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("📈 detail-elevation.js načten");
+if (window.GPX_DEBUG) console.log("📈 detail-elevation.js načten");
 
 let chart;
 let sampled = { distKm: [], elevM: [], latArr: [], lonArr: [], timesArr: [] };
@@ -22,7 +22,7 @@ function subsampleArrays(distKm, elevM, latArr, lonArr, timesArr, maxPoints) {
 
 /* ===== Hlavní logika ===== */
 document.addEventListener("gpxDataReady", e => {
-    console.log("📊 Zpracovávám GPX data pro výškový profil…");
+    if (window.GPX_DEBUG) console.log("📊 Zpracovávám GPX data pro výškový profil…");
 
     const xmlText = e.detail.xmlText;
     const parser = new DOMParser();
@@ -73,7 +73,7 @@ document.addEventListener("gpxDataReady", e => {
     createTooltipToggle();
     populateElevDataTable();
 
-    console.log(`✅ Výškový graf vykreslen (${dataXY.length} bodů)`);
+    if (window.GPX_DEBUG) console.log(`✅ Výškový graf vykreslen (${dataXY.length} bodů)`);
 
     const canvas = document.getElementById("elev");
     if (!canvas) return;

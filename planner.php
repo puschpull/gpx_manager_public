@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Plánovač výšlapu — klikáním do mapy naplánuj trasu po cestách
  * (Mapy.com routing), výškový profil, počasí, odhad času a export GPX.

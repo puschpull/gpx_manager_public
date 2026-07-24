@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * GPX Manager — Správa fotografií
  * Entry point: access gate, data loading, layout.

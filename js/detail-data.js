@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("📄 detail-data.js načten");
+if (window.GPX_DEBUG) console.log("📄 detail-data.js načten");
 
 
 

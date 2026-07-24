@@ -1,6 +1,6 @@
 # 🗺 GPX Manager — Instalační a uživatelský návod
 
-> Verze 2026-05 &nbsp;|&nbsp; [English version](en.md)
+> Verze 2026-07 &nbsp;|&nbsp; [English version](en.md)
 
 ---
 
@@ -297,27 +297,31 @@ Přistupuješ-li z povolené IP adresy, jsi přihlášen automaticky a v horní 
 
 > **Tip:** Lze importovat více souborů najednou nebo celý ZIP archív s GPX soubory.
 
-### Nastavení jazyka a tématu
+### Nastavení jazyka a vzhledu
 
 Aplikace nabízí:
 - **8 jazyků:** čeština, angličtina, němčina, slovenština, španělština, francouzština, italština, polština
-- **9 barevných témat:** classic, dark, darkblue, darkgreen, blue, green, minimal, lightgray, brown
+- **světlý a tmavý režim** — přepínač si volbu pamatuje, výchozí se řídí nastavením systému
 
-Přepínač jazyka a tématu najdeš v pravém horním rohu každé stránky.
+Přepínač jazyka i světlého/tmavého režimu najdeš v pravém horním rohu každé stránky.
 
 ### Nastavení viditelnosti stránek pro návštěvníky
 
-V menu **Nastavení** (dostupné jen pro admina) můžeš zapnout nebo vypnout jednotlivé stránky pro nepřihlášené návštěvníky:
+V **Administraci** (dostupné jen pro admina) můžeš zapnout nebo vypnout jednotlivé stránky pro nepřihlášené návštěvníky:
 
 - Statistiky
 - Kalendář aktivit
-- Heatmapa
-- Foto-heatmapa
+- Heatmapa a Foto-heatmapa
 - Hledání na mapě
-- Trasy v okolí
+- Trasy v okolí, Fotky v okolí
+- Fotografie
+- Virtuální trasy
+- Plánovač výšlapu (návštěvník smí plánovat a prohlížet, ale ne ukládat)
 - Filtr / čistič GPX
 - Porovnání tras
-- Virtuální trasy
+
+Tamtéž najdeš i **pořadí položek horního menu** a kartu **Volitelné funkce**, kde se
+nezávisle vypíná Přehrávač výšlapu, Počasí u turisty, Srážkové pole a Míjené fotky.
 
 ### Úprava tras
 
@@ -328,27 +332,6 @@ Po kliknutí na trasu v přehledu se otevře detailní stránka s mapou, výško
 - Obtížnost (1–5)
 - Kategorii
 - Oblíbenou trasu (hvězdička)
-
-### Virtuální trasy z fotek
-
-Pro fotky z výšlapů, u kterých nebyla zaznamenána GPX trasa (např. jsi neměl
-u sebe navigaci). Aplikace z nich poskládá „virtuální" trasu tvořenou polohami
-fotek — uloženou odděleně od běžných GPX tras.
-
-1. Nahraj fotky obvyklým způsobem (**Fotografie → Nahrát**). Fotky, ke kterým
-   se nenajde odpovídající GPX trasa, zůstanou **nepřiřazené**.
-2. Otevři **Virtuální trasy** v menu (jen admin).
-3. Nastav prahy shlukování a klikni **Náhled** (nic nezapíše):
-   - **Časová mezera (h)** — větší pauza mezi fotkami = nový výlet.
-   - **Skok v poloze (km)** — větší skok mezi fotkami = nový výlet (i ve stejný den).
-   - **Min. fotek na trasu** — shluky s méně fotkami se přeskočí.
-4. Když návrh sedí, klikni **Vytvořit** — fotky se seskupí do virtuálních tras.
-5. V detailu virtuální trasy je mapa s linií mezi fotkami. Chybně umístěnou
-   fotku (špatný GPS fix) můžeš jako admin **přetáhnout myší** na správné místo
-   — poloha se uloží a přepočítá se vzdálenost.
-
-Ve správě fotek mají virtuální trasy vlastní záložku, oddělenou od fotek
-přiřazených ke GPX trasám i od nepřiřazených.
 
 ---
 
@@ -484,4 +467,4 @@ Nahraný GPX soubory a náhledy tras se ukládají do `uploads/`. Na sdíleném 
 
 ---
 
-*GPX Manager — Instalační a uživatelský návod &nbsp;|&nbsp; Verze 2026-05*
+*GPX Manager — Instalační a uživatelský návod &nbsp;|&nbsp; Verze 2026-07*

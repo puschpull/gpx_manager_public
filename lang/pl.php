@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Lokalizacja polska
  * Klucze są zorganizowane według stron / sekcji.
@@ -671,4 +673,27 @@ return [
     'rp_photos_title'      => 'Pokaż w rogu mapy zdjęcie, które turysta właśnie mija',
     'rp_photos_on'         => 'Mijane zdjęcia: włączone',
     'rp_photos_none'       => 'Trasa nie ma zdjęć z pozycją GPS.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'maks. w obszarze: {v} mm/h',
+    'rp_radar_source'       => 'Źródło',
+    'rp_radar_src_chmi'     => 'radar CHMI (5 min)',
+    'rp_radar_src_model'    => 'model (szacunek, 1 h)',
+    'rp_radar_fetch'        => 'Pobierz radar',
+    'rp_radar_fetch_title'  => 'Pobierz obrazy radarowe CHMI dla czasu trwania tej trasy (archiwum sięga tylko ~7 dni wstecz)',
+    'rp_radar_no_frames'    => 'Dla tej trasy nie pobrano obrazów radarowych.',
+    'rp_radar_fetching'     => 'Pobieram obrazy radarowe CHMI…',
+    'rp_radar_fetched'      => 'Radar: {n} klatek',
+    'rp_radar_too_old'      => 'Archiwum CHMI sięga tylko ~7 dni wstecz — radar nie jest już dostępny dla tej trasy.',
+    'rp_radar_chmi_label'   => 'radar CHMI',
+    'wmo_clear'            => 'bezchmurnie',
+    'wmo_partly'           => 'częściowe zachmurzenie',
+    'wmo_overcast'         => 'pochmurno',
+    'wmo_fog'              => 'mgła',
+    'wmo_drizzle'          => 'mżawka',
+    'wmo_rain'             => 'deszcz',
+    'wmo_snow'             => 'śnieg',
+    'wmo_showers'          => 'przelotne opady',
+    'wmo_snow_showers'     => 'przelotny śnieg',
+    'wmo_storm'            => 'burza',
 ];

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 require_once __DIR__ . '/../includes/helpers.php';
 // gpx_parser.php removed — nearby AJAX now uses centroid BBOX, no GPX parsing (TASK-11)
 

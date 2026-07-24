@@ -229,6 +229,23 @@ document.addEventListener("gpxDataReady", (ev) => {
         return -1;
     }
 
+    // Stav oblohy podle WMO weather_code — pozná i „přeháňky" a „mlhu",
+    // které model hlásí, i když je hodinový úhrn srážek 0 mm.
+    function wmoDesc(c) {
+        if (c === null || c === undefined) return "";
+        const L = i18n.wmo || {};
+        if (c === 0)  return "☀️ " + (L.clear || "jasno");
+        if (c <= 2)   return "🌤️ " + (L.partly || "polojasno");
+        if (c === 3)  return "☁️ " + (L.overcast || "zataženo");
+        if (c <= 49)  return "🌫️ " + (L.fog || "mlha");
+        if (c <= 59)  return "🌦️ " + (L.drizzle || "mrholení");
+        if (c <= 69)  return "🌧️ " + (L.rain || "déšť");
+        if (c <= 79)  return "🌨️ " + (L.snow || "sněžení");
+        if (c <= 84)  return "🌦️ " + (L.showers || "přeháňky");
+        if (c <= 94)  return "🌨️ " + (L.snowShow || "sněhové přeháňky");
+        return "⛈️ " + (L.storm || "bouřka");
+    }
+
     // ===== Počasí „u turisty" (fáze B) =====
     let wxData = null;      // [{lat, lon, hourly}]
     let wxState = "idle";   // idle | loading | ready | error
@@ -254,7 +271,7 @@ document.addEventListener("gpxDataReady", (ev) => {
             const lons = idxs.map(i => lon[i].toFixed(4)).join(",");
             const url = apiBase()
                 + "?latitude=" + lats + "&longitude=" + lons
-                + "&hourly=temperature_2m,precipitation,wind_speed_10m,cloud_cover"
+                + "&hourly=temperature_2m,precipitation,wind_speed_10m,cloud_cover,weather_code"
                 + "&timezone=auto&start_date=" + dateStr(t0) + "&end_date=" + dateStr(tEnd);
             const res  = await fetch(url);
             const data = await res.json();
@@ -282,21 +299,57 @@ document.addEventListener("gpxDataReady", (ev) => {
         const pr = h.precipitation ? h.precipitation[hi] : null;
         const wi = h.wind_speed_10m ? h.wind_speed_10m[hi] : null;
         const cl = h.cloud_cover ? h.cloud_cover[hi] : null;
+        const wc = h.weather_code ? h.weather_code[hi] : null;
         if (tC === null || tC === undefined) { weatherEl.style.display = "none"; return; }
-        const rain = (pr !== null && pr >= 0.1) ? ("🌧️ " + pr.toFixed(1) + " mm/h") : "🌂 0 mm";
-        weatherEl.textContent = "🌡️ " + Math.round(tC) + " °C · " + rain
+        // Srážky: i mrholení (0,02+) ukázat číslem; jinak podle stavu oblohy,
+        // protože model umí hlásit „přeháňky" i s nulovým hodinovým úhrnem.
+        const rain = (pr !== null && pr >= 0.02)
+            ? ("🌧️ " + pr.toFixed(2).replace(".", ",") + " mm/h")
+            : "🌂 0 mm";
+        weatherEl.textContent = wmoDesc(wc) + " · 🌡️ " + Math.round(tC) + " °C · " + rain
             + (wi !== null ? " · 💨 " + Math.round(wi) + " km/h" : "")
             + (cl !== null ? " · ☁️ " + Math.round(cl) + " %" : "");
         weatherEl.style.display = "block";
     }
 
     // ===== Srážkové pole (fáze C) =====
-    const radarBtn     = document.getElementById("rpRadarToggle");
-    const radarOpacity = document.getElementById("rpRadarOpacity");
-    const radarOpWrap  = document.getElementById("rpRadarOpacityWrap");
-    const radarStatus  = document.getElementById("rpRadarStatus");
+    const radarBtn        = document.getElementById("rpRadarToggle");
+    const radarOpacity    = document.getElementById("rpRadarOpacity");
+    const radarOpWrap     = document.getElementById("rpRadarOpacityWrap");
+    const radarStatus     = document.getElementById("rpRadarStatus");
+    const radarSourceSel  = document.getElementById("rpRadarSource");
+    const radarSourceWrap = document.getElementById("rpRadarSourceWrap");
+    const radarFetchBtn   = document.getElementById("rpRadarFetch");
 
-    const GRID_N = 5;             // 5×5 bodů
+    // Zdroj srážek: "chmi" = skutečný radar ČHMÚ (5 min, archiv ~7 dní),
+    // "model" = odhad z meteomodelu (hodinový, funguje i pro staré trasy).
+    let radarSource = "chmi";
+    try { radarSource = localStorage.getItem("gpx_replay_radar_src") || "chmi"; } catch (e) {}
+
+    // --- ČHMÚ radar: georeference PNG (dle dokumentace opendata.chmi.cz) ---
+    // EPSG:3857, JZ roh obrazu E11,267 / N48,0475, 680×460 px, 1 km na pixel
+    // (v Mercatorových metrech na 50° = 1555,7 m).
+    const CHMI_SW_LAT = 48.0475, CHMI_SW_LON = 11.267;
+    const CHMI_PX_W = 680, CHMI_PX_H = 460, CHMI_M_PER_PX = 1555.7;
+    const R_MERC = 6378137;
+    function mercY(lat)  { return R_MERC * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)); }
+    function invMercY(y) { return (2 * Math.atan(Math.exp(y / R_MERC)) - Math.PI / 2) * 180 / Math.PI; }
+    function chmiBounds() {
+        const swX = CHMI_SW_LON * Math.PI / 180 * R_MERC;
+        const swY = mercY(CHMI_SW_LAT);
+        return [
+            [CHMI_SW_LAT, CHMI_SW_LON],
+            [invMercY(swY + CHMI_PX_H * CHMI_M_PER_PX),
+             (swX + CHMI_PX_W * CHMI_M_PER_PX) / R_MERC * 180 / Math.PI]
+        ];
+    }
+
+    let chmiFrames   = [];        // [{t (ms UTC), url}]
+    let chmiState    = "idle";    // idle | loading | ready | empty | error
+    let chmiOverlay  = null;
+    let chmiShownIdx = -2;
+
+    const GRID_N = 7;             // 7×7 bodů (hustší mřížka → míň rozmazané slabé srážky)
     let radarOn = false;
     let radarData = null;         // {lats[], lons[], times[], vals[gridIdx][hourIdx]}
     let radarState = "idle";
@@ -350,14 +403,29 @@ document.addEventListener("gpxDataReady", (ev) => {
         }
     }
 
-    // Barevná škála podle intenzity (mm/h) → [r,g,b,a 0..1]
+    // Barevná škála podle intenzity (mm/h) → [r,g,b,a 0..1].
+    // Škála je kalibrovaná na REÁLNÉ hodinové úhrny u nás (mrholení 0,05–0,3 mm/h,
+    // vydatný déšť 2+ mm/h). Dřívější práh 0,1 mm a slabá průhlednost způsobovaly,
+    // že běžný déšť byl na mapě prakticky neviditelný.
     function precipColor(v) {
-        if (v < 0.1) return null;
-        if (v < 0.5)  return [110, 170, 255, 0.35];
-        if (v < 1.5)  return [60, 130, 255, 0.5];
-        if (v < 4)    return [20, 80, 230, 0.62];
-        if (v < 8)    return [120, 40, 220, 0.7];
-        return [200, 30, 180, 0.78];
+        if (v < 0.02) return null;
+        if (v < 0.10) return [150, 200, 255, 0.45];   // mrholení
+        if (v < 0.30) return [110, 170, 255, 0.58];   // slabý déšť
+        if (v < 0.80) return [60, 130, 255, 0.68];    // déšť
+        if (v < 2.00) return [20, 80, 230, 0.76];     // vydatný déšť
+        if (v < 5.00) return [120, 40, 220, 0.82];    // silný déšť
+        return [200, 30, 180, 0.88];                  // průtrž
+    }
+
+    // Max srážky v oblasti pro danou hodinu (pro stavový řádek)
+    function radarMaxAtHour(hi) {
+        if (!radarData || hi < 0) return 0;
+        let max = 0;
+        for (let i = 0; i < radarData.vals.length; i++) {
+            const v = radarData.vals[i][hi] || 0;
+            if (v > max) max = v;
+        }
+        return max;
     }
 
     function renderRadarCanvas(hi) {
@@ -389,17 +457,98 @@ document.addEventListener("gpxDataReady", (ev) => {
         ctx.putImageData(img, 0, 0);
     }
 
+    // ===== Přepínání zdroje srážek =====
     function updateRadar(force) {
-        if (!flags.radar || !radarOn || radarState !== "ready" || !radarData) return;
+        if (!flags.radar || !radarOn) return;
+        if (radarSource === "chmi") updateRadarChmi(force);
+        else updateRadarModel(force);
+    }
+
+    function clearRadarOverlays() {
+        if (radarOverlay) { map.removeLayer(radarOverlay); radarOverlay = null; radarHourShown = -2; }
+        if (chmiOverlay)  { map.removeLayer(chmiOverlay);  chmiOverlay  = null; chmiShownIdx  = -2; }
+    }
+
+    // --- Skutečný radar ČHMÚ: vybrat snímek nejbližší aktuálnímu času ---
+    function nearestChmiIdx(t) {
+        if (!chmiFrames.length) return -1;
+        let lo = 0, hi = chmiFrames.length - 1;
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1;
+            if (chmiFrames[mid].t < t) lo = mid + 1; else hi = mid;
+        }
+        if (lo > 0 && Math.abs(chmiFrames[lo - 1].t - t) < Math.abs(chmiFrames[lo].t - t)) return lo - 1;
+        return lo;
+    }
+
+    function updateRadarChmi(force) {
+        if (chmiState !== "ready") return;
+        const idx = nearestChmiIdx(tCur);
+        if (idx < 0 || (idx === chmiShownIdx && !force)) return;
+        chmiShownIdx = idx;
+        const f  = chmiFrames[idx];
+        const op = parseInt(radarOpacity ? radarOpacity.value : "75", 10) / 100;
+        if (!chmiOverlay) {
+            chmiOverlay = L.imageOverlay(f.url, chmiBounds(), {
+                opacity: op, interactive: false, attribution: "© ČHMÚ"
+            }).addTo(map);
+        } else {
+            chmiOverlay.setUrl(f.url);
+        }
+        if (radarStatus) {
+            radarStatus.textContent = (i18n.radarChmi || "radar ČHMÚ") + " "
+                + new Date(f.t).toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" });
+        }
+    }
+
+    async function loadChmiFrames() {
+        if (chmiState === "loading") return;
+        chmiState = "loading";
+        try {
+            const res  = await fetch("api/radar/list.php?track_id=" + encodeURIComponent(cfg.trackId));
+            const data = await res.json();
+            chmiFrames = (data && data.frames) || [];
+            chmiState  = chmiFrames.length ? "ready" : "empty";
+            // Přednačíst do cache prohlížeče — jinak každý krok přehrávání blikne
+            chmiFrames.forEach(f => { const im = new Image(); im.src = f.url; });
+        } catch (err) {
+            if (window.GPX_DEBUG) console.error("chmi radar list:", err);
+            chmiState = "error";
+        }
+        updateRadarUi();
+        if (radarOn) updateRadar(true);
+    }
+
+    function updateRadarUi() {
+        if (radarSourceWrap) radarSourceWrap.style.display = radarOn ? "" : "none";
+        if (radarOpWrap)     radarOpWrap.style.display     = radarOn ? "" : "none";
+        if (radarFetchBtn) {
+            const need = radarOn && radarSource === "chmi" && (chmiState === "empty" || chmiState === "error");
+            radarFetchBtn.style.display = need ? "" : "none";
+        }
+        if (radarOn && radarSource === "chmi" && chmiState === "empty" && radarStatus) {
+            radarStatus.textContent = i18n.radarNoFrames || "";
+        }
+    }
+
+    function updateRadarModel(force) {
+        if (radarState !== "ready" || !radarData) return;
         const hi = hourIndex(radarData.times, tCur);
         if (hi === radarHourShown && !force) return;
         radarHourShown = hi;
+        // Stavový řádek: kolik model hlásí v oblasti právě teď (ať uživatel ví,
+        // jestli je vůbec co vidět — slabé srážky jsou na mapě sotva patrné)
+        if (radarStatus) {
+            const mx = radarMaxAtHour(hi);
+            radarStatus.textContent = (i18n.radarMax || "max v oblasti: {v} mm/h")
+                .replace("{v}", mx.toFixed(2).replace(".", ","));
+        }
         renderRadarCanvas(hi);
         const url = radarCanvas.toDataURL();
         const b = radarData.bounds;
         if (!radarOverlay) {
             radarOverlay = L.imageOverlay(url, [[b.s, b.w], [b.n, b.e]], {
-                opacity: parseInt(radarOpacity ? radarOpacity.value : "55", 10) / 100,
+                opacity: parseInt(radarOpacity ? radarOpacity.value : "75", 10) / 100,
                 interactive: false
             }).addTo(map);
         } else {
@@ -407,23 +556,80 @@ document.addEventListener("gpxDataReady", (ev) => {
         }
     }
 
+    // Spustí načtení dat pro aktuálně zvolený zdroj
+    function ensureRadarData() {
+        if (radarSource === "chmi") {
+            if (chmiState === "idle" || chmiState === "error") loadChmiFrames();
+            else updateRadar(true);
+        } else {
+            if (radarState === "idle" || radarState === "error") fetchRadar();
+            else updateRadar(true);
+        }
+    }
+
     if (radarBtn) {
         radarBtn.addEventListener("click", () => {
             radarOn = !radarOn;
             radarBtn.classList.toggle("rp-btn-active", radarOn);
-            if (radarOpWrap) radarOpWrap.style.display = radarOn ? "" : "none";
+            updateRadarUi();
             if (radarOn) {
-                if (radarState === "idle" || radarState === "error") fetchRadar();
-                else updateRadar(true);
+                ensureRadarData();
             } else {
-                if (radarOverlay) { map.removeLayer(radarOverlay); radarOverlay = null; radarHourShown = -2; }
+                clearRadarOverlays();
                 if (radarStatus) radarStatus.textContent = "";
             }
         });
     }
+
+    if (radarSourceSel) {
+        radarSourceSel.value = radarSource;
+        radarSourceSel.addEventListener("change", () => {
+            radarSource = radarSourceSel.value;
+            try { localStorage.setItem("gpx_replay_radar_src", radarSource); } catch (e) {}
+            clearRadarOverlays();
+            if (radarStatus) radarStatus.textContent = "";
+            updateRadarUi();
+            if (radarOn) ensureRadarData();
+        });
+    }
+
     if (radarOpacity) {
         radarOpacity.addEventListener("input", () => {
-            if (radarOverlay) radarOverlay.setOpacity(parseInt(radarOpacity.value, 10) / 100);
+            const op = parseInt(radarOpacity.value, 10) / 100;
+            if (radarOverlay) radarOverlay.setOpacity(op);
+            if (chmiOverlay)  chmiOverlay.setOpacity(op);
+        });
+    }
+
+    // Stažení radarových snímků ČHMÚ pro tuto trasu (admin)
+    if (radarFetchBtn) {
+        radarFetchBtn.addEventListener("click", async () => {
+            radarFetchBtn.disabled = true;
+            if (radarStatus) radarStatus.textContent = i18n.radarFetching || "";
+            try {
+                const fd = new FormData();
+                fd.append("_csrf_token", i18n.csrf || "");
+                fd.append("track_id", String(cfg.trackId));
+                const res = await fetch("api/radar/fetch.php", { method: "POST", body: fd });
+                const d   = await res.json();
+                if (d.ok && d.available > 0) {
+                    chmiState = "idle";
+                    await loadChmiFrames();
+                    if (radarStatus) {
+                        radarStatus.textContent = (i18n.radarFetched || "{n}").replace("{n}", d.available);
+                    }
+                } else if (d.ok) {
+                    if (radarStatus) radarStatus.textContent = i18n.radarTooOld || "";
+                } else {
+                    if (radarStatus) radarStatus.textContent = (i18n.radarErr || "") + " " + (d.error || "");
+                }
+            } catch (err) {
+                if (window.GPX_DEBUG) console.error("radar fetch:", err);
+                if (radarStatus) radarStatus.textContent = i18n.radarErr || "";
+            } finally {
+                radarFetchBtn.disabled = false;
+                updateRadarUi();
+            }
         });
     }
 

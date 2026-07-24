@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * GPX Manager — Hromadné operace (AJAX API)
  * Požaduje přihlášení administrátora.
@@ -63,13 +65,9 @@ try {
 
             $pdo->commit();
 
-            // Smazat soubory
+            // Smazat soubory (GPX + .bak, náhled, radarové snímky)
             foreach ($toDelete as $t) {
-                $gpxFile = uploads_fs($t['filename']);
-                if (is_file($gpxFile)) @unlink($gpxFile);
-
-                $thumbFile = uploads_fs('thumbs/' . pathinfo($t['filename'], PATHINFO_FILENAME) . '.png');
-                if (is_file($thumbFile)) @unlink($thumbFile);
+                delete_track_files((int)$t['id'], (string)$t['filename']);
             }
             break;
 

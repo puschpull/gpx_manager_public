@@ -36,7 +36,7 @@
 
 ## Konvence kódu
 
-- **PHP**: PSR-12 styl, `declare(strict_types=1);` POVINNĚ v nových souborech (postupně dopisujeme do existujících)
+- **PHP**: PSR-12 styl, `declare(strict_types=1);` POVINNĚ v nových souborech. V existujících je dopsaný všude kromě HTML šablon (`includes/*_view.php`, `table_tracks.php`, `pager_*.php`, `layout_*.php`) a stránek, které samy generují HTML (`stats.php`, `calendar.php`, `admin.php`, `edit.php`, `settings.php`, `login.php`, `import.php`, `heatmap.php`, `photo_heatmap.php`, `map_search.php`, `virtual_tracks*.php`) — tam je přes 370 volání `htmlspecialchars()`/`h()` s implicitní konverzí int→string, které by `strict_types` shodilo za běhu na konkrétní datové cestě. Do těch souborů ho nepřidávej, dokud nebudou volání přetypovaná. Stav: 101/127 souborů.
 - **Naming**: **snake_case** pro funkce (`get_app_config`, `csrf_verify`), camelCase je legacy dluh (sjednocení v rámci TASK-16)
 - **Strings**: všechny user-facing texty přes `t('key')` z lang souborů; technické komentáře v češtině jsou OK, ale komentáře v kódu by měly být postupně angličtinou (kód má identifikátory anglické)
 - **DB**: výhradně prepared statements, NIKDY `$pdo->quote()` se string konkatenací

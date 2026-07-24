@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * export_kml.php — Export trasy jako KML (Google Earth / Google Maps / QGIS)
  */

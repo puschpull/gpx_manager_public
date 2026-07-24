@@ -1,7 +1,7 @@
 /**
  * GPX Manager – Index Chart Logic (lazy init)
  */
-console.log("📈 index-chart.js načten");
+if (window.GPX_DEBUG) console.log("📈 index-chart.js načten");
 
 (function () {
     let chart; // instance Chart.js bude uložená tady

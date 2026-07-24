@@ -68,30 +68,7 @@ function t_arr(string $key): array {
     return is_array($val) ? $val : [];
 }
 
-/**
- * Renders the language-picker widget (flag image + transparent select overlay).
- *
- * @param array $allowedLangs List of enabled language codes.
- */
-function renderLangSelector(array $allowedLangs): void {
-    $langToFlag = ['cs' => 'cz', 'en' => 'gb', 'de' => 'de', 'sk' => 'sk',
-                   'es' => 'es', 'fr' => 'fr', 'pl' => 'pl', 'it' => 'it'];
-    $langNames  = ['cs' => 'Čeština',    'en' => 'English',    'de' => 'Deutsch',
-                   'sk' => 'Slovenčina', 'es' => 'Español',    'fr' => 'Français',
-                   'pl' => 'Polski',     'it' => 'Italiano'];
-    $cur      = app_lang();
-    $flagCode = $langToFlag[$cur] ?? 'cz';
-    $flagSrc  = 'lang/flags/' . $flagCode . '.png';
-    $altText  = htmlspecialchars($langNames[$cur] ?? $cur, ENT_QUOTES, 'UTF-8');
-    echo '<span class="lang-picker" title="Jazyk / Language">';
-    echo '<img id="lang-flag" src="' . $flagSrc . '" alt="' . $altText . '" class="lang-flag-img">';
-    echo '<select id="lang-selector" class="lang-selector-hidden">';
-    foreach ($allowedLangs as $lc) {
-        $sel  = $lc === $cur ? ' selected' : '';
-        $name = htmlspecialchars($langNames[$lc] ?? $lc, ENT_QUOTES, 'UTF-8');
-        echo "<option value=\"$lc\"$sel>$name</option>";
-    }
-    echo '</select>';
-    echo '</span>';
-}
+// renderLangSelector() odstraněna 2026-06-26 — mrtvý kód (jediný volající
+// renderHeaderMeta() byl odstraněn při úklidu legacy témat). Jazykový přepínač
+// dnes řeší layout_header.php (Alpine.js dropdown).
 

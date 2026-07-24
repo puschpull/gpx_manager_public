@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("🗺️ nearby-map.js načten");
+if (window.GPX_DEBUG) console.log("🗺️ nearby-map.js načten");
 
 document.addEventListener("DOMContentLoaded", () => {
 

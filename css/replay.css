@@ -36,13 +36,21 @@
 
 .rp-speed { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
 
-.rp-speed select {
+/* Všechny selecty v přehrávači — jinak podědí barvu textu z rodiče (--text-muted),
+   ale pozadí zůstane výchozí bílé prohlížečové = světlý text na světlém pozadí. */
+.replay-panel select {
     padding: 3px 6px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 13px;
+}
+
+/* Rozbalený seznam vykresluje OS — bez tohoto ho v tmavém režimu nakreslí světle */
+.replay-panel select option {
+    background: var(--card-bg);
+    color: var(--text-color);
 }
 
 .rp-readout { font-size: 13px; font-weight: 600; margin-left: auto; white-space: nowrap; }

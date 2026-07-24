@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("🗺️ detail-map.js načten");
+if (window.GPX_DEBUG) console.log("🗺️ detail-map.js načten");
 
 // Delegát na sdílené lib (js/lib/format-utils.js)
 function escHtml(s) { return window.GpxFmt.escHtml(s); }
@@ -381,7 +381,7 @@ map.on("overlayadd", e => {
         return;
     }
 
-    console.log("📥 Načítám GPX:", url);
+    if (window.GPX_DEBUG) console.log("📥 Načítám GPX:", url);
 
     fetch(url)
         .then(res => {
@@ -389,7 +389,7 @@ map.on("overlayadd", e => {
             return res.text();
         })
         .then(xmlText => {
-            console.log("📦 GPX soubor úspěšně načten.");
+            if (window.GPX_DEBUG) console.log("📦 GPX soubor úspěšně načten.");
 
 gpxLayer = new L.GPX(xmlText, {
                 async: true,
@@ -421,7 +421,7 @@ gpxLayer = new L.GPX(xmlText, {
 
                 window.gpxXMLText = xmlText;
                 document.dispatchEvent(new CustomEvent("gpxDataReady", { detail: { xmlText } }));
-                console.log("📡 Událost 'gpxDataReady' odeslána.");
+                if (window.GPX_DEBUG) console.log("📡 Událost 'gpxDataReady' odeslána.");
             })
             .addTo(map);
         })

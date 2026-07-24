@@ -54,6 +54,16 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
+# ---- Blokace interních adresářů ----
+# includes/, src/, migrations/, scripts/, tools/ a vendor/ nejsou veřejné vstupní
+# body — soubory v nich počítají s tím, že je někdo includuje, nemají vlastní
+# bootstrap ani auth gate. Přímé volání includes/*_data.php dřív vracelo data
+# mimo kontrolu přístupu (a rozbité JSON kvůli dvojímu načtení konstant).
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(includes|src|migrations|scripts|tools|vendor)/ - [F,L]
+</IfModule>
+
 # ---- HTTP bezpečnostní hlavičky ----
 # POZN: X-Frame-Options, CSP, HSTS, Permissions-Policy, COOP nastavuje security.php
 # (single source of truth). Zde pouze static defaults pro non-PHP requesty.

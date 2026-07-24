@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("🧩 index-ui.js načten");
+if (window.GPX_DEBUG) console.log("🧩 index-ui.js načten");
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterForm = document.querySelector("form.filters");
     if (filterForm) {
         filterForm.addEventListener("submit", () => {
-            console.log("🔍 Odesílám filtr...");
+            if (window.GPX_DEBUG) console.log("🔍 Odesílám filtr...");
         });
     }
 

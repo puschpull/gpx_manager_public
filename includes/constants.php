@@ -8,6 +8,17 @@ declare(strict_types=1);
  * ===========================================================
  */
 
+// This file is reachable two ways: through require_once (helpers.php,
+// bootstrap.php, …) and through Composer's `files` autoload, which uses a plain
+// `require`. When the require_once path runs FIRST, Composer's spelling of the
+// path differs and PHP loads the file a second time — every `const` below then
+// raises "Constant already defined" and the warning corrupts JSON responses.
+// The guard makes the file idempotent regardless of load order.
+if (defined('GPX_CONSTANTS_LOADED')) {
+    return;
+}
+define('GPX_CONSTANTS_LOADED', true);
+
 // Cookie lifetime
 const COOKIE_TTL_DAYS    = 365;
 const COOKIE_TTL_SECONDS = COOKIE_TTL_DAYS * 24 * 3600;

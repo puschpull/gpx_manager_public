@@ -1,4 +1,4 @@
-console.log('🧩 index-ajax.js načten – AJAX filtr připraven');
+if (window.GPX_DEBUG) console.log('🧩 index-ajax.js načten – AJAX filtr připraven');
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#filter-form');
@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const endpoint = form.dataset.endpoint || '../includes/index_data.php';
+    // Endpoint je vždy stránka v rootu, ne soubor z includes/ (ten nemá bootstrap ani auth)
+    const endpoint = form.dataset.endpoint || 'index-legacy.php';
     const tableContainer = document.querySelector('#table-container');
 
     // FE-9: Chart init lives exclusively in index-chart.js; no duplicate here.

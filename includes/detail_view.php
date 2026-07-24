@@ -264,9 +264,19 @@ require __DIR__ . '/layout_header.php';
         <?php if (feature_enabled('replay_radar')): ?>
         <div class="rp-radar-controls">
             <button type="button" id="rpRadarToggle" class="rp-btn">🌧️ <?= htmlspecialchars(t('rp_radar', 'Srážkové pole')) ?></button>
-            <label id="rpRadarOpacityWrap" style="display:none;"><?= htmlspecialchars(t('rp_radar_opacity', 'Sytost')) ?>:
-                <input type="range" id="rpRadarOpacity" min="10" max="90" value="55">
+            <label id="rpRadarSourceWrap" style="display:none;"><?= htmlspecialchars(t('rp_radar_source', 'Zdroj')) ?>:
+                <select id="rpRadarSource">
+                    <option value="chmi"><?= htmlspecialchars(t('rp_radar_src_chmi', 'radar ČHMÚ (5 min)')) ?></option>
+                    <option value="model"><?= htmlspecialchars(t('rp_radar_src_model', 'model (odhad, 1 h)')) ?></option>
+                </select>
             </label>
+            <label id="rpRadarOpacityWrap" style="display:none;"><?= htmlspecialchars(t('rp_radar_opacity', 'Sytost')) ?>:
+                <input type="range" id="rpRadarOpacity" min="10" max="100" value="75">
+            </label>
+            <?php if (!empty($_SESSION['is_admin'])): ?>
+            <button type="button" id="rpRadarFetch" class="rp-btn" style="display:none;"
+                    title="<?= htmlspecialchars(t('rp_radar_fetch_title', 'Stáhnout radarové snímky ČHMÚ pro dobu této trasy (archiv jen ~7 dní zpět)')) ?>">⬇ <?= htmlspecialchars(t('rp_radar_fetch', 'Stáhnout radar')) ?></button>
+            <?php endif; ?>
             <span id="rpRadarStatus" class="rp-radar-status"></span>
         </div>
         <?php endif; ?>
@@ -425,7 +435,26 @@ window.gpxDetailData = {
         radarErr:  <?= js_safe_json(t('rp_radar_error', 'Srážková data se nepodařilo načíst.')) ?>,
         weatherNA: <?= js_safe_json(t('rp_weather_na', 'Počasí není k dispozici.')) ?>,
         photosOn:  <?= js_safe_json(t('rp_photos_on', 'Míjené fotky: zapnuto')) ?>,
-        photosNone:<?= js_safe_json(t('rp_photos_none', 'Trasa nemá fotky s GPS polohou.')) ?>
+        photosNone:<?= js_safe_json(t('rp_photos_none', 'Trasa nemá fotky s GPS polohou.')) ?>,
+        radarMax:  <?= js_safe_json(t('rp_radar_max', 'max v oblasti: {v} mm/h')) ?>,
+        radarNoFrames: <?= js_safe_json(t('rp_radar_no_frames', 'Radarové snímky pro tuto trasu nejsou stažené.')) ?>,
+        radarFetching: <?= js_safe_json(t('rp_radar_fetching', 'Stahuji radarové snímky ČHMÚ…')) ?>,
+        radarFetched:  <?= js_safe_json(t('rp_radar_fetched', 'Radar: {n} snímků')) ?>,
+        radarTooOld:   <?= js_safe_json(t('rp_radar_too_old', 'Archiv ČHMÚ sahá jen ~7 dní zpět — pro tuto trasu už radar není k dispozici.')) ?>,
+        radarChmi:     <?= js_safe_json(t('rp_radar_chmi_label', 'radar ČHMÚ')) ?>,
+        csrf:          <?= js_safe_json(csrf_token()) ?>,
+        wmo: {
+            clear:    <?= js_safe_json(t('wmo_clear', 'jasno')) ?>,
+            partly:   <?= js_safe_json(t('wmo_partly', 'polojasno')) ?>,
+            overcast: <?= js_safe_json(t('wmo_overcast', 'zataženo')) ?>,
+            fog:      <?= js_safe_json(t('wmo_fog', 'mlha')) ?>,
+            drizzle:  <?= js_safe_json(t('wmo_drizzle', 'mrholení')) ?>,
+            rain:     <?= js_safe_json(t('wmo_rain', 'déšť')) ?>,
+            snow:     <?= js_safe_json(t('wmo_snow', 'sněžení')) ?>,
+            showers:  <?= js_safe_json(t('wmo_showers', 'přeháňky')) ?>,
+            snowShow: <?= js_safe_json(t('wmo_snow_showers', 'sněhové přeháňky')) ?>,
+            storm:    <?= js_safe_json(t('wmo_storm', 'bouřka')) ?>
+        }
     },
     apiKeys: {
         tf:        <?= js_safe_json(defined('TF_API_KEY') ? TF_API_KEY : '') ?>,
@@ -490,7 +519,9 @@ window.gpxDetailData = {
         return '<span style="color:' + (colors[level] || '#999') + '">' + filled + empty + '</span>';
     }
 
-    fetch('includes/detail_data.php?ajax=similar&id=' + trackId)
+    // Přes detail.php, ne přímo na includes/detail_data.php — soubory v includes/
+    // nejsou veřejné vstupní body a nemají vlastní auth/bootstrap.
+    fetch('detail.php?ajax=similar&id=' + trackId)
         .then(r => r.json())
         .then(data => {
             const tracks = data.tracks || [];

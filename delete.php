@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Smazání trasy — POST only, s CSRF ochranou
  */
@@ -41,20 +43,8 @@ try {
 
     $pdo->commit();
 
-    // Smazání GPX souboru (+ případné zálohy z in-place filtrace)
-    $gpxFile = uploads_fs($track['filename']);
-    if (is_file($gpxFile)) {
-        unlink($gpxFile);
-    }
-    if (is_file($gpxFile . '.bak')) {
-        unlink($gpxFile . '.bak');
-    }
-
-    // Smazání náhledu
-    $thumbFile = uploads_fs('thumbs/' . pathinfo($track['filename'], PATHINFO_FILENAME) . '.png');
-    if (is_file($thumbFile)) {
-        unlink($thumbFile);
-    }
+    // Smazání souborů trasy z uploads/ (GPX + .bak, náhled, radarové snímky)
+    delete_track_files($id, (string)$track['filename']);
 
 } catch (Throwable $e) {
     $pdo->rollBack();

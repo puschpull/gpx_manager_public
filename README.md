@@ -6,62 +6,67 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 
 ---
 
-## What's new in v2.1
+## What's new
 
-- **Virtual tracks from photos** — for hikes recorded without a GPX track: unassigned geotagged photos are clustered into trips (by time *and* distance gap) and turned into photo-only routes stored in a separate table. Generator with dry-run preview; detail map with a polyline through the photo points, toggleable thumbnail/red-dot layers, lightbox, and admin drag-to-fix for a bad GPS fix.
-- **Photo heatmap** — density of all geotagged photos on one map, with toggleable heatmap / red-dot / thumbnail overlays.
-- **Single-track photo view** — clicking a track's photo count shows only that track's photos.
-- **Elevation hysteresis** — ascent/descent computed from points ignores sub-threshold GPS jitter.
-- **Fixes** — nearest-track search ranks by the actual nearest track point (not centroid); weather widget CSP for historical tracks; admin buttons on the track detail; size-aware photo upload batching for shared-hosting PHP limits; corrected "missing thumbnail" admin stat.
+### 2026-07 — planning, replay and real radar
 
-## What's new in v2.0
+- **Trip planner** — click a route on the map, get it snapped to real paths via routing;
+  save plans, see weather for the planned day, estimate time from your own pace, and
+  export to GPX for a Garmin handheld. Manual segments let you draw a straight shortcut
+  across a field and mix it with auto-routed parts.
+- **Hike replay** — a walking figure travels the track by its real timestamps, in sync with
+  the elevation profile. Optional live weather at the hiker, a preview of the photo they
+  are passing, and a precipitation overlay.
+- **Real weather radar** — the precipitation overlay can use actual ČHMÚ radar composites
+  (5-minute steps) instead of the hourly model estimate. Frames are fetched on demand and
+  stored per track; the ČHMÚ archive only reaches ~7 days back.
+- **Photos Nearby** — find photos around a point, the photo counterpart of Tracks Nearby.
+- **More map layers** — CyclOSM, ČÚZK ZTM, Waymarked Trails, Mapy.com, Mapillary coverage,
+  Wikimedia Commons photos and OSM POIs, all available on every map in the app.
+- **Configurable top menu** — order and visibility of navigation items set in Administration.
+- **Optional features** — replay, weather, radar and passing photos can each be switched
+  off independently in Administration.
 
-- **Security audit** — 166 findings fixed: XXE prevention, CSRF on all mutating endpoints, path traversal hardening, XSS escaping, SQL injection prevention via prepared statements
-- **Migration system** — 15 numbered migrations, CLI runner (`php migrate.php`)
-- **Refactored architecture** — REST API endpoints (`api/`), shared PHP helpers, PSR-12, `declare(strict_types=1)`
+### 2026-06 — virtual tracks
+
+- **Virtual tracks** — a route reconstructed from GPS photos alone, for trips with no GPX
+  recording. Photos are clustered by time and location, the track is created from their
+  positions, and it can be renamed, split, merged and given its own thumbnail.
+
+### v2.0 — audit and refactor
+
+- **Security audit** — 166 findings fixed: XXE prevention, CSRF on all mutating endpoints,
+  path traversal hardening, XSS escaping, SQL injection prevention via prepared statements
+- **Migration system** — numbered migrations with a CLI runner (`php migrate.php`)
+- **Refactored architecture** — REST API endpoints (`api/`), shared PHP helpers, PSR-12,
+  `declare(strict_types=1)`
 - **Batch photo upload** — up to 100 photos per batch, ZIP archive support (Google Takeout compatible)
-- **Photo import from local folder** — scan server directory, EXIF batch read, auto-assign to tracks by GPS + time
-- **Accessibility** — WCAG 2.2 AA: skip links, ARIA landmarks, focus management, keyboard navigation, screen reader support
-- **Modern UI** — Tailwind CSS v4 + Alpine.js 3.x, 9 colour themes, full dark mode
+- **Photo import from local folder** — scan server directory, EXIF batch read, auto-assign to
+  tracks by GPS + time
+- **Accessibility** — WCAG 2.2 AA: skip links, ARIA landmarks, focus management, keyboard
+  navigation, screen reader support
+- **Modern UI** — Tailwind CSS v4 + Alpine.js 3.x, light/dark mode
 - **Performance** — N+1 query fixes, centroid index, OSM tile cache, pagination
-- **i18n** — 8 languages fully consistent (Czech, English, German, Slovak, Spanish, French, Italian, Polish)
+- **i18n** — 8 languages fully consistent (Czech, English, German, Slovak, Spanish, French,
+  Italian, Polish)
 
 ---
 
 ## Features
 
 - **GPX import** — single files or batch via ZIP archive
-- **Interactive map** for each track with elevation profile
-- **Photos on the track** — GPS EXIF → automatic assignment to track, lightbox gallery, timeline; per-track photo view
-- **Virtual tracks from photos** — build photo-only routes from unassigned geotagged photos (hikes without a GPX track)
+- **Interactive map** for each track with elevation profile, plus a replay of the hike
+- **Virtual tracks** — routes reconstructed from GPS photos when no GPX exists
+- **Trip planner** — plan a route, check the weather, export GPX for a GPS device
+- **Photos on the track** — GPS EXIF → automatic assignment to track, lightbox gallery, timeline
+- **Photos Nearby** and **Tracks Nearby** — find what you photographed or walked around a point
 - **Statistics** — track overview, favourites, categories, difficulty, activity type
 - **Filter & compare** — advanced filtering, side-by-side track comparison on map
-- **Nearest tracks** — click a point on the map to find the closest tracks
 - **Heatmap**, **photo heatmap** and **activity calendar**
+- **GPX Cleaner** — strip GPS noise, stationary points and elevation spikes
 - **Visitor mode** — public view-only access with configurable page visibility
 - **Multilingual UI** — Czech, English, German, Slovak, Spanish, French, Italian, Polish
-- **9 colour themes**
-
----
-
-## Using virtual tracks
-
-For photos taken on a hike where no GPX track was recorded, GPX Manager can
-build a photo-only route from the photo locations:
-
-1. **Upload** the photos as usual (Photos → Upload). Photos with no matching
-   GPX track stay **unassigned**.
-2. Open **Virtual tracks** from the menu (admin only).
-3. Set the clustering thresholds — **time gap**, **distance jump**, **min.
-   photos per track** — and click **Preview** (a dry run that writes nothing).
-4. When the proposal looks right, click **Create**. The photos are grouped into
-   virtual tracks (by time *and* distance gap), each stored in a separate table.
-5. On a virtual track's detail map you can **drag** a mis-placed photo (a bad
-   GPS fix) to the correct spot — the position is saved and the distance
-   recomputed.
-
-Virtual-track photos are kept clearly separate from GPX-track photos in the
-photo manager. See the full guide → [instructions/en.md](instructions/en.md).
+- **Light / dark mode**
 
 ---
 
@@ -76,15 +81,20 @@ photo manager. See the full guide → [instructions/en.md](instructions/en.md).
 
 PHP extensions: `pdo_mysql`, `simplexml`, `gd`, `exif`, `zip`
 
+Optional API keys (in `.env`) unlock extra map layers — Thunderforest, Mapy.com and
+Mapillary. Without a key the layer simply is not offered; nothing else breaks.
+
 ---
 
 ## Quick Start
 
 1. Copy files to the server (or into the WampServer `www/` folder)
 2. Create an empty MySQL database (e.g. `gpx_manager`)
-3. Open `http://localhost/gpx_manager/setup.php`
-4. Enter DB credentials, admin password and your IP address
-5. Log in via `login.php`
+3. Create an empty file named `.setup-allowed` next to `setup.php` (security gate)
+4. Open `http://localhost/gpx_manager/setup.php`
+5. Enter DB credentials, admin password and your IP address
+6. Run `php migrate.php` to apply any schema updates
+7. Log in via `login.php`
 
 📖 Full guide → [instructions/en.md](instructions/en.md)
 
@@ -97,18 +107,37 @@ gpx_manager/
 ├── setup.php          ← installation wizard (deletes itself after install)
 ├── .env.example       ← configuration template
 ├── install.sql        ← SQL schema for manual import
+├── migrate.php        ← CLI migration runner
 ├── config.php         ← loads configuration from .env
 ├── index.php          ← track overview
 ├── import.php         ← GPX import
 ├── photos.php         ← photo management
+├── planner.php        ← trip planner
 ├── ...
-├── includes/          ← PHP backend logic
-├── css/               ← styles and themes
+├── api/               ← JSON endpoints (photos, planner, radar, POI, virtual tracks)
+├── includes/          ← PHP backend logic (not reachable from the web)
+├── migrations/        ← numbered SQL migrations
+├── assets/css/        ← Tailwind build output (app.css)
+├── css/               ← legacy page styles
 ├── js/                ← JavaScript modules
 ├── lang/              ← translations (8 languages)
+├── tools/             ← CLI maintenance scripts
 ├── instructions/      ← installation & user guides (cs, en)
-└── uploads/           ← GPX files and photos (writable by server)
+└── uploads/           ← GPX files, photos, thumbnails, caches (writable by server)
 ```
+
+---
+
+## Maintenance
+
+```bash
+php migrate.php                          # apply pending schema migrations
+php scripts/lint_lang.php                # check translation keys across 8 languages
+php tools/cleanup_uploads.php            # dry-run: expired caches, orphaned radar frames
+php tools/cleanup_orphan_thumbs.php      # dry-run: thumbnails with no matching track
+```
+
+Both cleanup tools change nothing until you re-run them with `--apply`.
 
 ---
 

@@ -1,10 +1,90 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 22. července 2026
+  Poslední aktualizace: 24. července 2026
 
 ================================================================================
 
+
+── 24. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: DVOJÍ NAČTENÍ SOUBORŮ Z includes/ ROZBÍJELO JSON                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Sekce „Podobné trasy" na detailu trasy nefungovala vůbec. JS volal
+  includes/detail_data.php napřímo; tam se helpers.php načetl dřív než
+  Composer autoload, a ten používá `require` (ne `require_once`), takže
+  načetl constants.php a paths.php podruhé. PHP warning se vlil před
+  JSON → SyntaxError v prohlížeči.
+
+  - composer.json: autoload.files → jen includes/bootstrap.php, přesně jak
+    bootstrap.php i config.php už dokumentovaly. bootstrap.php používá
+    require_once, takže pořadí načtení už nehraje roli.
+  - constants.php: guard GPX_CONSTANTS_LOADED jako pojistka.
+  - includes/ nejsou veřejné vstupní body → fetch přesměrován na
+    detail.php?ajax=similar a index-legacy.php?ajax=1; .htaccess blokuje
+    includes|src|migrations|scripts|tools|vendor.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ÚKLID A KONZISTENCE                                                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  - install.sql: doplněna tabulka virtual_tracks a sloupec
+    track_photos.virtual_track_id (migrace 0015 chyběla v baseline).
+  - delete_track_files() — jednotný úklid souborů trasy pro delete.php
+    i hromadné mazání (to zapomínalo na .bak a na radarové snímky).
+  - tools/cleanup_uploads.php — nový nástroj: expirované dlaždice a POI
+    cache, radar smazaných tras, zálohy .gpx.bak. Dry-run výchozí.
+  - declare(strict_types=1) doplněn do 101 ze 127 PHP souborů (vynechány
+    HTML šablony, kde by implicitní konverze int→string shodila běh).
+  - 21 console.log dostalo guard window.GPX_DEBUG.
+  - Odstraněny nepoužívané css/base.css, css/layout.css, js/lang-switcher.js.
+  - README a instalační návody aktualizovány (uváděly „9 barevných témat",
+    která byla zrušena v 6/2026).
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  TMAVÝ REŽIM: NATIVNÍ PRVKY (ROZBALOVACÍ MENU, ZAŠKRTÁVÁTKA)                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Aplikace nikde nedeklarovala `color-scheme`, takže prohlížeč kreslil
+  všechny nativní prvky (select a jeho rozbalený seznam, inputy, scrollbary)
+  vždy světle — text zděděný z tmavého motivu na nich zmizel.
+
+  - `:root { color-scheme: light }` / `html.dark { color-scheme: dark }`
+    v layout_header.php i css/style.css.
+  - Výjimka `.leaflet-container { color-scheme: light }` — Leaflet kreslí
+    ovládání vrstev i bubliny vždy světle, zaškrtávátka tam musí zůstat světlá.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SRÁŽKOVÉ POLE: SKUTEČNÝ RADAR ČHMÚ (VOLITELNĚ VEDLE MODELU)                   │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Srážkové pole v přehrávači umí dva zdroje; přepínají se rozbalovátkem
+  „Zdroj" a volba se pamatuje.
+
+  - radar ČHMÚ (5 min) — skutečné radarové snímky z opendata.chmi.cz
+    (produkt maxz/png_masked, 680×460 px, EPSG:3857). Krok 5 minut místo
+    hodiny, zachytí i slabé mrholení, které meteomodel hlásí jako 0 mm.
+  - model (odhad, 1 h) — původní dopočet z Open-Meteo, beze změny.
+
+  Archiv ČHMÚ drží jen ~7 dní zpět, proto se snímky stahují na vyžádání
+  tlačítkem „⬇ Stáhnout radar" (jen admin) a ukládají natrvalo do
+  uploads/radar/<track_id>/. Číst je smí i návštěvník.
+
+  Nové: api/radar/fetch.php (POST, admin+CSRF), api/radar/list.php (GET)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SRÁŽKOVÉ POLE: KALIBRACE ZOBRAZENÍ                                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Modelové srážkové pole bylo prakticky neviditelné i když pršelo:
+  práh 0,1 mm/h a slabá průhlednost skryly běžný déšť.
+
+  - práh 0,1 → 0,02 mm/h, silnější barvy (alfa 0,45–0,88)
+  - mřížka 5×5 → 7×7 bodů, výchozí sytost 55 → 75
+  - stavový řádek ukazuje maximum v oblasti
+  - u panáčka se zobrazuje i stav oblohy podle weather_code
 
 ── 22. července 2026 ───────────────────────────────────────────────────────────
 

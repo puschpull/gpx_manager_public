@@ -88,7 +88,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
          role="region"
          aria-label="<?= htmlspecialchars(t('filters_panel', 'Panel filtrů')) ?>">
 
-        <form id="filter-form" class="filters" action="index-legacy.php" method="get" data-endpoint="../includes/index_data.php">
+        <form id="filter-form" class="filters" action="index-legacy.php" method="get" data-endpoint="index-legacy.php">
 
             <!-- Viditelnost sloupců — mimo sidebar-grid -->
             <?php

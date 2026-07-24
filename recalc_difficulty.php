@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Přepočet obtížnosti u všech tras
  * Spouští se jednorázově nebo po importu.

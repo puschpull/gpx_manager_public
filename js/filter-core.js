@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("filter-core.js nacten");
+if (window.GPX_DEBUG) console.log("filter-core.js nacten");
 
 window.GpxFilter = (function () {
     "use strict";

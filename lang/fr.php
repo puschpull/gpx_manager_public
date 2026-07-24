@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Localisation française
  * Les clés sont organisées par pages / sections.
@@ -671,4 +673,27 @@ return [
     'rp_photos_title'      => 'Afficher dans le coin de la carte la photo que le randonneur croise',
     'rp_photos_on'         => 'Photos rencontrées : activé',
     'rp_photos_none'       => 'La trace n\'a pas de photos géolocalisées.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'max dans la zone : {v} mm/h',
+    'rp_radar_source'       => 'Source',
+    'rp_radar_src_chmi'     => 'radar CHMI (5 min)',
+    'rp_radar_src_model'    => 'modèle (estimation, 1 h)',
+    'rp_radar_fetch'        => 'Télécharger le radar',
+    'rp_radar_fetch_title'  => 'Télécharger les images radar CHMI pour la durée de cet itinéraire (archive limitée à ~7 jours)',
+    'rp_radar_no_frames'    => 'Aucune image radar téléchargée pour cet itinéraire.',
+    'rp_radar_fetching'     => 'Téléchargement des images radar CHMI…',
+    'rp_radar_fetched'      => 'Radar : {n} images',
+    'rp_radar_too_old'      => 'L\'archive CHMI ne remonte qu\'à ~7 jours — le radar n\'est plus disponible pour cet itinéraire.',
+    'rp_radar_chmi_label'   => 'radar CHMI',
+    'wmo_clear'            => 'ciel clair',
+    'wmo_partly'           => 'partiellement nuageux',
+    'wmo_overcast'         => 'couvert',
+    'wmo_fog'              => 'brouillard',
+    'wmo_drizzle'          => 'bruine',
+    'wmo_rain'             => 'pluie',
+    'wmo_snow'             => 'neige',
+    'wmo_showers'          => 'averses',
+    'wmo_snow_showers'     => 'averses de neige',
+    'wmo_storm'            => 'orage',
 ];

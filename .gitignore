@@ -8,14 +8,9 @@
 /uploads/*.gpx
 /uploads/photos/
 /uploads/thumbs/
-/uploads/vt_thumbs/
 /uploads/_tile_cache/
-/uploads/_poi_cache/
 /uploads/_errors.log
 /uploads/heatmap_cache.json
-/uploads/photo_heatmap_cache.json
-/uploads/_heatmap_rebuild.marker
-/uploads/*.gpx.bak
 logs/*.log
 
 # IDE a systémové soubory
@@ -34,3 +29,19 @@ Thumbs.db
 # Node / npm — instaluj lokálně přes "npm install"
 # package-lock.json se commituje pro deterministický build
 /node_modules/
+
+# Zálohy z in-place filtrace (i karanténa z tools/cleanup_uploads.php)
+/uploads/*.gpx.bak
+/uploads/_bak_quarantine/
+
+# Logy filtračních skriptů
+/tools/_*.log
+
+# Záloha setup.php
+setup.php.backup
+
+/uploads/vt_thumbs/
+/uploads/photo_heatmap_cache.json
+/uploads/_heatmap_rebuild.marker
+/uploads/_poi_cache/
+/uploads/radar/

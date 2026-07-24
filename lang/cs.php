@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Česká lokalizace (výchozí jazyk)
  * Klíče jsou organizovány podle stránek / sekcí.
@@ -677,4 +679,27 @@ return [
     'rp_photos_title'      => 'Zobrazovat v rohu mapy fotku, kterou panáček zrovna míjí',
     'rp_photos_on'         => 'Míjené fotky: zapnuto',
     'rp_photos_none'       => 'Trasa nemá fotky s GPS polohou.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'max v oblasti: {v} mm/h',
+    'rp_radar_source'       => 'Zdroj',
+    'rp_radar_src_chmi'     => 'radar ČHMÚ (5 min)',
+    'rp_radar_src_model'    => 'model (odhad, 1 h)',
+    'rp_radar_fetch'        => 'Stáhnout radar',
+    'rp_radar_fetch_title'  => 'Stáhnout radarové snímky ČHMÚ pro dobu této trasy (archiv jen ~7 dní zpět)',
+    'rp_radar_no_frames'    => 'Radarové snímky pro tuto trasu nejsou stažené.',
+    'rp_radar_fetching'     => 'Stahuji radarové snímky ČHMÚ…',
+    'rp_radar_fetched'      => 'Radar: {n} snímků',
+    'rp_radar_too_old'      => 'Archiv ČHMÚ sahá jen ~7 dní zpět — pro tuto trasu už radar není k dispozici.',
+    'rp_radar_chmi_label'   => 'radar ČHMÚ',
+    'wmo_clear'            => 'jasno',
+    'wmo_partly'           => 'polojasno',
+    'wmo_overcast'         => 'zataženo',
+    'wmo_fog'              => 'mlha',
+    'wmo_drizzle'          => 'mrholení',
+    'wmo_rain'             => 'déšť',
+    'wmo_snow'             => 'sněžení',
+    'wmo_showers'          => 'přeháňky',
+    'wmo_snow_showers'     => 'sněhové přeháňky',
+    'wmo_storm'            => 'bouřka',
 ];

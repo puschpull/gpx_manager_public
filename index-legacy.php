@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Legacy view — původní detailní tabulka s 30+ sloupci a filtrovacím sidebarem.
  * Pro power users, kteří preferují tabulkový pohled.

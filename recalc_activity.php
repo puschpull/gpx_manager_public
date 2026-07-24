@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Hromadné rozpoznání typu aktivity u existujících tras
  * Aktualizuje sloupec activity_type a přiřadí kategorii

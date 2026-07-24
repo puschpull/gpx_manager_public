@@ -786,6 +786,14 @@ form textarea { min-height: 120px; }
 }
 
 /* ====== LEAFLET — zarovnání vrstev ====== */
+
+/* Leaflet kreslí ovládání vrstev i bubliny vždy na světlém pozadí, i v tmavém
+   režimu. Musí tam proto zůstat i světlá zaškrtávátka — bez tohoto by je
+   globální color-scheme: dark invertoval na tmavá. */
+.leaflet-container {
+    color-scheme: light;
+}
+
 .leaflet-control-layers label {
     display: flex;
     flex-direction: row;
@@ -1194,6 +1202,11 @@ form textarea { min-height: 120px; }
 
 /* ====== DEFAULT CSS VARIABLES (light mode fallback — no theme cookie) ====== */
 :root {
+    /* Řekne prohlížeči, jak kreslit nativní prvky (select, rozbalený seznam,
+       date picker, scrollbary). Bez toho je kreslí vždy světle — a text, který
+       podědí --text-muted/--text-color z tmavého motivu, na nich zmizí. */
+    color-scheme: light;
+
     --bg-color:           #f9f9f9;
     --text-color:         #222222;
     --text-muted:         #666666;
@@ -1218,6 +1231,8 @@ form textarea { min-height: 120px; }
 /* ====== DARK MODE — html.dark (Tailwind toggle) overrides CSS variables ====== */
 /* Applies to all legacy pages (index-legacy, detail, filter, nearby, compare, admin, edit, import) */
 html.dark {
+    color-scheme: dark;
+
     --bg-color:           #1e1f22;
     --text-color:         #e4e4e4;
     --text-muted:         #a0a0a0;

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * English localization
  * Keys are organized by pages / sections.
@@ -677,4 +679,27 @@ return [
     'rp_photos_title'      => 'Show the photo the hiker is currently passing in the map corner',
     'rp_photos_on'         => 'Passing photos: on',
     'rp_photos_none'       => 'The track has no geotagged photos.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'max in area: {v} mm/h',
+    'rp_radar_source'       => 'Source',
+    'rp_radar_src_chmi'     => 'CHMI radar (5 min)',
+    'rp_radar_src_model'    => 'model (estimate, 1 h)',
+    'rp_radar_fetch'        => 'Download radar',
+    'rp_radar_fetch_title'  => 'Download CHMI radar images for the duration of this track (archive covers only ~7 days back)',
+    'rp_radar_no_frames'    => 'No radar images downloaded for this track.',
+    'rp_radar_fetching'     => 'Downloading CHMI radar images…',
+    'rp_radar_fetched'      => 'Radar: {n} frames',
+    'rp_radar_too_old'      => 'The CHMI archive only goes ~7 days back — radar is no longer available for this track.',
+    'rp_radar_chmi_label'   => 'CHMI radar',
+    'wmo_clear'            => 'clear',
+    'wmo_partly'           => 'partly cloudy',
+    'wmo_overcast'         => 'overcast',
+    'wmo_fog'              => 'fog',
+    'wmo_drizzle'          => 'drizzle',
+    'wmo_rain'             => 'rain',
+    'wmo_snow'             => 'snow',
+    'wmo_showers'          => 'showers',
+    'wmo_snow_showers'     => 'snow showers',
+    'wmo_storm'            => 'thunderstorm',
 ];

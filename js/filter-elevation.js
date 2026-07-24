@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("filter-elevation.js nacten");
+if (window.GPX_DEBUG) console.log("filter-elevation.js nacten");
 
 window.FilterElevation = (function () {
     "use strict";

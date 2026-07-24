@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Localizzazione italiana
  * Le chiavi sono organizzate per pagine / sezioni.
@@ -671,4 +673,27 @@ return [
     'rp_photos_title'      => 'Mostra nell\'angolo della mappa la foto che l\'escursionista sta passando',
     'rp_photos_on'         => 'Foto incontrate: attivo',
     'rp_photos_none'       => 'La traccia non ha foto con posizione GPS.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'max nella zona: {v} mm/h',
+    'rp_radar_source'       => 'Fonte',
+    'rp_radar_src_chmi'     => 'radar CHMI (5 min)',
+    'rp_radar_src_model'    => 'modello (stima, 1 h)',
+    'rp_radar_fetch'        => 'Scarica radar',
+    'rp_radar_fetch_title'  => 'Scarica le immagini radar CHMI per la durata di questo percorso (archivio solo ~7 giorni indietro)',
+    'rp_radar_no_frames'    => 'Nessuna immagine radar scaricata per questo percorso.',
+    'rp_radar_fetching'     => 'Scarico le immagini radar CHMI…',
+    'rp_radar_fetched'      => 'Radar: {n} immagini',
+    'rp_radar_too_old'      => 'L\'archivio CHMI copre solo ~7 giorni — il radar non è più disponibile per questo percorso.',
+    'rp_radar_chmi_label'   => 'radar CHMI',
+    'wmo_clear'            => 'sereno',
+    'wmo_partly'           => 'parzialmente nuvoloso',
+    'wmo_overcast'         => 'coperto',
+    'wmo_fog'              => 'nebbia',
+    'wmo_drizzle'          => 'pioviggine',
+    'wmo_rain'             => 'pioggia',
+    'wmo_snow'             => 'neve',
+    'wmo_showers'          => 'rovesci',
+    'wmo_snow_showers'     => 'rovesci di neve',
+    'wmo_storm'            => 'temporale',
 ];

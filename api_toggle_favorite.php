@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * API endpoint: přepne is_favorite u trasy (AJAX)
  * POST: id = track ID

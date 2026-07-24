@@ -48,6 +48,13 @@ if (!function_exists('t')) {
     <!-- x-cloak: skryje Alpine elementy před inicializací (jinak jsou vidět při načtení stránky) -->
     <style>[x-cloak] { display: none !important; }</style>
 
+    <!-- Nativní prvky (select a jeho rozbalený seznam, inputy, scrollbary) kreslí prohlížeč,
+         ne Tailwind. Bez color-scheme je kreslí vždy světle — a text, který podědí barvu
+         z tmavého motivu, na nich zmizí. Opakovaný zdroj „světlý text na světlém pozadí". -->
+    <!-- Výjimka: uvnitř mapy má Leaflet vždy světlé pozadí (ovládání vrstev, bubliny),
+         takže tam musí zůstat i světlá zaškrtávátka — jinak by se invertovala. -->
+    <style>:root { color-scheme: light; } html.dark { color-scheme: dark; } .leaflet-container { color-scheme: light; }</style>
+
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
     <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>

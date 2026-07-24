@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("⚙️ detail-ui.js načten");
+if (window.GPX_DEBUG) console.log("⚙️ detail-ui.js načten");
 
 document.addEventListener("DOMContentLoaded", () => {
     /* ====== EXPORT PROFILU DO PNG ====== */
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             a.download = `profil_${safeTitle}.png`;
             a.click();
 
-            console.log(`📤 Exportován výškový profil jako profil_${safeTitle}.png`);
+            if (window.GPX_DEBUG) console.log(`📤 Exportován výškový profil jako profil_${safeTitle}.png`);
         });
     }
 
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         timeModeSelect.addEventListener("change", () => {
             window.timeMode = timeModeSelect.value;
-            console.log(`🕒 Režim času změněn na: ${window.timeMode}`);
+            if (window.GPX_DEBUG) console.log(`🕒 Režim času změněn na: ${window.timeMode}`);
 
             // Pokud je už graf načten, jen aktualizuj tooltipy
             if (window.chart && typeof window.chart.update === "function") {

@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("⚖️ compare-map.js načten");
+if (window.GPX_DEBUG) console.log("⚖️ compare-map.js načten");
 
 // Delegát na sdílené lib (js/lib/format-utils.js)
 function escHtml(s) { return window.GpxFmt.escHtml(s); }

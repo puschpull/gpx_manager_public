@@ -1,6 +1,6 @@
 -- ============================================================
 --  GPX Manager — instalační SQL skript
---  Verze: 2026-05 (migrations 0012–0014 synced)
+--  Verze: 2026-07 (migrations 0012–0017 synced)
 --  Spusť tento soubor přes phpMyAdmin nebo MySQL CLI
 --  PŘED spuštěním: vytvoř prázdnou databázi (např. gpx_manager)
 -- ============================================================
@@ -105,14 +105,42 @@ CREATE TABLE IF NOT EXISTS track_photos (
     img_direction FLOAT            DEFAULT NULL,
     visible       TINYINT(1)       NOT NULL DEFAULT 1,
     created_at    TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
+    -- 0015_virtual_tracks: vazba fotka → virtuální trasa (nezávislá na track_id)
+    virtual_track_id INT           DEFAULT NULL,
     UNIQUE KEY idx_tp_hash   (file_hash),
     INDEX idx_tp_track  (track_id),
     INDEX idx_tp_taken  (taken_at),
     INDEX idx_tp_coords (lat, lon),
     -- 0012_indexes: composite index for photo_count correlated subquery
     INDEX idx_tp_track_visible (track_id, visible),
-    FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE SET NULL
+    INDEX idx_tp_vtrack (virtual_track_id),
+    FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE SET NULL,
+    CONSTRAINT fk_tp_vtrack FOREIGN KEY (virtual_track_id) REFERENCES virtual_tracks(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+--  Tabulka: virtual_tracks (virtuální trasy z GPS fotek — 0015)
+--  Trasa tvořená body z fotek, ne z GPX. Uložena samostatně, ne v `tracks`.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS virtual_tracks (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    name          VARCHAR(255) DEFAULT NULL,
+    note          TEXT         DEFAULT NULL,
+    color         VARCHAR(20)  DEFAULT NULL,
+    is_favorite   TINYINT(1)   NOT NULL DEFAULT 0,
+    date_start    DATETIME     DEFAULT NULL,
+    date_end      DATETIME     DEFAULT NULL,
+    photo_count   INT          DEFAULT 0,
+    distance_km   FLOAT        DEFAULT NULL,
+    ascent        FLOAT        DEFAULT NULL,
+    descent       FLOAT        DEFAULT NULL,
+    bounds        JSON         DEFAULT NULL,
+    centroid_lat  DOUBLE       DEFAULT NULL,
+    centroid_lon  DOUBLE       DEFAULT NULL,
+    created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_vt_date     (date_start),
+    INDEX idx_vt_centroid (centroid_lat, centroid_lon)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
 --  Tabulka: app_config (globální konfigurace aplikace)

@@ -116,6 +116,35 @@ function thumb_url(string $filename): string {
 }
 
 /**
+ * Removes every file a track owns in uploads/: the GPX itself, its in-place
+ * filter backup, the generated thumbnail and any downloaded CHMI radar frames.
+ *
+ * Single source of truth for both delete.php (single track) and
+ * api_bulk_action.php (bulk delete) — they used to drift apart.
+ * Call AFTER the database rows are gone; never throws.
+ */
+function delete_track_files(int $trackId, string $filename): void {
+    if ($filename !== '') {
+        $gpx = uploads_fs($filename);
+        if (is_file($gpx))          @unlink($gpx);
+        if (is_file($gpx . '.bak')) @unlink($gpx . '.bak');
+
+        $thumb = uploads_fs('thumbs/' . pathinfo($filename, PATHINFO_FILENAME) . '.png');
+        if (is_file($thumb)) @unlink($thumb);
+    }
+
+    if ($trackId > 0) {
+        $radarDir = uploads_fs('radar/' . $trackId . '/');
+        if (is_dir($radarDir)) {
+            foreach (glob($radarDir . '*.png') ?: [] as $png) {
+                @unlink($png);
+            }
+            @rmdir($radarDir);
+        }
+    }
+}
+
+/**
  * Validates that $path resolves to a file inside the uploads/ directory
  * and that the extension is an accepted image type.
  * Returns true only when the path is safe and the file exists.

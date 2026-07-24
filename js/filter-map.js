@@ -5,7 +5,7 @@
  * ===========================================================
  */
 
-console.log("filter-map.js nacten");
+if (window.GPX_DEBUG) console.log("filter-map.js nacten");
 
 window.FilterMap = (function () {
     "use strict";

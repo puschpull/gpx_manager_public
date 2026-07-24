@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * Localización en español
  * Las claves están organizadas por páginas / secciones.
@@ -671,4 +673,27 @@ return [
     'rp_photos_title'      => 'Mostrar en la esquina del mapa la foto por la que pasa el excursionista',
     'rp_photos_on'         => 'Fotos al pasar: activado',
     'rp_photos_none'       => 'La ruta no tiene fotos con posición GPS.',
+
+    // ===== Stav oblohy (WMO) + srazky v prehravaci =====
+    'rp_radar_max'         => 'máx. en la zona: {v} mm/h',
+    'rp_radar_source'       => 'Fuente',
+    'rp_radar_src_chmi'     => 'radar CHMI (5 min)',
+    'rp_radar_src_model'    => 'modelo (estimación, 1 h)',
+    'rp_radar_fetch'        => 'Descargar radar',
+    'rp_radar_fetch_title'  => 'Descargar imágenes de radar CHMI para la duración de esta ruta (el archivo solo cubre ~7 días)',
+    'rp_radar_no_frames'    => 'No hay imágenes de radar descargadas para esta ruta.',
+    'rp_radar_fetching'     => 'Descargando imágenes de radar CHMI…',
+    'rp_radar_fetched'      => 'Radar: {n} imágenes',
+    'rp_radar_too_old'      => 'El archivo de CHMI solo cubre ~7 días — el radar ya no está disponible para esta ruta.',
+    'rp_radar_chmi_label'   => 'radar CHMI',
+    'wmo_clear'            => 'despejado',
+    'wmo_partly'           => 'parcialmente nublado',
+    'wmo_overcast'         => 'cubierto',
+    'wmo_fog'              => 'niebla',
+    'wmo_drizzle'          => 'llovizna',
+    'wmo_rain'             => 'lluvia',
+    'wmo_snow'             => 'nieve',
+    'wmo_showers'          => 'chubascos',
+    'wmo_snow_showers'     => 'chubascos de nieve',
+    'wmo_storm'            => 'tormenta',
 ];
