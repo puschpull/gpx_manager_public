@@ -420,6 +420,17 @@ mysqldump -u root -p gpx_manager > zaloha_gpx_manager.sql
 
 Nahraný GPX soubory a náhledy tras se ukládají do `uploads/`. Na sdíleném hostingu sleduj volné místo — každá trasa zabírá desítky až stovky kB.
 
+Kromě vlastních dat tam přibývají i odvozené soubory, které se dají kdykoli zahodit: cache mapových dlaždic a POI, radarové snímky a zálohy z čištění GPX. Na jejich úklid slouží dva nástroje pro příkazovou řádku:
+
+```bash
+php tools/cleanup_uploads.php         # expirované cache, radar smazaných tras, zálohy .gpx.bak
+php tools/cleanup_orphan_thumbs.php   # náhledy, ke kterým už neexistuje trasa
+```
+
+Oba se ve výchozím stavu jen rozhlédnou a vypíšou, co by udělaly — **nic nemění, dokud je nespustíš znovu s `--apply`**. Zálohy `.gpx.bak` se ani potom nemažou, jen přesunou do karantény `uploads/_bak_quarantine/`, odkud je můžeš vrátit nebo smazat sám.
+
+> **Radarové snímky:** archiv ČHMÚ sahá jen zhruba 7 dní zpět. Pokud u deštivého výletu chceš mít v přehrávači skutečný radar, stáhni si snímky do týdne — později už nebudou k dispozici.
+
 ---
 
 ## 11. Řešení problémů

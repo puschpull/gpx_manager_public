@@ -421,6 +421,17 @@ mysqldump -u root -p gpx_manager > gpx_manager_backup.sql
 
 Uploaded GPX files and track thumbnails are stored in `uploads/`. On shared hosting, keep an eye on available disk space — each track takes up tens to hundreds of kilobytes.
 
+Alongside your own data, the folder accumulates derived files that can be discarded at any time: map tile and POI caches, radar frames, and backups from GPX cleaning. Two command-line tools clean them up:
+
+```bash
+php tools/cleanup_uploads.php         # expired caches, radar of deleted tracks, .gpx.bak backups
+php tools/cleanup_orphan_thumbs.php   # thumbnails with no matching track
+```
+
+By default both only look around and report what they would do — **nothing changes until you run them again with `--apply`**. Even then, `.gpx.bak` backups are not deleted but moved to a quarantine folder, `uploads/_bak_quarantine/`, so you can restore or remove them yourself.
+
+> **Radar frames:** the CHMI archive only reaches about 7 days back. If you want real radar in the replay for a rainy trip, download the frames within a week — after that they are gone.
+
 ---
 
 ## 11. Troubleshooting

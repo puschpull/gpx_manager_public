@@ -9,6 +9,16 @@
 ── 24. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: PLÁNOVAČ — VADNÝ TVAR WAYPOINTU VRACEL PHP WARNING                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  api/planner/save.php i import.php ověřovaly waypoint přes count($w) >= 2.
+  Asociativní tvar {"lat":…,"lon":…} tím projde, ale $w[0] neexistuje →
+  warning se vlil do JSON a klient dostal neparsovatelný text místo hlášky.
+  Opraveno na isset($w[0], $w[1]); všech 5 testovaných vadných tvarů nyní
+  vrací čistý JSON s chybovou hláškou.
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  OPRAVA: DVOJÍ NAČTENÍ SOUBORŮ Z includes/ ROZBÍJELO JSON                      │
 └──────────────────────────────────────────────────────────────────────────────┘
 
