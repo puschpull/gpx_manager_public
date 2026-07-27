@@ -59,10 +59,7 @@ if (!function_exists('t')) {
          z-index 9999, hlavička 40 — po odrolování proto banner hlavičku překryl
          a z menu zbyl jen spodní proužek. Hlavička se proto lepí AŽ POD banner;
          jeho výšku (mění se zalomením na úzkých displejích) měří skript níže. -->
-    <style>header.site-header { top: var(--gpx-banner-h, 0px); }
-    /* Posuvník u menu skrýt — posouvá se tažením, lišta by v hlavičce rušila */
-    .gpx-nav-scroll { scrollbar-width: none; }
-    .gpx-nav-scroll::-webkit-scrollbar { display: none; }</style>
+    <style>header.site-header { top: var(--gpx-banner-h, 0px); }</style>
 
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
@@ -176,10 +173,7 @@ if (!function_exists('t')) {
         </a>
 
         <!-- Desktop nav -->
-        <!-- min-w-0 + overflow-x-auto: s deseti položkami menu přeteklo a odsunulo
-             přepínače jazyka/motivu i tlačítko Administrace mimo okno. Takto se
-             při nedostatku místa vodorovně posouvá a pravé ovládání zůstane vidět. -->
-        <nav class="hidden md:flex items-center gap-1 ml-4 text-sm min-w-0 flex-1 overflow-x-auto gpx-nav-scroll">
+        <nav class="hidden md:flex items-center gap-1 ml-4 text-sm">
             <?php
             // Položky + výchozí pořadí definuje nav_menu_items() (app_constants.php),
             // pořadí si admin mění v Administraci (app_config 'nav_order').
@@ -200,7 +194,7 @@ if (!function_exists('t')) {
                 $active = ($currentScript === $href);
             ?>
                 <a href="<?= $href ?>"
-                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors shrink-0 whitespace-nowrap
+                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors
                           <?= $active
                               ? 'bg-forest-100 text-forest-700 dark:bg-forest-800 dark:text-sand-100'
                               : 'text-forest-700/80 dark:text-sand-100/70 hover:bg-sand-100 dark:hover:bg-forest-800' ?>">
