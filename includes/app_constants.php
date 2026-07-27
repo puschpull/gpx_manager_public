@@ -84,6 +84,7 @@ function feature_flag_labels(): array {
         'replay_weather' => '🌦️ ' . t('ft_replay_weather', 'Počasí u turisty (při přehrávání)'),
         'replay_radar'   => '🌧️ ' . t('ft_replay_radar', 'Srážkové pole (animace deště)'),
         'replay_photos'  => '📷 ' . t('ft_replay_photos', 'Míjené fotky (při přehrávání)'),
+        'plan_overlay'   => '🗺️ ' . t('ft_plan_overlay', 'Porovnání s plánem (detail trasy)'),
     ];
 }
 

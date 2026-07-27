@@ -321,8 +321,8 @@ In **Administration** (admin only) you can enable or disable individual pages fo
 - Track comparison
 
 The same screen holds the **order of the top menu items** and an **Optional features**
-card, where the hike replay, weather at the hiker, precipitation overlay and passing
-photos can each be switched off independently.
+card, where the hike replay, weather at the hiker, precipitation overlay, passing
+photos and plan comparison can each be switched off independently.
 
 ### Editing Tracks
 

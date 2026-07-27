@@ -45,6 +45,100 @@
     transform: scale(1.2);
 }
 
+/* ====== Porovnání s plánem (detail trasy) ======
+   Styly jsou samostatné, ne převzaté z replay.css — ten se načítá jen
+   když je zapnutý přehrávač, kdežto tato funkce se zapíná nezávisle. */
+
+.plan-compare {
+    padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-color);
+}
+
+.plan-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.plan-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-secondary, var(--card-bg));
+    color: var(--text-color);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.plan-btn:hover { border-color: var(--link-color, #0078d7); }
+
+.plan-btn-active {
+    border-color: #7c3aed;
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+.plan-compare select {
+    padding: 3px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+    max-width: 260px;
+}
+
+.plan-compare select option {
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.plan-legend {
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.plan-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.plan-swatch {
+    width: 22px;
+    height: 0;
+    border-top-width: 4px;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+.plan-swatch-plan { border-top-style: dashed; border-top-color: #7c3aed; }
+.plan-swatch-real { border-top-style: solid;  border-top-color: var(--text-muted); }
+.plan-swatch-dev  { border-top-style: solid;  border-top-color: #dc2626; }
+
+.plan-status {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+/* Fialová i červená musí být čitelné i v tmavém režimu */
+html.dark .plan-btn-active   { border-color: #a78bfa; color: #a78bfa; }
+html.dark .plan-swatch-plan  { border-top-color: #a78bfa; }
+html.dark .plan-swatch-dev   { border-top-color: #f87171; }
+
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {
     .slope-legend,

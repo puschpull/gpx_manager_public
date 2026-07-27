@@ -1,10 +1,44 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 24. července 2026
+  Poslední aktualizace: 27. července 2026
 
 ================================================================================
 
+
+── 27. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  POROVNÁNÍ S PLÁNEM — PLÁN PŘES SKUTEČNOU TRASU + ODCHYLKY                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Na detailu trasy přibylo tlačítko „🗺️ Porovnat s plánem". Přes projitou
+  trasu vykreslí naplánovanou variantu z Plánovače a vyhodnotí, kde a o kolik
+  ses od ní odchýlil — pro případ, kdy tě z plánované cesty vyhodí uzavírka.
+
+  - Plán se kreslí čárkovaně fialově a POD skutečnou trasou, takže ta zůstane
+    čitelná. Legenda si barvu „skutečné trasy" bere z její vlastní barvy.
+  - Plán se předvybere sám: nejdřív podle shody data výletu, pak podle
+    nejbližší polohy. Přepnout lze v rozbalovátku.
+  - Úseky mimo zvolenou toleranci (10 / 25 / 50 / 100 m) se obarví červeně,
+    v místě největší odchylky je značka s údajem o vzdálenosti.
+  - Souhrn pod mapou: % trasy podle plánu, počet odboček a jejich délka,
+    největší a průměrná odchylka, délka plánu proti skutečnosti.
+  - Statistiky se váží DÉLKOU trasy, ne počtem bodů — delší zastávka tedy
+    výsledek nezkreslí. Vybočení kratší než 50 m a návraty na plán kratší
+    než 80 m se nepočítají jako odbočka, aby kolísání GPS nedělalo z jedné
+    objížďky několik.
+  - Panel se nabídne jen když existuje aspoň jeden plán s vypočítanou trasou;
+    volba se pamatuje, ale sama se zapne jen u trasy z okolí plánu (do 25 km).
+  - Vypínatelné v Administraci → Volitelné funkce.
+
+  Implementováno jako samostatný modul js/detail-plan.js, který kreslí do
+  sdílené mapy stejně jako přehrávač — do detail-map.js se nesahalo.
+
+  Nové: js/detail-plan.js
+  Upravené: includes/detail_view.php, includes/app_constants.php,
+            api/planner/list.php (volitelné ?with_pos=1), css/detail.css,
+            lang/*.php (8× — 18 klíčů)
 
 ── 24. července 2026 ───────────────────────────────────────────────────────────
 

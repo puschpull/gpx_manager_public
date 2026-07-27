@@ -321,7 +321,8 @@ V **Administraci** (dostupné jen pro admina) můžeš zapnout nebo vypnout jedn
 - Porovnání tras
 
 Tamtéž najdeš i **pořadí položek horního menu** a kartu **Volitelné funkce**, kde se
-nezávisle vypíná Přehrávač výšlapu, Počasí u turisty, Srážkové pole a Míjené fotky.
+nezávisle vypíná Přehrávač výšlapu, Počasí u turisty, Srážkové pole, Míjené fotky
+a Porovnání s plánem.
 
 ### Úprava tras
 

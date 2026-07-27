@@ -292,6 +292,36 @@ require __DIR__ . '/layout_header.php';
 </section>
 <?php endif; ?>
 
+<?php if (feature_enabled('plan_overlay')): ?>
+<!-- POROVNÁNÍ S PLÁNEM (volitelná funkce — Administrace → Volitelné funkce) -->
+<!-- Panel zůstává skrytý, dokud JS nezjistí, že existuje aspoň jeden plán s geometrií -->
+<section class="mx-auto max-w-7xl px-4 sm:px-6 mt-3">
+    <div id="plan-compare" class="plan-compare" style="display:none;">
+        <div class="plan-controls">
+            <button type="button" id="planToggle" class="plan-btn"
+                    title="<?= htmlspecialchars(t('pl_toggle_title', 'Zobrazit přes trasu naplánovanou variantu a vyhodnotit odchylky')) ?>">🗺️ <?= htmlspecialchars(t('pl_toggle', 'Porovnat s plánem')) ?></button>
+            <label id="planSelectWrap" style="display:none;"><?= htmlspecialchars(t('pl_plan', 'Plán')) ?>:
+                <select id="planSelect"></select>
+            </label>
+            <label id="planTolWrap" style="display:none;"><?= htmlspecialchars(t('pl_tolerance', 'Tolerance')) ?>:
+                <select id="planTol">
+                    <option value="10">10 m</option>
+                    <option value="25" selected>25 m</option>
+                    <option value="50">50 m</option>
+                    <option value="100">100 m</option>
+                </select>
+            </label>
+        </div>
+        <div id="planLegend" class="plan-legend" style="display:none;">
+            <span><i class="plan-swatch plan-swatch-plan"></i><?= htmlspecialchars(t('pl_legend_plan', 'plán')) ?></span>
+            <span><i class="plan-swatch plan-swatch-real"></i><?= htmlspecialchars(t('pl_legend_real', 'skutečná trasa')) ?></span>
+            <span><i class="plan-swatch plan-swatch-dev"></i><?= htmlspecialchars(t('pl_legend_dev', 'mimo plán')) ?></span>
+        </div>
+        <div id="planStatus" class="plan-status"></div>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- ACTIONS BAR -->
 <section class="mx-auto max-w-7xl px-4 sm:px-6 mt-4">
     <div class="flex flex-wrap items-center gap-2">
@@ -421,6 +451,19 @@ window.gpxDetailData = {
     dbAvgSpeed:   <?= js_safe_json(round($track['speed_avg']       ?? 0, 3)) ?>,
     dbAvgMoving:  <?= js_safe_json(round($track['speed_avg_total'] ?? 0, 3)) ?>,
     garminColor:  <?= js_safe_json($track['color'] ?? '') ?>,
+    trackDateStart: <?= js_safe_json((string)($track['date_start'] ?? '')) ?>,
+    planI18n: {
+        loading:  <?= js_safe_json(t('pl_loading', 'Načítám plán…')) ?>,
+        error:    <?= js_safe_json(t('pl_error', 'Plán se nepodařilo načíst.')) ?>,
+        noPlans:  <?= js_safe_json(t('pl_no_plans', 'Zatím nemáš uložený žádný plán s vypočítanou trasou.')) ?>,
+        noGeom:   <?= js_safe_json(t('pl_no_geom', 'Tento plán nemá uloženou vypočítanou trasu.')) ?>,
+        onPlan:   <?= js_safe_json(t('pl_on_plan', 'trasy podle plánu')) ?>,
+        maxDev:   <?= js_safe_json(t('pl_max_dev', 'nejdál od plánu')) ?>,
+        avgDev:   <?= js_safe_json(t('pl_avg_dev', 'průměrně')) ?>,
+        detours:  <?= js_safe_json(t('pl_detours', 'odboček')) ?>,
+        planLen:  <?= js_safe_json(t('pl_plan_len', 'plán')) ?>,
+        realLen:  <?= js_safe_json(t('pl_real_len', 'realita')) ?>
+    },
     replayFlags: {
         weather: <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_weather')) ?>,
         radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>,
@@ -484,6 +527,7 @@ window.gpxDetailData = {
 <script src="<?= asset('js/detail-map.js') ?>"></script>
 <script src="<?= asset('js/detail-elevation.js') ?>"></script>
 <?php if (feature_enabled('replay')): ?><script src="<?= asset('js/detail-replay.js') ?>"></script><?php endif; ?>
+<?php if (feature_enabled('plan_overlay')): ?><script src="<?= asset('js/detail-plan.js') ?>"></script><?php endif; ?>
 <script src="<?= asset('js/detail-ui.js') ?>"></script>
 <script src="<?= asset('js/detail-weather.js') ?>"></script>
 
