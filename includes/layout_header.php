@@ -59,7 +59,20 @@ if (!function_exists('t')) {
          z-index 9999, hlavička 40 — po odrolování proto banner hlavičku překryl
          a z menu zbyl jen spodní proužek. Hlavička se proto lepí AŽ POD banner;
          jeho výšku (mění se zalomením na úzkých displejích) měří skript níže. -->
-    <style>header.site-header { top: var(--gpx-banner-h, 0px); }</style>
+    <style>header.site-header { top: var(--gpx-banner-h, 0px); }
+
+    /* Horní menu a tlačítko Administrace mají vlastní třídy místo Tailwindího
+       `hidden md:flex` / `hidden sm:inline-flex`. Důvod: `.hidden` je tak obecný
+       název, že ho do stránky vnese kdejaké rozšíření prohlížeče se svým UI —
+       a protože v našem CSS stojí `.hidden` dřív než `.md\:flex`, cizí pravidlo
+       vyhraje a menu zmizí i na širokém displeji. Vlastní název tohle vylučuje.
+       Breakpointy odpovídají Tailwindu: sm = 40rem, md = 48rem. */
+    .gpx-desktop-nav { display: none; }
+    .gpx-admin-btn   { display: none; }
+    .gpx-lang-code   { display: none; }
+    @media (min-width: 48rem) { .gpx-desktop-nav { display: flex; } }
+    @media (min-width: 40rem) { .gpx-admin-btn   { display: inline-flex; }
+                                .gpx-lang-code   { display: inline; } }</style>
 
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
@@ -173,7 +186,10 @@ if (!function_exists('t')) {
         </a>
 
         <!-- Desktop nav -->
-        <nav class="hidden md:flex items-center gap-1 ml-4 text-sm">
+        <!-- Vlastní třída místo Tailwindího `hidden md:flex` — viz komentář u stylů
+             v hlavičce. `hidden` je natolik obecný název, že ho přebije kdejaké
+             cizí pravidlo a menu pak zmizí i na širokém displeji. -->
+        <nav class="gpx-desktop-nav items-center gap-1 ml-4 text-sm">
             <?php
             // Položky + výchozí pořadí definuje nav_menu_items() (app_constants.php),
             // pořadí si admin mění v Administraci (app_config 'nav_order').
@@ -226,7 +242,7 @@ if (!function_exists('t')) {
                         aria-haspopup="menu"
                         :aria-expanded="open.toString()">
                     <span class="text-base leading-none" aria-hidden="true"><?= $langFlags[$currentLang] ?? '🌐' ?></span>
-                    <span class="hidden sm:inline uppercase font-medium tracking-wider text-xs"><?= htmlspecialchars($currentLang) ?></span>
+                    <span class="gpx-lang-code uppercase font-medium tracking-wider text-xs"><?= htmlspecialchars($currentLang) ?></span>
                     <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60" x-bind:class="open && 'rotate-180'" style="transition: transform .15s" aria-hidden="true"></i>
                 </button>
                 <div x-show="open" x-cloak x-transition.opacity.duration.150ms
@@ -260,7 +276,7 @@ if (!function_exists('t')) {
             </button>
 
             <?php if ($isAdmin): ?>
-                <a href="admin.php" class="hidden sm:inline-flex w-9 h-9 items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors" aria-label="Admin">
+                <a href="admin.php" class="gpx-admin-btn w-9 h-9 items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors" aria-label="Admin">
                     <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
                 </a>
             <?php endif; ?>
