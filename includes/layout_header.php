@@ -55,6 +55,15 @@ if (!function_exists('t')) {
          takže tam musí zůstat i světlá zaškrtávátka — jinak by se invertovala. -->
     <style>:root { color-scheme: light; } html.dark { color-scheme: dark; } .leaflet-container { color-scheme: light; }</style>
 
+    <!-- Admin/návštěvnický banner i hlavička jsou sticky na top:0. Banner má
+         z-index 9999, hlavička 40 — po odrolování proto banner hlavičku překryl
+         a z menu zbyl jen spodní proužek. Hlavička se proto lepí AŽ POD banner;
+         jeho výšku (mění se zalomením na úzkých displejích) měří skript níže. -->
+    <style>header.site-header { top: var(--gpx-banner-h, 0px); }
+    /* Posuvník u menu skrýt — posouvá se tažením, lišta by v hlavičce rušila */
+    .gpx-nav-scroll { scrollbar-width: none; }
+    .gpx-nav-scroll::-webkit-scrollbar { display: none; }</style>
+
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
     <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>
@@ -115,11 +124,42 @@ if (!function_exists('t')) {
 <?php endif; ?>
 <?php if (function_exists('render_visitor_preview_banner')) render_visitor_preview_banner(); ?>
 
+<script>
+// Odsazení sticky hlavičky o výšku bannerů nad ní (viz --gpx-banner-h výše).
+// Měří se za běhu, protože banner se na úzkém displeji zalomí do dvou řádků.
+(function () {
+    var banners = document.querySelectorAll('.admin-banner, .visitor-preview-banner');
+    if (!banners.length) { return; }
+
+    function setBannerOffset() {
+        var h = 0;
+        for (var i = 0; i < banners.length; i++) {
+            h += banners[i].getBoundingClientRect().height;
+        }
+        document.documentElement.style.setProperty('--gpx-banner-h', h + 'px');
+    }
+    setBannerOffset();
+
+    // ResizeObserver, ne jen window.resize: banner se na úzkém displeji zalomí
+    // do dvou řádků a vyroste, aniž by se okno muselo měnit (změna jazyka,
+    // doběhnutí fontů, přepnutí na návštěvnický náhled). Se zastaralou výškou
+    // by banner hlavičku zase překryl.
+    if (window.ResizeObserver) {
+        var ro = new ResizeObserver(setBannerOffset);
+        for (var j = 0; j < banners.length; j++) { ro.observe(banners[j]); }
+    }
+    // window.resize necháváme i vedle ResizeObserveru jako pojistku — je to
+    // jeden řádek a kryje případy, kdy se callbacky observeru nedoručí.
+    window.addEventListener('resize', setBannerOffset);
+    window.addEventListener('load', setBannerOffset);   // po doběhnutí fontů
+})();
+</script>
+
 <style>.skip-link{position:absolute;left:-9999px;z-index:10000;padding:8px 16px;background:#003366;color:#fff;text-decoration:none;font-weight:600}.skip-link:focus{left:8px;top:8px;outline:2px solid #fff;outline-offset:2px}</style>
 <a href="#main-content" class="skip-link"><?= htmlspecialchars(t('skip_to_content', 'Přeskočit na obsah')) ?></a>
 
 <!-- Sticky header s blur backdrop -->
-<header class="sticky top-0 z-40 bg-sand-50/85 dark:bg-forest-900/85 backdrop-blur-md border-b border-sand-200 dark:border-forest-800">
+<header class="site-header sticky top-0 z-40 bg-sand-50/85 dark:bg-forest-900/85 backdrop-blur-md border-b border-sand-200 dark:border-forest-800">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <!-- Brand -->
         <a href="index.php" class="flex items-center gap-2 text-forest-700 dark:text-sand-100 hover:text-terracotta-500 transition-colors">
@@ -136,7 +176,10 @@ if (!function_exists('t')) {
         </a>
 
         <!-- Desktop nav -->
-        <nav class="hidden md:flex items-center gap-1 ml-4 text-sm">
+        <!-- min-w-0 + overflow-x-auto: s deseti položkami menu přeteklo a odsunulo
+             přepínače jazyka/motivu i tlačítko Administrace mimo okno. Takto se
+             při nedostatku místa vodorovně posouvá a pravé ovládání zůstane vidět. -->
+        <nav class="hidden md:flex items-center gap-1 ml-4 text-sm min-w-0 flex-1 overflow-x-auto gpx-nav-scroll">
             <?php
             // Položky + výchozí pořadí definuje nav_menu_items() (app_constants.php),
             // pořadí si admin mění v Administraci (app_config 'nav_order').
@@ -157,7 +200,7 @@ if (!function_exists('t')) {
                 $active = ($currentScript === $href);
             ?>
                 <a href="<?= $href ?>"
-                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors
+                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors shrink-0 whitespace-nowrap
                           <?= $active
                               ? 'bg-forest-100 text-forest-700 dark:bg-forest-800 dark:text-sand-100'
                               : 'text-forest-700/80 dark:text-sand-100/70 hover:bg-sand-100 dark:hover:bg-forest-800' ?>">
