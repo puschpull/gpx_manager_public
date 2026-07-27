@@ -127,6 +127,7 @@ Doplňující ke standardům z agentů:
 - [ ] **i18n klíče konzistentní** napříč 8 jazyky (`php scripts/lint_lang.php` projde)
 - [ ] **`declare(strict_types=1);`** v každém novém PHP souboru
 - [ ] **Žádné nové `console.log`** v JS bez `if (window.GPX_DEBUG)`
+- [ ] **Žádné `hidden md:flex`** a podobné CSS-only přepínače viditelnosti (`php scripts/lint_css_fragile.php` projde)
 - [ ] **CDN scripty pinnuté** na konkrétní verzi + SRI hash (žádné `@latest`)
 - [ ] **WCAG 2.2 AA** — kontrast ≥ 4.5:1 pro normální text ve světlém i tmavém režimu
 - [ ] **`prefers-reduced-motion` honored** — žádné animace bez respektování
@@ -186,6 +187,7 @@ Doplňující ke standardům z agentů:
 - **`error_log` cesta v `config.php`** — jen `logs/errors.log`, NIKDY `uploads/`
 - **GPX bounds JSON** je užitečné pro UI, ale pro geo queries používej centroid_lat/lon sloupce (po TASK-11) — `bounds JSON` nelze indexovat
 - **JS globální `window.*`** je legacy komunikační bus — nové moduly přes `window.GpxBus` event bus (po TASK-23)
+- **`hidden md:flex` a spol. jsou křehké**: Tailwind v4 dává utility do `@layer utilities`, a podle specifikace CSS je porazí jakékoli NEVRSTVENÉ pravidlo — bez ohledu na pořadí a bez `!important`. Rozšíření prohlížeče si běžně vkládají do stránky vlastní `.hidden{display:none}`, čímž zmizí každý prvek, jehož viditelnost stojí čistě na `hidden` + responzivní variantě (27.7.2026 tak zmizelo celé horní menu, a v anonymním okně to přitom fungovalo). Používej nevrstvené `.gpx-md-flex` / `.gpx-md-block` / `.gpx-sm-inline` / `.gpx-sm-inline-flex` z `includes/layout_header.php`. Hlídá to `scripts/lint_css_fragile.php` v CI. `hidden` přidávané a odebírané JavaScriptem je v pořádku.
 
 ---
 

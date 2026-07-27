@@ -38,6 +38,11 @@ jobs:
       - name: i18n key consistency
         run: php scripts/lint_lang.php
 
+      # Hlídá vzor `hidden md:flex`, který 27.7.2026 shodil horní menu —
+      # Tailwind utility jsou v @layer a přebije je nevrstvené CSS od rozšíření.
+      - name: Fragile CSS visibility patterns
+        run: php scripts/lint_css_fragile.php
+
   css-build:
     name: Tailwind Build Verification
     runs-on: ubuntu-latest

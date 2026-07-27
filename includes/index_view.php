@@ -113,7 +113,9 @@ function gpx_chip_url($overrides = []) {
             </div>
 
             <!-- Hero illustration -->
-            <div class="hidden md:block">
+            <!-- gpx-md-block místo `hidden md:block` — viz styly v layout_header.php:
+                 cizí nevrstvené `.hidden` od rozšíření prohlížeče by tohle skrylo -->
+            <div class="gpx-md-block">
                 <div class="relative aspect-[5/4] max-w-md mx-auto">
                     <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-forest-600 to-forest-800 shadow-hover overflow-hidden">
                         <svg viewBox="0 0 400 320" class="w-full h-full" preserveAspectRatio="xMidYMid slice">

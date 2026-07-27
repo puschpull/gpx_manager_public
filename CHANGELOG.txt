@@ -9,6 +9,43 @@
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  HLAVIČKA: DVĚ OPRAVY MIZEJÍCÍHO HORNÍHO MENU                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  1) Menu se schovávalo pod admin banner. Banner i hlavička jsou oba
+     position:sticky na top:0, ale banner má z-index 9999 proti 40 hlavičky.
+     Po odrolování se hlavička zasunula pod banner a z menu zbyl 24px proužek.
+
+     Hlavička se nově lepí AŽ POD banner (top: var(--gpx-banner-h)). Výšku
+     banneru měří skript a sleduje ji přes ResizeObserver — na úzkém displeji
+     se banner zalomí do dvou řádků (42 → 81 px) a se zastaralou hodnotou by
+     se překryv vrátil.
+
+  2) Menu přestalo záviset na obecné třídě `hidden`. Tailwind v4 dává utility
+     do @layer utilities a podle specifikace CSS je porazí jakékoli NEVRSTVENÉ
+     pravidlo — bez ohledu na pořadí a bez !important. Rozšíření prohlížeče si
+     přitom běžně vkládají do stránky vlastní `.hidden{display:none}` kvůli
+     svému UI. Každý prvek s `hidden md:flex` pak zmizel i na širokém displeji,
+     zatímco v anonymním okně vše fungovalo.
+
+     Zavedena sada nevrstvených tříd s vlastním jmenným prostorem:
+     .gpx-md-flex, .gpx-md-block, .gpx-sm-inline, .gpx-sm-inline-flex
+     (breakpointy stejné jako v Tailwindu: sm 40rem, md 48rem). Používá je
+     horní menu, tlačítko Administrace, kód jazyka a ilustrace na úvodní
+     stránce — tedy všechna místa, kde viditelnost závisí čistě na CSS.
+
+  3) Aby se to nevrátilo: nový hlídač scripts/lint_css_fragile.php, který ten
+     vzor hledá v šablonách a při nálezu shodí CI.
+
+     Prověřen celý projekt: ve vyrenderovaném HTML všech 22 stránek nezůstalo
+     jediné křehké místo. Ostatní výskyty třídy `hidden` jsou v pořádku — buď
+     je přidává a odebírá JavaScript, nebo mají vlastní nevrstvené pravidlo.
+
+  Upravené: includes/layout_header.php, includes/index_view.php,
+            .github/workflows/ci.yml, CLAUDE.md
+  Nové: scripts/lint_css_fragile.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  PŘEHRÁVAČ: MAPA SE MŮŽE SAMA POSOUVAT ZA TURISTOU                             │
 └──────────────────────────────────────────────────────────────────────────────┘
 
