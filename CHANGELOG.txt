@@ -9,6 +9,26 @@
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  PŘEHRÁVAČ: MAPA SE MŮŽE SAMA POSOUVAT ZA TURISTOU                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Při přiblížené mapě panáček rychle vyjel ze záběru a bylo nutné za ním
+  ručně posouvat. Nové tlačítko „🎯 Sledovat" v ovládání přehrávače nechá
+  mapu jet s ním.
+
+  - Mapa se NEPOSOUVÁ na každý krok — až když turista opustí středovou zónu
+    (60 % výřezu). Jinak by drncala a nešlo by se rozhlédnout.
+  - Po ručním posunu mapy se sledování na 4 sekundy odmlčí, aby uživateli
+    mapu netrhalo z ruky.
+  - Přiblížení se nemění, to zůstává na uživateli.
+  - Při rychlosti nad 120× a při zapnutém „prefers-reduced-motion" se posouvá
+    skokem — animace by se řetězily a mapa by se plazila za panáčkem.
+  - Volba se pamatuje, tlačítko hlásí stav přes aria-pressed.
+
+  Upravené: js/detail-replay.js, includes/detail_view.php,
+            lang/*.php (8× — 2 klíče)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  POROVNÁNÍ S PLÁNEM — PLÁN PŘES SKUTEČNOU TRASU + ODCHYLKY                     │
 └──────────────────────────────────────────────────────────────────────────────┘
 

@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Odtwórz wycieczkę',
     'rp_pause'               => 'Pauza',
     'rp_speed'               => 'Prędkość',
+    'rp_follow'             => 'Śledź',
+    'rp_follow_title'       => 'Mapa przesuwa się za turystą — przydatne przy przybliżonej mapie',
     'rp_progress'            => 'Postęp wycieczki',
     'rp_no_times'            => 'Trasa nie ma znaczników czasu — odtwarzanie według odległości (4 km/h).',
     'rp_radar'               => 'Pole opadów',

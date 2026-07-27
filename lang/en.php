@@ -637,6 +637,8 @@ return [
     'rp_play'                => 'Play hike',
     'rp_pause'               => 'Pause',
     'rp_speed'               => 'Speed',
+    'rp_follow'             => 'Follow',
+    'rp_follow_title'       => 'The map pans along with the hiker — useful when zoomed in',
     'rp_progress'            => 'Hike progress',
     'rp_no_times'            => 'The track has no timestamps — replay runs by distance (4 km/h).',
     'rp_radar'               => 'Precipitation field',

@@ -73,6 +73,7 @@ document.addEventListener("gpxDataReady", (ev) => {
     const btnBackMin= document.getElementById("rpBackMin");
     const btnFwdMin = document.getElementById("rpFwdMin");
     const speedSel  = document.getElementById("rpSpeed");
+    const btnFollow = document.getElementById("rpFollow");
     const slider    = document.getElementById("rpSlider");
     const outTime   = document.getElementById("rpTime");
     const outDist   = document.getElementById("rpDist");
@@ -125,6 +126,47 @@ document.addEventListener("gpxDataReady", (ev) => {
         walker = L.marker([p.lat, p.lon], { icon, zIndexOffset: 1500, keyboard: false }).addTo(map);
     }
 
+    // ===== Sledování panáčka mapou =====
+    // Při přiblížené mapě turista rychle vyjede ze záběru. Mapa se ale
+    // NEPOSOUVÁ na každý krok — to by drncalo a bralo možnost se rozhlédnout.
+    // Posune se, až když panáček opustí středovou zónu (60 % výřezu).
+    const FOLLOW_ZONE     = 0.6;    // podíl výřezu, ve kterém se nic neděje
+    const FOLLOW_GRACE_MS = 4000;   // po ručním posunu mapy chvíli nesledovat
+    const FOLLOW_MIN_MS   = 350;    // minimální rozestup posunů (delší než animace)
+    let followOn = false;
+    let followSuspendedUntil = 0;
+    let followLastPanAt = 0;
+
+    // Ruční posun mapy má přednost — jinak by uživateli „vytrhávala" mapu z ruky
+    map.on("dragstart", () => { followSuspendedUntil = Date.now() + FOLLOW_GRACE_MS; });
+
+    function followWalker(p) {
+        if (!followOn || !walker) return;
+        const now = Date.now();
+        if (now < followSuspendedUntil) return;
+        // Bez odstupu by se při rychlém přehrávání animace řetězily přes sebe
+        if (now - followLastPanAt < FOLLOW_MIN_MS) return;
+
+        const size = map.getSize();
+        const pt   = map.latLngToContainerPoint([p.lat, p.lon]);
+        const mx   = size.x * (1 - FOLLOW_ZONE) / 2;
+        const my   = size.y * (1 - FOLLOW_ZONE) / 2;
+
+        const outside = pt.x < mx || pt.x > size.x - mx
+                     || pt.y < my || pt.y > size.y - my;
+        if (!outside) return;
+
+        // Při rychlém přehrávání i při omezení animací posunout skokem —
+        // animace by se řetězily a mapa by se plazila za panáčkem.
+        const fast = playing && parseFloat(speedSel.value || "60") > 120;
+        const reduce = window.matchMedia
+            && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        followLastPanAt = now;
+        map.panTo([p.lat, p.lon], (fast || reduce)
+            ? { animate: false }
+            : { animate: true, duration: 0.4, easeLinearity: 0.5 });
+    }
+
     // Souběžný ukazatel na výškovém profilu (globální `chart` + `sampled`
     // z detail-elevation.js — zvýrazní bod grafu odpovídající pozici turisty)
     function updateChartMarker(distKmCur) {
@@ -148,6 +190,7 @@ document.addEventListener("gpxDataReady", (ev) => {
         tCur = Math.min(Math.max(tCur, t0), tEnd);
         const p = posAt(tCur);
         ensureWalker(p);
+        followWalker(p);
         outTime.textContent = fmtClock(tCur);
         outDist.textContent = (p.dist / 1000).toFixed(2).replace(".", ",") + " km";
         outEle.textContent  = Math.round(p.ele) + " m";
@@ -203,6 +246,24 @@ document.addEventListener("gpxDataReady", (ev) => {
         update();
         if (flags.weather) prefetchWeather();
     });
+
+    if (btnFollow) {
+        try { followOn = localStorage.getItem("gpx_replay_follow") === "1"; } catch (e) {}
+        btnFollow.classList.toggle("rp-btn-active", followOn);
+        btnFollow.setAttribute("aria-pressed", followOn ? "true" : "false");
+
+        btnFollow.addEventListener("click", () => {
+            followOn = !followOn;
+            btnFollow.classList.toggle("rp-btn-active", followOn);
+            btnFollow.setAttribute("aria-pressed", followOn ? "true" : "false");
+            try { localStorage.setItem("gpx_replay_follow", followOn ? "1" : "0"); } catch (e) {}
+            // Po zapnutí panáčka rovnou najdi, ať na něj uživatel nemusí hledat
+            if (followOn) {
+                followSuspendedUntil = 0;
+                map.panTo([posAt(tCur).lat, posAt(tCur).lon], { animate: true, duration: 0.4 });
+            }
+        });
+    }
 
     // ===== Open-Meteo helpers =====
     function dateStr(ms) {

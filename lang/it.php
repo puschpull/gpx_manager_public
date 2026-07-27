@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Riproduci escursione',
     'rp_pause'               => 'Pausa',
     'rp_speed'               => 'Velocità',
+    'rp_follow'             => 'Segui',
+    'rp_follow_title'       => 'La mappa si sposta seguendo l\'escursionista — utile con la mappa ingrandita',
     'rp_progress'            => 'Avanzamento dell\'escursione',
     'rp_no_times'            => 'La traccia non ha marcatura temporale — riproduzione per distanza (4 km/h).',
     'rp_radar'               => 'Campo di precipitazione',

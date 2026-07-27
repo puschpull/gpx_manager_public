@@ -244,6 +244,8 @@ require __DIR__ . '/layout_header.php';
                     title="<?= htmlspecialchars(t('rp_play', 'Přehrát výšlap')) ?>">▶</button>
             <button type="button" id="rpFwdMin"  class="rp-btn" title="+5 min">5 min ⏩</button>
             <button type="button" id="rpFwdKm"   class="rp-btn" title="+1 km">1 km ⏭</button>
+            <button type="button" id="rpFollow" class="rp-btn" aria-pressed="false"
+                    title="<?= htmlspecialchars(t('rp_follow_title', 'Mapa se sama posouvá za turistou — užitečné při přiblížené mapě')) ?>">🎯 <?= htmlspecialchars(t('rp_follow', 'Sledovat')) ?></button>
             <label class="rp-speed"><?= htmlspecialchars(t('rp_speed', 'Rychlost')) ?>:
                 <select id="rpSpeed">
                     <option value="30">30×</option>

@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Lire la randonnée',
     'rp_pause'               => 'Pause',
     'rp_speed'               => 'Vitesse',
+    'rp_follow'             => 'Suivre',
+    'rp_follow_title'       => 'La carte se déplace avec le randonneur — utile quand elle est zoomée',
     'rp_progress'            => 'Progression de la randonnée',
     'rp_no_times'            => 'La trace n\'a pas d\'horodatage — lecture par distance (4 km/h).',
     'rp_radar'               => 'Champ de précipitations',

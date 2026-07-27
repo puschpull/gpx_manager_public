@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Reproducir ruta',
     'rp_pause'               => 'Pausa',
     'rp_speed'               => 'Velocidad',
+    'rp_follow'             => 'Seguir',
+    'rp_follow_title'       => 'El mapa se desplaza siguiendo al excursionista — útil con el mapa ampliado',
     'rp_progress'            => 'Progreso de la ruta',
     'rp_no_times'            => 'La ruta no tiene marcas de tiempo — la reproducción va por distancia (4 km/h).',
     'rp_radar'               => 'Campo de precipitación',

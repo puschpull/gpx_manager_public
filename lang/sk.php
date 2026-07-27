@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Prehrať výšľap',
     'rp_pause'               => 'Pauza',
     'rp_speed'               => 'Rýchlosť',
+    'rp_follow'             => 'Sledovať',
+    'rp_follow_title'       => 'Mapa sa sama posúva za turistom — užitočné pri priblíženej mape',
     'rp_progress'            => 'Priebeh výšľapu',
     'rp_no_times'            => 'Trasa nemá časové značky — prehrávanie ide po vzdialenosti (4 km/h).',
     'rp_radar'               => 'Zrážkové pole',

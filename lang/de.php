@@ -631,6 +631,8 @@ return [
     'rp_play'                => 'Tour abspielen',
     'rp_pause'               => 'Pause',
     'rp_speed'               => 'Tempo',
+    'rp_follow'             => 'Folgen',
+    'rp_follow_title'       => 'Die Karte folgt dem Wanderer — nützlich bei hohem Zoom',
     'rp_progress'            => 'Tourfortschritt',
     'rp_no_times'            => 'Die Tour hat keine Zeitstempel — Wiedergabe nach Distanz (4 km/h).',
     'rp_radar'               => 'Niederschlagsfeld',
