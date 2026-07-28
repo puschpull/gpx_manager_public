@@ -310,7 +310,7 @@ return [
     'record_fastest'      => 'Najwyższa prędkość',
     'record_longest_time' => 'Najdłuższy czas',
     'record_hardest'      => 'Najtrudniejsza trasa',
-    'records_no_motor'      => 'bez motorowych',
+    'records_foot_only'      => 'tylko aktywności piesze',
     'records_by_activity'   => 'Rekordy według aktywności',
     'chart_difficulty'    => 'Rozkład trudności',
     'chart_top_cats'      => 'Top kategorie',

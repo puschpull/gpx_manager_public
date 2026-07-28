@@ -115,17 +115,18 @@ function detectActivityType(?float $speed_avg, ?float $speed_max, ?float $distan
 }
 
 /**
- * Motorised activity types — excluded from the headline records on stats.php.
+ * Foot activities — hlavní rekordy na stats.php se počítají jen z nich.
  *
- * Devět jízd autem jinak přebije stovky výšlapů: nejdelší trasa i největší
- * převýšení patřily jízdě přes Grossglockner, takže skutečný pěší rekord
- * nebylo vidět. Auta zůstávají v datech i ve statistikách, jen mají vlastní
- * řádek v přehledu podle aktivit.
+ * Jinak rekordy vyhrávaly jízdy autem (nejdelší trasa 191 km, převýšení
+ * 3 661 m) a po jejich vyloučení zase cyklovýlety. Rekord má být za to,
+ * co člověk ušel po svých; ostatní aktivity mají vlastní řádek v tabulce
+ * „Rekordy podle aktivity", takže se nikam neztratí.
  *
- * Single source of truth — používá stats.php a případné další přehledy.
+ * Single source of truth. Kdybys chtěl mezi pěší počítat i běh, přidej
+ * sem 'Běh' — jinde se nic měnit nemusí.
  */
-function motorized_activities(): array {
-    return ['Auto'];
+function foot_activities(): array {
+    return ['Turistika', 'Pěšky'];
 }
 
 /**

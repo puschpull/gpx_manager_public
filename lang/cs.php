@@ -316,7 +316,7 @@ return [
     'record_fastest'      => 'Nejvyšší rychlost',
     'record_longest_time' => 'Nejdelší doba',
     'record_hardest'      => 'Nejtěžší trasa',
-    'records_no_motor'      => 'bez motorových aktivit',
+    'records_foot_only'      => 'jen pěší aktivity',
     'records_by_activity'   => 'Rekordy podle aktivity',
     'chart_difficulty'    => 'Rozložení obtížnosti',
     'chart_top_cats'      => 'Top kategorie',

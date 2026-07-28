@@ -26,22 +26,20 @@ $totals = $pdo->query("
 ")->fetch(PDO::FETCH_ASSOC);
 
 /* ===== Rekordy =====
-   Motorové aktivity jsou z hlavních rekordů vynechané — devět jízd autem
-   jinak přebilo stovky výšlapů (nejdelší trasa i největší převýšení patřily
-   jízdě přes Grossglockner). Auta zůstávají v datech i v celkových součtech,
-   mají jen vlastní řádek v přehledu podle aktivit níže. */
-$motor       = motorized_activities();
-$motorPh     = implode(',', array_fill(0, count($motor), '?'));
-$notMotor    = "(activity_type IS NULL OR activity_type NOT IN ($motorPh))";
+   Počítají se jen z pěších aktivit (viz foot_activities()). Jízdy autem
+   jinak přebily stovky výšlapů a po jejich vyloučení zase vedly cyklovýlety.
+   Ostatní aktivity nezmizely — mají vlastní řádek v tabulce pod dlaždicemi. */
+$foot   = foot_activities();
+$footPh = implode(',', array_fill(0, count($foot), '?'));
 
-/** Jeden rekord z nemotorových tras. */
-$recordQuery = function (string $col, string $extra = '', string $order = '') use ($pdo, $motor, $notMotor) {
+/** Jeden rekord z pěších tras. */
+$recordQuery = function (string $col, string $extra = '', string $order = '') use ($pdo, $foot, $footPh) {
     $sql = "SELECT id, track_name, filename, activity_type, $col
             FROM tracks
-            WHERE $notMotor AND $col IS NOT NULL $extra
+            WHERE activity_type IN ($footPh) AND $col IS NOT NULL $extra
             ORDER BY " . ($order ?: "$col DESC") . " LIMIT 1";
     $st = $pdo->prepare($sql);
-    $st->execute($motor);
+    $st->execute($foot);
     return $st->fetch(PDO::FETCH_ASSOC) ?: null;
 };
 
@@ -173,7 +171,7 @@ require __DIR__ . '/includes/layout_header.php';
 <section class="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
     <h2 class="font-[Manrope] text-xs uppercase tracking-widest text-forest-700/60 dark:text-sand-100/60 mb-3">
         <?= htmlspecialchars(t('section_records')) ?>
-        <span class="normal-case tracking-normal opacity-70">— <?= htmlspecialchars(t('records_no_motor', 'bez motorových aktivit')) ?></span>
+        <span class="normal-case tracking-normal opacity-70">— <?= htmlspecialchars(t('records_foot_only', 'jen pěší aktivity')) ?></span>
     </h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <?php
@@ -232,8 +230,9 @@ require __DIR__ . '/includes/layout_header.php';
             </thead>
             <tbody>
             <?php foreach ($byActivity as $a):
-                $isMotor = in_array($a['activity_type'], $motor, true); ?>
-                <tr class="border-b border-sand-100 dark:border-forest-800 last:border-0 <?= $isMotor ? 'opacity-70' : '' ?>">
+                // Aktivity mimo pěší jsou ztlumené — do hlavních rekordů nevstupují
+                $isFoot = in_array($a['activity_type'], $foot, true); ?>
+                <tr class="border-b border-sand-100 dark:border-forest-800 last:border-0 <?= $isFoot ? '' : 'opacity-70' ?>">
                     <th scope="row" class="text-left font-normal px-4 py-2.5 whitespace-nowrap">
                         <?= activityBadge($a['activity_type']) ?>
                     </th>
