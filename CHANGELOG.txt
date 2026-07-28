@@ -9,6 +9,26 @@
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  STATISTIKY: REKORDY UŽ NEPŘEBÍJEJÍ JÍZDY AUTEM                                │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Několik jízd autem drželo všechny hlavní rekordy, přestože v databázi jsou
+  stovky výšlapů — nejdelší trasa, největší převýšení i nejvyšší rychlost.
+  Skutečný pěší ani cyklistický rekord tak nebyl vidět.
+
+  - Hlavní rekordy se nově počítají BEZ motorových aktivit (uvedeno v nadpisu).
+  - U každého rekordu přibyl odznak aktivity — nejdelší trasa může být klidně
+    cyklovýlet, což by jinak nebylo poznat.
+  - Nová tabulka „Rekordy podle aktivity": pro každou aktivitu s aspoň dvěma
+    trasami počet, celkové kilometry a nejlepší hodnoty. Motorové aktivity se
+    tedy neztratí, jen mají vlastní řádek.
+
+  Co je motorová aktivita, určuje jediná funkce motorized_activities()
+  v includes/activity.php.
+
+  Upravené: stats.php, includes/activity.php, lang/*.php (8× — 2 klíče)
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  HLAVIČKA: DVĚ OPRAVY MIZEJÍCÍHO HORNÍHO MENU                                  │
 └──────────────────────────────────────────────────────────────────────────────┘
 

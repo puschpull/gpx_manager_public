@@ -25,20 +25,56 @@ $totals = $pdo->query("
     FROM tracks
 ")->fetch(PDO::FETCH_ASSOC);
 
-/* ===== Rekordy ===== */
+/* ===== Rekordy =====
+   Motorové aktivity jsou z hlavních rekordů vynechané — devět jízd autem
+   jinak přebilo stovky výšlapů (nejdelší trasa i největší převýšení patřily
+   jízdě přes Grossglockner). Auta zůstávají v datech i v celkových součtech,
+   mají jen vlastní řádek v přehledu podle aktivit níže. */
+$motor       = motorized_activities();
+$motorPh     = implode(',', array_fill(0, count($motor), '?'));
+$notMotor    = "(activity_type IS NULL OR activity_type NOT IN ($motorPh))";
+
+/** Jeden rekord z nemotorových tras. */
+$recordQuery = function (string $col, string $extra = '', string $order = '') use ($pdo, $motor, $notMotor) {
+    $sql = "SELECT id, track_name, filename, activity_type, $col
+            FROM tracks
+            WHERE $notMotor AND $col IS NOT NULL $extra
+            ORDER BY " . ($order ?: "$col DESC") . " LIMIT 1";
+    $st = $pdo->prepare($sql);
+    $st->execute($motor);
+    return $st->fetch(PDO::FETCH_ASSOC) ?: null;
+};
+
 $records = [];
-$r = $pdo->query("SELECT id, track_name, filename, distance_km FROM tracks ORDER BY distance_km DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['longest'] = $r;
-$r = $pdo->query("SELECT id, track_name, filename, ascent FROM tracks ORDER BY ascent DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['most_ascent'] = $r;
-$r = $pdo->query("SELECT id, track_name, filename, elevation_max FROM tracks ORDER BY elevation_max DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['highest'] = $r;
-$r = $pdo->query("SELECT id, track_name, filename, speed_max FROM tracks WHERE speed_max IS NOT NULL ORDER BY speed_max DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['fastest'] = $r;
-$r = $pdo->query("SELECT id, track_name, filename, duration FROM tracks WHERE duration IS NOT NULL ORDER BY duration DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['longest_time'] = $r;
-$r = $pdo->query("SELECT id, track_name, filename, difficulty FROM tracks WHERE difficulty IS NOT NULL ORDER BY difficulty DESC, ascent DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-if ($r) $records['hardest'] = $r;
+foreach ([
+    'longest'      => ['distance_km',   '', ''],
+    'most_ascent'  => ['ascent',        '', ''],
+    'highest'      => ['elevation_max', '', ''],
+    'fastest'      => ['speed_max',     '', ''],
+    'longest_time' => ['duration',      '', ''],
+    'hardest'      => ['difficulty',    '', 'difficulty DESC, ascent DESC'],
+] as $key => [$col, $extra, $order]) {
+    $r = $recordQuery($col, $extra, $order);
+    if ($r) $records[$key] = $r;
+}
+
+/* ===== Rekordy podle aktivity =====
+   Kompaktní přehled — každá aktivita s aspoň dvěma trasami dostane řádek,
+   takže se auta ani ojedinělé aktivity neztratí, jen nepřebijí ostatní. */
+$byActivity = $pdo->query("
+    SELECT activity_type,
+           COUNT(*)            AS cnt,
+           SUM(distance_km)    AS total_km,
+           MAX(distance_km)    AS max_km,
+           MAX(ascent)         AS max_ascent,
+           MAX(speed_max)      AS max_speed,
+           MAX(duration)       AS max_duration
+    FROM tracks
+    WHERE activity_type IS NOT NULL AND activity_type <> ''
+    GROUP BY activity_type
+    HAVING cnt >= 2
+    ORDER BY cnt DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 
 /* ===== Statistiky po letech ===== */
 $yearly = $pdo->query("
@@ -137,6 +173,7 @@ require __DIR__ . '/includes/layout_header.php';
 <section class="mx-auto max-w-7xl px-4 sm:px-6 mt-10">
     <h2 class="font-[Manrope] text-xs uppercase tracking-widest text-forest-700/60 dark:text-sand-100/60 mb-3">
         <?= htmlspecialchars(t('section_records')) ?>
+        <span class="normal-case tracking-normal opacity-70">— <?= htmlspecialchars(t('records_no_motor', 'bez motorových aktivit')) ?></span>
     </h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <?php
@@ -164,11 +201,54 @@ require __DIR__ . '/includes/layout_header.php';
                             <span class="line-clamp-1"><?= h($r['track_name'] ?: $r['filename']) ?></span>
                             <i data-lucide="arrow-up-right" class="w-3 h-3 shrink-0" aria-hidden="true"></i>
                         </a>
+                        <?php if (!empty($r['activity_type'])): ?>
+                            <!-- Aktivita u rekordu: nejdelší trasa může být klidně cyklovýlet -->
+                            <div class="mt-1"><?= activityBadge($r['activity_type']) ?></div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
+
+    <?php if (count($byActivity) > 1): ?>
+    <!-- Rekordy po aktivitách — aby se auta ani menší aktivity neztratily -->
+    <h3 class="font-[Manrope] text-xs uppercase tracking-widest text-forest-700/60 dark:text-sand-100/60 mt-8 mb-3">
+        <?= htmlspecialchars(t('records_by_activity', 'Rekordy podle aktivity')) ?>
+    </h3>
+    <div class="card-outdoor overflow-x-auto">
+        <table class="w-full text-sm">
+            <caption class="sr-only"><?= htmlspecialchars(t('records_by_activity', 'Rekordy podle aktivity')) ?></caption>
+            <thead>
+                <tr class="text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 border-b border-sand-200 dark:border-forest-700">
+                    <th scope="col" class="text-left  font-medium px-4 py-3"><?= htmlspecialchars(t('th_activity')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('th_tracks_count')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('insight_total_km', 'Celkem nachozeno')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('record_longest')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('record_most_ascent')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('record_fastest')) ?></th>
+                    <th scope="col" class="text-right font-medium px-4 py-3"><?= htmlspecialchars(t('record_longest_time')) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($byActivity as $a):
+                $isMotor = in_array($a['activity_type'], $motor, true); ?>
+                <tr class="border-b border-sand-100 dark:border-forest-800 last:border-0 <?= $isMotor ? 'opacity-70' : '' ?>">
+                    <th scope="row" class="text-left font-normal px-4 py-2.5 whitespace-nowrap">
+                        <?= activityBadge($a['activity_type']) ?>
+                    </th>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= (int)$a['cnt'] ?></td>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= fmtDist((float)$a['total_km']) ?></td>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= fmtDist((float)$a['max_km']) ?></td>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= $a['max_ascent']   !== null ? fmtElev((float)$a['max_ascent'])  : '–' ?></td>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= $a['max_speed']    !== null ? fmtSpeed((float)$a['max_speed']) : '–' ?></td>
+                    <td class="text-right px-4 py-2.5 stat-num"><?= $a['max_duration'] !== null ? formatSecondsToHMS((int)$a['max_duration']) : '–' ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php endif; ?>
 </section>
 
 <!-- ===== GRAFY ===== -->

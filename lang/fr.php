@@ -310,6 +310,8 @@ return [
     'record_fastest'      => 'Vitesse maximale',
     'record_longest_time' => 'Durée la plus longue',
     'record_hardest'      => 'Trace la plus difficile',
+    'records_no_motor'      => 'hors motorisées',
+    'records_by_activity'   => 'Records par activité',
     'chart_difficulty'    => 'Répartition des difficultés',
     'chart_top_cats'      => 'Meilleures catégories',
 

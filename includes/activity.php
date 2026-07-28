@@ -115,6 +115,20 @@ function detectActivityType(?float $speed_avg, ?float $speed_max, ?float $distan
 }
 
 /**
+ * Motorised activity types — excluded from the headline records on stats.php.
+ *
+ * Devět jízd autem jinak přebije stovky výšlapů: nejdelší trasa i největší
+ * převýšení patřily jízdě přes Grossglockner, takže skutečný pěší rekord
+ * nebylo vidět. Auta zůstávají v datech i ve statistikách, jen mají vlastní
+ * řádek v přehledu podle aktivit.
+ *
+ * Single source of truth — používá stats.php a případné další přehledy.
+ */
+function motorized_activities(): array {
+    return ['Auto'];
+}
+
+/**
  * Returns the localised display label for a raw activity_type DB value.
  *
  * DB stores Czech string values ('Pěšky', 'Turistika', …) — OPTION A from

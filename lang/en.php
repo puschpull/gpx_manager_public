@@ -316,6 +316,8 @@ return [
     'record_fastest'      => 'Highest speed',
     'record_longest_time' => 'Longest duration',
     'record_hardest'      => 'Hardest track',
+    'records_no_motor'      => 'excluding motorised',
+    'records_by_activity'   => 'Records by activity',
     'chart_difficulty'    => 'Difficulty distribution',
     'chart_top_cats'      => 'Top categories',
 

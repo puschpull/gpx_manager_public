@@ -310,6 +310,8 @@ return [
     'record_fastest'      => 'Höchste Geschwindigkeit',
     'record_longest_time' => 'Längste Dauer',
     'record_hardest'      => 'Schwierigste Tour',
+    'records_no_motor'      => 'ohne motorisierte',
+    'records_by_activity'   => 'Rekorde nach Aktivität',
     'chart_difficulty'    => 'Schwierigkeitsverteilung',
     'chart_top_cats'      => 'Top-Kategorien',
 
