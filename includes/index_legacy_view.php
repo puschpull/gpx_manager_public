@@ -1,7 +1,6 @@
 
 <?php
 $page_title = t('h1_my_tracks');
-$show_admin_banner = false;
 require __DIR__ . '/layout_header.php';
 ?>
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">

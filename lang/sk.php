@@ -551,6 +551,7 @@ return [
 
     // ===== Admin banner (TASK-17) =====
     'admin_banner_aria'           => 'Administrátorský panel',
+    'nav_admin'                   => 'Administrácia',
     'admin_logged_in'             => 'Prihlásený ako',
     'administrator'               => 'administrátor',
     'preview_as_visitor'          => 'Náhľad ako návštevník',

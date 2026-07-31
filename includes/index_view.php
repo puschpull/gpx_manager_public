@@ -15,7 +15,6 @@ if (!isset($_SESSION)) { @session_start(); }
 $is_admin = !empty($_SESSION['is_admin']);
 
 $page_title = t('h1_my_tracks');
-$show_admin_banner = false;
 
 $activeQ        = $q ?? '';
 $activeFav      = ($fav_only ?? '') === '1';

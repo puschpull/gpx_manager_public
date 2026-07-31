@@ -52,7 +52,7 @@ if ($_pub_is_real_admin && isset($_GET['visitor_preview'])) {
 
 unset($_pub_allowed_ips, $_pub_is_real_admin);
 
-// Banner partials (render_admin_banner, render_visitor_preview_banner).
+// Admin partials (render_admin_menu, render_visitor_preview_banner).
 require_once __DIR__ . '/partials/admin_banner.php';
 
 /**

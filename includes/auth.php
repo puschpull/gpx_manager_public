@@ -67,6 +67,6 @@ if (empty($_SESSION['is_admin'])) {
 }
 
 // ====== Banner ======
-// render_admin_banner() is defined in the partial below.
+// render_admin_menu() is defined in the partial below.
 require_once __DIR__ . '/partials/admin_banner.php';
 ?>

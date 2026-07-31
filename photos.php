@@ -35,7 +35,6 @@ extract($pageData, EXTR_SKIP);
    Layout
    ===================================================================== */
 $page_title = 'Fotografie tras';
-$show_admin_banner = false;
 require __DIR__ . '/includes/layout_header.php';
 require __DIR__ . '/includes/photos_view.php';
 require __DIR__ . '/includes/layout_footer.php';

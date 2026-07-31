@@ -1,10 +1,67 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 27. července 2026
+  Poslední aktualizace: 31. července 2026
 
 ================================================================================
 
+
+── 31. července 2026 ───────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ADMIN LIŠTA ZRUŠENA — JEJÍ OBSAH JE V MENU V HLAVIČCE                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Modrá lišta přes celou šířku stránky ("Přihlášen jako administrátor / IP /
+  Náhled jako návštěvník / Odhlásit se") byla zapnutá jako výchozí na každé
+  stránce a vypínala se tím, že si stránka nastavila $show_admin_banner = false.
+  Dělaly to přesně tři soubory, takže z 22 stránek měla lištu 19 a tři ne —
+  bez jakéhokoli pravidla, čistá nekonzistence.
+
+  Nově je její obsah v rozbalovacím menu v pravé části hlavičky, na místě
+  bývalého ozubeného kolečka:
+
+      ⚙ ▾
+      ├─ Přihlášen jako administrátor (IP)
+      │  IP: …
+      ├─ Administrace
+      ├─ Náhled jako návštěvník
+      └─ Odhlásit se
+
+  Funkcionalita je tím dostupná z každé stránky jedním kliknutím a současně
+  se na každé stránce uvolnilo 42 px výšky — na mapách a fotkách se to hodí.
+
+  Identita a IP jsou hlavička menu, ne poznámka pod čarou: vlastní podklad,
+  tučné písmo a terracotta proužek vlevo. Terracotta je záměrně jen proužek,
+  ne barva písma — na tom podkladu má kontrast 2,9:1, tedy pod hranicí
+  WCAG AA. Text zůstává tmavě zelený (8,6:1 světle, 9,9:1 tmavě).
+
+  Oranžová lišta návštěvnického náhledu ZŮSTÁVÁ beze změny. Je to dočasný
+  stav, který musí být nepřehlédnutelný a jedním kliknutím opustitelný;
+  odkaz zpět se dál skládá z aktuální adresy, takže tě vrátí tam, kde jsi.
+
+  Na úzkých displejích je menu v hlavičce schované, proto mobilní vysouvací
+  menu dostalo tytéž dvě položky — náhled a odhlášení. Bez toho by se na
+  telefonu nedalo odhlásit, protože to uměla jen zrušená lišta.
+
+  Poznámka pro budoucnost: geometrie menu je ve vlastních .gpx-adminmenu-*
+  třídách v nevrstveném <style> hlavičky, ne v Tailwind utilitách.
+  assets/css/app.css je commitnutý build a ověřeno, že nové utility (w-64,
+  my-1, gap-2.5, leading-relaxed, m-0, p-0) v něm nejsou — bez přegenerování
+  by menu vyšlo široké 133 px místo 260. Z Tailwindu se berou jen barvy,
+  rámečky a stín, které v app.css prokazatelně jsou.
+
+  Při téže změně uklizeno:
+    • delete.php volalo vykreslení lišty těsně před přesměrováním — tichý
+      zdroj chyby "headers already sent". Volání je pryč.
+    • photo_import.php je samostatná stránka bez hlavičky webu, lišta tam
+      byla jediná navigace. Místo ní má odkaz zpět na seznam tras.
+    • nový překladový klíč nav_admin ve všech 8 jazycích.
+
+  Upravené: includes/partials/admin_banner.php, includes/layout_header.php,
+  includes/index_view.php, includes/index_legacy_view.php, photos.php,
+  delete.php, includes/photo_import_view.php, includes/auth.php,
+  includes/public_access.php, lang/*.php
 
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 

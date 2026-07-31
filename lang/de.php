@@ -551,6 +551,7 @@ return [
 
     // ===== Admin-Banner (TASK-17) =====
     'admin_banner_aria'           => 'Administratorbereich',
+    'nav_admin'                   => 'Administration',
     'admin_logged_in'             => 'Angemeldet als',
     'administrator'               => 'Administrator',
     'preview_as_visitor'          => 'Als Besucher anzeigen',

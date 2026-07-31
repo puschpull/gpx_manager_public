@@ -566,6 +566,7 @@ return [
 
     // ===== Admin banner (TASK-17) =====
     'admin_banner_aria'           => 'Administrator panel',
+    'nav_admin'                   => 'Administration',
     'admin_logged_in'             => 'Logged in as',
     'administrator'               => 'administrator',
     'preview_as_visitor'          => 'Preview as visitor',

@@ -121,6 +121,39 @@ if (!function_exists('t')) {
     .gpx-topnav-item:hover,
     .gpx-topnav-item[aria-current] { opacity: 1; }
 
+    /* Admin menu v hlavičce — nevrstveně ze stejného důvodu jako menu výše.
+       Geometrie je tady, ne v Tailwind utilitách: app.css je commitnutý build
+       a nové utility (w-64, my-1, …) v něm nejsou. */
+    .gpx-adminmenu-btn   { height: 36px; padding: 0 8px; display: inline-flex;
+                           align-items: center; gap: 4px; border-radius: 6px;
+                           background: none; border: 0; cursor: pointer; font-family: inherit; }
+    .gpx-adminmenu-btn svg   { width: 20px; height: 20px; }
+    .gpx-adminmenu-caret     { display: inline-flex; transition: transform .15s; }
+    .gpx-adminmenu-btn .gpx-adminmenu-caret svg { width: 14px; height: 14px; opacity: .6; }
+    .gpx-adminmenu-panel { position: absolute; right: 0; top: 100%; margin-top: 4px;
+                           width: 260px; padding: 4px 0; z-index: 50; }
+    /* Identita adminu je hlavička menu, ne poznámka pod čarou — proto vlastní
+       podklad a proužek. Terracotta jen jako proužek: na text má na sand-100
+       kontrast 2,9:1, což je pod hranicí WCAG AA. */
+    .gpx-adminmenu-meta  { margin: 2px 4px 4px; padding: 8px 10px; border-radius: 6px;
+                           font-size: 12.5px; line-height: 1.55; font-weight: 600;
+                           color: var(--color-forest-700);
+                           background: var(--color-sand-100);
+                           border-left: 3px solid var(--color-terracotta-500); }
+    .gpx-adminmenu-meta strong { font-weight: 800; }
+    html.dark .gpx-adminmenu-meta { color: var(--color-sand-100);
+                                    background: rgba(255, 255, 255, .07); }
+    .gpx-adminmenu-sep   { margin: 4px 0; }
+    .gpx-adminmenu-item  { display: flex; align-items: center; gap: 10px;
+                           padding: 8px 12px; font-size: 14px; width: 100%;
+                           text-align: left; background: none; border: 0;
+                           cursor: pointer; font-family: inherit; }
+    .gpx-adminmenu-item svg { width: 16px; height: 16px; flex: none; }
+    .gpx-adminmenu-form  { margin: 0; padding: 0; }
+    /* Dvě třídy porazí .site-header button (jedna třída + typ) výše. */
+    .site-header .gpx-adminmenu-logout           { color: #b32d2d; }
+    html.dark .site-header .gpx-adminmenu-logout { color: #ff9090; }
+
     /* Na mobilu je menu skryté, takže ovládání vpravo si musí doprava pomoct
        samo. Na desktopu to naopak musí být 0, jinak by třetí auto margin
        rozhodil symetrii mezer kolem menu. */
@@ -182,26 +215,19 @@ if (!function_exists('t')) {
 <body class="font-[Inter] bg-sand-50 text-forest-900 dark:bg-forest-900 dark:text-sand-100 antialiased">
 
 <style>
-.admin-banner{background:#003366;color:#fff;padding:6px 16px;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #002244;position:sticky;top:0;z-index:9999;gap:12px;font-family:inherit}
-.admin-banner__muted{opacity:.8}
-.admin-banner__actions{display:flex;gap:8px;align-items:center}
-.admin-banner__actions a,.admin-banner__actions button{color:#fff;text-decoration:none;background:#e65c00;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-family:inherit}
-.admin-banner__logout-form{display:inline;margin:0;padding:0}
-.admin-banner__logout-form button{background:#cc3333}
-.admin-banner__actions a:focus-visible,.admin-banner__actions button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* Administrátorská lišta přes celou šířku byla zrušena — její obsah je nyní
+   v rozbalovacím menu v hlavičce (render_admin_menu()). Zůstává jen oranžová
+   lišta návštěvnického náhledu: je to dočasný stav, který musí být vidět. */
 .visitor-preview-banner{background:#e65c00;color:#fff;padding:6px 16px;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #cc4400;position:sticky;top:0;z-index:9999;gap:12px;font-family:inherit}
 .visitor-preview-banner__exit{color:#fff;text-decoration:none;background:#003366;padding:4px 10px;border-radius:6px}
 </style>
-<?php if (!isset($show_admin_banner) || $show_admin_banner): ?>
-<?php if (function_exists('render_admin_banner')) render_admin_banner(); ?>
-<?php endif; ?>
 <?php if (function_exists('render_visitor_preview_banner')) render_visitor_preview_banner(); ?>
 
 <script>
 // Odsazení sticky hlavičky o výšku bannerů nad ní (viz --gpx-banner-h výše).
 // Měří se za běhu, protože banner se na úzkém displeji zalomí do dvou řádků.
 (function () {
-    var banners = document.querySelectorAll('.admin-banner, .visitor-preview-banner');
+    var banners = document.querySelectorAll('.visitor-preview-banner');
     if (!banners.length) { return; }
 
     function setBannerOffset() {
@@ -338,11 +364,11 @@ if (!function_exists('t')) {
                 <i data-lucide="moon" class="w-5 h-5" x-show="!dark" x-cloak aria-hidden="true"></i>
             </button>
 
-            <?php if ($isAdmin): ?>
-                <a href="admin.php" class="gpx-sm-inline-flex w-9 h-9 items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors" aria-label="Admin">
-                    <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
-                </a>
-            <?php endif; ?>
+            <?php
+            // Admin menu (identita, Administrace, náhled jako návštěvník, odhlášení).
+            // Nahrazuje bývalou modrou lištu přes celou šířku stránky.
+            if (function_exists('render_admin_menu')) render_admin_menu();
+            ?>
 
             <!-- Mobile menu (hamburger) — A11Y-003 -->
             <button @click="$store.mobileNav.open = !$store.mobileNav.open" type="button"
@@ -417,6 +443,20 @@ if (!function_exists('t')) {
                     <i data-lucide="upload" class="w-5 h-5 shrink-0" aria-hidden="true"></i>
                     <span class="font-medium"><?= htmlspecialchars(t('h1_import')) ?></span>
                 </a>
+                <?php // Na mobilu je admin menu v hlavičce skryté — náhled a odhlášení musí být tady. ?>
+                <div class="my-2 mx-4 border-t border-sand-200 dark:border-forest-800"></div>
+                <a href="index.php?visitor_preview=1" class="flex items-center gap-3 px-4 py-3 text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors">
+                    <i data-lucide="eye" class="w-5 h-5 shrink-0" aria-hidden="true"></i>
+                    <span class="font-medium"><?= htmlspecialchars(t('preview_as_visitor', 'Náhled jako návštěvník')) ?></span>
+                </a>
+                <form method="post" action="login.php" class="m-0 p-0">
+                    <?= function_exists('csrf_field') ? csrf_field() : '' ?>
+                    <input type="hidden" name="logout" value="1">
+                    <button type="submit" class="w-full text-left flex items-center gap-3 px-4 py-3 text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors">
+                        <i data-lucide="log-out" class="w-5 h-5 shrink-0" aria-hidden="true"></i>
+                        <span class="font-medium"><?= htmlspecialchars(t('logout', 'Odhlásit se')) ?></span>
+                    </button>
+                </form>
             <?php endif; ?>
         </nav>
     </aside>

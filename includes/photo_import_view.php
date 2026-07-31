@@ -21,7 +21,10 @@
     <link rel="stylesheet" href="<?= asset('css/photo-import.css') ?>">
 </head>
 <body>
-<?php render_admin_banner(); ?>
+<?php // Samostatná stránka bez hlavičky webu — místo bývalé admin lišty stačí návrat zpět. ?>
+<p style="margin:12px 16px 0;font-size:13px">
+    <a href="index.php">&larr; <?= h(t('h1_my_tracks', 'Moje trasy')) ?></a>
+</p>
 <div class="imp-wrap">
 
 <h1 class="imp-title">&#128229; Lokalni import fotek</h1>
