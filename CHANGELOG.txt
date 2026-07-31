@@ -9,6 +9,26 @@
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  HORNÍ MENU: IKONA NAD DROBNÝM POPISKEM, VYCENTROVANÉ                          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Devět položek vedle sebe s textem za ikonou potřebovalo 1122 px, ale
+  hlavička jich nabízí jen ~947 — proto působily namačkaně, zvlášť na širokém
+  monitoru, kde hlavička zůstává zastropovaná na 1280 px.
+
+  Nová podoba: ikona 30 px, pod ní popisek 12 px. Šířku pak určuje popisek,
+  ne ikona s textem vedle sebe, takže menu měří 752 px a je kolem něj vzduch.
+  Položka má 58 px, hlavička 64 px — výška se tedy nemění.
+
+  Menu je vycentrované do volné plochy mezi značkou a ovládáním vpravo:
+  mezera vlevo i vpravo od menu je stejná.
+
+  Pod 768 px se menu stále skrývá ve prospěch hamburgeru; ovládání vpravo si
+  tam drží margin-left:auto, bez toho by se po skrytí menu sesunulo doleva.
+
+  Upravené: includes/layout_header.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  STATISTIKY: REKORDY JEN Z PĚŠÍCH AKTIVIT                                      │
 └──────────────────────────────────────────────────────────────────────────────┘
 

@@ -74,6 +74,38 @@ if (!function_exists('t')) {
        (Tam, kde třídu `hidden` přidává a odebírá JavaScript, problém nenastává —
        po odebrání třídy se cizí pravidlo nemá čeho chytit.)
        Breakpointy odpovídají Tailwindu: sm = 40rem, md = 48rem. */
+    /* ===== Horní menu: ikona nad drobným popiskem =====
+       Devět položek vedle sebe s textem za ikonou potřebovalo 1122 px, ale
+       hlavička jich nabízí jen ~947 — proto působilo natěsnaně. Ve svislém
+       uspořádání šířku určuje popisek, ne ikona s textem, a menu se vejde
+       do 752 px. Položka měří 58 px, hlavička má 64, takže se nezvyšuje.
+       Rozměry vybrané v menu_demo.php (varianta F2). */
+    .gpx-topnav {
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;      /* obě auto marginy = menu je na středu */
+        margin-right: auto;     /* volné plochy mezi značkou a ovládáním */
+    }
+    .gpx-topnav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 6px;
+        border-radius: 6px;
+        line-height: 1.15;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .gpx-topnav-item svg  { width: 30px; height: 30px; }
+    .gpx-topnav-item span { font-size: 12px; }
+
+    /* Na mobilu je menu skryté, takže ovládání vpravo si musí doprava pomoct
+       samo. Na desktopu to naopak musí být 0, jinak by třetí auto margin
+       rozhodil symetrii mezer kolem menu. */
+    .gpx-topnav-right { margin-left: auto; }
+    @media (min-width: 48rem) { .gpx-topnav-right { margin-left: 0; } }
+
     .gpx-md-flex, .gpx-md-block, .gpx-sm-inline, .gpx-sm-inline-flex { display: none; }
     @media (min-width: 48rem) {
         .gpx-md-flex  { display: flex; }
@@ -199,7 +231,7 @@ if (!function_exists('t')) {
         <!-- Vlastní třída místo Tailwindího `hidden md:flex` — viz komentář u stylů
              v hlavičce. `hidden` je natolik obecný název, že ho přebije kdejaké
              cizí pravidlo a menu pak zmizí i na širokém displeji. -->
-        <nav class="gpx-md-flex items-center gap-1 ml-4 text-sm">
+        <nav class="gpx-md-flex gpx-topnav">
             <?php
             // Položky + výchozí pořadí definuje nav_menu_items() (app_constants.php),
             // pořadí si admin mění v Administraci (app_config 'nav_order').
@@ -220,17 +252,17 @@ if (!function_exists('t')) {
                 $active = ($currentScript === $href);
             ?>
                 <a href="<?= $href ?>"
-                   class="flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors
+                   class="gpx-topnav-item transition-colors
                           <?= $active
                               ? 'bg-forest-100 text-forest-700 dark:bg-forest-800 dark:text-sand-100'
                               : 'text-forest-700/80 dark:text-sand-100/70 hover:bg-sand-100 dark:hover:bg-forest-800' ?>">
-                    <i data-lucide="<?= $icon ?>" class="w-4 h-4" aria-hidden="true"></i>
+                    <i data-lucide="<?= $icon ?>" aria-hidden="true"></i>
                     <span><?= htmlspecialchars($label) ?></span>
                 </a>
             <?php endforeach; ?>
         </nav>
 
-        <div class="ml-auto flex items-center gap-2">
+        <div class="gpx-topnav-right flex items-center gap-2">
             <!-- Language switcher -->
             <?php
                 $currentLang = function_exists('app_lang') ? app_lang() : 'cs';
