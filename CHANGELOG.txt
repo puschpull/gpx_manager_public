@@ -9,6 +9,30 @@
 ── 27. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: NA ČÁSTI STRÁNEK BYLO CELÉ MENU MODRÉ                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Na stránkách, které vedle Tailwindu načítají i legacy css/style.css
+  (Detailní tabulka, Trasy v okolí, Virtuální trasy, Fotky v okolí,
+  Foto-heatmapa, Plánovač, Administrace a další), byla celá hlavička modrá —
+  značka, položky menu i tlačítka vpravo.
+
+  Příčina: css/style.css má nevrstvené `a { color: var(--accent-color) }`.
+  Tailwind dává barevné utility do @layer utilities a nevrstvené pravidlo je
+  porazí bez ohledu na specificitu i pořadí. Tentýž mechanismus, jakým cizí
+  `.hidden` od rozšíření prohlížeče skrylo horní menu — jen zdrojem byl náš
+  vlastní starý stylopis. Není to nová chyba, pravidlo je v style.css od
+  počátku a ověřeno, že i původní podoba menu na těch stránkách modrala.
+
+  Hlavička si proto barvy určuje sama, nevrstveně (.site-header a/button,
+  #mobile-nav-drawer a, .gpx-brand, .gpx-topnav-item), a legacy podtržení
+  odkazů v hlavičce je vypnuté. Pozadí zůstává na Tailwindu.
+
+  Aktivní položka menu nově nese aria-current="page".
+
+  Upravené: includes/layout_header.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  HORNÍ MENU: IKONA NAD DROBNÝM POPISKEM, VYCENTROVANÉ                          │
 └──────────────────────────────────────────────────────────────────────────────┘
 

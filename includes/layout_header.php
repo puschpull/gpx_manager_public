@@ -100,6 +100,27 @@ if (!function_exists('t')) {
     .gpx-topnav-item svg  { width: 30px; height: 30px; }
     .gpx-topnav-item span { font-size: 12px; }
 
+    /* ===== Barvy hlavičky si řídíme sami =====
+       Stránky, které vedle Tailwindu načítají i legacy css/style.css
+       (Detailní tabulka, Trasy v okolí, Virtuální trasy, Fotky v okolí,
+       Foto-heatmapa, Plánovač, Administrace a pár dalších), v něm mají
+       nevrstvené `a { color: var(--accent-color) }`. Nevrstvené pravidlo
+       porazí Tailwind utility v @layer bez ohledu na specificitu i pořadí,
+       takže celá hlavička na nich vycházela modrá — značka, menu i ovládání.
+       Barvy proto určujeme tady, taky nevrstveně. Pozadí (aktivní položka,
+       hover) legacy CSS neřeší, ta zůstávají na Tailwindu. */
+    .site-header a,
+    .site-header button,
+    #mobile-nav-drawer a       { color: var(--color-forest-700); }
+    html.dark .site-header a,
+    html.dark .site-header button,
+    html.dark #mobile-nav-drawer a { color: var(--color-sand-100); }
+    .site-header a:hover       { text-decoration: none; }   /* legacy podtrhává */
+    .gpx-brand:hover           { color: var(--color-terracotta-500); }
+    .gpx-topnav-item           { opacity: .8; }
+    .gpx-topnav-item:hover,
+    .gpx-topnav-item[aria-current] { opacity: 1; }
+
     /* Na mobilu je menu skryté, takže ovládání vpravo si musí doprava pomoct
        samo. Na desktopu to naopak musí být 0, jinak by třetí auto margin
        rozhodil symetrii mezer kolem menu. */
@@ -214,7 +235,7 @@ if (!function_exists('t')) {
 <header class="site-header sticky top-0 z-40 bg-sand-50/85 dark:bg-forest-900/85 backdrop-blur-md border-b border-sand-200 dark:border-forest-800">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 h-16 flex items-center gap-4">
         <!-- Brand -->
-        <a href="index.php" class="flex items-center gap-2 text-forest-700 dark:text-sand-100 hover:text-terracotta-500 transition-colors">
+        <a href="index.php" class="gpx-brand flex items-center gap-2 transition-colors">
             <span class="w-8 h-8 inline-flex items-center justify-center text-forest-600 dark:text-forest-300">
                 <!-- Mountain SVG inline pro fast paint -->
                 <svg viewBox="0 0 32 32" fill="currentColor" class="w-7 h-7">
@@ -251,11 +272,11 @@ if (!function_exists('t')) {
             foreach ($navItems as [$href, $icon, $label]):
                 $active = ($currentScript === $href);
             ?>
-                <a href="<?= $href ?>"
+                <a href="<?= $href ?>"<?= $active ? ' aria-current="page"' : '' ?>
                    class="gpx-topnav-item transition-colors
                           <?= $active
-                              ? 'bg-forest-100 text-forest-700 dark:bg-forest-800 dark:text-sand-100'
-                              : 'text-forest-700/80 dark:text-sand-100/70 hover:bg-sand-100 dark:hover:bg-forest-800' ?>">
+                              ? 'bg-forest-100 dark:bg-forest-800 font-semibold'
+                              : 'hover:bg-sand-100 dark:hover:bg-forest-800' ?>">
                     <i data-lucide="<?= $icon ?>" aria-hidden="true"></i>
                     <span><?= htmlspecialchars($label) ?></span>
                 </a>
