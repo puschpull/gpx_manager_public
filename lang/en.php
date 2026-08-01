@@ -565,6 +565,22 @@ return [
     'elev_data_caption' => 'Elevation values along the track',
 
     // ===== Admin banner (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Explain the start/finish elevation gap (loops)',
+    'baro_show'            => 'Show details',
+    'baro_hide'            => 'Hide details',
+    'baro_summary_diff'    => 'difference {diff} m',
+    'baro_title'           => 'Elevation at start and finish',
+    'baro_loop'            => 'This is a loop (start and finish {gap} m apart), yet the elevation differs by {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'Air pressure changed by {dp} hPa over that time, which shifts a barometric altimeter by {drift} m ({k} m per hPa).',
+    'baro_verdict_full'    => 'The change in air pressure accounts for the elevation gap.',
+    'baro_verdict_most'    => 'The change in pressure accounts for most of the gap.',
+    'baro_verdict_part'    => 'The change in pressure accounts for only part of the gap.',
+    'baro_verdict_none'    => 'Pressure does not explain the gap - it moved the other way.',
+    'baro_rest'            => 'Unexplained remainder: {rest} m.',
+    'baro_verdict_device'  => 'Pressure alone would give {drift} m, so {rest} m remain unexplained — most likely the altimeter still settling after the device was switched on.',
+    'baro_disclaimer'      => 'Applies to devices with a barometric altimeter. Pressure data come from the ERA5 model, not from measurements on the route.',
+
     'admin_banner_aria'           => 'Administrator panel',
     'nav_admin'                   => 'Administration',
     'admin_logged_in'             => 'Logged in as',

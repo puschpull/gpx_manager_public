@@ -85,6 +85,7 @@ function feature_flag_labels(): array {
         'replay_radar'   => '🌧️ ' . t('ft_replay_radar', 'Srážkové pole (animace deště)'),
         'replay_photos'  => '📷 ' . t('ft_replay_photos', 'Míjené fotky (při přehrávání)'),
         'plan_overlay'   => '🗺️ ' . t('ft_plan_overlay', 'Porovnání s plánem (detail trasy)'),
+        'baro_note'      => '⛰️ ' . t('ft_baro_note', 'Vysvětlení rozdílu výšky start/cíl (okruhy)'),
     ];
 }
 

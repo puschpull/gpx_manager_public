@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Configurazione percorsi salvata',
 
     // ===== Banner amministratore (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Spiegare il dislivello partenza/arrivo (anelli)',
+    'baro_show'            => 'Mostra dettagli',
+    'baro_hide'            => 'Nascondi dettagli',
+    'baro_summary_diff'    => 'differenza {diff} m',
+    'baro_title'           => 'Quota alla partenza e all’arrivo',
+    'baro_loop'            => 'Il percorso è ad anello (partenza e arrivo a {gap} m l’uno dall’altro), ma la quota differisce di {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'La pressione atmosferica è cambiata di {dp} hPa in quel tempo, il che sposta un altimetro barometrico di {drift} m ({k} m per hPa).',
+    'baro_verdict_full'    => 'La differenza di quota tra partenza e arrivo si spiega con la variazione di pressione.',
+    'baro_verdict_most'    => 'La variazione di pressione spiega gran parte della differenza.',
+    'baro_verdict_part'    => 'La variazione di pressione spiega solo una parte della differenza.',
+    'baro_verdict_none'    => 'La pressione non spiega la differenza: ha agito in senso opposto.',
+    'baro_rest'            => 'Resto inspiegato: {rest} m.',
+    'baro_verdict_device'  => 'La sola pressione darebbe {drift} m, quindi restano {rest} m inspiegati: molto probabilmente l\'altimetro, che si stava ancora stabilizzando dopo l\'accensione.',
+    'baro_disclaimer'      => 'Vale per i dispositivi con altimetro barometrico. I dati di pressione provengono dal modello ERA5, non da misure sul percorso.',
+
     'admin_banner_aria'           => 'Pannello amministratore',
     'nav_admin'                   => 'Amministrazione',
     'admin_logged_in'             => 'Accesso effettuato come',

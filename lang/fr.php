@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Configuration des chemins enregistrée',
 
     // ===== Bannière administrateur (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Expliquer l\'écart d\'altitude départ/arrivée (boucles)',
+    'baro_show'            => 'Afficher les détails',
+    'baro_hide'            => 'Masquer les détails',
+    'baro_summary_diff'    => 'écart {diff} m',
+    'baro_title'           => 'Altitude au départ et à l\'arrivée',
+    'baro_loop'            => 'Le parcours est une boucle (départ et arrivée à {gap} m l\'un de l\'autre), mais l\'altitude diffère de {diff} m : {e0} → {e1} m.',
+    'baro_pressure'        => 'La pression atmosphérique a varié de {dp} hPa pendant ce temps, ce qui décale un altimètre barométrique de {drift} m ({k} m par hPa).',
+    'baro_verdict_full'    => 'L\'écart d\'altitude entre le départ et l\'arrivée s\'explique par la variation de pression.',
+    'baro_verdict_most'    => 'La variation de pression explique la majeure partie de l\'écart.',
+    'baro_verdict_part'    => 'La variation de pression n\'explique qu\'une partie de l\'écart.',
+    'baro_verdict_none'    => 'La pression n\'explique pas l\'écart : elle a agi en sens inverse.',
+    'baro_rest'            => 'Reste inexpliqué : {rest} m.',
+    'baro_verdict_device'  => 'La pression seule donnerait {drift} m, il reste donc {rest} m inexpliqués — très probablement l\'altimètre, qui se stabilisait encore après l\'allumage.',
+    'baro_disclaimer'      => 'Valable pour les appareils à altimètre barométrique. Les données de pression proviennent du modèle ERA5, non de mesures sur le terrain.',
+
     'admin_banner_aria'           => 'Panneau administrateur',
     'nav_admin'                   => 'Administration',
     'admin_logged_in'             => 'Connecté en tant que',

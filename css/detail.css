@@ -146,3 +146,44 @@ html.dark .plan-swatch-dev   { border-top-color: #f87171; }
         transition: none;
     }
 }
+
+/* ===== Barometrická poznámka pod výškovým profilem (js/detail-baro.js) =====
+   Rozbalovací <details>, aby na detailu ve výchozím stavu zabrala jeden řádek.
+   Vlastní názvy tříd, ne Tailwind utility: detail.php načítá vedle app.css
+   i legacy css/style.css, a barvy si tady blok určuje sám. */
+.gpx-baro {
+    margin-top: 12px;
+    border: 1px solid var(--color-sand-200);
+    border-radius: 6px;
+    color: var(--color-forest-700);
+    font-size: 12px;
+    line-height: 1.6;
+}
+/* forest-700, ne forest-800: karta pod tím má právě forest-800, takže by
+   se rámeček slil s pozadím a blok by v tmavém režimu nebyl ohraničený. */
+html.dark .gpx-baro { border-color: var(--color-forest-700); color: var(--color-sand-100); }
+
+.gpx-baro > summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    list-style: none;          /* Firefox */
+}
+.gpx-baro > summary::-webkit-details-marker { display: none; }   /* Safari */
+.gpx-baro > summary:focus-visible { outline: 2px solid var(--color-terracotta-500); outline-offset: -2px; }
+
+.gpx-baro-diff   { font-weight: 400; opacity: .75; }
+.gpx-baro-toggle { margin-left: auto; font-weight: 400; opacity: .75; white-space: nowrap; }
+
+/* Popisek přepínače se mění podle stavu — dva prvky, ne JS. */
+.gpx-baro-more   { display: inline; }
+.gpx-baro-less   { display: none; }
+.gpx-baro[open] .gpx-baro-more { display: none; }
+.gpx-baro[open] .gpx-baro-less { display: inline; }
+
+.gpx-baro-body { padding: 0 12px 10px; }
+.gpx-baro-verdict { font-weight: 600; margin-top: 4px; }
+.gpx-baro-foot    { opacity: .7; margin-top: 4px; }

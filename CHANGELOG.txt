@@ -9,6 +9,56 @@
 ── 31. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  VÝŠKA NA STARTU A V CÍLI: CO ZA TÍM ROZDÍLEM JE                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Na okruhu, kde se člověk vrátí na stejné místo, se nadmořská výška prvního
+  a posledního bodu často liší o desítky metrů. Pod výškovým profilem je nově
+  rozbalovací řádek, který to rozebere — zavřený zabírá jeden řádek s tím,
+  o kolik metrů jde, po kliknutí na „Ukázat detaily" se rozepíše:
+
+    ⛰ Výška na startu a v cíli — rozdíl −15 m          [Ukázat detaily]
+
+    Trasa je okruh (start a cíl 38 m od sebe), ale výška se liší o −15 m:
+    455 → 440 m.
+    Tlak vzduchu se za tu dobu změnil o −2,5 hPa, což barometrický výškoměr
+    posune o +23 m (9,2 m na hPa).
+    Samotný tlak by dal +23 m, takže −38 m zůstává nevysvětlených — nejspíš
+    výškoměr, který se po zapnutí přístroje teprve ustaloval.
+
+  Průběh tlaku se bere z Open-Meteo, tedy ze stejného zdroje jako widget
+  počasí (model ERA5). Žádná nová služba ani klíč.
+
+  Přepočet nedrží konstantu 8,4 m/hPa — ta platí u hladiny moře při 15 °C.
+  Počítá se k = R·T/(g·p) z teploty a tlaku na místě, což v 800 metrech
+  vychází kolem 9,1 m/hPa, tedy o devět procent jinak. Tendence se bere
+  z tlaku přepočteného na hladinu moře, k ze skutečného okolního tlaku.
+
+  Vyhodnocuje se jen tam, kde to dává smysl: musí jít o okruh (start a cíl
+  blíž než 250 m), rozdíl výšky aspoň 8 m a trvání aspoň 20 minut. Jinak
+  řádek vůbec nevznikne a NEODEŠLE se žádný dotaz na API. Práh 8 m není
+  odhad: ERA5 má u tlaku nejistotu kolem 0,5 hPa, což samo dělá ±4 m.
+
+  CO SE PŘITOM ZJISTILO — a co mění dřívější závěr:
+
+  Výpočet proběhl na náhodném vzorku 45 tras. Tlak vysvětlil rozdíl úplně
+  nebo z větší části jen v 11 % případů. Medián rozdílu výšky vyšel 36,8 m,
+  medián nevysvětleného zbytku 34,4 m — ta dvě čísla jsou skoro stejná,
+  takže tlak nevysvětluje skoro nic.
+
+  Hlavní příčina tedy není počasí, ale ustalování barometrického výškoměru
+  po zapnutí přístroje. Sedí to na dřívější měření, kde starému přístroji
+  trvalo ustálení v průměru 31,7 m. Proto řádek u zbytků nad 30 m nevede
+  jako závěr tlak, ale přístroj — jinak by tvrdil „tlak to nevysvětluje"
+  a mlčel o tom, co to tedy vysvětluje.
+
+  Vypnout se to dá v Administraci (volitelné funkce).
+
+  Nové: js/detail-baro.js
+  Upravené: includes/detail_view.php, includes/app_constants.php,
+  css/detail.css, lang/*.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  ADMIN LIŠTA ZRUŠENA — JEJÍ OBSAH JE V MENU V HLAVIČCE                         │
 └──────────────────────────────────────────────────────────────────────────────┘
 

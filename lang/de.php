@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Pfadkonfiguration gespeichert',
 
     // ===== Admin-Banner (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Höhenunterschied Start/Ziel erklären (Rundwege)',
+    'baro_show'            => 'Details anzeigen',
+    'baro_hide'            => 'Details ausblenden',
+    'baro_summary_diff'    => 'Unterschied {diff} m',
+    'baro_title'           => 'Höhe am Start und am Ziel',
+    'baro_loop'            => 'Die Route ist ein Rundweg (Start und Ziel {gap} m auseinander), die Höhe unterscheidet sich aber um {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'Der Luftdruck änderte sich in dieser Zeit um {dp} hPa, was einen barometrischen Höhenmesser um {drift} m verschiebt ({k} m pro hPa).',
+    'baro_verdict_full'    => 'Der Höhenunterschied zwischen Start und Ziel erklärt sich durch die Luftdruckänderung.',
+    'baro_verdict_most'    => 'Die Druckänderung erklärt den größten Teil des Unterschieds.',
+    'baro_verdict_part'    => 'Die Druckänderung erklärt nur einen Teil des Unterschieds.',
+    'baro_verdict_none'    => 'Der Luftdruck erklärt den Unterschied nicht — er wirkte in die Gegenrichtung.',
+    'baro_rest'            => 'Unerklärter Rest: {rest} m.',
+    'baro_verdict_device'  => 'Der Luftdruck allein ergäbe {drift} m, somit bleiben {rest} m unerklärt — höchstwahrscheinlich der Höhenmesser, der sich nach dem Einschalten noch einstellte.',
+    'baro_disclaimer'      => 'Gilt für Geräte mit barometrischem Höhenmesser. Die Druckdaten stammen aus dem ERA5-Modell, nicht aus Messungen auf der Route.',
+
     'admin_banner_aria'           => 'Administratorbereich',
     'nav_admin'                   => 'Administration',
     'admin_logged_in'             => 'Angemeldet als',

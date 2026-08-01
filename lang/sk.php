@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Konfigurácia ciest uložená',
 
     // ===== Admin banner (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Vysvetlenie rozdielu výšky štart/cieľ (okruhy)',
+    'baro_show'            => 'Zobraziť detaily',
+    'baro_hide'            => 'Skryť detaily',
+    'baro_summary_diff'    => 'rozdiel {diff} m',
+    'baro_title'           => 'Výška na štarte a v cieli',
+    'baro_loop'            => 'Trasa je okruh (štart a cieľ {gap} m od seba), ale výška sa líši o {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'Tlak vzduchu sa za ten čas zmenil o {dp} hPa, čo barometrický výškomer posunie o {drift} m ({k} m na hPa).',
+    'baro_verdict_full'    => 'Rozdiel výšky medzi štartom a cieľom vysvetľuje zmena atmosférického tlaku.',
+    'baro_verdict_most'    => 'Zmena tlaku vysvetľuje väčšinu toho rozdielu.',
+    'baro_verdict_part'    => 'Zmena tlaku vysvetľuje len časť rozdielu.',
+    'baro_verdict_none'    => 'Zmena tlaku rozdiel nevysvetľuje — pôsobila opačným smerom.',
+    'baro_rest'            => 'Nevysvetlený zvyšok: {rest} m.',
+    'baro_verdict_device'  => 'Samotný tlak by dal {drift} m, takže {rest} m zostáva nevysvetlených — najskôr výškomer, ktorý sa po zapnutí prístroja ešte ustaľoval.',
+    'baro_disclaimer'      => 'Platí pre prístroje s barometrickým výškomerom. Údaje o tlaku pochádzajú z modelu ERA5, nie z merania na trase.',
+
     'admin_banner_aria'           => 'Administrátorský panel',
     'nav_admin'                   => 'Administrácia',
     'admin_logged_in'             => 'Prihlásený ako',

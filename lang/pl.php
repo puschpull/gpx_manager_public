@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Konfiguracja ścieżek zapisana',
 
     // ===== Baner administratora (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Wyjaśnienie różnicy wysokości start/meta (pętle)',
+    'baro_show'            => 'Pokaż szczegóły',
+    'baro_hide'            => 'Ukryj szczegóły',
+    'baro_summary_diff'    => 'różnica {diff} m',
+    'baro_title'           => 'Wysokość na starcie i na mecie',
+    'baro_loop'            => 'Trasa jest pętlą (start i meta {gap} m od siebie), ale wysokość różni się o {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'Ciśnienie powietrza zmieniło się w tym czasie o {dp} hPa, co przesuwa wysokościomierz barometryczny o {drift} m ({k} m na hPa).',
+    'baro_verdict_full'    => 'Różnicę wysokości między startem a metą wyjaśnia zmiana ciśnienia atmosferycznego.',
+    'baro_verdict_most'    => 'Zmiana ciśnienia wyjaśnia większość tej różnicy.',
+    'baro_verdict_part'    => 'Zmiana ciśnienia wyjaśnia tylko część różnicy.',
+    'baro_verdict_none'    => 'Ciśnienie nie wyjaśnia różnicy — działało w przeciwną stronę.',
+    'baro_rest'            => 'Niewyjaśniona reszta: {rest} m.',
+    'baro_verdict_device'  => 'Samo ciśnienie dałoby {drift} m, więc {rest} m pozostaje niewyjaśnionych — najpewniej wysokościomierz, który po włączeniu urządzenia jeszcze się stabilizował.',
+    'baro_disclaimer'      => 'Dotyczy urządzeń z wysokościomierzem barometrycznym. Dane o ciśnieniu pochodzą z modelu ERA5, nie z pomiarów na trasie.',
+
     'admin_banner_aria'           => 'Panel administratora',
     'nav_admin'                   => 'Administracja',
     'admin_logged_in'             => 'Zalogowany jako',

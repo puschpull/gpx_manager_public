@@ -550,6 +550,22 @@ return [
     'admin_uploads_saved'       => 'Configuración de rutas guardada',
 
     // ===== Banner de administrador (TASK-17) =====
+    // ===== Barometricka kontrola vysky start/cil =====
+    'ft_baro_note'         => 'Explicar la diferencia de altitud salida/llegada (circulares)',
+    'baro_show'            => 'Mostrar detalles',
+    'baro_hide'            => 'Ocultar detalles',
+    'baro_summary_diff'    => 'diferencia {diff} m',
+    'baro_title'           => 'Altitud en la salida y en la llegada',
+    'baro_loop'            => 'La ruta es circular (salida y llegada a {gap} m una de otra), pero la altitud difiere en {diff} m: {e0} → {e1} m.',
+    'baro_pressure'        => 'La presión atmosférica cambió {dp} hPa en ese tiempo, lo que desplaza un altímetro barométrico {drift} m ({k} m por hPa).',
+    'baro_verdict_full'    => 'La diferencia de altitud entre la salida y la llegada se explica por el cambio de presión.',
+    'baro_verdict_most'    => 'El cambio de presión explica la mayor parte de la diferencia.',
+    'baro_verdict_part'    => 'El cambio de presión explica solo una parte de la diferencia.',
+    'baro_verdict_none'    => 'La presión no explica la diferencia: actuó en sentido contrario.',
+    'baro_rest'            => 'Resto sin explicar: {rest} m.',
+    'baro_verdict_device'  => 'La presión por sí sola daría {drift} m, así que quedan {rest} m sin explicar: probablemente el altímetro, que aún se estabilizaba tras encender el dispositivo.',
+    'baro_disclaimer'      => 'Se aplica a dispositivos con altímetro barométrico. Los datos de presión proceden del modelo ERA5, no de mediciones en la ruta.',
+
     'admin_banner_aria'           => 'Panel de administrador',
     'nav_admin'                   => 'Administración',
     'admin_logged_in'             => 'Conectado como',

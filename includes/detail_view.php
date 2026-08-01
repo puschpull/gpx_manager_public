@@ -395,6 +395,11 @@ require __DIR__ . '/layout_header.php';
                 <?= htmlspecialchars(t('elev_legend_2')) ?> <strong><?= htmlspecialchars(t('elev_legend_3')) ?></strong> <?= htmlspecialchars(t('elev_legend_4')) ?>
             </div>
             <div class="badges mt-3 flex flex-wrap gap-2" id="stats"></div>
+            <?php if (feature_enabled('baro_note')): ?>
+            <!-- Barometrická kontrola výšky start/cíl — naplní js/detail-baro.js,
+                 a to jen u okruhů s rozdílem výšky; jinak zůstane prázdné a skryté. -->
+            <div id="baro-note" class="hidden"></div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -466,6 +471,21 @@ window.gpxDetailData = {
         planLen:  <?= js_safe_json(t('pl_plan_len', 'plán')) ?>,
         realLen:  <?= js_safe_json(t('pl_real_len', 'realita')) ?>
     },
+    baroI18n: {
+        baro_title:        <?= js_safe_json(t('baro_title')) ?>,
+        baro_show:         <?= js_safe_json(t('baro_show')) ?>,
+        baro_hide:         <?= js_safe_json(t('baro_hide')) ?>,
+        baro_summary_diff: <?= js_safe_json(t('baro_summary_diff')) ?>,
+        baro_loop:         <?= js_safe_json(t('baro_loop')) ?>,
+        baro_pressure:     <?= js_safe_json(t('baro_pressure')) ?>,
+        baro_verdict_full: <?= js_safe_json(t('baro_verdict_full')) ?>,
+        baro_verdict_most: <?= js_safe_json(t('baro_verdict_most')) ?>,
+        baro_verdict_part: <?= js_safe_json(t('baro_verdict_part')) ?>,
+        baro_verdict_none: <?= js_safe_json(t('baro_verdict_none')) ?>,
+        baro_rest:         <?= js_safe_json(t('baro_rest')) ?>,
+        baro_verdict_device: <?= js_safe_json(t('baro_verdict_device')) ?>,
+        baro_disclaimer:   <?= js_safe_json(t('baro_disclaimer')) ?>
+    },
     replayFlags: {
         weather: <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_weather')) ?>,
         radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>,
@@ -530,6 +550,7 @@ window.gpxDetailData = {
 <script src="<?= asset('js/detail-elevation.js') ?>"></script>
 <?php if (feature_enabled('replay')): ?><script src="<?= asset('js/detail-replay.js') ?>"></script><?php endif; ?>
 <?php if (feature_enabled('plan_overlay')): ?><script src="<?= asset('js/detail-plan.js') ?>"></script><?php endif; ?>
+<?php if (feature_enabled('baro_note')): ?><script src="<?= asset('js/detail-baro.js') ?>"></script><?php endif; ?>
 <script src="<?= asset('js/detail-ui.js') ?>"></script>
 <script src="<?= asset('js/detail-weather.js') ?>"></script>
 
