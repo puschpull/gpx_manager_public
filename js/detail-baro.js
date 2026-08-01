@@ -18,6 +18,31 @@
  *   – rozdíl výšky musí být aspoň MIN_DIFF_M,
  *   – výšlap musí trvat aspoň MIN_DURATION_MS.
  * Když některá podmínka neplatí, modul mlčí a NEODESÍLÁ žádný dotaz na API.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * POZOR — OVĚŘENO 31.7.2026, VÝSLEDEK JE NEGATIVNÍ. Neber výstup tohoto
+ * modulu jako spolehlivou diagnózu a nestav na něm další funkce.
+ *
+ * Na 70 okruzích z GPSMAP 64sx (tedy z novějšího přístroje, kde by data
+ * měla být nejčistší) vyšlo:
+ *   – korelace mezi tlakem předpovězeným posunem a skutečným rozdílem
+ *     výšky  r = +0,02  (u rozdílů pod 12 m dokonce −0,21). Při n = 70 je
+ *     mez významnosti kolem 0,24, takže ani slabý vztah tam není.
+ *   – po odečtení vlivu tlaku směrodatná odchylka NEKLESNE, ale STOUPNE:
+ *     22,2 → 24,5 m (u rozdílů pod 12 m 7,6 → 14,4 m). Kdyby byl tlak
+ *     příčinou, musela by klesnout. Korekce tedy přidává šum.
+ *   – medián tlakového posunu vychází 9,0 m, zatímco medián skutečného
+ *     rozdílu u tohoto přístroje je 6,5 m — „oprava" je větší než jev.
+ *
+ * Nejpravděpodobnější příčina (úvaha, ne měření): GPSMAP 64sx si barometr
+ * průběžně kalibruje podle GPS, takže tlakový drift vyrovná uvnitř sebe
+ * a ven jde jen zbytkový šum, nezávislý na počasí.
+ *
+ * Funkce zůstává v kódu jako doplňková informace a dá se vypnout příznakem
+ * `baro_note` v Administraci. Ověřeno, že vypnutá neposílá do stránky ani
+ * skript, ani kontejner, ani své texty, a nedělá žádný dotaz na API.
+ * Čísla a postup měření: CHANGELOG.txt, záznam z 31.7.2026.
+ * ─────────────────────────────────────────────────────────────────────────
  */
 (function () {
     'use strict';

@@ -9,6 +9,63 @@
 ── 31. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
+│  DODATEK: TLAKOVÉ VYSVĚTLENÍ ROZDÍLU VÝŠKY NEOBSTÁLO                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Funkce popsaná níže byla po nasazení podrobena ostřejšímu testu a ten
+  dopadl negativně. Zůstává v aplikaci jako doplňková informace, ale nelze
+  ji brát jako spolehlivou diagnózu a nemá smysl na ní stavět další věci.
+
+  Nejdřív se ukázalo, jak různě se chovají oba přístroje (630 tras, okruhy
+  delší než 20 minut):
+
+    práh        starý Garmin (385)   GPSMAP 64sx (243)   celkem (630)
+    ────────────────────────────────────────────────────────────────
+      8 m          273 (71 %)           100 (41 %)        373 (59 %)
+     10 m          263 (68 %)            76 (31 %)        339 (54 %)
+     12 m          254 (66 %)            63 (26 %)        317 (50 %)
+     15 m          248 (64 %)            43 (18 %)        291 (46 %)
+     20 m          238 (62 %)            30 (12 %)        268 (43 %)
+     30 m          209 (54 %)            16 ( 7 %)        225 (36 %)
+
+    medián rozdílu výšky:  starý 55,4 m,  nový 6,5 m
+    75. percentil:         starý  107 m,  nový 12,3 m
+
+  Napadlo nás tedy funkci vyladit na nový přístroj, protože všechny další
+  trasy už budou jen z něj. Test na 70 okruzích z GPSMAP 64sx to ale
+  vyvrátil:
+
+    – Korelace mezi posunem, který předpovídá tlak, a skutečným rozdílem
+      výšky:  r = +0,02.  U rozdílů pod 12 m dokonce −0,21. Při 70 trasách
+      je mez významnosti kolem 0,24, takže tam není ani slabý vztah.
+
+    – Po odečtení vlivu tlaku směrodatná odchylka NEKLESNE, ale STOUPNE:
+      22,2 → 24,5 m (u rozdílů pod 12 m 7,6 → 14,4 m). Kdyby byl tlak
+      příčinou, musela by klesnout. Korekce tedy nic neodstraňuje, jen
+      přidává šum.
+
+    – Medián tlakového posunu vychází 9,0 m, zatímco medián skutečného
+      rozdílu u tohoto přístroje je 6,5 m. „Oprava" je větší než jev,
+      který má opravovat.
+
+  Nejpravděpodobnější vysvětlení (úvaha, ne měření): GPSMAP 64sx si
+  barometrický výškoměr průběžně kalibruje podle GPS. Tlakový drift tedy
+  vyrovnává sám uvnitř přístroje a ven se dostane jen zbytkový šum, který
+  s počasím nesouvisí. U starého přístroje jsou zase rozdíly tak velké
+  (medián 55 m), že je stejně nese ustalování výškoměru po zapnutí.
+
+  Práh zůstává na 8 metrech — posouvat ho nemá smysl, protože v pásmu, kde
+  by tlak měl největší šanci něco vysvětlit, je nejistota modelu ERA5
+  (±4 m) srovnatelná s celým jevem.
+
+  Funkce se vypíná příznakem v Administraci (volitelné funkce). Ověřeno,
+  že vypnutá neposílá do stránky skript, kontejner ani své překlady
+  a neodešle žádný dotaz na API — konzole bez chyb, zbytek detailu trasy
+  beze změny.
+
+  Upravené: js/detail-baro.js, includes/detail_view.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
 │  VÝŠKA NA STARTU A V CÍLI: CO ZA TÍM ROZDÍLEM JE                               │
 └──────────────────────────────────────────────────────────────────────────────┘
 

@@ -471,6 +471,8 @@ window.gpxDetailData = {
         planLen:  <?= js_safe_json(t('pl_plan_len', 'plán')) ?>,
         realLen:  <?= js_safe_json(t('pl_real_len', 'realita')) ?>
     },
+    <?php // Bez zapnuté funkce nemá smysl posílat její texty do stránky. ?>
+    <?php if (feature_enabled('baro_note')): ?>
     baroI18n: {
         baro_title:        <?= js_safe_json(t('baro_title')) ?>,
         baro_show:         <?= js_safe_json(t('baro_show')) ?>,
@@ -486,6 +488,7 @@ window.gpxDetailData = {
         baro_verdict_device: <?= js_safe_json(t('baro_verdict_device')) ?>,
         baro_disclaimer:   <?= js_safe_json(t('baro_disclaimer')) ?>
     },
+    <?php endif; ?>
     replayFlags: {
         weather: <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_weather')) ?>,
         radar:   <?= js_safe_json(feature_enabled('replay') && feature_enabled('replay_radar')) ?>,
