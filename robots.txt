@@ -1,0 +1,13 @@
+# GPX Manager — osobní archiv výletů, ne veřejný obsah.
+#
+# Tenhle web nemá být ve vyhledávačích. Nejde o návštěvnost ani o reklamu:
+# jednotlivá trasa neprozradí nic, ale několik set tras dohromady ukazuje,
+# odkud se vyráží a kdy tu majitel nebývá. Prosíme proto o neprocházení.
+#
+# Doplňkem je hlavička X-Robots-Tag: noindex (viz includes/security.php),
+# která platí i tehdy, když na stránku odkáže někdo zvenčí.
+
+User-agent: *
+Disallow: /
+
+# Bez odkazu na sitemap.xml — záměrně, žádná se negeneruje.

@@ -70,6 +70,15 @@ function send_security_headers(): void {
     header('Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()');
     header('Cross-Origin-Opener-Policy: same-origin');
 
+    // Osobní archiv výletů nepatří do vyhledávačů. Samotný robots.txt na to
+    // nestačí — ten říká „neprocházej", ale stránka se do výsledků může dostat
+    // i tak, pokud na ni někdo odkáže zvenčí. Tahle hlavička říká „nezobrazuj".
+    //
+    // Není to zámek, jen prosba, kterou slušné vyhledávače respektují. Kdo zná
+    // adresu, dostane se dál — na to je omezení viditelných stránek
+    // v Administraci, případně přihlášení.
+    header('X-Robots-Tag: noindex, nofollow, noarchive, noimageindex');
+
     // HSTS only on production — local dev runs plain HTTP (SEC-021)
     if (defined('APP_ENV') && APP_ENV !== 'local') {
         header('Strict-Transport-Security: max-age=63072000; includeSubDomains');
