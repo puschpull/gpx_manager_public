@@ -132,12 +132,31 @@
 }
 
 /* ====== Základní reset ====== */
+/* margin na body je 0 ZÁMĚRNĚ. Dřív tu bylo 20px a Tailwindí preflight
+   (`body{margin:0}` v @layer base) to nepřebil — nevrstvené pravidlo porazí
+   vrstvené bez ohledu na pořadí. Stránky s tímto stylopisem proto měly
+   hlavičku odsazenou o 20px shora i po stranách, zatímco ostatní ne.
+   Odsazení obsahu si drží samotné bloky, ne body. */
 body {
     font-family: Arial, Helvetica, sans-serif;
-    margin: 20px;
+    margin: 0;
     background: var(--bg-color);
     color: var(--text-color);
     line-height: 1.5;
+}
+
+/* Legacy blok nad tabulkou tras (index-legacy.php) neměl vlastní odsazení
+   a stál na margin body. Hodnoty odpovídají Tailwindímu px-4 / sm:px-6,
+   aby obsah začínal stejně jako na ostatních stránkách. */
+.topbar {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+@media (min-width: 640px) {
+    .topbar {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
 }
 
 h1 {
@@ -880,8 +899,9 @@ form textarea { min-height: 120px; }
 @media (max-width: 900px) {
 
     /* ====== ZÁKLADNÍ BODY ====== */
+    /* Žádný margin ani tady — viz komentář u body výše. */
     body {
-        margin: 10px;
+        margin: 0;
     }
 
     /* ====== H1 HLAVIČKA ====== */
