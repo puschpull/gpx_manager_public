@@ -117,6 +117,16 @@ if (!function_exists('t')) {
     html.dark #mobile-nav-drawer a { color: var(--color-sand-100); }
     .site-header a:hover       { text-decoration: none; }   /* legacy podtrhává */
     .gpx-brand:hover           { color: var(--color-terracotta-500); }
+
+    /* Totéž platí pro PÍSMO. Legacy stylopisy mají nevrstvené
+       `body { font-family: Arial }` a to přebije Tailwindí font-[Inter] na
+       body — položky menu ho pak dědí a vykreslují se v Arialu. Ten je při
+       stejné velikosti užší (12px „Virtuální trasy" měří 73,1 px proti
+       78,2 px v Interu), takže menu na těch stránkách vycházelo o ~28 px
+       užší a opticky drobnější. Značka si Manrope drží sama, protože ho má
+       vlastní třídou — přímé pravidlo porazí dědičnost bez ohledu na vrstvy. */
+    .site-header,
+    #mobile-nav-drawer         { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; }
     .gpx-topnav-item           { opacity: .8; }
     .gpx-topnav-item:hover,
     .gpx-topnav-item[aria-current] { opacity: 1; }
