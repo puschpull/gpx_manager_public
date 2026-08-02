@@ -7,7 +7,7 @@
     margin-bottom: 12px; padding: 10px 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
 }
 
 .plan-controls label {
@@ -19,7 +19,7 @@
 .plan-controls input[type="text"] {
     padding: 5px 8px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 13px;
@@ -30,24 +30,24 @@
 .plan-btn {
     padding: 6px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     background: var(--bg-secondary, var(--card-bg));
     color: var(--text-color);
     font-size: 13px;
     cursor: pointer;
 }
 
-.plan-btn:hover:not(:disabled) { border-color: var(--link-color, #0078d7); }
+.plan-btn:hover:not(:disabled) { border-color: var(--link-color, #2d4a3e); }
 .plan-btn:disabled { opacity: .45; cursor: not-allowed; }
 
 .plan-btn-primary {
-    background: #2e7d32; border-color: #2e7d32; color: #fff; font-weight: 600;
+    background: #2e7d32; border-color: var(--success-color); color: #fff; font-weight: 600;
 }
 .plan-btn-primary:hover:not(:disabled) { background: #256a29; border-color: #256a29; }
 
 /* Aktivní ruční režim (rovné úseky) */
 .plan-btn-active {
-    background: #ef6c00; border-color: #ef6c00; color: #fff; font-weight: 600;
+    background: #bc5500; border-color: #bc5500; color: #fff; font-weight: 600;
 }
 .plan-btn-active:hover:not(:disabled) { background: #d95f00; border-color: #d95f00; }
 
@@ -69,7 +69,7 @@
     margin-bottom: 12px; padding: 8px 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     font-size: 14px; font-weight: 600; color: var(--text-color);
 }
 
@@ -89,7 +89,7 @@
     margin-bottom: 12px; padding: 8px 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     font-size: 13px; color: var(--text-color);
 }
 
@@ -101,7 +101,7 @@
     padding: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     height: 220px;
 }
 

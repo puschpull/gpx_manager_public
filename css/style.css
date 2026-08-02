@@ -30,7 +30,7 @@
     white-space: normal;
     padding: 8px 12px;
     background: var(--accent-color, #3b7d5e);
-    color: #fff;
+    color: var(--accent-contrast);
     text-decoration: none;
     border-radius: 4px;
     outline: 2px solid #fff;
@@ -137,8 +137,13 @@
    vrstvené bez ohledu na pořadí. Stránky s tímto stylopisem proto měly
    hlavičku odsazenou o 20px shora i po stranách, zatímco ostatní ne.
    Odsazení obsahu si drží samotné bloky, ne body. */
+/* Písmo je Inter, ne Arial. Dřív tu byl Arial a jako nevrstvené pravidlo
+   přebíjel Tailwindí font-[Inter] na body, takže se stránky s tímto
+   stylopisem sázely jiným řezem než zbytek aplikace. Rodina se tu uvádí
+   celá (ne jen zděděně), protože photo_import.php tento stylopis načítá
+   bez Tailwindu a bez něj by spadl na patkové výchozí písmo prohlížeče. */
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     margin: 0;
     background: var(--bg-color);
     color: var(--text-color);
@@ -225,6 +230,16 @@ h1 small {
     color: var(--text-muted);
 }
 
+/* Stejný kroužek při focusu jako ve zbytku aplikace. V app.css je totéž
+   pravidlo, ale photo_import.php Tailwind nenačítá — bez téhle kopie by tam
+   klávesnicová navigace neměla žádné vodítko. Na ostatních stránkách je to
+   duplicita se shodnými hodnotami, takže se nic nemění. */
+:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
 /* ====== Odkazy ====== */
 a {
     color: var(--accent-color);
@@ -240,7 +255,7 @@ a:hover {
     background: var(--bg-button);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     padding: 6px 12px;
     cursor: pointer;
     text-decoration: none;
@@ -250,7 +265,7 @@ a:hover {
 }
 .btn:hover {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 .btn.disabled,
 .pgbtn.disabled {
@@ -265,7 +280,7 @@ textarea {
     background: var(--bg-input);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     padding: 6px 8px;
     width: 100%;
     box-sizing: border-box;
@@ -296,6 +311,9 @@ th {
     background: var(--table-header-bg);
     color: var(--header-text);
     white-space: normal;
+    /* 600 místo výchozí prohlížečové sedmistovky — nový design sází záhlaví
+       tabulek polotučně a 700 z něj dělalo nejtěžší písmo na stránce. */
+    font-weight: 600;
 }
 tr {
     background: var(--table-row-bg);
@@ -315,7 +333,7 @@ table tr:hover td {
 }
 .pgbtn {
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     padding: 4px 8px;
     background: var(--bg-secondary);
     text-decoration: none;
@@ -323,14 +341,14 @@ table tr:hover td {
 }
 .pgbtn:hover {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 
 /* ====== Filtry ====== */
 .filters {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px;
     margin-bottom: 15px;
 }
@@ -355,7 +373,7 @@ table tr:hover td {
     gap: 6px;
     padding: 4px 8px;
     border: 1px solid var(--highlight-border);
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     background: var(--highlight-bg);
     font-size: 12px;
 }
@@ -403,7 +421,7 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
     overflow-x: auto;
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     border: 1px solid var(--border-color);
     max-height: calc(100vh - 88px);
 }
@@ -448,7 +466,7 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
     justify-content: flex-start;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px 14px;
     margin: 10px 0 18px;
     font-size: 15px;
@@ -464,11 +482,15 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
 /* ====== Zoom info (mapa) ====== */
 .zoom-info {
     background: rgba(255,255,255,0.9);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 6px 10px;
     font-size: 13px;
     line-height: 1.4;
-    color: #222;
+    /* forest-900 natvrdo, ne přes --text-color: tenhle ovládací prvek leží
+       v mapě a má vždy světlé pozadí, takže v tmavém režimu by ho proměnná
+       přebarvila na světlou a text by zmizel (viz výjimka pro Leaflet
+       v layout_header.php). */
+    color: #1a2620;
     box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     margin-top: 6px;
     user-select: text;
@@ -498,13 +520,13 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
     height: 500px !important;
     border: 1px solid var(--border-color);
     margin-bottom: 15px;
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     overflow: hidden;
 }
 #elev-wrap {
     border: 1px solid var(--border-color);
     background: var(--card-bg);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 8px;
     box-sizing: border-box;
 }
@@ -527,7 +549,7 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
 .badge {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 6px 10px;
     font-size: 13px;
     color: var(--text-color);
@@ -550,24 +572,26 @@ a.back:hover { text-decoration: underline; }
     margin-bottom: 10px;
     flex-wrap: wrap;
 }
+/* Přes proměnné, ne natvrdo — ID selektor přebíjel .filter-dropzone
+   z filter.css a plocha pro přetažení jako jediná zůstávala v šedomodré. */
 #dropzone {
-    border: 2px dashed #999;
-    border-radius: 8px;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-card);
     padding: 18px;
     text-align: center;
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 12px;
 }
 #dropzone.dragover {
-    border-color: #007bff;
-    color: #007bff;
-    background: #f4f9ff;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: var(--highlight-bg);
 }
 #fileInput { display: none; }
 .list { margin-top: 10px; }
 .item {
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px;
     margin-bottom: 8px;
     display: flex;
@@ -583,16 +607,16 @@ a.back:hover { text-decoration: underline; }
 .item.status-overwritten { border-color: #ffe0b2; }
 .item.status-skipped     { border-color: #eeeeee; }
 .item.status-error       { border-color: #ffcdd2; }
-.import-ok  { color: #008800; }
-.import-dup { color: #cc8800; }
-.import-err { color: #cc0000; }
+.import-ok  { color: var(--success-color); }
+.import-dup { color: var(--warning-color); }
+.import-err { color: var(--error-color); }
 .import-row { margin-bottom: 4px; font-family: monospace; }
 
 /* ====== EDIT ====== */
 .wrap { max-width: 980px; margin: 0 auto; }
 .meta { color: var(--text-muted); margin-bottom: 14px; font-size: 14px; }
-.flash-ok    { color: #008800; margin: 10px 0; font-weight: 600; }
-.flash-error { color: #cc0000; margin: 10px 0; font-weight: 600; }
+.flash-ok    { color: var(--success-color); margin: 10px 0; font-weight: 600; }
+.flash-error { color: var(--error-color); margin: 10px 0; font-weight: 600; }
 form .row { display: flex; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
 form .row .col { flex: 1 1 220px; min-width: 200px; }
 form label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
@@ -603,7 +627,7 @@ form textarea {
     width: 100%;
     padding: 8px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     box-sizing: border-box;
     background: var(--bg-input);
     color: var(--text-color);
@@ -666,7 +690,7 @@ form textarea { min-height: 120px; }
     background: #cc3333;
     color: #fff;
     border: 1px solid #aa2222;
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 6px 12px;
     cursor: pointer;
     font-size: 14px;
@@ -725,13 +749,14 @@ form textarea { min-height: 120px; }
 }
 
 /* ====== A11Y-002 — Skip link ====== */
+/* forest-700 misto puvodni tmave modre; bila na nem ma 9,7:1. */
 .skip-link {
     position: absolute;
     left: -9999px;
     z-index: 10000;
     padding: 8px 16px;
-    background: #003366;
-    color: #fff;
+    background: var(--accent-color);
+    color: var(--accent-contrast);
     text-decoration: none;
     font-weight: 600;
 }
@@ -753,10 +778,10 @@ form textarea { min-height: 120px; }
 }
 
 /* ====== A11Y-029 — Import status icons (non-color indicator) ====== */
-.item.status-inserted::before  { content: "\2713\00A0"; color: #2e7d32; font-weight: bold; }
-.item.status-overwritten::before { content: "\2192\00A0"; color: #e65100; }
-.item.status-skipped::before   { content: "\25CB\00A0"; color: #757575; }
-.item.status-error::before     { content: "\2717\00A0"; color: #c62828; font-weight: bold; }
+.item.status-inserted::before  { content: "\2713\00A0"; color: var(--success-color); font-weight: bold; }
+.item.status-overwritten::before { content: "\2192\00A0"; color: var(--warning-color); }
+.item.status-skipped::before   { content: "\25CB\00A0"; color: var(--muted-color); }
+.item.status-error::before     { content: "\2717\00A0"; color: var(--error-color); font-weight: bold; }
 
 
 /* ====== SIDEBAR TOGGLE — přidej na konec style.css ====== */
@@ -766,7 +791,7 @@ form textarea { min-height: 120px; }
     gap: 6px;
     padding: 6px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     background: var(--bg-button);
     color: var(--text-color);
     cursor: pointer;
@@ -776,11 +801,11 @@ form textarea { min-height: 120px; }
 }
 .sidebar-toggle:hover {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 .sidebar-toggle.active {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 
 
@@ -856,11 +881,11 @@ form textarea { min-height: 120px; }
     position: absolute;
     top: -5px;
     right: -6px;
-    background: #e91e63;
+    background: #e2165b;
     color: #fff;
     font-size: 10px;
     font-weight: 700;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
     padding: 1px 4px;
     line-height: 1.4;
     min-width: 16px;
@@ -1059,7 +1084,7 @@ form textarea { min-height: 120px; }
     gap: 14px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 12px 16px;
     margin: 8px 0 4px;
     width: fit-content;
@@ -1087,7 +1112,7 @@ form textarea { min-height: 120px; }
     padding: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .similar-wrap h2 {
@@ -1108,7 +1133,7 @@ form textarea { min-height: 120px; }
     padding: 10px;
     background: var(--bg-color, #f8f9fa);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     text-decoration: none;
     color: var(--text-color);
     transition: box-shadow 0.15s, border-color 0.15s;
@@ -1165,61 +1190,6 @@ form textarea { min-height: 120px; }
     }
 }
 
-/* ====== ADMIN BANNER (TASK-17) ====== */
-.admin-banner {
-    background: #003366;
-    color: #fff;
-    padding: 6px 12px;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #002244;
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-}
-
-.admin-banner__muted {
-    opacity: 0.8;
-}
-
-.admin-banner__actions {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.admin-banner__actions a,
-.admin-banner__actions button {
-    color: #fff;
-    text-decoration: none;
-    background: #e65c00;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-}
-
-.admin-banner__logout-form {
-    display: inline;
-    margin: 0;
-    padding: 0;
-}
-
-.admin-banner__logout-form button {
-    background: #cc3333;
-}
-
-.admin-banner__actions a:focus-visible,
-.admin-banner__actions button:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-}
-
 /* ====== DEFAULT CSS VARIABLES (light mode fallback — no theme cookie) ====== */
 :root {
     /* Řekne prohlížeči, jak kreslit nativní prvky (select, rozbalený seznam,
@@ -1227,25 +1197,62 @@ form textarea { min-height: 120px; }
        podědí --text-muted/--text-color z tmavého motivu, na nich zmizí. */
     color-scheme: light;
 
-    --bg-color:           #f9f9f9;
-    --text-color:         #222222;
-    --text-muted:         #666666;
-    --border-color:       #cccccc;
-    --accent-color:       #005fa3;
-    --accent-hover:       #005a9e;
-    --highlight-bg:       #e7f2ff;
-    --highlight-border:   #0078d7;
+    /* Hodnoty odpovídají outdoor paletě z assets/css/app.css (sand / forest /
+       terracotta). Původní sada byla modrošedá a legacy stránky kvůli ní
+       vypadaly jako jiná aplikace. Přebarvení se dělá tady, protože 53–95 %
+       barevných deklarací v legacy stylopisech chodí přes tyhle proměnné —
+       jednou změnou se tak přebarví dohromady přes dvě stě pravidel.
+       Všechny dvojice text/pozadí ověřeny na WCAG 2.2 AA. */
+    --bg-color:           #faf8f3;   /* sand-50 */
+    --text-color:         #1a2620;   /* forest-900 */
+    --text-muted:         #55665c;   /* 5,8:1 na sand-50 */
+    --border-color:       #e8e0d2;   /* sand-200 */
+    --accent-color:       #2d4a3e;   /* forest-700 — odkazy */
+    /* terracotta-600, ne 500: pětistovka má na sand-50 jen 2,9:1, tedy pod AA */
+    --accent-hover:       #a85f2f;
+    --highlight-bg:       #d6e6dc;   /* forest-100 */
+    --highlight-border:   #c97b3f;   /* terracotta-500 — jen rámeček, ne text */
     --card-bg:            #ffffff;
-    --bg-secondary:       #f4f4f4;
-    --bg-button:          #f6f6f6;
-    --bg-hover:           #e9f3ff;
+    --bg-secondary:       #f5f1ea;   /* sand-100 */
+    --bg-button:          #f5f1ea;   /* sand-100 */
+    --bg-hover:           #d6e6dc;   /* forest-100 */
     --bg-input:           #ffffff;
-    --header-bg:          #e8eef5;
-    --header-text:        #003366;
-    --table-header-bg:    #f2f5fa;
+    --header-bg:          #f5f1ea;   /* sand-100 */
+    --header-text:        #2d4a3e;   /* forest-700 — nadpisy a záhlaví tabulek */
+    --table-header-bg:    #f5f1ea;   /* sand-100 */
     --table-row-bg:       #ffffff;
-    --table-row-hover:    #f5f9ff;
-    --table-border-color: #d0d7de;
+    --table-row-hover:    #eef5f0;   /* forest-50 */
+    --table-border-color: #e8e0d2;   /* sand-200 */
+
+    /* Tyhle čtyři se v CSS používaly, ale nikde se nedefinovaly — padaly proto
+       na svůj fallback, a ten byl u --link-color jasně modrý (#0078d7) na
+       dvanácti místech v sedmi souborech. Bez nich by přebarvení nebylo úplné. */
+    --link-color:           #2d4a3e;   /* stejné jako --accent-color */
+    --input-bg:             #ffffff;
+    --row-hover:            #eef5f0;
+    --text-secondary-color: #55665c;
+    /* Stavové barvy zůstávají sémantické (zelená = hotovo, červená = chyba),
+       jen sladěné s paletou a ověřené na AA. */
+    --success-color:        var(--success-color);   /* 4,8:1 na sand-50 */
+    --error-color:          #b32d2d;   /* 5,9:1 na sand-50 */
+    --warning-color:        #c24400;   /* 4,8:1 na sand-50 */
+    --muted-color:          #707070;   /* 4,7:1 — neutrální stav (přeskočeno ap.) */
+    /* Barva textu POLOŽENÉHO NA --accent-color. Ve světlém režimu je akcent
+       tmavý, takže bílá; v tmavém je akcent světle zelený a bílá na něm má
+       jen 2,5:1 — tam musí být text tmavý. */
+    --accent-contrast:      #ffffff;
+    /* Terakota jako TEXT: pětistovka má na světlém podkladu 3,1:1. */
+    --terracotta-text:      #9e5e2d;
+
+    /* ===== Škála zaoblení =====
+       V legacy CSS bylo zaoblení rozeseté v osmi hodnotách (2 až 16 px) bez
+       pravidla. Tyhle tři odpovídají novému designu (Tailwind --radius-md
+       a --radius-lg) a používají se podle VÝZNAMU prvku, ne podle toho, kde
+       zrovna vznikl. Vlastní názvy, ne Tailwindí: photo_import.php načítá
+       tento stylopis bez app.css, kde jsou ty Tailwindí definované. */
+    --radius-chip:    6px;    /* štítky, drobné přepínače */
+    --radius-control: 10px;   /* pole, výběry, tlačítka */
+    --radius-card:    14px;   /* karty, panely, mapy */
 }
 
 /* ====== DARK MODE — html.dark (Tailwind toggle) overrides CSS variables ====== */
@@ -1253,57 +1260,40 @@ form textarea { min-height: 120px; }
 html.dark {
     color-scheme: dark;
 
-    --bg-color:           #1e1f22;
-    --text-color:         #e4e4e4;
-    --text-muted:         #a0a0a0;
-    --border-color:       #333333;
-    --accent-color:       #4da3ff;
-    --accent-hover:       #78b6ff;
-    --highlight-bg:       #2d2f33;
-    --highlight-border:   #f0c24b;
-    --card-bg:            #2a2b2f;
-    --bg-secondary:       #2a2b2f;
-    --bg-button:          #2a2b2f;
-    --bg-hover:           #3a3d42;
-    --bg-input:           #25262a;
-    --header-bg:          #2d2f33;
-    --header-text:        #ffffff;
-    --table-header-bg:    #33363a;
-    --table-row-bg:       #26282c;
-    --table-row-hover:    #2f3a47;
-    --table-border-color: #444444;
+    /* Tmavá varianta téže palety — viz komentář u :root výše. */
+    --bg-color:           #1a2620;   /* forest-900 */
+    --text-color:         #f5f1ea;   /* sand-100 */
+    --text-muted:         #a8bcb0;   /* 7,8:1 na forest-900 */
+    --border-color:       #2d4a3e;   /* forest-700 */
+    --accent-color:       #84ad94;   /* forest-300 — odkazy */
+    --accent-hover:       #e89455;   /* terracotta-300 */
+    --highlight-bg:       #243028;   /* forest-800 */
+    --highlight-border:   #e89455;   /* terracotta-300 */
+    --card-bg:            #243028;   /* forest-800 */
+    --bg-secondary:       #243028;
+    --bg-button:          #243028;
+    --bg-hover:           #2d4a3e;   /* forest-700 */
+    --bg-input:           #1a2620;
+    --header-bg:          #243028;
+    --header-text:        #f5f1ea;
+    --table-header-bg:    #243028;
+    --table-row-bg:       #1a2620;
+    --table-row-hover:    #243028;
+    --table-border-color: #2d4a3e;
+
+    --link-color:           #84ad94;   /* stejné jako --accent-color */
+    --input-bg:             #1a2620;
+    --row-hover:            #243028;
+    --text-secondary-color: #a8bcb0;
+    --success-color:        #7fc48a;   /* 7,6:1 na forest-900 */
+    --error-color:          #ff9090;   /* 7,2:1 na forest-900 */
+    --warning-color:        #f55600;   /* 4,6:1 na forest-900 */
+    --muted-color:          #8c8c8c;   /* 4,7:1 na forest-900 */
+    --accent-contrast:      #1a2620;   /* tmavý text na světle zeleném akcentu (6,3:1) */
+    --terracotta-text:      #c97b3f;   /* na tmavém podkladu stačí pětistovka (4,8:1) */
 }
 
 html.dark .btn:hover,
 html.dark .pgbtn:hover {
     color: #000;
-}
-
-/* ====== VISITOR PREVIEW BANNER (TASK-17) ====== */
-.visitor-preview-banner {
-    background: #e65c00;
-    color: #fff;
-    padding: 6px 12px;
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #cc4400;
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-}
-
-.visitor-preview-banner__exit {
-    color: #fff;
-    text-decoration: none;
-    background: #003366;
-    padding: 4px 10px;
-    border-radius: 6px;
-}
-
-.visitor-preview-banner__exit:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 2px;
 }

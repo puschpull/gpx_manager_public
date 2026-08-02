@@ -8,9 +8,10 @@
 /* ====== ZÁKLADNÍ ====== */
 /* margin: 0 záměrně — stejný důvod jako v css/style.css: nevrstvené pravidlo
    by přebilo Tailwindí preflight a hlavička by byla odsazená od okraje okna. */
+/* Inter, ne Arial — viz komentář u body v css/style.css. */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     background: var(--bg-color);
     color: var(--text-color);
 }
@@ -77,7 +78,7 @@ body {
     gap: 6px;
     padding: 6px 12px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--bg-button);
     color: var(--text-color);
     cursor: pointer;
@@ -88,18 +89,18 @@ body {
 
 .sidebar-toggle:hover {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 
 .sidebar-toggle.active {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
 }
 
 /* ====== FILTRY V SIDEBARU ====== */
 .index-sidebar form.filters {
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px;
     background: var(--card-bg);
 }
@@ -122,7 +123,7 @@ body {
     width: 100%;
     padding: 5px 6px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 13px;
@@ -207,11 +208,11 @@ body.hide-col-action             .col-action            { display: none !importa
 .col-compare { width: 30px; text-align: center; }
 .col-compare input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; }
 #compare-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-#compare-btn:not(:disabled) { background: #0077cc; color: white; }
+#compare-btn:not(:disabled) { background: var(--accent-color); color: var(--accent-contrast); }
 .bulk-actions { display: inline-flex; align-items: center; gap: 4px; }
 .bulk-actions .select { font-size: 12px; padding: 4px 6px; }
-.btn-bulk { font-size: 12px; padding: 4px 10px; background: #e53935; color: white; border: none; border-radius: 4px; cursor: pointer; }
-.btn-bulk:hover { background: #c62828; }
+.btn-bulk { font-size: 12px; padding: 4px 10px; background: var(--error-color); color: #fff; border: none; border-radius: var(--radius-control); cursor: pointer; }
+.btn-bulk:hover { background: var(--accent-hover); }
 
 /* ====== TABULKA ====== */
 table {
@@ -268,7 +269,7 @@ table td {
     padding: 6px 10px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     font-size: 0.85em;
 }
 .column-toggle-panel summary {
@@ -285,7 +286,7 @@ table td {
 .btn.small {
     padding: 2px 6px !important;
     font-size: 0.75em !important;
-    border-radius: 4px;
+    border-radius: var(--radius-control);
 }
 .col-grid {
     display: grid;
@@ -400,7 +401,7 @@ table td {
         display: block;
         margin-bottom: 12px;
         border: 1px solid var(--border-color);
-        border-radius: 10px;
+        border-radius: var(--radius-control);
         background: var(--card-bg);
         padding: 10px 12px 8px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.07);
@@ -495,7 +496,7 @@ table td {
         display: inline-block;
         padding: 8px 14px;
         border: 1px solid var(--border-color);
-        border-radius: 6px;
+        border-radius: var(--radius-chip);
         background: var(--bg-button);
         color: var(--text-color);
         font-size: 13px;
@@ -513,7 +514,7 @@ table td {
         height: auto;
         max-height: 160px;
         object-fit: cover;
-        border-radius: 6px;
+        border-radius: var(--radius-chip);
     }
     .track-table td.col-thumb .thumb-missing {
         display: none;

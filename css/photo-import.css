@@ -26,7 +26,7 @@
     padding: 10px 14px;
     font-size: 14px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--card-bg);
     color: var(--text-color);
     font-family: monospace;
@@ -40,10 +40,10 @@
     font-size: 14px;
     font-weight: 600;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     cursor: pointer;
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
     white-space: nowrap;
 }
 .btn-scan:disabled { opacity: .5; cursor: default; }
@@ -81,7 +81,7 @@
     padding: 10px 14px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 .imp-stats {
     font-size: 13px;
@@ -102,7 +102,7 @@
 }
 .imp-filter-btn.active {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--accent-contrast);
     border-color: var(--accent-color);
 }
 .imp-filter-btn:hover:not(.active) {
@@ -121,7 +121,7 @@
     position: relative;
     background: var(--card-bg);
     border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     cursor: pointer;
     transition: border-color .15s, box-shadow .15s;
@@ -183,7 +183,7 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    background: #888;
+    background: #747474;
     color: #fff;
     font-size: 9px;
     font-weight: 700;
@@ -218,8 +218,8 @@
     text-overflow: ellipsis;
     margin-top: 1px;
 }
-.gps-yes { color: #2e7d32; }
-.gps-no  { color: #aaa; }
+.gps-yes { color: var(--success-color); }
+.gps-no  { color: var(--muted-color); }
 
 /* Sticky import bar */
 .imp-action-bar {
@@ -252,7 +252,7 @@
     font-size: 14px;
     font-weight: 700;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     background: #2e7d32;
     color: #fff;
     cursor: pointer;
@@ -314,9 +314,9 @@
 }
 .imp-result-info { flex: 1; min-width: 0; }
 .imp-result-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.res-ok  { color: #2e7d32; font-weight: 700; }
-.res-dup { color: #888;    font-weight: 700; }
-.res-err { color: #c62828; font-weight: 700; }
+.res-ok  { color: var(--success-color); font-weight: 700; }
+.res-dup { color: var(--warning-color);    font-weight: 700; }
+.res-err { color: var(--error-color); font-weight: 700; }
 
 /* Loading state */
 .imp-loading {

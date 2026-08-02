@@ -17,6 +17,12 @@
     <!-- CSRF token for AJAX requests (read by photo-import.js via meta[name=csrf-token]) -->
     <meta name="csrf-token" content="<?= h(csrf_token()) ?>">
 
+    <?php // Tahle stránka nejede přes layout_header, takže si Inter musí načíst sama —
+          // jinak by jako jediná zůstala v systémovém bezpatkovém písmu. ?>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/photo-import.css') ?>">
 </head>

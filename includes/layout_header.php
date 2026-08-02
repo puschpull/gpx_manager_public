@@ -229,7 +229,7 @@ if (!function_exists('t')) {
    v rozbalovacím menu v hlavičce (render_admin_menu()). Zůstává jen oranžová
    lišta návštěvnického náhledu: je to dočasný stav, který musí být vidět. */
 .visitor-preview-banner{background:#e65c00;color:#fff;padding:6px 16px;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #cc4400;position:sticky;top:0;z-index:9999;gap:12px;font-family:inherit}
-.visitor-preview-banner__exit{color:#fff;text-decoration:none;background:#003366;padding:4px 10px;border-radius:6px}
+.visitor-preview-banner__exit{color:#fff;text-decoration:none;background:var(--color-forest-700);padding:4px 10px;border-radius:6px}
 </style>
 <?php if (function_exists('render_visitor_preview_banner')) render_visitor_preview_banner(); ?>
 
@@ -264,7 +264,7 @@ if (!function_exists('t')) {
 })();
 </script>
 
-<style>.skip-link{position:absolute;left:-9999px;z-index:10000;padding:8px 16px;background:#003366;color:#fff;text-decoration:none;font-weight:600}.skip-link:focus{left:8px;top:8px;outline:2px solid #fff;outline-offset:2px}</style>
+<style>.skip-link{position:absolute;left:-9999px;z-index:10000;padding:8px 16px;background:var(--color-forest-700);color:#fff;text-decoration:none;font-weight:600}.skip-link:focus{left:8px;top:8px;outline:2px solid #fff;outline-offset:2px}</style>
 <a href="#main-content" class="skip-link"><?= htmlspecialchars(t('skip_to_content', 'Přeskočit na obsah')) ?></a>
 
 <!-- Sticky header s blur backdrop -->

@@ -7,7 +7,7 @@
     margin-bottom: 12px; padding: 10px 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
 }
 
 .pn-controls label {
@@ -18,7 +18,7 @@
 .pn-controls select {
     padding: 4px 8px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     background: var(--card-bg);
     color: var(--text-color);
     font-size: 13px;
@@ -38,7 +38,7 @@
     padding: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .pn-results h2 {
@@ -57,7 +57,7 @@
 .pn-card {
     background: var(--bg-secondary, var(--card-bg));
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     cursor: pointer;
     transition: transform .12s ease, box-shadow .12s ease;
@@ -104,7 +104,7 @@
 .pn-track { flex-basis: 100%; }
 
 .pn-track a {
-    color: var(--link-color, #0078d7);
+    color: var(--link-color, #2d4a3e);
     text-decoration: none;
     font-size: 11px;
 }

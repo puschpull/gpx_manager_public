@@ -6,7 +6,7 @@
     height: 65vh;
     min-height: 400px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     margin-bottom: 16px;
     cursor: crosshair;
 }
@@ -17,23 +17,23 @@
     margin-bottom: 12px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     font-size: 14px;
     color: var(--text-color);
 }
 
 .nearby-status.loading {
-    color: var(--link-color, #0078d7);
+    color: var(--link-color, #2d4a3e);
     font-style: italic;
 }
 
 .nearby-status.done {
-    color: var(--success-color, #28a745);
+    color: var(--success-color, #2e7d32);
     font-weight: 600;
 }
 
 .nearby-status.error {
-    color: var(--error-color, #dc3545);
+    color: var(--error-color, #b32d2d);
     font-weight: 600;
 }
 
@@ -43,7 +43,7 @@
     padding: 16px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
 }
 
 .nearby-results h2 {
@@ -81,7 +81,7 @@
 }
 
 .nearby-table a {
-    color: var(--link-color, #0078d7);
+    color: var(--link-color, #2d4a3e);
     text-decoration: none;
 }
 

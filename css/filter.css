@@ -4,7 +4,7 @@
     background: var(--card-bg);
     border: 1px solid var(--accent-color);
     border-left: 4px solid var(--accent-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 10px 14px;
     margin-bottom: 12px;
     font-size: 13px;
@@ -30,7 +30,7 @@
     overflow-y: auto;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 12px;
 }
 
@@ -50,7 +50,7 @@
 .filter-section {
     margin-bottom: 8px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     background: var(--bg-secondary, var(--card-bg));
 }
 
@@ -191,7 +191,7 @@
 
 .btn-primary {
     background: var(--accent-color) !important;
-    color: #fff !important;
+    color: var(--accent-contrast) !important;
     font-weight: 600;
 }
 
@@ -211,7 +211,7 @@
     gap: 12px 20px;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px 14px;
     margin-bottom: 12px;
     font-size: 14px;
@@ -250,14 +250,14 @@
     margin-left: 2px;
 }
 
-.stat-diff.positive { color: #cc0000; }
-.stat-diff.negative { color: #008800; }
+.stat-diff.positive { color: var(--error-color); }
+.stat-diff.negative { color: var(--success-color); }
 
 /* ====== Mapa ====== */
 #filterMap {
     height: 450px;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     overflow: hidden;
     margin-bottom: 12px;
 }
@@ -320,7 +320,7 @@
     height: 220px;
     border: 1px solid var(--border-color);
     background: var(--card-bg);
-    border-radius: 6px;
+    border-radius: var(--radius-chip);
     padding: 8px;
     box-sizing: border-box;
     margin-bottom: 12px;
@@ -336,7 +336,7 @@
 .filter-removal-stats {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 10px 14px;
 }
 
@@ -357,7 +357,7 @@
     align-items: center;
     gap: 6px;
     padding: 4px 10px;
-    border-radius: 14px;
+    border-radius: var(--radius-card);
     font-size: 12px;
     font-weight: 600;
     border: 1px solid;
@@ -373,7 +373,10 @@
 .removal-badge.speed    { border-color: #c62828; color: #c62828; }
 .removal-badge.speed .dot    { background: #c62828; }
 .removal-badge.speed::before { content: "\26A1\00A0"; }
-.removal-badge.spike    { border-color: #e65100; color: #e65100; }
+/* U tří odznaků je původní odstín jako TEXT pod hranicí AA (3,6 až 4,3:1).
+   Ztmavuje se proto jen písmo; tečka a rámeček si drží přesnou barvu z legendy
+   mapy, takže vazba odznak–čára v mapě zůstává nedotčená. */
+.removal-badge.spike    { border-color: #e65100; color: #c24400; }
 .removal-badge.spike .dot    { background: #e65100; }
 .removal-badge.spike::before { content: "\1F4CD\00A0"; }
 .removal-badge.stationary    { border-color: #6e6b00; color: #6e6b00; }
@@ -381,15 +384,39 @@
 .removal-badge.stationary::before { content: "\23F8\00A0"; }
 .removal-badge.elevation { border-color: #9c27b0; color: #9c27b0; }
 .removal-badge.elevation .dot { background: #9c27b0; }
-.removal-badge.segment  { border-color: #757575; color: #757575; }
+.removal-badge.segment  { border-color: #757575; color: #707070; }
 .removal-badge.segment .dot  { background: #757575; }
-.removal-badge.simplify { border-color: #e91e63; color: #e91e63; }
+.removal-badge.simplify { border-color: #e91e63; color: #d81557; }
 .removal-badge.simplify .dot { background: #e91e63; }
+
+/* Tmavý režim: odstín zůstává (odznaky se párují s barvami čar v legendě mapy,
+   takže je nelze sladit do palety), mění se jen světlost, aby text splnil
+   WCAG AA na KARTĚ (forest-800), na které odznaky leží — ne na pozadí
+   stránky. Bez toho měly 2,2 až 3,6:1. Tečka a rámeček si
+   berou tutéž hodnotu, aby odznak držel pohromadě. */
+html.dark .removal-badge.speed,
+html.dark .removal-badge.speed .dot         { border-color: #e37676; color: #e37676; }
+html.dark .removal-badge.speed .dot         { background: #e37676; }
+html.dark .removal-badge.spike,
+html.dark .removal-badge.spike .dot         { border-color: #ff6410; color: #ff6410; }
+html.dark .removal-badge.spike .dot         { background: #ff6410; }
+html.dark .removal-badge.stationary,
+html.dark .removal-badge.stationary .dot    { border-color: #a19d00; color: #a19d00; }
+html.dark .removal-badge.stationary .dot    { background: #a19d00; }
+html.dark .removal-badge.elevation,
+html.dark .removal-badge.elevation .dot     { border-color: #d072e0; color: #d072e0; }
+html.dark .removal-badge.elevation .dot     { background: #d072e0; }
+html.dark .removal-badge.segment,
+html.dark .removal-badge.segment .dot       { border-color: #969696; color: #969696; }
+html.dark .removal-badge.segment .dot       { background: #969696; }
+html.dark .removal-badge.simplify,
+html.dark .removal-badge.simplify .dot      { border-color: #f06897; color: #f06897; }
+html.dark .removal-badge.simplify .dot      { background: #f06897; }
 
 /* ====== Dropzone ====== */
 .filter-dropzone {
     border: 2px dashed var(--border-color);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 20px;
     text-align: center;
     color: var(--text-muted);
@@ -412,8 +439,8 @@
     padding: 10px;
     background: #fff3cd;
     border: 1px solid #ffc107;
-    border-radius: 6px;
-    color: #856404;
+    border-radius: var(--radius-chip);
+    color: var(--warning-color);
     font-size: 13px;
 }
 
@@ -485,7 +512,7 @@ body.filter-mode-expanded .filter-removal-stats {
 /* ====== Preset name dialog (A11Y-026) ====== */
 #preset-name-dialog {
     border: 1px solid var(--border-color, #ddd);
-    border-radius: 8px;
+    border-radius: var(--radius-card);
     padding: 1.5rem;
     max-width: 360px;
     width: 90vw;
@@ -507,7 +534,7 @@ body.filter-mode-expanded .filter-removal-stats {
 .dialog-desc {
     margin: 0 0 1rem;
     font-size: 0.875rem;
-    color: var(--text-secondary-color, #666);
+    color: var(--text-secondary-color, #55665c);
 }
 
 #preset-name-dialog label {
@@ -522,7 +549,7 @@ body.filter-mode-expanded .filter-removal-stats {
     box-sizing: border-box;
     padding: 0.45rem 0.65rem;
     border: 1px solid var(--border-color, #ccc);
-    border-radius: 4px;
+    border-radius: var(--radius-control);
     font-size: 0.9rem;
     background: var(--input-bg, #fff);
     color: var(--text-color, #1a1a1a);
@@ -535,7 +562,7 @@ body.filter-mode-expanded .filter-removal-stats {
 }
 
 .dialog-error {
-    color: #b91c1c;
+    color: var(--error-color);
     font-size: 0.8rem;
     margin: 0 0 0.5rem;
 }
