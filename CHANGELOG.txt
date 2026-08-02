@@ -1,12 +1,133 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 31. července 2026
+  Poslední aktualizace: 2. srpna 2026
 
 ================================================================================
 
 
-── 31. července 2026 ───────────────────────────────────────────────────────────
+── 2. srpna 2026 ───────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  SJEDNOCENÍ VZHLEDU: LEGACY STRÁNKY UŽ NEVYPADAJÍ JAKO JINÁ APLIKACE           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Jedenáct stránek načítá vedle Tailwindu i starší stylopisy — Detailní
+  tabulka, Trasy v okolí, Fotky v okolí, Foto-heatmapa, GPX Cleaner,
+  Porovnání, Administrace, Plánovač, Virtuální trasy, Import a Úprava trasy.
+  Vypadalo to tam jako jiná aplikace. Práce proběhla ve čtyřech etapách,
+  každá zvlášť ověřená měřením a odsouhlasená.
+
+  ETAPA 1 — PÍSMO
+  Starší stylopisy měly `body { font-family: Arial }` a to přebíjelo Inter
+  z nového designu. Nyní je všude Inter. Stránka lokálního importu fotek
+  si ho musela začít načítat sama, protože jako jediná nejede přes společnou
+  hlavičku.
+
+  Při té příležitosti zmizelo 83 řádků mrtvého CSS: pravidla pro zrušenou
+  admin lištu a duplicitní kopie lišty návštěvnického náhledu. Ta kopie se
+  navíc lišila od originálu, takže oranžová lišta vypadala na starších
+  stránkách jinak než jinde.
+
+  ETAPA 2 — BAREVNÁ PALETA
+  Dvacet proměnných přepnuto z původní modrošedé sady na zeleno-pískovou
+  paletu nového designu. Jednou změnou se přebarvilo přes dvě stě pravidel
+  v pěti stylopisech. Zmizely tak modré nadpisy, modré odkazy i modrošedá
+  záhlaví tabulek.
+
+  Šest proměnných se v CSS používalo, ale nikde se nedefinovalo — padaly
+  proto na svou náhradní hodnotu, a ta byla u odkazů výrazně modrá na
+  dvanácti místech v sedmi souborech. To byla skrytá druhá polovina problému.
+
+  ETAPA 3 — ROZMĚRY KOMPONENT
+  Zaoblení rohů bylo rozeseté v osmi hodnotách od 2 do 16 px bez pravidla.
+  Zavedena škála: 6 px pro štítky, 10 px pro pole a tlačítka, 14 px pro karty
+  a panely — stejné hodnoty, jaké má nový design. Zařazeno podle významu
+  prvku, ne plošně.
+
+  ETAPA 4 — ZBYLÉ BARVY ZADANÉ NATVRDO
+  Odhalila regresi ze druhé etapy: jakmile se akcentní barva v tmavém režimu
+  stala světle zelenou, spadl bílý text na tlačítkách na kontrast 2,5:1.
+  Opraveno zvláštní proměnnou pro barvu textu na akcentu.
+
+  Stavové barvy (hotovo, chyba, varování, přeskočeno) byly rozeseté v jedenácti
+  hodnotách bez variant pro tmavý režim — červená chybová hláška měla na tmavém
+  pozadí 2,3:1. Nyní čtyři proměnné s variantami pro oba režimy.
+
+  Odznaky v GPX Cleaneru byly zvláštní případ: jejich barvy nejsou dekorace,
+  ale kódování dat — každý důvod odstranění má svůj odstín a ten se páruje
+  s barvou čar v mapě. Zachován odstín, upravena jen světlost; tečka a rámeček
+  si drží přesnou barvu z legendy, takže vazba na mapu zůstala nedotčená.
+
+  VÝSLEDEK MĚŘENÍ KONTRASTU
+                              před    po
+    propadá v tmavém režimu     52      0
+    propadá ve světlém          22      0
+
+  Tohle byl mimochodem nejcennější výnos celé práce a nešlo o vzhled:
+  v tmavém režimu, který je zde výchozí, byla řada hlášek na hranici
+  čitelnosti.
+
+  CO ZŮSTALO ZÁMĚRNĚ
+  Hustota tabulek (záhlaví 2×4 px, buňky 6×8 px). Detailní tabulka má
+  třicet sloupců a vzdušnější rozestupy z nového designu by ubraly viditelné
+  řádky. Ze stejného důvodu zůstaly menší velikosti písma v hustém ovládání
+  a drobná dekorativní zaoblení u vzorníků barev a teček.
+
+  Upravené: css/style.css, css/index.css, css/filter.css, css/photos-outdoor.css,
+  css/photo-import.css, css/compare.css, css/nearby.css, css/photo_nearby.css,
+  css/planner.css, css/replay.css, css/detail.css, includes/layout_header.php,
+  includes/photo_import_view.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: MENU BYLO NA ČÁSTI STRÁNEK O 28 PX UŽŠÍ                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Na osmi stránkách vypadalo horní menu užší a písmo drobnější. Naměřeno
+  721 px proti 749 px jinde.
+
+  Příčinou bylo `body { font-family: Arial }` ve starších stylopisech, které
+  přebíjelo Inter. Položky menu vlastní písmo nedeklarují, takže ho dědí —
+  a Arial je při stejné velikosti užší: 12px „Virtuální trasy" měří 73,1 px
+  proti 78,2 px v Interu.
+
+  Dojem drobnějších ikon a písma klamal jen zdánlivě: velikosti byly celou
+  dobu shodné (písmo 12 px, ikona 30 px), liší se jen kresba písma. Nápis
+  GPX Manager zůstával správně v Manrope, protože ho má vlastní třídou.
+
+  Hlavička a mobilní menu si nyní písmo určují samy. Ověřeno na všech osmi
+  hlášených stránkách: 749 až 752 px, přičemž rozdíl 1–3 px je výhradně tučná
+  aktivní položka.
+
+  Upravené: includes/layout_header.php
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: HLAVIČKA BYLA NA 11 STRÁNKÁCH ODSAZENÁ OD OKRAJE OKNA                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Zhruba polovina stránek měla menu nahoře odsazené. Sedělo to přesně na ty,
+  které načítají starší stylopis.
+
+  Příčinou bylo `body { margin: 20px }` v css/style.css a tatáž kopie
+  v css/index.css. Nešlo přitom jen o 20 px shora — hlavička byla zasunutá
+  i po stranách, měřila 1234 px místo 1274 a nešla přes celou šířku okna.
+  Při rolování zasunutá zůstávala.
+
+  Odsazení si nyní drží obsah sám. Ze všech jedenácti stránek má pod hlavičkou
+  starší obsah bez vlastního odsazení jen Detailní tabulka; ty dva bloky
+  dostaly stejné hodnoty, aby obsah začínal všude stejně.
+
+  Upravené: css/style.css, css/index.css
+
+  POZNÁMKA KE VŠEM TŘEM ZÁZNAMŮM VÝŠE
+  Všechny tři mají tentýž kořen a je to už počtvrté za týden. Starší stylopisy
+  jsou nevrstvené, kdežto Tailwind dává svá pravidla do vrstev (@layer) —
+  a nevrstvené pravidlo porazí vrstvené bez ohledu na pořadí i specificitu.
+  Stejný mechanismus dřív shodil horní menu (přes cizí pravidlo od rozšíření
+  prohlížeče) a obarvil menu namodro. Až se příště objeví odchylka „jen na
+  některých stránkách", tohle je první podezřelý.
+
+── 1. srpna 2026 ───────────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  DODATEK: TLAKOVÉ VYSVĚTLENÍ ROZDÍLU VÝŠKY NEOBSTÁLO                           │
@@ -114,6 +235,8 @@
   Nové: js/detail-baro.js
   Upravené: includes/detail_view.php, includes/app_constants.php,
   css/detail.css, lang/*.php
+
+── 31. července 2026 ───────────────────────────────────────────────────────────
 
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │  ADMIN LIŠTA ZRUŠENA — JEJÍ OBSAH JE V MENU V HLAVIČCE                         │
