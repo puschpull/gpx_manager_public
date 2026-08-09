@@ -1,10 +1,68 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 2. srpna 2026
+  Poslední aktualizace: 9. srpna 2026
 
 ================================================================================
 
+
+── 9. srpna 2026 ───────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ STRÁNKA: PODOBNÉ WEBY — ROZCESTNÍK NA PŘÍBUZNÉ NÁSTROJE                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  Nová stránka links.php se seznamem webů, které se hodí vedle tohoto archivu.
+  Dvacet odkazů v šesti kategoriích:
+
+    Prohlížeče a editory GPX   gpx.studio, GPX mapy, GPS Visualizer,
+                               MyGPSFiles, ViewGPX, msimons.nl, GlandNav
+    Plánování tras             Mapy.com, BRouter web, openrouteservice, Komoot
+    Mapy a značené trasy       Waymarked Trails, OpenTopoMap, CyclOSM, Cykloatlas
+    Deníky a komunita          Strava, Turistika.cz
+    Hory a panorama            PeakFinder, PeakVisor
+    Převody a nástroje         GPSBabel
+
+  Prvních sedm jsou tipy majitele, zbytek doplněn a před zařazením ověřen, že
+  weby žijí a odpovídají. Waymarked Trails a OpenTopoMap přitom aplikace už
+  používá jako mapové vrstvy, PeakFinder a PeakVisor se hodí k fotkám z hřebenů
+  — pojmenují kopce na obzoru.
+
+  Každý odkaz má krátký popis, doménu pod názvem (ať je vidět, kam vede, ještě
+  před kliknutím) a odznaky „česky", „zdarma", „bez registrace", „registrace"
+  nebo „i mobilní aplikace". Odkazy se otevírají v novém okně a mají
+  rel="noopener noreferrer".
+
+  VYPÍNÁNÍ
+  Stránka se zapíná a vypíná v Administraci mezi viditelnými stránkami
+  (🧭 Podobné weby), stejně jako většina ostatních. Ve výchozím stavu je jen
+  pro správce — návštěvníkům se ukáže, až se zaškrtne. V menu se objevila na
+  konci; pořadí lze přeskládat v Administraci.
+
+  DVĚ ZÁMĚRNÁ ROZHODNUTÍ
+
+  Popisky odkazů jsou jen česky. Okolí stránky — nadpis, kategorie, odznaky,
+  úvod — je přeložené do všech osmi jazyků, ale dvacet popisů krát osm jazyků
+  by bylo nepoměrné k užitku, zvlášť když je část odkazovaných nástrojů stejně
+  jen česká.
+
+  Nenačítají se ikonky (favicony) cizích webů. Vypadalo by to hezčí, ale každé
+  zobrazení stránky by ohlásilo návštěvu dvaceti cizím serverům — což by šlo
+  proti tomu, proč web od 2. srpna nechceme ve vyhledávačích.
+
+  OVĚŘENO
+  Kontrast v obou režimech nad hranicí WCAG AA. U domény pod názvem bylo nutné
+  zvýšit sytost: při 12 px a průhlednosti 65 % vycházela na bílé kartě na
+  3,7:1, tedy pod normou; na 75 % je to 4,8:1. Vypnutí ověřeno tak, že stránka
+  byla dočasně odebrána z viditelných a návštěvník skončil na úvodní stránce;
+  nastavení pak vráceno do původního stavu. Smoke test 22 cest bez chyby.
+
+  PŘIDÁNÍ DALŠÍHO ODKAZU
+  Jeden řádek v includes/links_data.php. Nikde jinde se nic měnit nemusí.
+
+  Nové: links.php, includes/links_data.php, includes/links_view.php,
+  css/links.css
+  Upravené: includes/app_constants.php, admin.php, lang/*.php
 
 ── 2. srpna 2026 ───────────────────────────────────────────────────────────────
 

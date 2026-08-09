@@ -552,6 +552,24 @@ return [
     // ===== Admin banner (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Vysvetlenie rozdielu výšky štart/cieľ (okruhy)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Podobné weby',
+    'nav_links'            => 'Podobné weby',
+    'links_intro'          => 'Nástroje, ktoré sa hodia popri tomto archíve — prehliadače a editory GPX, plánovače trás, mapy so značením a pár ďalších užitočností. Všetky odkazy vedú mimo tento web a otvoria sa v novom okne.',
+    'links_count'          => 'Celkom %d odkazov v %d kategóriách.',
+    'links_disclaimer'     => 'Odkazy sú tipy, nie odporúčania — s cudzími webmi nemá tento archív nič spoločné a nemôže ručiť za to, čo na nich nájdete ani ako narábajú s vašimi údajmi.',
+    'links_cat_viewers'    => 'Prehliadače a editory GPX',
+    'links_cat_planning'   => 'Plánovanie trás',
+    'links_cat_maps'       => 'Mapy a značené trasy',
+    'links_cat_community'  => 'Denníky a komunita',
+    'links_cat_peaks'      => 'Hory a panoráma',
+    'links_cat_tools'      => 'Prevody a nástroje',
+    'links_badge_cz'       => 'po česky',
+    'links_badge_free'     => 'zadarmo',
+    'links_badge_noreg'    => 'bez registrácie',
+    'links_badge_reg'      => 'registrácia',
+    'links_badge_app'      => 'aj mobilná aplikácia',
+
     'baro_show'            => 'Zobraziť detaily',
     'baro_hide'            => 'Skryť detaily',
     'baro_summary_diff'    => 'rozdiel {diff} m',

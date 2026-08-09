@@ -567,6 +567,24 @@ return [
     // ===== Admin banner (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Explain the start/finish elevation gap (loops)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Similar sites',
+    'nav_links'            => 'Similar sites',
+    'links_intro'          => 'Tools that go well alongside this archive — GPX viewers and editors, route planners, maps with waymarking and a few other useful things. Every link leads off this site and opens in a new window.',
+    'links_count'          => '%d links in %d categories.',
+    'links_disclaimer'     => 'These are tips, not endorsements. This archive has no connection to those sites and cannot vouch for what you find there or how they handle your data.',
+    'links_cat_viewers'    => 'GPX viewers and editors',
+    'links_cat_planning'   => 'Route planning',
+    'links_cat_maps'       => 'Maps and waymarked trails',
+    'links_cat_community'  => 'Logs and community',
+    'links_cat_peaks'      => 'Mountains and panoramas',
+    'links_cat_tools'      => 'Conversion and tools',
+    'links_badge_cz'       => 'Czech',
+    'links_badge_free'     => 'free',
+    'links_badge_noreg'    => 'no sign-up',
+    'links_badge_reg'      => 'sign-up needed',
+    'links_badge_app'      => 'mobile app too',
+
     'baro_show'            => 'Show details',
     'baro_hide'            => 'Hide details',
     'baro_summary_diff'    => 'difference {diff} m',

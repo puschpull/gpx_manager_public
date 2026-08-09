@@ -552,6 +552,24 @@ return [
     // ===== Banner amministratore (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Spiegare il dislivello partenza/arrivo (anelli)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Siti simili',
+    'nav_links'            => 'Siti simili',
+    'links_intro'          => 'Strumenti che si affiancano bene a questo archivio: visualizzatori ed editor GPX, pianificatori di percorsi, mappe con segnaletica e qualche altra utilità. Tutti i collegamenti portano fuori da questo sito e si aprono in una nuova finestra.',
+    'links_count'          => '%d collegamenti in %d categorie.',
+    'links_disclaimer'     => 'Sono spunti, non raccomandazioni. Questo archivio non ha alcun rapporto con quei siti e non può garantire né i contenuti né il trattamento dei vostri dati.',
+    'links_cat_viewers'    => 'Visualizzatori ed editor GPX',
+    'links_cat_planning'   => 'Pianificazione dei percorsi',
+    'links_cat_maps'       => 'Mappe e sentieri segnalati',
+    'links_cat_community'  => 'Diari e comunità',
+    'links_cat_peaks'      => 'Montagne e panorami',
+    'links_cat_tools'      => 'Conversione e strumenti',
+    'links_badge_cz'       => 'in ceco',
+    'links_badge_free'     => 'gratuito',
+    'links_badge_noreg'    => 'senza registrazione',
+    'links_badge_reg'      => 'richiede registrazione',
+    'links_badge_app'      => 'anche app mobile',
+
     'baro_show'            => 'Mostra dettagli',
     'baro_hide'            => 'Nascondi dettagli',
     'baro_summary_diff'    => 'differenza {diff} m',

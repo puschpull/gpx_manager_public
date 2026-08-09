@@ -22,7 +22,7 @@ function all_langs(): array {
  * Toto je jediné místo, kde se tento seznam definuje.
  */
 function all_pages(): array {
-    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks'];
+    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks', 'links'];
 }
 
 /**
@@ -44,6 +44,7 @@ function nav_menu_items(): array {
         // 'planner' není v all_pages() → návštěvník ho nikdy nevidí (jen admin);
         // samotná stránka je navíc za auth.php.
         'planner'        => ['planner.php',        'signpost',    t('nav_planner',        'Plánovač'),        'planner'],
+        'links'          => ['links.php',          'compass',     t('nav_links',          'Podobné weby'),    'links'],
     ];
 }
 

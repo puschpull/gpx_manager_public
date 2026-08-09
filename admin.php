@@ -433,7 +433,7 @@ $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩
 $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
     'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě',
     'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
-    'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení',
+    'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení','links'=>'🧭 Podobné weby',
     'photos'=>'📸 Fotografie (jen prohlížení)',
     'planner'=>'🥾 Plánovač (bez ukládání — čerpá mapovou API kvótu!)'];
 ?>

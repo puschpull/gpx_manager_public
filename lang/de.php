@@ -552,6 +552,24 @@ return [
     // ===== Admin-Banner (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Höhenunterschied Start/Ziel erklären (Rundwege)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Ähnliche Websites',
+    'nav_links'            => 'Ähnliche Websites',
+    'links_intro'          => 'Werkzeuge, die sich neben diesem Archiv anbieten — GPX-Betrachter und -Editoren, Routenplaner, Karten mit Wegmarkierung und einige weitere Helfer. Alle Links führen von dieser Website weg und öffnen sich in einem neuen Fenster.',
+    'links_count'          => '%d Links in %d Kategorien.',
+    'links_disclaimer'     => 'Das sind Tipps, keine Empfehlungen. Dieses Archiv hat mit den fremden Websites nichts zu tun und kann weder für deren Inhalte noch für den Umgang mit Ihren Daten einstehen.',
+    'links_cat_viewers'    => 'GPX-Betrachter und -Editoren',
+    'links_cat_planning'   => 'Routenplanung',
+    'links_cat_maps'       => 'Karten und markierte Wege',
+    'links_cat_community'  => 'Tagebücher und Community',
+    'links_cat_peaks'      => 'Berge und Panoramen',
+    'links_cat_tools'      => 'Umwandlung und Werkzeuge',
+    'links_badge_cz'       => 'tschechisch',
+    'links_badge_free'     => 'kostenlos',
+    'links_badge_noreg'    => 'ohne Anmeldung',
+    'links_badge_reg'      => 'Anmeldung nötig',
+    'links_badge_app'      => 'auch als App',
+
     'baro_show'            => 'Details anzeigen',
     'baro_hide'            => 'Details ausblenden',
     'baro_summary_diff'    => 'Unterschied {diff} m',

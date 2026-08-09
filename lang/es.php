@@ -552,6 +552,24 @@ return [
     // ===== Banner de administrador (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Explicar la diferencia de altitud salida/llegada (circulares)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Sitios similares',
+    'nav_links'            => 'Sitios similares',
+    'links_intro'          => 'Herramientas que acompañan bien a este archivo: visores y editores de GPX, planificadores de rutas, mapas con señalización y alguna utilidad más. Todos los enlaces salen de este sitio y se abren en una ventana nueva.',
+    'links_count'          => '%d enlaces en %d categorías.',
+    'links_disclaimer'     => 'Son sugerencias, no recomendaciones. Este archivo no tiene relación con esos sitios y no puede responder de lo que encuentre allí ni de cómo tratan sus datos.',
+    'links_cat_viewers'    => 'Visores y editores de GPX',
+    'links_cat_planning'   => 'Planificación de rutas',
+    'links_cat_maps'       => 'Mapas y senderos señalizados',
+    'links_cat_community'  => 'Diarios y comunidad',
+    'links_cat_peaks'      => 'Montañas y panorámicas',
+    'links_cat_tools'      => 'Conversión y herramientas',
+    'links_badge_cz'       => 'en checo',
+    'links_badge_free'     => 'gratis',
+    'links_badge_noreg'    => 'sin registro',
+    'links_badge_reg'      => 'requiere registro',
+    'links_badge_app'      => 'también app móvil',
+
     'baro_show'            => 'Mostrar detalles',
     'baro_hide'            => 'Ocultar detalles',
     'baro_summary_diff'    => 'diferencia {diff} m',

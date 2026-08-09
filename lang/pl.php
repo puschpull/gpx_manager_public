@@ -552,6 +552,24 @@ return [
     // ===== Baner administratora (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Wyjaśnienie różnicy wysokości start/meta (pętle)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Podobne strony',
+    'nav_links'            => 'Podobne strony',
+    'links_intro'          => 'Narzędzia, które dobrze uzupełniają to archiwum — przeglądarki i edytory GPX, planery tras, mapy ze znakowaniem i kilka innych przydatnych rzeczy. Wszystkie odnośniki prowadzą poza tę stronę i otwierają się w nowym oknie.',
+    'links_count'          => '%d odnośników w %d kategoriach.',
+    'links_disclaimer'     => 'To wskazówki, nie rekomendacje. To archiwum nie ma nic wspólnego z tamtymi stronami i nie odpowiada za ich treść ani za to, jak traktują Twoje dane.',
+    'links_cat_viewers'    => 'Przeglądarki i edytory GPX',
+    'links_cat_planning'   => 'Planowanie tras',
+    'links_cat_maps'       => 'Mapy i szlaki znakowane',
+    'links_cat_community'  => 'Dzienniki i społeczność',
+    'links_cat_peaks'      => 'Góry i panoramy',
+    'links_cat_tools'      => 'Konwersja i narzędzia',
+    'links_badge_cz'       => 'po czesku',
+    'links_badge_free'     => 'za darmo',
+    'links_badge_noreg'    => 'bez rejestracji',
+    'links_badge_reg'      => 'wymaga rejestracji',
+    'links_badge_app'      => 'także aplikacja',
+
     'baro_show'            => 'Pokaż szczegóły',
     'baro_hide'            => 'Ukryj szczegóły',
     'baro_summary_diff'    => 'różnica {diff} m',

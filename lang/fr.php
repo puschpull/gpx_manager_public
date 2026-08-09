@@ -552,6 +552,24 @@ return [
     // ===== Bannière administrateur (TASK-17) =====
     // ===== Barometricka kontrola vysky start/cil =====
     'ft_baro_note'         => 'Expliquer l\'écart d\'altitude départ/arrivée (boucles)',
+    // ===== Rozcestnik na podobne weby (links.php) =====
+    'h1_links'             => 'Sites similaires',
+    'nav_links'            => 'Sites similaires',
+    'links_intro'          => 'Des outils qui complètent bien cette archive : visionneuses et éditeurs GPX, planificateurs d\'itinéraires, cartes avec balisage et quelques autres utilitaires. Tous les liens quittent ce site et s\'ouvrent dans une nouvelle fenêtre.',
+    'links_count'          => '%d liens dans %d catégories.',
+    'links_disclaimer'     => 'Ce sont des suggestions, pas des recommandations. Cette archive n\'a aucun lien avec ces sites et ne peut répondre ni de leur contenu ni de l\'usage qu\'ils font de vos données.',
+    'links_cat_viewers'    => 'Visionneuses et éditeurs GPX',
+    'links_cat_planning'   => 'Planification d\'itinéraires',
+    'links_cat_maps'       => 'Cartes et sentiers balisés',
+    'links_cat_community'  => 'Carnets et communauté',
+    'links_cat_peaks'      => 'Montagnes et panoramas',
+    'links_cat_tools'      => 'Conversion et outils',
+    'links_badge_cz'       => 'en tchèque',
+    'links_badge_free'     => 'gratuit',
+    'links_badge_noreg'    => 'sans inscription',
+    'links_badge_reg'      => 'inscription requise',
+    'links_badge_app'      => 'application mobile aussi',
+
     'baro_show'            => 'Afficher les détails',
     'baro_hide'            => 'Masquer les détails',
     'baro_summary_diff'    => 'écart {diff} m',
