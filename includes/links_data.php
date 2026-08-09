@@ -13,6 +13,7 @@ declare(strict_types=1);
  *
  * Odznaky (badge): 'cz' česky | 'free' zdarma | 'reg' vyžaduje registraci
  *                  | 'noreg' bez registrace | 'app' i mobilní aplikace
+ *                  | 'local' zpracuje soubor v prohlížeči, nikam ho neposílá
  *
  * Poznámka k soukromí: schválně se nenačítají ikonky (favicony) z cizích
  * domén. Vypadalo by to hezky, ale každé zobrazení stránky by ohlásilo
@@ -79,6 +80,13 @@ function links_catalog(): array
                     'desc' => 'Další rychlý prohlížeč v prohlížeči — nahraj a koukej. '
                             . 'Užitečné jako druhý názor, když se ti něco nezdá.',
                     'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'Mappr GPX Viewer',
+                    'url'  => 'https://www.mappr.co/gpx-viewer/',
+                    'desc' => 'Zpracuje soubor přímo v prohlížeči — nikam se nenahrává. '
+                            . 'Ukáže trasu, výškový profil, vzdálenost a převýšení.',
+                    'badges' => ['free', 'noreg', 'local'],
                 ],
             ],
         ],
@@ -147,6 +155,74 @@ function links_catalog(): array
                     'desc' => 'Český cykloatlas s cyklotrasami a jejich značením. '
                             . 'Pro plánování na kole doma nejpodrobnější.',
                     'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Klub českých turistů',
+                    'url'  => 'https://kct.cz/',
+                    'desc' => 'Ti, kdo to značení v terénu opravdu udržují — přes 135 let. '
+                            . 'Popis systému značek, mapová edice, síť turistických chat.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Trailforks',
+                    'url'  => 'https://www.trailforks.com/',
+                    'desc' => 'Největší databáze stezek na světě, s obtížností a stavem povrchu. '
+                            . 'Těžiště má u horských kol, ale hodí se i pěšímu.',
+                    'badges' => ['free', 'app'],
+                ],
+            ],
+        ],
+        [
+            'title' => t('links_cat_replay', 'Animace a 3D přelety'),
+            'icon'  => 'play-circle',
+            'items' => [
+                [
+                    'name' => 'GPX Replay',
+                    'url'  => 'https://gpx.pelmers.com/',
+                    'desc' => 'Udělá z trasy animovanou mapu, kterou si pustíš nebo vyexportuješ '
+                            . 'do videa. Nemá serverovou část — soubor tvůj počítač neopustí.',
+                    'badges' => ['free', 'noreg', 'local'],
+                ],
+                [
+                    'name' => 'Trackalyzer',
+                    'url'  => 'https://trackalyzer.trackthisout.com/',
+                    'desc' => 'Rozbor trasy a 3D přelet nad terénem. Nástupce zrušené Doaramy, '
+                            . 'umí i trasy ze Stravy.',
+                    'badges' => ['free'],
+                ],
+                [
+                    'name' => 'Mapdirector',
+                    'url'  => 'https://www.mapdirector.com/',
+                    'desc' => 'Filmové přelety nad trasou pro sdílení. Pozor, kde končí verze '
+                            . 'zdarma — z webu to není zřejmé.',
+                    'badges' => [],
+                ],
+            ],
+        ],
+        [
+            'title' => t('links_cat_weather', 'Počasí a podmínky'),
+            'icon'  => 'cloud-sun',
+            'items' => [
+                [
+                    'name' => 'Windy',
+                    'url'  => 'https://www.windy.com/',
+                    'desc' => 'Nejlepší vizualizace počasí na webu — vrstvy pro vítr, srážky, '
+                            . 'oblačnost i mlhu. K plánování výšlapu praktičtější než běžná předpověď.',
+                    'badges' => ['cz', 'free', 'app'],
+                ],
+                [
+                    'name' => 'Horská služba ČR',
+                    'url'  => 'https://www.horskasluzba.cz/',
+                    'desc' => 'Aktuální podmínky na horách, výstrahy a lavinová situace. '
+                            . 'Než vyrazíš do vyšších poloh, stojí za dvě minuty.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'bergfex',
+                    'url'  => 'https://www.bergfex.cz/',
+                    'desc' => 'Počasí, webkamery a túry, těžiště v Alpách a v Rakousku. '
+                            . 'Webkamery se hodí ke zjištění, jak to na místě opravdu vypadá.',
+                    'badges' => ['cz', 'free', 'app'],
                 ],
             ],
         ],
@@ -219,5 +295,6 @@ function links_badge_labels(): array
         'noreg' => t('links_badge_noreg', 'bez registrace'),
         'reg'   => t('links_badge_reg',   'registrace'),
         'app'   => t('links_badge_app',   'i mobilní aplikace'),
+        'local' => t('links_badge_local', 'soubor se nikam nenahrává'),
     ];
 }

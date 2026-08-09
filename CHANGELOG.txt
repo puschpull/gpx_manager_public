@@ -57,6 +57,22 @@
   byla dočasně odebrána z viditelných a návštěvník skončil na úvodní stránce;
   nastavení pak vráceno do původního stavu. Smoke test 22 cest bez chyby.
 
+  ROZŠÍŘENO NA 29 ODKAZŮ (9. 8. odpoledne)
+  Po průzkumu zahraničních i českých webů přibylo devět odkazů a dvě
+  kategorie:
+
+    Animace a 3D přelety   GPX Replay, Trackalyzer, Mapdirector
+    Počasí a podmínky      Windy, Horská služba ČR, bergfex
+
+  Do stávajících kategorií: Mappr GPX Viewer (prohlížeče), Klub českých
+  turistů a Trailforks (mapy a značené trasy).
+
+  Nový odznak „soubor se nikam nenahrává" u nástrojů, které zpracují GPX
+  přímo v prohlížeči a nikam ho neposílají — GPX Replay a Mappr.
+
+  U Mapdirectoru se z webu nepodařilo zjistit, kde končí verze zdarma, proto
+  nemá odznak „zdarma" a je to zmíněné v popisu.
+
   PŘIDÁNÍ DALŠÍHO ODKAZU
   Jeden řádek v includes/links_data.php. Nikde jinde se nic měnit nemusí.
 
