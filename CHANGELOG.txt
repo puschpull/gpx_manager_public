@@ -73,6 +73,24 @@
   U Mapdirectoru se z webu nepodařilo zjistit, kde končí verze zdarma, proto
   nemá odznak „zdarma" a je to zmíněné v popisu.
 
+  ROZŠÍŘENO NA 49 ODKAZŮ (9. 8. večer)
+  Dalších dvacet odkazů a dvě kategorie:
+
+    Do přístroje a offline      OpenTopoMap pro Garmin, BBBike extracts,
+                                Garmin BaseCamp, Locus Map, OsmAnd
+    Statistiky a průzkum území  StatsHunters, Wandrer.earth, VeloViewer
+
+  Do stávajících kategorií: IDOS, OpenStreetMap, Waymarked Trails pro cyklo
+  i MTB, Freemap Slovakia, Mapillary, uMap, Wikiloc, Treking.cz, Hrady.cz,
+  Geocaching a MyGeodata Converter.
+
+  Kategorie „Do přístroje a offline" vznikla cíleně kvůli navigacím Garmin —
+  hotové topografické mapy z OpenStreetMap a možnost vyříznout si libovolný
+  kus světa v garminském formátu.
+
+  Všech 49 odkazů prověřeno dávkově. Dva vrátily chybu (Trailforks 403,
+  Mapillary 400) — obojí je obrana proti automatům, v prohlížeči fungují.
+
   PŘIDÁNÍ DALŠÍHO ODKAZU
   Jeden řádek v includes/links_data.php. Nikde jinde se nic měnit nemusí.
 

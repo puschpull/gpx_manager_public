@@ -564,6 +564,8 @@ return [
     'links_cat_community'  => 'Diari e comunità',
     'links_cat_peaks'      => 'Montagne e panorami',
     'links_cat_tools'      => 'Conversione e strumenti',
+    'links_cat_device'     => 'Sul dispositivo e offline',
+    'links_cat_stats'      => 'Statistiche ed esplorazione',
     'links_cat_replay'     => 'Animazioni e sorvoli 3D',
     'links_cat_weather'    => 'Meteo e condizioni',
     'links_badge_local'    => 'il file non lascia il browser',

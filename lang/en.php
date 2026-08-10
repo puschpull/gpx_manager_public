@@ -579,6 +579,8 @@ return [
     'links_cat_community'  => 'Logs and community',
     'links_cat_peaks'      => 'Mountains and panoramas',
     'links_cat_tools'      => 'Conversion and tools',
+    'links_cat_device'     => 'On the device and offline',
+    'links_cat_stats'      => 'Statistics and exploration',
     'links_cat_replay'     => 'Animation and 3D flyovers',
     'links_cat_weather'    => 'Weather and conditions',
     'links_badge_local'    => 'file never leaves your browser',

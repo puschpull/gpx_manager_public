@@ -564,6 +564,8 @@ return [
     'links_cat_community'  => 'Denníky a komunita',
     'links_cat_peaks'      => 'Hory a panoráma',
     'links_cat_tools'      => 'Prevody a nástroje',
+    'links_cat_device'     => 'Do prístroja a offline',
+    'links_cat_stats'      => 'Štatistiky a prieskum územia',
     'links_cat_replay'     => 'Animácie a 3D prelety',
     'links_cat_weather'    => 'Počasie a podmienky',
     'links_badge_local'    => 'súbor sa nikam nenahráva',

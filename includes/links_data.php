@@ -122,6 +122,13 @@ function links_catalog(): array
                             . 'kondice. Základ zdarma, offline mapy za peníze.',
                     'badges' => ['cz', 'reg', 'app'],
                 ],
+                [
+                    'name' => 'IDOS',
+                    'url'  => 'https://idos.cz/',
+                    'desc' => 'Jízdní řády vlaků a autobusů. Když trasa nezačíná u domu, '
+                            . 'je tohle druhá polovina plánování.',
+                    'badges' => ['cz', 'free', 'app'],
+                ],
             ],
         ],
         [
@@ -169,6 +176,116 @@ function links_catalog(): array
                     'desc' => 'Největší databáze stezek na světě, s obtížností a stavem povrchu. '
                             . 'Těžiště má u horských kol, ale hodí se i pěšímu.',
                     'badges' => ['free', 'app'],
+                ],
+                [
+                    'name' => 'OpenStreetMap',
+                    'url'  => 'https://www.openstreetmap.org/',
+                    'desc' => 'Pramen, ze kterého čerpá skoro všechno ostatní na této stránce '
+                            . '— tenhle web nevyjímaje. Když někde chybí cesta, opravit ji jde tady.',
+                    'badges' => ['cz', 'free', 'noreg'],
+                ],
+                [
+                    'name' => 'Waymarked Trails — Cycling',
+                    'url'  => 'https://cycling.waymarkedtrails.org/',
+                    'desc' => 'Sesterská mapa k turistické: značené cyklotrasy z OpenStreetMap, '
+                            . 'od dálkových po místní.',
+                    'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'Waymarked Trails — MTB',
+                    'url'  => 'https://mtb.waymarkedtrails.org/',
+                    'desc' => 'Totéž pro singletracky a horská kola, s vyznačenou obtížností.',
+                    'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'Freemap Slovakia',
+                    'url'  => 'https://www.freemap.sk/',
+                    'desc' => 'Slovenská outdoorová mapa s plánováním a exportem GPX. '
+                            . 'Pro Malou i Velkou Fatru lepší podklad než obecné mapy.',
+                    'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'Mapillary',
+                    'url'  => 'https://www.mapillary.com/',
+                    'desc' => 'Fotky z úrovně cesty, nasnímané dobrovolníky. Užitečné k ověření, '
+                            . 'jestli je „cesta" na mapě opravdu cesta. Vrstvu z Mapillary má '
+                            . 'i tenhle web přímo v mapách.',
+                    'badges' => ['free'],
+                ],
+                [
+                    'name' => 'uMap',
+                    'url'  => 'https://umap.openstreetmap.fr/',
+                    'desc' => 'Vlastní mapa na pár kliknutí — přidáš body, čáry, vlastní popisky '
+                            . 'a sdílíš odkazem. Hodí se na mapu k jedné konkrétní akci.',
+                    'badges' => ['free', 'noreg'],
+                ],
+            ],
+        ],
+        [
+            'title' => t('links_cat_device', 'Do přístroje a offline'),
+            'icon'  => 'download',
+            'items' => [
+                [
+                    'name' => 'OpenTopoMap pro Garmin',
+                    'url'  => 'https://garmin.opentopomap.org/',
+                    'desc' => 'Hotové topografické mapy pro Garmin, generované z OpenStreetMap. '
+                            . 'Zdarma a pravidelně aktualizované — do navigace se nahrají jako soubor.',
+                    'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'BBBike extracts',
+                    'url'  => 'https://extract.bbbike.org/',
+                    'desc' => 'Vyřízneš si z OpenStreetMap libovolný kus světa a stáhneš ho '
+                            . 'v požadovaném formátu, včetně garminského. Hodí se na cesty do zahraničí.',
+                    'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'Garmin BaseCamp',
+                    'url'  => 'https://www.garmin.com/cs-CZ/software/basecamp/',
+                    'desc' => 'Program do počítače pro správu tras a bodů v Garminu. '
+                            . 'Starší, ale pro přenos dat do přístroje pořád nejjistější cesta.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Locus Map',
+                    'url'  => 'https://www.locusmap.app/',
+                    'desc' => 'Česká outdoorová navigace do mobilu s offline mapami a záznamem '
+                            . 'trasy. Umí importovat i exportovat GPX.',
+                    'badges' => ['cz', 'app'],
+                ],
+                [
+                    'name' => 'OsmAnd',
+                    'url'  => 'https://osmand.net/',
+                    'desc' => 'Otevřená navigace s offline mapami z OpenStreetMap. '
+                            . 'Dobrá záloha pro případ, že v terénu není signál.',
+                    'badges' => ['free', 'app'],
+                ],
+            ],
+        ],
+        [
+            'title' => t('links_cat_stats', 'Statistiky a průzkum území'),
+            'icon'  => 'trending-up',
+            'items' => [
+                [
+                    'name' => 'StatsHunters',
+                    'url'  => 'https://www.statshunters.com/',
+                    'desc' => 'Rozdělí mapu na čtverce a ukáže, které jsi už projel nebo prošel. '
+                            . 'Nenápadně návyková hra, která tě začne posílat do neznámých míst.',
+                    'badges' => ['free', 'reg'],
+                ],
+                [
+                    'name' => 'Wandrer.earth',
+                    'url'  => 'https://wandrer.earth/',
+                    'desc' => 'Počítá, kolik procent cest ve tvém okolí jsi už prošel. '
+                            . 'Jiný pohled na totéž — místo čtverců sleduje konkrétní cesty.',
+                    'badges' => ['free', 'reg'],
+                ],
+                [
+                    'name' => 'VeloViewer',
+                    'url'  => 'https://veloviewer.com/',
+                    'desc' => 'Podrobné rozbory aktivit ze Stravy, žebříčky a mapy pokrytí. '
+                            . 'Původně pro cyklisty, ale zvládne i chůzi.',
+                    'badges' => ['reg'],
                 ],
             ],
         ],
@@ -244,6 +361,34 @@ function links_catalog(): array
                             . 'Dobrý zdroj nápadů, kam příště.',
                     'badges' => ['cz', 'free'],
                 ],
+                [
+                    'name' => 'Wikiloc',
+                    'url'  => 'https://www.wikiloc.com/',
+                    'desc' => 'Obrovská sbírka tras od lidí z celého světa, ke stažení jako GPX. '
+                            . 'Když jedeš někam, kde jsi nikdy nebyl, tady najdeš, kudy chodí ostatní.',
+                    'badges' => ['cz', 'free', 'app'],
+                ],
+                [
+                    'name' => 'Treking.cz',
+                    'url'  => 'https://www.treking.cz/',
+                    'desc' => 'Outdoorový magazín s články o horách, popisy hřebenovek '
+                            . 'a praktickými tipy. Čtení na večer před výletem.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Hrady.cz',
+                    'url'  => 'https://www.hrady.cz/',
+                    'desc' => 'Databáze hradů, zámků a tvrzí s otevírací dobou a polohou. '
+                            . 'Praktické, když se má výšlap o něco opřít.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Geocaching',
+                    'url'  => 'https://www.geocaching.com/',
+                    'desc' => 'Hledání schránek podle souřadnic. Umí z obyčejné procházky '
+                            . 'udělat výpravu a zavede tě na místa, kam bys jinak nezašel.',
+                    'badges' => ['cz', 'reg', 'app'],
+                ],
             ],
         ],
         [
@@ -275,6 +420,13 @@ function links_catalog(): array
                     'url'  => 'https://www.gpsbabel.org/',
                     'desc' => 'Program do počítače, který převede kdeco na cokoli — desítky '
                             . 'formátů, filtry, komunikace s přístroji. Když si online nástroj neporadí.',
+                    'badges' => ['free'],
+                ],
+                [
+                    'name' => 'MyGeodata Converter',
+                    'url'  => 'https://mygeodata.cloud/converter/',
+                    'desc' => 'Převody mezi mapovými formáty rovnou v prohlížeči — GPX, KML, '
+                            . 'shapefile a další. Zdarma do určitého objemu dat.',
                     'badges' => ['free'],
                 ],
             ],

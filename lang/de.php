@@ -564,6 +564,8 @@ return [
     'links_cat_community'  => 'Tagebücher und Community',
     'links_cat_peaks'      => 'Berge und Panoramen',
     'links_cat_tools'      => 'Umwandlung und Werkzeuge',
+    'links_cat_device'     => 'Aufs Gerät und offline',
+    'links_cat_stats'      => 'Statistik und Erkundung',
     'links_cat_replay'     => 'Animation und 3D-Überflüge',
     'links_cat_weather'    => 'Wetter und Bedingungen',
     'links_badge_local'    => 'Datei bleibt im Browser',
