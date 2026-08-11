@@ -688,6 +688,14 @@ return [
     'planner_manual'           => 'Odcinek ręczny',
     'planner_manual_title'     => 'Odcinek ręczny — klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót)',
     'planner_manual_on'        => 'Tryb ręczny: klikaj, aby poprowadzić trasę linią prostą (pole, las, skrót). Kliknij ponownie „✏️ Odcinek ręczny“, aby wrócić do trasowania po ścieżkach.',
+    'planner_restr_head'         => 'Ograniczenia na trasie',
+    'planner_point_word'         => 'punkt',
+    'planner_restr_no_entry'     => 'zakaz wstępu',
+    'planner_restr_limited'      => 'wstęp ograniczony (zezwolenie, opłata)',
+    'planner_restr_pedestrian'   => 'strefa dla pieszych',
+    'planner_restr_closure'      => 'czasowe zamknięcie',
+    'planner_restr_other'        => 'inne ograniczenie',
+    'planner_snap_note'          => 'Najdalszy punkt przesunięto na najbliższą ścieżkę o',
     'planner_auto_on'          => 'Tryb automatyczny: trasa biegnie po prawdziwych ścieżkach.',
 
     // ===== Plánovač — export/import plánů =====

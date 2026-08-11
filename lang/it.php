@@ -688,6 +688,14 @@ return [
     'planner_manual'           => 'Tratto manuale',
     'planner_manual_title'     => 'Tratto manuale — fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia)',
     'planner_manual_on'        => 'Modalità manuale: fai clic per tracciare il percorso in linea retta (campo, bosco, scorciatoia). Fai di nuovo clic su «✏️ Tratto manuale» per tornare al calcolo lungo i sentieri.',
+    'planner_restr_head'         => 'Limitazioni sul percorso',
+    'planner_point_word'         => 'punto',
+    'planner_restr_no_entry'     => 'accesso vietato',
+    'planner_restr_limited'      => 'accesso limitato (permesso o pagamento)',
+    'planner_restr_pedestrian'   => 'zona pedonale',
+    'planner_restr_closure'      => 'chiusura temporanea',
+    'planner_restr_other'        => 'altra limitazione',
+    'planner_snap_note'          => 'Il punto più lontano è stato spostato sul sentiero più vicino di',
     'planner_auto_on'          => 'Modalità automatica: il percorso segue i sentieri reali.',
 
     // ===== Plánovač — export/import plánů =====

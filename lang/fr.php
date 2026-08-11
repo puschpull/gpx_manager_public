@@ -688,6 +688,14 @@ return [
     'planner_manual'           => 'Tronçon manuel',
     'planner_manual_title'     => 'Tronçon manuel — cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci)',
     'planner_manual_on'        => 'Mode manuel : cliquez pour tracer l\'itinéraire en ligne droite (champ, forêt, raccourci). Cliquez à nouveau sur « ✏️ Tronçon manuel » pour revenir au calcul par les chemins.',
+    'planner_restr_head'         => 'Restrictions sur l’itinéraire',
+    'planner_point_word'         => 'point',
+    'planner_restr_no_entry'     => 'accès interdit',
+    'planner_restr_limited'      => 'accès restreint (autorisation ou péage)',
+    'planner_restr_pedestrian'   => 'zone piétonne',
+    'planner_restr_closure'      => 'fermeture temporaire',
+    'planner_restr_other'        => 'autre restriction',
+    'planner_snap_note'          => 'Le point le plus éloigné a été déplacé vers le chemin le plus proche de',
     'planner_auto_on'          => 'Mode automatique : l\'itinéraire suit les chemins réels.',
 
     // ===== Plánovač — export/import plánů =====

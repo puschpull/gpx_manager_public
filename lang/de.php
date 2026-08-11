@@ -688,6 +688,14 @@ return [
     'planner_manual'           => 'Manueller Abschnitt',
     'planner_manual_title'     => 'Manueller Abschnitt — Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung)',
     'planner_manual_on'        => 'Manueller Modus: Route per Klick als gerade Linie ziehen (Feld, Wald, Abkürzung). Erneut auf „✏️ Manueller Abschnitt“ klicken, um zur Routenführung zurückzukehren.',
+    'planner_restr_head'         => 'Einschränkungen auf der Route',
+    'planner_point_word'         => 'Punkt',
+    'planner_restr_no_entry'     => 'Zutritt verboten',
+    'planner_restr_limited'      => 'eingeschränkter Zutritt (Erlaubnis, Gebühr)',
+    'planner_restr_pedestrian'   => 'Fußgängerzone',
+    'planner_restr_closure'      => 'vorübergehende Sperrung',
+    'planner_restr_other'        => 'sonstige Einschränkung',
+    'planner_snap_note'          => 'Der entfernteste Punkt wurde auf den nächsten Weg verschoben um',
     'planner_auto_on'          => 'Automatischer Modus: die Route folgt echten Wegen.',
 
     // ===== Plánovač — export/import plánů =====

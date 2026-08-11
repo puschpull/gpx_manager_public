@@ -1,10 +1,63 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 9. srpna 2026
+  Poslední aktualizace: 10. srpna 2026
 
 ================================================================================
 
+
+── 10. srpna 2026 ──────────────────────────────────────────────────────────────
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  PLÁNOVAČ: PŘESNĚJŠÍ VÝŠKY A VAROVÁNÍ O OMEZENÍCH NA TRASE                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+  PŘESNĚJŠÍ VÝŠKOVÝ PROFIL
+  Výškový profil v Plánovači bral výšky z Open-Meteo. Nově je bere z Mapy.com
+  a na Open-Meteo spadne jen tehdy, když se první zdroj neozve.
+
+  Měřeno na čtyřech reálných trasách (40 bodů z každé) proti výšce z barometru
+  v GPX. Rozhodující je rozptyl odchylky, protože nezávisí na konstantním
+  posunu — a ten má i barometr:
+
+    trasa        Mapy.com   Open-Meteo     medián odchylky
+      1             5,7 m       9,7 m       4,9 vs 7,8 m
+      2             8,1 m       7,6 m       7,0 vs 11,0 m
+      3             5,0 m      10,7 m       4,9 vs 7,1 m
+      4            23,6 m      31,7 m       6,4 vs 18,4 m
+
+  Mapy.com vyhrály v rozptylu třikrát ze čtyř a v mediánu odchylky ve všech
+  čtyřech. Pro Česko mají podrobný výškový model, Open-Meteo jede na globálním
+  s krokem 90 m. V zahraničí ta výhoda mizí — proto je záloha plnohodnotná.
+
+  Při testování se ukázala ještě jedna věc, možná důležitější než přesnost
+  modelu: Open-Meteo vrací výšky ZAOKROUHLENÉ NA CELÉ METRY, Mapy.com na
+  desetiny. Na dvanácti bodech mírného svahu dalo Open-Meteo jen devět
+  různých hodnot (třikrát po sobě totéž), Mapy.com dvanáct. Odtud ty
+  „schody" ve starém profilu — a taky nepřesná čísla stoupání, protože práh
+  2 m plíživé stoupání buď schoval celé, nebo započítal naráz.
+
+  Vedlejší přínos: Mapy.com berou 256 bodů na dotaz místo stovky, profil se
+  proto vzorkuje hustěji (200 bodů místo 100).
+
+  VAROVÁNÍ O OMEZENÍCH
+  Mapy.com od prosince 2025 hlásí u každého zadaného bodu, jestli leží
+  v oblasti se zákazem vstupu, v pěší zóně, v uzavírce nebo s jinak omezeným
+  přístupem. Dřív se trasa jen tiše protáhla, nyní se objeví upozornění.
+
+  KAM SE POSUNUL ZADANÝ BOD
+  Odpověď obsahuje vzdálenost, o kterou se kliknutí přichytilo k nejbližší
+  cestě. Hlásí se od 50 m výš — pod tím jde o běžné přichycení.
+
+  POZNÁMKA K ULOŽENÝM PLÁNŮM
+  Plán ukládá půdorys trasy, ne výškový profil — ten se při načtení počítá
+  znovu tou instalací, ve které se plán prohlíží. Souhrnná čísla stoupání
+  a klesání se ale ukládají, takže u starších plánů zůstala ta z Open-Meteo;
+  přepočítají se, jakmile plán otevřeš a znovu uložíš.
+
+  Nové: api/planner/elevation.php
+  Upravené: api/planner/route.php, js/planner.js, includes/planner_view.php,
+  lang/*.php
 
 ── 9. srpna 2026 ───────────────────────────────────────────────────────────────
 

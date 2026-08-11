@@ -66,6 +66,39 @@ document.addEventListener("DOMContentLoaded", () => {
         statusEl.className = "nearby-status" + (cls ? " " + cls : "");
     }
 
+    /**
+     * Poznámky k vypočítané trase: omezení u zadaných bodů a jak daleko se
+     * kliknutí přichytilo k cestě. Dřív se trasa jen tiše protáhla přes
+     * zavřený úsek nebo se bod odsunul o stovky metrů, aniž by to bylo znát.
+     */
+    function showRouteNotes(restrictions, maxSnapM) {
+        const DRUHY = {
+            NO_ENTRY:          i18n.restrNoEntry    || "zákaz vstupu",
+            RESTRICTED_ENTRY:  i18n.restrLimited    || "omezený vstup (povolenka, poplatek)",
+            PEDESTRIAN_ZONE:   i18n.restrPedestrian || "pěší zóna",
+            CLOSURE:           i18n.restrClosure    || "dočasná uzavírka",
+            OTHER_RESTRICTION: i18n.restrOther      || "jiné omezení"
+        };
+        const casti = [];
+
+        if (restrictions && restrictions.length) {
+            const popis = restrictions.map(r =>
+                `${(i18n.pointWord || "bod")} ${r.index + 1} — ${DRUHY[r.type] || DRUHY.OTHER_RESTRICTION}`);
+            casti.push("⚠ " + (i18n.restrHead || "Omezení na trase") + ": " + popis.join(", "));
+        }
+        // Pod 50 m je přichycení běžné (klikneš vedle pěšiny) a nemá cenu o něm psát.
+        if (maxSnapM >= 50) {
+            casti.push("↔ " + (i18n.snapNote || "Nejvzdálenější bod se posunul na nejbližší cestu o")
+                     + " " + Math.round(maxSnapM) + " m");
+        }
+
+        if (casti.length) {
+            setStatus(casti.join("   ·   "), "error");
+        } else {
+            setStatus(i18n.done || "Hotovo.", "done");
+        }
+    }
+
     function fmtDur(sec) {
         sec = Math.round(sec);
         const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
@@ -242,6 +275,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const rendered   = [];   // {coords, manual} — pro vykreslení
             const nomSpeed   = nominalSpeedMs(profile);
             let totalLen = 0, totalDur = 0;
+            // Mapy.com hlásí, jestli bod leží v omezené oblasti a jak daleko
+            // se přichytil k cestě. Sbírá se napříč úseky, vypíše se najednou.
+            const allRestrictions = [];
+            let maxSnap = 0;
 
             const pushCoord = c => {
                 const last = fullCoords[fullCoords.length - 1];
@@ -270,6 +307,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     totalLen += r.length_m   || 0;
                     totalDur += r.duration_s || 0;
                     rendered.push({ coords: r.coords, manual: false });
+                    if (Array.isArray(r.restrictions)) allRestrictions.push(...r.restrictions);
+                    if (typeof r.max_snap_m === "number") maxSnap = Math.max(maxSnap, r.max_snap_m);
                 }
             }
 
@@ -297,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("planAsc").textContent  = "…";
             document.getElementById("planDesc").textContent = "…";
             statsEl.style.display = "flex";
-            setStatus(i18n.done || "Hotovo.", "done");
+            showRouteNotes(allRestrictions, maxSnap);
             updateButtons();
 
             loadElevation(fullCoords, seq);
@@ -311,10 +350,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     profileSel.addEventListener("change", () => { if (waypoints.length >= 2) scheduleCompute(); });
 
-    // ===== Výškový profil (Open-Meteo elevation API, max 100 bodů/požadavek) =====
+    // ===== Výškový profil =====
+    // Výšky bere api/planner/elevation.php — primárně z Mapy.com, při potížích
+    // spadne na Open-Meteo. Pro české hory je jejich model měřitelně přesnější
+    // (podrobnosti v hlavičce toho souboru), a zvládne 256 bodů místo stovky.
     async function loadElevation(coords, seq) {
-        // Podvzorkovat na max 100 bodů, spočítat kumulativní vzdálenost
-        const maxPts = 100;
+        // Podvzorkovat na max 200 bodů, spočítat kumulativní vzdálenost.
+        // Dvě stě je kompromis: Mapy.com by vzaly 256, ale záloha na Open-Meteo
+        // by pak potřebovala tři požadavky místo dvou.
+        const maxPts = 200;
         const step = Math.max(1, Math.ceil(coords.length / maxPts));
         const sample = [];
         for (let i = 0; i < coords.length; i += step) sample.push(coords[i]);
@@ -328,13 +372,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const lat = sample.map(c => c[0].toFixed(5)).join(",");
-            const lon = sample.map(c => c[1].toFixed(5)).join(",");
-            const res  = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`);
+            const points = sample.map(c => `${c[0].toFixed(5)},${c[1].toFixed(5)}`).join(";");
+            const res  = await fetch(`api/planner/elevation.php?points=${encodeURIComponent(points)}`);
             const data = await res.json();
             if (seq !== computeSeq) return;
-            const elev = data && data.elevation;
+            const elev = data && data.ok && data.elevation;
             if (!Array.isArray(elev) || elev.length !== sample.length) return;
+            if (window.GPX_DEBUG) console.log("planner elevation source:", data.source);
 
             // Stoupání/klesání s hysterezí 2 m (potlačení šumu DEM)
             let asc = 0, desc = 0, ref = elev[0];

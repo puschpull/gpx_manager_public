@@ -688,6 +688,14 @@ return [
     'planner_manual'           => 'Tramo manual',
     'planner_manual_title'     => 'Tramo manual — haz clic para trazar la ruta en línea recta (campo, bosque, atajo)',
     'planner_manual_on'        => 'Modo manual: haz clic para trazar la ruta en línea recta (campo, bosque, atajo). Vuelve a hacer clic en «✏️ Tramo manual» para volver al trazado por caminos.',
+    'planner_restr_head'         => 'Restricciones en la ruta',
+    'planner_point_word'         => 'punto',
+    'planner_restr_no_entry'     => 'prohibido el paso',
+    'planner_restr_limited'      => 'acceso restringido (permiso o pago)',
+    'planner_restr_pedestrian'   => 'zona peatonal',
+    'planner_restr_closure'      => 'cierre temporal',
+    'planner_restr_other'        => 'otra restricción',
+    'planner_snap_note'          => 'El punto más alejado se desplazó al camino más cercano',
     'planner_auto_on'          => 'Modo automático: la ruta sigue los caminos reales.',
 
     // ===== Plánovač — export/import plánů =====

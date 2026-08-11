@@ -694,6 +694,14 @@ return [
     'planner_manual'           => 'Manual segment',
     'planner_manual_title'     => 'Manual segment — click to draw the route as a straight line (field, forest, shortcut)',
     'planner_manual_on'        => 'Manual mode: click to draw the route as a straight line (field, forest, shortcut). Click "✏️ Manual segment" again to return to routing along paths.',
+    'planner_restr_head'         => 'Restrictions on the route',
+    'planner_point_word'         => 'point',
+    'planner_restr_no_entry'     => 'no entry',
+    'planner_restr_limited'      => 'restricted entry (permit or fee)',
+    'planner_restr_pedestrian'   => 'pedestrian zone',
+    'planner_restr_closure'      => 'temporary closure',
+    'planner_restr_other'        => 'other restriction',
+    'planner_snap_note'          => 'The farthest point was moved onto the nearest path by',
     'planner_auto_on'          => 'Automatic mode: the route follows real paths.',
 
     // ===== Plánovač — export/import plánů =====

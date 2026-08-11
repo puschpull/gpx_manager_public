@@ -90,6 +90,12 @@ ajax_endpoint(function (): array {
     $coords    = [];   // [lat, lon] pro Leaflet
     $lengthM   = 0.0;
     $durationS = 0.0;
+    // Mapy.com od prosince 2025 vracejí u každého zadaného bodu info o tom,
+    // jestli leží v omezené oblasti a jak daleko se musel přichytit k cestní
+    // síti. Dřív se trasa jen tiše protáhla; teď to jde uživateli říct.
+    $restrictions = [];   // [{index, type}]
+    $maxSnapM     = 0.0;  // největší posun zadaného bodu na cestu
+    $ptIndex      = 0;    // pořadí bodu napříč všemi úseky
 
     foreach ($chunks as $chunk) {
         $params = [
@@ -152,6 +158,28 @@ ajax_endpoint(function (): array {
             }
         }
 
+        // routePoints: omezení a přichycení. Úseky se překrývají posledním
+        // bodem, proto se u druhého a dalšího úseku první bod přeskakuje —
+        // jinak by se hlásil dvakrát.
+        $rp = $data['routePoints'] ?? null;
+        if (is_array($rp)) {
+            $skipFirst = $ptIndex > 0;
+            foreach (array_values($rp) as $i => $point) {
+                if ($skipFirst && $i === 0) continue;
+                if (!empty($point['restricted'])) {
+                    $restrictions[] = [
+                        'index' => $ptIndex + $i,
+                        'type'  => (string)($point['restrictionType'] ?? 'OTHER_RESTRICTION'),
+                    ];
+                }
+                $snap = $point['snapDistance'] ?? null;
+                if (is_numeric($snap)) {
+                    $maxSnapM = max($maxSnapM, (float)$snap);
+                }
+            }
+        }
+        $ptIndex += count($chunk) - 1;
+
         $len = $data['length']   ?? ($data['routes'][0]['length']   ?? null);
         $dur = $data['duration'] ?? ($data['routes'][0]['duration'] ?? null);
         if ($len !== null) $lengthM   += (float)$len;
@@ -163,12 +191,14 @@ ajax_endpoint(function (): array {
     }
 
     return [
-        'ok'         => true,
-        'profile'    => $profile,
-        'coords'     => $coords,
-        'length_m'   => round($lengthM),
-        'duration_s' => round($durationS),
-        'segments'   => count($chunks),
+        'ok'           => true,
+        'profile'      => $profile,
+        'coords'       => $coords,
+        'length_m'     => round($lengthM),
+        'duration_s'   => round($durationS),
+        'segments'     => count($chunks),
+        'restrictions' => $restrictions,
+        'max_snap_m'   => round($maxSnapM),
     ];
 }, ['csrf' => false, 'admin' => false, 'name' => 'planner/route']);
 

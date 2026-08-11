@@ -694,6 +694,14 @@ return [
     'planner_manual'           => 'Ruční úsek',
     'planner_manual_title'     => 'Ruční úsek — klikáním veď trasu rovnou čarou (pole, les, zkratka)',
     'planner_manual_on'        => 'Ruční režim: klikáním veď trasu rovnou čarou (pole, les, zkratka). Dalším klikem na „✏️ Ruční úsek“ se vrátíš k automatu po cestách.',
+    'planner_restr_head'         => 'Omezení na trase',
+    'planner_point_word'         => 'bod',
+    'planner_restr_no_entry'     => 'zákaz vstupu',
+    'planner_restr_limited'      => 'omezený vstup (povolenka, poplatek)',
+    'planner_restr_pedestrian'   => 'pěší zóna',
+    'planner_restr_closure'      => 'dočasná uzavírka',
+    'planner_restr_other'        => 'jiné omezení',
+    'planner_snap_note'          => 'Nejvzdálenější bod se posunul na nejbližší cestu o',
     'planner_auto_on'          => 'Automatický režim: trasa se počítá po cestách.',
 
     // ===== Plánovač — export/import plánů =====
