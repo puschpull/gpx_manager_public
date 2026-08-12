@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Planificador de rutas',
     'planner_profile'            => 'Perfil',
     'planner_name_placeholder'   => 'Nombre del plan (para exportar)',
+    'planner_reverse'          => 'Invertir',
+    'planner_reverse_title'    => 'Invertir el sentido: intercambia salida y llegada y recalcula la ruta',
     'planner_undo'               => 'Deshacer',
     'planner_clear'              => 'Limpiar',
     'planner_export'             => 'Exportar GPX (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'cierre temporal',
     'planner_restr_other'        => 'otra restricción',
     'planner_snap_note'          => 'El punto más alejado se desplazó al camino más cercano',
+    'planner_click_on_route'     => 'Al hacer clic sobre la ruta no se añade ningún punto. Añade los puntos junto a la línea: el enrutado los ajusta al camino igualmente.',
     'planner_auto_on'          => 'Modo automático: la ruta sigue los caminos reales.',
 
     // ===== Plánovač — export/import plánů =====

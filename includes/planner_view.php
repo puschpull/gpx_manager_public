@@ -72,6 +72,8 @@ require __DIR__ . '/layout_header.php';
            placeholder="<?= htmlspecialchars(t('planner_name_placeholder', 'Název plánu (pro export)')) ?>">
     <button type="button" id="planManual" class="plan-btn" aria-pressed="false"
             title="<?= htmlspecialchars(t('planner_manual_title', 'Ruční úsek — klikáním veď trasu rovnou čarou (pole, les, zkratka)')) ?>">✏️ <?= htmlspecialchars(t('planner_manual', 'Ruční úsek')) ?></button>
+    <button type="button" id="planReverse" class="plan-btn" disabled
+            title="<?= htmlspecialchars(t('planner_reverse_title', 'Otočit směr — prohodí start a cíl, trasa se přepočítá')) ?>">🔄 <?= htmlspecialchars(t('planner_reverse', 'Otočit směr')) ?></button>
     <button type="button" id="planUndo" class="plan-btn" disabled>↩ <?= htmlspecialchars(t('planner_undo', 'Zpět')) ?></button>
     <button type="button" id="planClear" class="plan-btn" disabled>✕ <?= htmlspecialchars(t('planner_clear', 'Vyčistit')) ?></button>
     <button type="button" id="planExport" class="plan-btn plan-btn-primary" disabled>💾 <?= htmlspecialchars(t('planner_export', 'Export GPX (Garmin)')) ?></button>
@@ -196,6 +198,7 @@ window.gpxPlannerData = {
         restrClosure:   <?= js_safe_json(t('planner_restr_closure',   'dočasná uzavírka')) ?>,
         restrOther:     <?= js_safe_json(t('planner_restr_other',     'jiné omezení')) ?>,
         snapNote:       <?= js_safe_json(t('planner_snap_note',       'Nejvzdálenější bod se posunul na nejbližší cestu o')) ?>,
+        clickOnRoute:   <?= js_safe_json(t('planner_click_on_route',  'Klik na trasu bod nepřidal. Nový bod přidej kousek vedle čáry — routing ho stejně přichytí na cestu.')) ?>,
         exportNone: <?= js_safe_json(t('planner_export_none', 'Žádné uložené plány k exportu.')) ?>,
         exportDone: <?= js_safe_json(t('planner_export_done', 'Plány staženy: {n}')) ?>,
         importBad:  <?= js_safe_json(t('planner_import_bad', 'Soubor se nepodařilo načíst.')) ?>,

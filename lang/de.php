@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Tourenplaner',
     'planner_profile'            => 'Profil',
     'planner_name_placeholder'   => 'Planname (für Export)',
+    'planner_reverse'          => 'Richtung umkehren',
+    'planner_reverse_title'    => 'Richtung umkehren — vertauscht Start und Ziel, die Route wird neu berechnet',
     'planner_undo'               => 'Zurück',
     'planner_clear'              => 'Löschen',
     'planner_export'             => 'GPX-Export (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'vorübergehende Sperrung',
     'planner_restr_other'        => 'sonstige Einschränkung',
     'planner_snap_note'          => 'Der entfernteste Punkt wurde auf den nächsten Weg verschoben um',
+    'planner_click_on_route'     => 'Ein Klick auf die Route fügt keinen Punkt hinzu. Setze neue Punkte knapp neben die Linie — das Routing zieht sie ohnehin auf den Weg.',
     'planner_auto_on'          => 'Automatischer Modus: die Route folgt echten Wegen.',
 
     // ===== Plánovač — export/import plánů =====

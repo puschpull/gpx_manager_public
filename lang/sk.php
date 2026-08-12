@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Plánovač výšľapu',
     'planner_profile'            => 'Profil',
     'planner_name_placeholder'   => 'Názov plánu (pre export)',
+    'planner_reverse'          => 'Otočiť smer',
+    'planner_reverse_title'    => 'Otočiť smer — prehodí štart a cieľ, trasa sa prepočíta',
     'planner_undo'               => 'Späť',
     'planner_clear'              => 'Vyčistiť',
     'planner_export'             => 'Export GPX (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'dočasná uzávierka',
     'planner_restr_other'        => 'iné obmedzenie',
     'planner_snap_note'          => 'Najvzdialenejší bod sa posunul na najbližšiu cestu o',
+    'planner_click_on_route'     => 'Klik na trasu bod nepridal. Nový bod pridaj kúsok vedľa čiary — routing ho aj tak prichytí na cestu.',
     'planner_auto_on'          => 'Automatický režim: trasa sa počíta po cestách.',
 
     // ===== Plánovač — export/import plánů =====

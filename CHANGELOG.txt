@@ -1,10 +1,46 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 10. srpna 2026
+  Poslední aktualizace: 12. srpna 2026
 
 ================================================================================
 
+
+── 12. srpna 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PLÁNOVAČ: OTOČENÍ SMĚRU A PROVÁZÁNÍ MAPY S VÝŠKOVÝM PROFILEM             │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  OTOČIT SMĚR
+  U uloženého plánu přibylo tlačítko „⇄ Otočit směr“ — jedním kliknutím prohodí start
+  s cílem a trasu přepočítá. Není to pouhé otočení pole bodů: příznak „ruční úsek“
+  patří ÚSEKU mezi dvěma body, ne bodu samotnému, takže se při otočení musí
+  posunout o jedna — jinak by se ručně vedené úseky při otáčení rozjely.
+
+  Otáčení se několikrát jevilo jako rozbité, i když počítalo správně. Vinu nesl
+  výškový profil: značky v mapě se přečíslovaly hned, ale nový profil je hotový až
+  po routingu a dotazu na výšky (u delšího plánu naměřeno 6 sekund) — a mezitím
+  graf ukázal starý průběh. Než se nová data vrátí, profil teď zešedne.
+
+  PROVÁZÁNÍ MAPY A PROFILU
+  Když jedeš myší po trase v mapě, v grafu se rozsvítí odpovídající místo i s bublinou
+  (výška a kilometr). Když jedeš myší po grafu, bílý kroužek v mapě ukazuje, kde na
+  trase právě jsi. Ukazatel je jeden a společný pro oba směry.
+
+  Dvě věci, které se při tom musely ošetřit:
+
+  Kroužek nesmí brát kliknutí — jinak by pod ním nešlo přidat bod.
+
+  A hlavně: při čtení profilu se snadno stane, že člověk klikne přímo do trasy —
+  a plán se rozjede o smyčku navíc na konec. Klik do 12 pixelů od nakreslené čáry
+  proto bod nepřidá a místo toho se na čtyři sekundy ukáže vysvětlení (pak se stavový
+  řádek vrátí k původnímu textu, aby kvůli jednomu kliknutí nezmizelo upozornění na
+  omezení na trase). Nic se tím neztrácí: bod „na trase“ nemá smysl přidávat na konec
+  plánu, a když ho tam potřebuješ, klikneš kousek vedle — routing ho na cestu
+  stejně přichytí. Nechtěné kliknutí jinam vezme zpět tlačítko „↩ Zpět“.
+
+  Soubory: js/planner.js, css/planner.css, includes/planner_view.php, lang/*.php
 
 ── 10. srpna 2026 ──────────────────────────────────────────────────────────────
 

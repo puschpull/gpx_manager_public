@@ -112,3 +112,16 @@
 }
 
 .plan-elev-wrap canvas { max-height: 160px; }
+
+/* Profil čeká na přepočet — zešedne, aby nevypadal jako platný.
+   Značky na mapě se přečíslují hned, ale nový profil je hotový až po
+   routingu a dotazu na výšky (u delšího plánu naměřeno 6 s). Bez tohohle
+   graf mezitím ukazoval starý průběh k už otočené trase. */
+.plan-elev-wrap.plan-elev-stale canvas {
+    opacity: .3;
+    transition: opacity .15s;
+}
+.plan-elev-wrap.plan-elev-stale h2::after {
+    content: " …";
+    opacity: .6;
+}

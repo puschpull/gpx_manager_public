@@ -3,7 +3,8 @@
  *  GPX Manager – Plánovač výšlapu
  *  Klikáním do mapy waypointy → routing po cestách (Mapy.com,
  *  server-side api/planner/route.php) → statistiky, výškový
- *  profil (Open-Meteo elevation) a export GPX pro Garmin.
+ *  profil (api/planner/elevation.php — Mapy.com se zálohou na
+ *  Open-Meteo) a export GPX pro Garmin.
  * ===========================================================
  */
 
@@ -44,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentPlanId = 0;      // 0 = neuložený plán
     let restoring  = false;     // načítání uloženého plánu → nepřepočítávat routing
     let manualMode = false;     // ruční režim: nové body se spojují rovnou čarou (přechod pole/lesa)
+    let elevSample = [];        // [[lat,lng],…] — body odpovídající sloupcům výškového profilu
+    let hoverMarker = null;     // společný ukazatel mapa ↔ profil
 
     const statusEl   = document.getElementById("plan-status");
     const statsEl    = document.getElementById("plan-stats");
@@ -51,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileSel = document.getElementById("planProfile");
     const nameInput  = document.getElementById("planName");
     const btnManual  = document.getElementById("planManual");
+    const btnReverse = document.getElementById("planReverse");
     const btnUndo    = document.getElementById("planUndo");
     const btnClear   = document.getElementById("planClear");
     const btnExport  = document.getElementById("planExport");
@@ -112,6 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateButtons() {
         const hasRoute = !!(routeData && routeData.coords && routeData.coords.length > 1);
         btnUndo.disabled   = waypoints.length === 0;
+        if (btnReverse) btnReverse.disabled = waypoints.length < 2;
         btnClear.disabled  = waypoints.length === 0;
         btnExport.disabled = !hasRoute;
         if (btnSave)   btnSave.disabled   = !hasRoute;          // návštěvník tlačítko nemá
@@ -180,6 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
         statsEl.style.display = "none";
         elevWrap.style.display = "none";
         if (elevChart) { elevChart.destroy(); elevChart = null; }
+        // Bez tohohle by ukazatel dál skákal po bodech zrušené trasy.
+        elevSample = [];
+        hideHover();
     }
 
     // ===== Ruční režim (rovné úseky přes pole/les) =====
@@ -198,6 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     if (btnManual) btnManual.addEventListener("click", () => setManualMode(!manualMode));
+    if (btnReverse) btnReverse.addEventListener("click", reverseRoute);
 
     // Nominální rychlost (m/s) pro odhad času ručních úseků dle profilu
     function nominalSpeedMs(profile) {
@@ -221,6 +230,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Rozdělí waypointy na úseky: souvislé auto body → jeden routing požadavek,
     // ruční bod → samostatný rovný úsek.
+    /**
+     * Otočí směr trasy — prohodí start a cíl.
+     *
+     * Pozor na ruční úseky: příznak `manual` sedí na CÍLOVÉM bodu segmentu
+     * (`manual` u bodu i znamená, že úsek z i-1 do i je rovná čára). Po otočení
+     * se tentýž fyzický úsek přiřazuje k opačnému konci, takže nestačí pole
+     * obrátit — příznaky se musí posunout o jednu pozici. Bez toho by se ruční
+     * úseky rozjely a trasa by se přepočítala jinudy.
+     */
+    function reverseRoute() {
+        if (waypoints.length < 2) return;
+
+        const n     = waypoints.length;
+        const flags = waypoints.map(w => !!w.manual);   // flags[i] popisuje úsek (i-1)→i
+        const rev   = waypoints.slice().reverse();
+
+        for (let j = 0; j < n; j++) {
+            const oldIdx = n - 1 - j;                   // index téhož bodu v původním pořadí
+            // Úsek vedoucí DO rev[j] je původní úsek oldIdx→oldIdx+1, jehož
+            // příznak byl na oldIdx+1. Nový start (j = 0) žádný příchozí nemá.
+            rev[j].manual = (oldIdx + 1 < n) ? flags[oldIdx + 1] : false;
+        }
+
+        waypoints = rev;
+        refreshMarkers();          // přečísluje popisky, přebarví start/cíl a ruční body
+        updateButtons();
+        // Trasa se musí přepočítat — v opačném směru nemusí vést stejně
+        // (jednosměrky, zákazy) a mění se i profil stoupání.
+        scheduleCompute();
+    }
+
     function buildParts() {
         const parts = [];
         let i = 1;
@@ -242,8 +282,22 @@ document.addEventListener("DOMContentLoaded", () => {
     function scheduleCompute() {
         if (restoring) return;   // při načítání uloženého plánu se routing nevolá
         updateButtons();
+        markElevStale();
         clearTimeout(debounceT);
         debounceT = setTimeout(compute, 600);
+    }
+
+    /**
+     * Zešedí výškový profil, dokud se nepřepočítá.
+     *
+     * Značky na mapě se překreslí okamžitě, ale nový profil je hotový až po
+     * debouncingu, routingu a dotazu na výšky — u delšího plánu to bylo
+     * naměřeno na 6 sekund. Do té doby graf ukazoval STARÝ průběh k už otočené
+     * trase, což vypadalo, jako by se vyráželo od cíle. Zešednutí říká
+     * „tohle ještě neplatí“ dřív, než uživatel stihne špatný závěr.
+     */
+    function markElevStale() {
+        if (elevWrap && elevChart) elevWrap.classList.add("plan-elev-stale");
     }
 
     async function compute() {
@@ -350,6 +404,98 @@ document.addEventListener("DOMContentLoaded", () => {
 
     profileSel.addEventListener("change", () => { if (waypoints.length >= 2) scheduleCompute(); });
 
+    /* ===== Provázání mapy a výškového profilu =====
+       Ukazatel je jeden a společný: ať jedeš myší po trase v mapě, nebo po
+       grafu, druhá strana se dorovná. Vzor je převzatý z detailu trasy
+       (graf → mapa, `moveHoverMarker`) a z přehrávače (mapa → graf,
+       `setActiveElements`), tady jsou obě strany pohromadě.
+
+       Ukazatel je `interactive: false` — jinak by kroužek bral kliknutí
+       a v plánovači by se pod ním nedal přidat bod. */
+
+    function ensureHoverMarker() {
+        if (!hoverMarker) {
+            hoverMarker = L.circleMarker([0, 0], {
+                radius: 6, color: "#000", weight: 2,
+                fillColor: "#fff", fillOpacity: 1,
+                interactive: false
+            }).addTo(map);
+        }
+    }
+
+    function showHoverAt(idx) {
+        if (idx == null || !elevSample[idx]) return;
+        ensureHoverMarker();
+        hoverMarker.setLatLng(elevSample[idx]);
+    }
+
+    function hideHover() {
+        if (hoverMarker) { map.removeLayer(hoverMarker); hoverMarker = null; }
+    }
+
+    /** Zvýrazní bod v grafu (a jeho bublinu) bez překreslení celého grafu. */
+    function highlightChart(idx) {
+        if (!elevChart || idx == null) return;
+        try {
+            elevChart.setActiveElements([{ datasetIndex: 0, index: idx }]);
+            elevChart.tooltip.setActiveElements([{ datasetIndex: 0, index: idx }], { x: 0, y: 0 });
+            elevChart.update("none");
+        } catch (e) {
+            if (window.GPX_DEBUG) console.warn("planner chart sync:", e);
+        }
+    }
+
+    function clearChartHighlight() {
+        if (!elevChart) return;
+        try {
+            elevChart.setActiveElements([]);
+            elevChart.tooltip.setActiveElements([], { x: 0, y: 0 });
+            elevChart.update("none");
+        } catch (e) { /* graf mezitím zanikl */ }
+    }
+
+    // ---- Mapa → profil ----
+    // Hledá se nejbližší bod trasy k myši. Bodů je max 200, takže lineární
+    // průchod stačí; drží se ale na jednom vyhodnocení za snímek, aby se
+    // při rychlém pohybu myší nepočítalo zbytečně.
+    let hoverRaf = null;
+    map.on("mousemove", e => {
+        if (!elevSample.length || hoverRaf) return;
+        hoverRaf = requestAnimationFrame(() => {
+            hoverRaf = null;
+            const mouse = map.latLngToContainerPoint(e.latlng);
+            let best = -1, bestD = Infinity;
+            for (let i = 0; i < elevSample.length; i++) {
+                const p = map.latLngToContainerPoint(elevSample[i]);
+                const d = (p.x - mouse.x) ** 2 + (p.y - mouse.y) ** 2;
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            // Práh 40 px: mimo trasu ukazatel nemá co ukazovat.
+            if (best >= 0 && bestD <= 40 * 40) {
+                showHoverAt(best);
+                highlightChart(best);
+            } else {
+                hideHover();
+                clearChartHighlight();
+            }
+        });
+    });
+
+    map.on("mouseout", () => { hideHover(); clearChartHighlight(); });
+
+    // ---- Profil → mapa ----
+    // Posluchače visí na plátně, ne na instanci grafu — plátno v DOM zůstává,
+    // kdežto graf se při každém přepočtu ruší a tvoří znovu.
+    const elevCanvas = document.getElementById("planElevChart");
+    if (elevCanvas) {
+        elevCanvas.addEventListener("mousemove", evt => {
+            if (!elevChart || !elevSample.length) return;
+            const el = elevChart.getElementsAtEventForMode(evt, "nearest", { intersect: false }, false);
+            if (el && el.length) showHoverAt(el[0].index);
+        });
+        elevCanvas.addEventListener("mouseleave", hideHover);
+    }
+
     // ===== Výškový profil =====
     // Výšky bere api/planner/elevation.php — primárně z Mapy.com, při potížích
     // spadne na Open-Meteo. Pro české hory je jejich model měřitelně přesnější
@@ -395,6 +541,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             updatePersonalPace(asc);
 
+            // Souřadnice bodů grafu si podržíme — bez nich by nešlo provázat
+            // profil s mapou (index v grafu ↔ místo na trase).
+            elevSample = sample;
+
             renderElevChart(distKm, elev);
         } catch (err) {
             if (window.GPX_DEBUG) console.error("planner elevation:", err);
@@ -408,6 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const canvas = document.getElementById("planElevChart");
         if (!canvas) return;
         if (elevChart) elevChart.destroy();
+        if (elevWrap) elevWrap.classList.remove("plan-elev-stale");   // data jsou aktuální
 
         const dark = document.documentElement.classList.contains("dark");
         const gridColor = dark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
@@ -738,7 +889,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ===== Klik do mapy = nový waypoint =====
-    map.on("click", e => addWaypoint(e.latlng));
+    /* Klik přímo na vykreslenou trasu bod NEPŘIDÁ.
+       Když člověk jede myší po čáře a čte výškový profil, snadno se stane,
+       že klikne — a plán se rozjede o smyčku navíc na konec. Přidat bod
+       „na trase“ přitom nic nepřináší: routing kliknutí stejně přichytí na
+       nejbližší cestu, takže stačí kliknout kousek vedle čáry. */
+    const CLICK_ROUTE_PX = 12;
+
+    /** Vzdálenost bodu od nakreslené trasy v pixelech (po úsečkách, ne po vrcholech). */
+    function pixelsFromRoute(latlng) {
+        const c = routeData && routeData.coords;
+        if (!c || c.length < 2) return Infinity;
+        const p = map.latLngToContainerPoint(latlng);
+        let best = Infinity, prev = map.latLngToContainerPoint(c[0]);
+        for (let i = 1; i < c.length; i++) {
+            const cur = map.latLngToContainerPoint(c[i]);
+            const d = L.LineUtil.pointToSegmentDistance(p, prev, cur);
+            if (d < best) best = d;
+            prev = cur;
+        }
+        return best;
+    }
+
+    /** Dočasná hláška ve stavovém řádku — původní text se po chvíli vrátí
+        (jinak by upozornění na omezení na trase zmizelo kvůli jednomu kliknutí). */
+    let hintTimer = null;
+    function flashStatus(text) {
+        if (!statusEl) return;
+        const prevText = statusEl.textContent, prevCls = statusEl.className;
+        setStatus(text, "");
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(() => {
+            if (statusEl.textContent === text) {
+                statusEl.textContent = prevText;
+                statusEl.className   = prevCls;
+            }
+        }, 4000);
+    }
+
+    map.on("click", e => {
+        if (pixelsFromRoute(e.latlng) <= CLICK_ROUTE_PX) {
+            flashStatus(i18n.clickOnRoute
+                || "Klik na trasu bod nepřidal. Nový bod přidej kousek vedle čáry.");
+            return;
+        }
+        addWaypoint(e.latlng);
+    });
 
     // ===== Zpět / Vyčistit =====
     btnUndo.addEventListener("click", () => {

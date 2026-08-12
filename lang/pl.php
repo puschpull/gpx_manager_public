@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Planer wycieczki',
     'planner_profile'            => 'Profil',
     'planner_name_placeholder'   => 'Nazwa planu (do eksportu)',
+    'planner_reverse'          => 'Odwróć kierunek',
+    'planner_reverse_title'    => 'Odwróć kierunek — zamienia start z metą, trasa zostanie przeliczona',
     'planner_undo'               => 'Cofnij',
     'planner_clear'              => 'Wyczyść',
     'planner_export'             => 'Eksport GPX (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'czasowe zamknięcie',
     'planner_restr_other'        => 'inne ograniczenie',
     'planner_snap_note'          => 'Najdalszy punkt przesunięto na najbliższą ścieżkę o',
+    'planner_click_on_route'     => 'Kliknięcie w trasę nie dodaje punktu. Nowy punkt dodaj tuż obok linii — routing i tak przyciągnie go do ścieżki.',
     'planner_auto_on'          => 'Tryb automatyczny: trasa biegnie po prawdziwych ścieżkach.',
 
     // ===== Plánovač — export/import plánů =====

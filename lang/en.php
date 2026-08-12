@@ -641,6 +641,8 @@ return [
     'h1_planner'                 => 'Trip planner',
     'planner_profile'            => 'Profile',
     'planner_name_placeholder'   => 'Plan name (for export)',
+    'planner_reverse'          => 'Reverse',
+    'planner_reverse_title'    => 'Reverse direction — swaps start and finish, the route is recalculated',
     'planner_undo'               => 'Undo',
     'planner_clear'              => 'Clear',
     'planner_export'             => 'Export GPX (Garmin)',
@@ -702,6 +704,7 @@ return [
     'planner_restr_closure'      => 'temporary closure',
     'planner_restr_other'        => 'other restriction',
     'planner_snap_note'          => 'The farthest point was moved onto the nearest path by',
+    'planner_click_on_route'     => 'Clicking the route did not add a point. Add new points just beside the line — routing snaps them to the path anyway.',
     'planner_auto_on'          => 'Automatic mode: the route follows real paths.',
 
     // ===== Plánovač — export/import plánů =====

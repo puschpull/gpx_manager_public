@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Planificateur de randonnée',
     'planner_profile'            => 'Profil',
     'planner_name_placeholder'   => 'Nom du plan (pour l\'export)',
+    'planner_reverse'          => 'Inverser',
+    'planner_reverse_title'    => 'Inverser le sens — échange départ et arrivée, l’itinéraire est recalculé',
     'planner_undo'               => 'Annuler',
     'planner_clear'              => 'Effacer',
     'planner_export'             => 'Export GPX (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'fermeture temporaire',
     'planner_restr_other'        => 'autre restriction',
     'planner_snap_note'          => 'Le point le plus éloigné a été déplacé vers le chemin le plus proche de',
+    'planner_click_on_route'     => 'Un clic sur l’itinéraire n’ajoute pas de point. Placez les nouveaux points juste à côté de la ligne — le calcul les ramène de toute façon sur le chemin.',
     'planner_auto_on'          => 'Mode automatique : l\'itinéraire suit les chemins réels.',
 
     // ===== Plánovač — export/import plánů =====

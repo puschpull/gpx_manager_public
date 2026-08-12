@@ -635,6 +635,8 @@ return [
     'h1_planner'                 => 'Pianificatore escursioni',
     'planner_profile'            => 'Profilo',
     'planner_name_placeholder'   => 'Nome del piano (per esportare)',
+    'planner_reverse'          => 'Inverti',
+    'planner_reverse_title'    => 'Inverti il senso: scambia partenza e arrivo, il percorso viene ricalcolato',
     'planner_undo'               => 'Indietro',
     'planner_clear'              => 'Cancella',
     'planner_export'             => 'Esporta GPX (Garmin)',
@@ -696,6 +698,7 @@ return [
     'planner_restr_closure'      => 'chiusura temporanea',
     'planner_restr_other'        => 'altra limitazione',
     'planner_snap_note'          => 'Il punto più lontano è stato spostato sul sentiero più vicino di',
+    'planner_click_on_route'     => 'Fare clic sul percorso non aggiunge un punto. Aggiungi i punti accanto alla linea: il calcolo li aggancia comunque al sentiero.',
     'planner_auto_on'          => 'Modalità automatica: il percorso segue i sentieri reali.',
 
     // ===== Plánovač — export/import plánů =====
