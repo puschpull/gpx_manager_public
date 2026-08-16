@@ -26,6 +26,10 @@ if (!function_exists('t')) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> — GPX Manager</title>
 
+    <?php // Místo pro značky konkrétní stránky (Open Graph na detailu trasy).
+          // Obsah si escapuje ten, kdo proměnnou plní. ?>
+    <?= $page_head_extra ?? '' ?>
+
     <!-- Inline blok: nastav dark mode PŘED parsováním <body> — eliminuje FOUC (FE-6) -->
     <script>
         (function () {

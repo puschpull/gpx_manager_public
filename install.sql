@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS planned_routes (
     name        VARCHAR(120) NOT NULL,
     profile     VARCHAR(30)  NOT NULL DEFAULT 'foot_hiking',
     plan_date   DATE         DEFAULT NULL,
+    track_id    INT          DEFAULT NULL,
     waypoints   JSON         NOT NULL,
     geometry    MEDIUMTEXT   DEFAULT NULL,
     length_m    INT          DEFAULT NULL,
@@ -183,7 +184,8 @@ CREATE TABLE IF NOT EXISTS planned_routes (
     note        TEXT         DEFAULT NULL,
     created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_pr_date (plan_date)
+    INDEX idx_pr_date (plan_date),
+    INDEX idx_pr_track (track_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------

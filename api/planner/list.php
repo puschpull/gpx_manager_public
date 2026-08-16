@@ -24,13 +24,17 @@ ajax_endpoint(function () use ($pdo): array {
         return ['ok' => false, 'error' => 'Forbidden'];
     }
     $withPos = ($_GET['with_pos'] ?? '') === '1';
-    $cols = 'id, name, profile, plan_date, length_m, duration_s, ascent, descent, updated_at'
-          . ($withPos ? ', geometry' : '');
+    $cols = 'p.id, p.name, p.profile, p.plan_date, p.track_id, p.length_m, p.duration_s,'
+          . ' p.ascent, p.descent, p.updated_at'
+          . ($withPos ? ', p.geometry' : '');
 
+    // LEFT JOIN, ne INNER: smazaná trasa nesmí plán vyřadit z výpisu —
+    // takový plán se chová, jako by uskutečněný nebyl.
     $rows = $pdo->query("
-        SELECT $cols
-        FROM planned_routes
-        ORDER BY COALESCE(plan_date, DATE(updated_at)) DESC, id DESC
+        SELECT $cols, t.track_name AS t_name, t.filename AS t_file, t.date_start AS t_date
+        FROM planned_routes p
+        LEFT JOIN tracks t ON t.id = p.track_id
+        ORDER BY COALESCE(p.plan_date, DATE(p.updated_at)) DESC, p.id DESC
     ")->fetchAll(\PDO::FETCH_ASSOC);
 
     return ['ok' => true, 'plans' => array_map(static function ($r) use ($withPos) {
@@ -44,6 +48,11 @@ ajax_endpoint(function () use ($pdo): array {
             'ascent'     => $r['ascent']     !== null ? (int)$r['ascent']     : null,
             'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
             'updated_at' => $r['updated_at'],
+            // track_id drží i tehdy, když trasa mezitím zmizela; ostatní pole
+            // jsou pak null a UI to ukáže jako neuskutečněný plán.
+            'track_id'   => $r['t_name'] !== null || $r['t_file'] !== null ? (int)$r['track_id'] : null,
+            'track_name' => $r['t_name'] ?: $r['t_file'],
+            'track_date' => $r['t_date'],
         ];
         if ($withPos) {
             $geom = $r['geometry'] !== null ? json_decode((string)$r['geometry'], true) : null;

@@ -1,10 +1,105 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 12. srpna 2026
+  Poslední aktualizace: 16. srpna 2026
 
 ================================================================================
 
+
+── 16. srpna 2026 (2) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  NÁHLED ODKAZU PŘI SDÍLENÍ A PROPOJENÍ PLÁNU SE SKUTEČNOU TRASOU          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  NÁHLED ODKAZU
+  Odkaz na výšlap vložený do diskuse byl dosud holá adresa. Detail trasy teď
+  posílá značky Open Graph — název, shrnutí (datum, kilometry, převýšení, čas,
+  případně začátek poznámky) a obrázek mapy s vykreslenou trasou 1200×630.
+
+  Obrázek dělá share_image.php a generuje se až při prvním vyžádání; hotový
+  se ukládá do uploads/share/. Starší trasy tedy nic přegenerovávat nemusí.
+  Když je GPX novější než obrázek (třeba po filtraci), vykreslí se znovu.
+
+  Nešlo použít generate_thumb() s jinými rozměry: ten složí mozaiku dlaždic
+  a přeškáluje ji na cílový rozměr, takže mapu natáhne. U náhledu 240×120 si
+  toho nikdo nevšiml, u obrázku do diskuse ano. Nový generátor proto vybírá
+  okno v pixelech mapy a ořízne přesně.
+
+  Druhá potíž: zoom je po celých číslech, takže trasa vycházela buď na půlku
+  obrázku, nebo se mačkala na okraj. Kreslí se proto do většího okna, které se
+  na závěr zmenší — tím vznikne „mezizoom“ a obrázek je navíc hladší.
+
+  Formát je JPEG (kvalita 85): mapa je fotografická a PNG vycházelo přes
+  500 kB, kdežto JPEG má 120–150 kB. Obrázek nese povinnou atribuci OSM.
+
+  Vykreslení nové trasy trvá kolem 9 sekund (stahují se dlaždice), a čekal by
+  na něj robot náhledu. Otevření detailu trasy administrátorem proto obrázek
+  připraví na pozadí; podruhé se vydá z disku za desetinu sekundy.
+
+  ROBOTS.TXT
+  Zákaz procházení celého webu by náhled zabil u všech robotů, kteří ho
+  respektují (Facebook, Discourse). Dostali proto výslovnou výjimku — spolu
+  s Twitterem, LinkedInem, Discordem, Slackem, Telegramem, WhatsAppem, Skypem
+  a redditem. Nic neprocházejí: stáhnou jen tu jednu adresu, kterou někdo
+  vloží do diskuse, takže se k seznamu tras jako celku nedostanou — a přesně
+  to měl zákaz chránit. Vyhledávací roboti zůstávají zakázaní a indexování
+  navíc hlídá hlavička X-Robots-Tag: noindex.
+
+  PROPOJENÍ PLÁNU SE SKUTEČNOU TRASOU
+  Porovnání trasy s plánem dosud hádalo, který plán k trase patří: nejdřív
+  přesná shoda data, jinak nejbližší těžiště. Nově jde v detailu trasy
+  tlačítkem „✔ Uskutečněno touto trasou“ říct to natvrdo.
+
+  Propojení má při výběru přednost před datem i polohou — je to jediné
+  z kritérií, které zvolil člověk. V Plánovači svítí u načteného plánu odkaz
+  na trasu, takže je vidět, co už je prošlapané.
+
+  Databáze: migrace 0018 přidává planned_routes.track_id (+ index). Bez
+  cizího klíče záměrně — smazání trasy nemá plán zlikvidovat, jen se pak
+  chová jako neuskutečněný (LEFT JOIN).
+
+  Soubory: share_image.php, includes/share_image.php, includes/layout_header.php,
+           includes/detail_view.php, includes/planner_view.php, js/detail-plan.js,
+           js/planner.js, api/planner/{link,list,get}.php,
+           migrations/0018_planned_route_track.sql, install.sql, lang/*.php
+
+── 16. srpna 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MAPY: POPISKY NAD LETECKOU MAPOU A OSTRÉ DLAŽDICE NA HUSTÉM DISPLEJI     │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  POPISKY A HRANICE
+  Letecká mapa Mapy.com i satelit od Esri byly dosud bez jediného názvu, takže
+  se v nich špatně orientovalo. Mapy.com přitom nabízejí pátou mapovou sadu,
+  kterou jsme nevyužívali: names-overlay, tedy názvy a hranice na průhledném
+  podkladu. Nově je v ovladači vrstev jako „Popisky a hranice (Mapy.com)“.
+  Dlaždice má 4 kB a kreslí se nad podkladem, takže jde přidat k čemukoli.
+
+  Bez API klíče se vrstva vůbec nenabízí, ať v seznamu nesvítí mrtvá položka.
+
+  OSTRÉ DLAŽDICE
+  Na telefonu a na monitoru s vysokou hustotou bodů byly mapy lehce rozmazané.
+  Mapy.com umí dlaždice ve dvojnásobném rozlišení; nejsou ale pod cestou
+  /512/, jak by člověk čekal — ta vrací 404 — nýbrž pod segmentem 256@2x.
+  A mají je jen sady basic a outdoor; u zimní a letecké API 404 vrací také
+  (ověřeno dotazem na všech pět sad).
+
+  Základní a turistická mapa proto používají zástupný znak {r}, který Leaflet
+  na hustém displeji přeloží na @2x. Počet požadavků se nemění, jen jsou
+  dlaždice větší. Záměrně BEZ volby detectRetina: ta místo @2x tahá dlaždice
+  o zoom výš a kreslí je do poloviční velikosti, takže dohromady by to
+  znamenalo čtyřnásobek požadavků.
+
+  Obojí je ve sdíleném js/lib/map-factory.js, takže to platí pro všech devět
+  map v aplikaci — detaily tras, filtr, okolí, fotky v okolí, porovnání,
+  plánovač, obě heatmapy i hledání v mapě.
+
+  Vektorové mapy od Mapy.com zatím nejsou; jejich API nabízí výhradně rastrové
+  dlaždice. Kdyby přišly, znamenalo by to vyměnit Leaflet za MapLibre.
+
+  Soubory: js/lib/map-factory.js
 
 ── 12. srpna 2026 ──────────────────────────────────────────────────────────────
 

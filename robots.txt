@@ -10,4 +10,51 @@
 User-agent: *
 Disallow: /
 
+# --- Výjimka: roboti sestavující náhled vloženého odkazu ---
+#
+# Tyhle služby nic neprocházejí — stáhnou jen tu jednu adresu, kterou někdo
+# vloží do diskuse nebo zprávy, aby z ní udělaly náhled (obrázek, název,
+# shrnutí). Nedostanou se tedy k seznamu tras jako celku, což je přesně to,
+# co má zákaz výše chránit. Do vyhledávačů se přes ně nic nedostane:
+# indexování hlídá zvlášť hlavička X-Robots-Tag: noindex.
+#
+# Vyhledávací roboti (Googlebot, Seznam, Bing, Applebot…) zůstávají zakázaní
+# pravidlem výše — tady je záměrně nikdo z nich není.
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: SkypeUriPreview
+Allow: /
+
+User-agent: redditbot
+Allow: /
+
+User-agent: Discourse Forum Onebox
+Allow: /
+
 # Bez odkazu na sitemap.xml — záměrně, žádná se negeneruje.

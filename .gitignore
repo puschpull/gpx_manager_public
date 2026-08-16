@@ -41,6 +41,8 @@ Thumbs.db
 setup.php.backup
 
 /uploads/vt_thumbs/
+# Obrázky pro náhled sdíleného odkazu (generují se z GPX na vyžádání)
+/uploads/share/
 /uploads/photo_heatmap_cache.json
 /uploads/_heatmap_rebuild.marker
 /uploads/_poi_cache/

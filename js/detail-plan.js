@@ -38,6 +38,7 @@ document.addEventListener("gpxDataReady", (ev) => {
     const tol        = document.getElementById("planTol");
     const statusEl   = document.getElementById("planStatus");
     const legendEl   = document.getElementById("planLegend");
+    const linkBtn    = document.getElementById("planLinkBtn");   // jen admin
 
     let plans = [];          // seznam z api/planner/list.php
     let planOn = false;
@@ -282,10 +283,19 @@ document.addEventListener("gpxDataReady", (ev) => {
         }
     }
 
-    /** Nejpravděpodobnější plán k této trase: shoda data, jinak nejbližší těžiště. */
+    /**
+     * Nejpravděpodobnější plán k této trase. Pořadí kritérií:
+     *   1. výslovné propojení (plán označený jako uskutečněný touto trasou),
+     *   2. shoda data plánu s datem výšlapu (přesný den),
+     *   3. nejbližší těžiště.
+     * Propojení je jediné z nich, které si zvolil člověk — proto vyhrává.
+     */
     function bestPlanId() {
         const usable = plans.filter(p => p.has_geometry);
         if (!usable.length) return null;
+
+        const linked = usable.find(p => p.track_id && p.track_id === cfg.trackId);
+        if (linked) return linked.id;
 
         const trackDate = (cfg.trackDateStart || "").slice(0, 10);
         const sameDay = usable.filter(p => p.plan_date && p.plan_date === trackDate);
@@ -335,6 +345,7 @@ document.addEventListener("gpxDataReady", (ev) => {
                 clearLayers();
                 if (selWrap)  selWrap.style.display  = "none";
                 if (tolWrap)  tolWrap.style.display  = "none";
+                if (linkBtn)  linkBtn.style.display  = "none";
                 if (legendEl) legendEl.style.display = "none";
                 if (statusEl) statusEl.textContent   = "";
                 return;
@@ -348,11 +359,58 @@ document.addEventListener("gpxDataReady", (ev) => {
             }
             if (selWrap) selWrap.style.display = "";
             if (tolWrap) tolWrap.style.display = "";
+            refreshLinkBtn();
             loadPlanGeometry(parseInt(sel.value, 10));
         });
     }
 
-    if (sel) sel.addEventListener("change", () => loadPlanGeometry(parseInt(sel.value, 10)));
+    /* ============ Propojení plánu s trasou ============ */
+    /** Popisek tlačítka podle toho, jak je vybraný plán propojený. */
+    function refreshLinkBtn() {
+        if (!linkBtn || !cfg.isAdmin) return;
+        const p = plans.find(x => String(x.id) === String(sel.value));
+        if (!p) { linkBtn.style.display = "none"; return; }
+
+        const mine = p.track_id && p.track_id === cfg.trackId;
+        linkBtn.style.display = "";
+        linkBtn.classList.toggle("plan-btn-active", !!mine);
+        linkBtn.textContent = mine
+            ? "✔ " + (i18n.linkRemove || "Zrušit propojení")
+            : "✔ " + (i18n.linkAdd    || "Označit plán jako uskutečněný");
+        // Plán patřící jiné trase jde přepnout, ale ať je to vidět dopředu
+        linkBtn.title = (!mine && p.track_id) ? (i18n.linkOther || "") : "";
+    }
+
+    async function toggleLink() {
+        const p = plans.find(x => String(x.id) === String(sel.value));
+        if (!p) return;
+        const mine = p.track_id && p.track_id === cfg.trackId;
+
+        const fd = new FormData();
+        fd.append("_csrf_token", cfg.csrfToken || "");
+        fd.append("plan_id",  p.id);
+        fd.append("track_id", mine ? 0 : cfg.trackId);
+        linkBtn.disabled = true;
+        try {
+            const res = await fetch("api/planner/link.php", { method: "POST", body: fd });
+            const d   = await res.json();
+            if (!d.ok) throw new Error(d.error || "link failed");
+            p.track_id = d.track_id;
+            refreshLinkBtn();
+            if (statusEl) {
+                statusEl.textContent = mine ? (i18n.unlinked || "") : (i18n.linked || "");
+            }
+        } catch (err) {
+            if (window.GPX_DEBUG) console.error("plan link:", err);
+            if (statusEl) statusEl.textContent = i18n.error || "";
+        } finally {
+            linkBtn.disabled = false;
+        }
+    }
+
+    if (linkBtn) linkBtn.addEventListener("click", toggleLink);
+
+    if (sel) sel.addEventListener("change", () => { refreshLinkBtn(); loadPlanGeometry(parseInt(sel.value, 10)); });
     if (tol) tol.addEventListener("change", () => { if (planOn && planGeom) analyse(); });
 
     // Panel se ukáže jen když vůbec existuje nějaký plán s geometrií

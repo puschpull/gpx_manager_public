@@ -35,13 +35,21 @@ window.GpxMapFactory = (function () {
             { maxZoom: 19, attribution: "© Esri" }
         );
 
+        /* {r} nahradí Leaflet za "@2x" na displeji s vysokou hustotou bodů —
+           dlaždice pak přijde v 512 px na stejné území a mapa je ostrá i na
+           telefonu. Počet požadavků se nemění, jen jsou dlaždice větší.
+
+           Záměrně BEZ detectRetina: to by místo @2x tahalo dlaždice o zoom výš
+           a kreslilo je do poloviční velikosti — obojí dohromady by znamenalo
+           čtyřnásobek požadavků. Retinu mají jen sady basic a outdoor
+           (u winter a aerial vrací API 404, ověřeno). */
         var baseMapyCOMBasic = L.tileLayer(
-            "https://api.mapy.com/v1/maptiles/basic/256/{z}/{x}/{y}?apikey=" + mapycom,
+            "https://api.mapy.com/v1/maptiles/basic/256{r}/{z}/{x}/{y}?apikey=" + mapycom,
             { maxZoom: 19, attribution: "© <a href=\"https://mapy.com\" target=\"_blank\">Mapy.com</a>, © OpenStreetMap" }
         );
 
         var baseMapyCOMTurist = L.tileLayer(
-            "https://api.mapy.com/v1/maptiles/outdoor/256/{z}/{x}/{y}?apikey=" + mapycom,
+            "https://api.mapy.com/v1/maptiles/outdoor/256{r}/{z}/{x}/{y}?apikey=" + mapycom,
             { maxZoom: 19, attribution: "© <a href=\"https://mapy.com\" target=\"_blank\">Mapy.com</a>, © OpenStreetMap" }
         );
 
@@ -115,6 +123,16 @@ window.GpxMapFactory = (function () {
             "⛰️ Stínování terénu (Esri)": overlayHillshade,
             "📌 Turistické body (OSM)": createPoiLayer(map),
         };
+
+        // Názvy a hranice na průhledném podkladu (Mapy.com). Hlavní smysl je nad
+        // leteckou a satelitní mapou — ty jsou jinak bez jediného popisku.
+        // Bez klíče se vrstva vůbec nenabízí, ať v seznamu nesvítí mrtvá položka.
+        if (mapycom) {
+            overlayLayers["🏷️ Popisky a hranice (Mapy.com)"] = L.tileLayer(
+                "https://api.mapy.com/v1/maptiles/names-overlay/256/{z}/{x}/{y}?apikey=" + mapycom,
+                { maxZoom: 20, attribution: "© <a href=\"https://mapy.com\" target=\"_blank\">Mapy.com</a>" }
+            );
+        }
 
         return { baseLayers: baseLayers, overlayLayers: overlayLayers, baseOSM: baseOSM };
     }

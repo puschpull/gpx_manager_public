@@ -23,7 +23,11 @@ ajax_endpoint(function () use ($pdo): array {
         return ['ok' => false, 'error' => 'Chybí id.'];
     }
 
-    $stmt = $pdo->prepare('SELECT * FROM planned_routes WHERE id = ?');
+    $stmt = $pdo->prepare(
+        'SELECT p.*, t.track_name AS t_name, t.filename AS t_file, t.date_start AS t_date
+         FROM planned_routes p
+         LEFT JOIN tracks t ON t.id = p.track_id
+         WHERE p.id = ?');
     $stmt->execute([$id]);
     $r = $stmt->fetch(\PDO::FETCH_ASSOC);
     if (!$r) {
@@ -43,5 +47,8 @@ ajax_endpoint(function () use ($pdo): array {
         'ascent'     => $r['ascent']     !== null ? (int)$r['ascent']     : null,
         'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
         'note'       => $r['note'],
+        'track_id'   => ($r['t_name'] !== null || $r['t_file'] !== null) ? (int)$r['track_id'] : null,
+        'track_name' => $r['t_name'] ?: $r['t_file'],
+        'track_date' => $r['t_date'],
     ]];
 }, ['csrf' => false, 'admin' => false, 'name' => 'planner/get']);

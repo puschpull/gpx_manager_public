@@ -41,6 +41,45 @@ $_weatherLat = $_bounds ? round(($_bounds['minlat'] + $_bounds['maxlat']) / 2, 5
 $_weatherLon = $_bounds ? round(($_bounds['minlon'] + $_bounds['maxlon']) / 2, 5) : null;
 $_hasWeather = !empty($track['date_start']) && $_weatherLat && $_weatherLon;
 
+/* Open Graph — náhled odkazu při sdílení (diskusní fóra, messengery).
+   Bez těchhle značek se z odkazu na výšlap ukáže jen holá adresa.
+   Obrázek dělá share_image.php: mapa s trasou 1200×630, generuje se
+   až při prvním vyžádání. */
+$_ogTitle = trim((string)($track['alt_title'] ?: $track['track_name'] ?: $track['filename']));
+$_ogBits  = [];
+if (!empty($track['date_start']))  $_ogBits[] = date('j. n. Y', strtotime((string)$track['date_start']));
+if (!empty($track['distance_km'])) $_ogBits[] = number_format((float)$track['distance_km'], 1, ',', ' ') . ' km';
+if (!empty($track['ascent']))      $_ogBits[] = '↑ ' . round((float)$track['ascent']) . ' m';
+if (!empty($track['duration']))    $_ogBits[] = fmtDur($track['duration']);
+$_ogDesc = implode(' · ', $_ogBits);
+if (!empty($track['note'])) {
+    $_note = trim(preg_replace('/\s+/u', ' ', (string)$track['note']));
+    if ($_note !== '') {
+        $_ogDesc .= ' — ' . (mb_strlen($_note) > 160 ? mb_substr($_note, 0, 157) . '…' : $_note);
+    }
+}
+$_ogBase  = $protocol . '://' . $_SERVER['HTTP_HOST']
+          . rtrim(str_replace('\\', '/', dirname(strtok($_SERVER['PHP_SELF'], '?'))), '/');
+$_ogImage = $_ogBase . '/share_image.php?id=' . (int)$track['id'];
+
+$_og = function (string $prop, string $val): string {
+    return '    <meta property="' . $prop . '" content="'
+         . htmlspecialchars($val, ENT_QUOTES, 'UTF-8') . "\">\n";
+};
+$page_head_extra =
+      $_og('og:type', 'article')
+    . $_og('og:site_name', 'GPX Manager')
+    . $_og('og:locale', function_exists('app_lang') ? app_lang() : 'cs')
+    . $_og('og:title', $_ogTitle)
+    . $_og('og:description', $_ogDesc)
+    . $_og('og:url', $shareUrl)
+    . $_og('og:image', $_ogImage)
+    . $_og('og:image:width', '1200')
+    . $_og('og:image:height', '630')
+    . '    <meta name="twitter:card" content="summary_large_image">' . "\n"
+    . '    <meta name="description" content="'
+        . htmlspecialchars($_ogDesc, ENT_QUOTES, 'UTF-8') . "\">\n";
+
 require __DIR__ . '/layout_header.php';
 ?>
 
@@ -313,6 +352,12 @@ require __DIR__ . '/layout_header.php';
                     <option value="100">100 m</option>
                 </select>
             </label>
+            <?php if ($_isAdmin): ?>
+            <!-- Označení, že tenhle plán byl uskutečněn právě touto trasou.
+                 Detail trasy pak porovnání předvybere podle propojení, ne podle
+                 data a polohy, a v Plánovači je u plánu odkaz na trasu. -->
+            <button type="button" id="planLinkBtn" class="plan-btn" style="display:none;"></button>
+            <?php endif; ?>
         </div>
         <div id="planLegend" class="plan-legend" style="display:none;">
             <span><i class="plan-swatch plan-swatch-plan"></i><?= htmlspecialchars(t('pl_legend_plan', 'plán')) ?></span>
@@ -459,12 +504,19 @@ window.gpxDetailData = {
     dbAvgMoving:  <?= js_safe_json(round($track['speed_avg_total'] ?? 0, 3)) ?>,
     garminColor:  <?= js_safe_json($track['color'] ?? '') ?>,
     trackDateStart: <?= js_safe_json((string)($track['date_start'] ?? '')) ?>,
+    isAdmin:        <?= js_safe_json((bool)$_isAdmin) ?>,
+    csrfToken:      <?= js_safe_json(csrf_token()) ?>,
     planI18n: {
         loading:  <?= js_safe_json(t('pl_loading', 'Načítám plán…')) ?>,
         error:    <?= js_safe_json(t('pl_error', 'Plán se nepodařilo načíst.')) ?>,
         noPlans:  <?= js_safe_json(t('pl_no_plans', 'Zatím nemáš uložený žádný plán s vypočítanou trasou.')) ?>,
         noGeom:   <?= js_safe_json(t('pl_no_geom', 'Tento plán nemá uloženou vypočítanou trasu.')) ?>,
         onPlan:   <?= js_safe_json(t('pl_on_plan', 'trasy podle plánu')) ?>,
+        linkAdd:    <?= js_safe_json(t('pl_link_add',    'Uskutečněno touto trasou')) ?>,
+        linkRemove: <?= js_safe_json(t('pl_link_remove', 'Zrušit propojení')) ?>,
+        linked:     <?= js_safe_json(t('pl_linked',      'Plán je propojen s touto trasou.')) ?>,
+        unlinked:   <?= js_safe_json(t('pl_unlinked',    'Propojení zrušeno.')) ?>,
+        linkOther:  <?= js_safe_json(t('pl_link_other',  'Plán je už propojen s jinou trasou.')) ?>,
         maxDev:   <?= js_safe_json(t('pl_max_dev', 'nejdál od plánu')) ?>,
         avgDev:   <?= js_safe_json(t('pl_avg_dev', 'průměrně')) ?>,
         detours:  <?= js_safe_json(t('pl_detours', 'odboček')) ?>,
@@ -540,6 +592,19 @@ window.gpxDetailData = {
     }
 };
 </script>
+
+<?php if ($_isAdmin): ?>
+<!-- Předpřipraví obrázek pro náhled sdíleného odkazu (uploads/share/).
+     U nové trasy trvá vykreslení z OSM dlaždic okolo 9 s; když ho spustí
+     otevření detailu, je hotový dřív, než odkaz někam vložíš. Běží jen
+     administrátorovi a jen jednou — podruhé endpoint jen potvrdí hotový soubor. -->
+<script>
+    window.addEventListener("load", function () {
+        fetch("share_image.php?id=<?= (int)$track['id'] ?>&warm=1", { credentials: "same-origin" })
+            .catch(function () { /* náhled odkazu není kritický */ });
+    });
+</script>
+<?php endif; ?>
 
 <!-- Sdílené lib moduly — musí být načteny jako první -->
 <script src="<?= asset('js/lib/event-bus.js') ?>"></script>

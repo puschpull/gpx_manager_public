@@ -781,10 +781,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             refreshMarkers();
             updateButtons();
+            showPlanTrack(p);
             setStatus(i18n.loaded || "Načteno.", "done");
         } catch (err) {
             setStatus((i18n.error || "Chyba") + ".", "error");
         }
+    }
+
+    /**
+     * Plán, který už byl prošlapán, ukáže odkaz na skutečnou trasu.
+     * Propojení se zakládá v detailu trasy (tlačítko u porovnání s plánem).
+     */
+    function showPlanTrack(p) {
+        const wrap = document.getElementById("planTrackWrap");
+        const link = document.getElementById("planTrackLink");
+        if (!wrap || !link) return;
+        if (!p || !p.track_id) { wrap.style.display = "none"; return; }
+
+        const datum = p.track_date ? " · " + String(p.track_date).slice(0, 10) : "";
+        link.textContent = (i18n.doneTrack || "Uskutečněno") + ": "
+                         + (p.track_name || "#" + p.track_id) + datum;
+        link.href = "detail.php?id=" + encodeURIComponent(p.track_id);
+        wrap.style.display = "";
     }
 
     async function deletePlan() {
@@ -943,6 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     btnClear.addEventListener("click", () => {
+        showPlanTrack(null);
         waypoints.forEach(w => map.removeLayer(w.marker));
         waypoints = [];
         currentPlanId = 0;

@@ -123,6 +123,8 @@ require __DIR__ . '/layout_header.php';
     <span>⛰️ ↗ <span id="planAsc">–</span></span>
     <span>↘ <span id="planDesc">–</span></span>
     <span>📍 <span id="planWpts">0</span> <?= htmlspecialchars(t('planner_waypoints', 'bodů')) ?></span>
+    <!-- Plán, který už byl prošlapán, odkazuje na skutečnou trasu -->
+    <span id="planTrackWrap" style="display:none;">✔ <a id="planTrackLink" href="#"></a></span>
 </div>
 
 <!-- Počasí pro plánovaný den -->
@@ -199,6 +201,7 @@ window.gpxPlannerData = {
         restrOther:     <?= js_safe_json(t('planner_restr_other',     'jiné omezení')) ?>,
         snapNote:       <?= js_safe_json(t('planner_snap_note',       'Nejvzdálenější bod se posunul na nejbližší cestu o')) ?>,
         clickOnRoute:   <?= js_safe_json(t('planner_click_on_route',  'Klik na trasu bod nepřidal. Nový bod přidej kousek vedle čáry — routing ho stejně přichytí na cestu.')) ?>,
+        doneTrack:      <?= js_safe_json(t('planner_done_track',     'Uskutečněno')) ?>,
         exportNone: <?= js_safe_json(t('planner_export_none', 'Žádné uložené plány k exportu.')) ?>,
         exportDone: <?= js_safe_json(t('planner_export_done', 'Plány staženy: {n}')) ?>,
         importBad:  <?= js_safe_json(t('planner_import_bad', 'Soubor se nepodařilo načíst.')) ?>,
