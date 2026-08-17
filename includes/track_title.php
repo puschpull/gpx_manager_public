@@ -6,7 +6,8 @@ declare(strict_types=1);
  *  track_title.php — čitelný titulek trasy
  *
  *  Garmin ukládá do GPX jako název trasy okamžik, kdy záznam
- *  uložil („2026-08-15 14:40:14“). Takový název je k ničemu
+ *  uložil („2026-08-15 14:40:14“), filtrace tras zase nechává
+ *  „Cleaned Track“. Takový název je k ničemu
  *  v panelu prohlížeče, v záložkách i v náhledu odkazu, který
  *  se vloží do diskuse — ze všech údajů o výšlapu je čas
  *  dokončení ten nejméně zajímavý.
@@ -32,6 +33,28 @@ function track_name_is_timestamp(?string $name): bool {
     $name = trim((string)$name);
     if ($name === '') return false;
     return (bool)preg_match('/^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?$/', $name);
+}
+
+/**
+ * Neříká název vůbec nic? Kromě časového razítka sem patří i názvy, které
+ * do GPX zapsal nástroj nebo přístroj: „Cleaned Track“ nechává filtrace tras
+ * (v tomhle archivu je jich 385), „ACTIVE LOG“ a „Track 001“ zase Garmin.
+ *
+ * Seznam je krátký a doslovný právě proto, aby nesebral skutečný název —
+ * „Výlet Zuberec“ nebo „Track přes Ještěd“ musí zůstat.
+ */
+function track_name_is_generic(?string $name): bool {
+    $name = trim((string)$name);
+    if ($name === '') return true;
+    if (track_name_is_timestamp($name)) return true;
+
+    $bezDiakritiky = mb_strtolower($name);
+    $presne = ['cleaned track', 'track', 'trasa', 'untitled', 'unnamed',
+               'no name', 'bez nazvu', 'bez názvu', 'new track', 'current track'];
+    if (in_array($bezDiakritiky, $presne, true)) return true;
+
+    // „Track 001“, „ACTIVE LOG 15“, „Trasa 3“ — jméno nástroje plus pořadové číslo
+    return (bool)preg_match('/^(track|trasa|active log|log)[ _-]?\d+$/iu', $name);
 }
 
 /**
@@ -201,7 +224,7 @@ function track_display_title(\PDO $pdo, array $track): string {
     if ($alt !== '') return $alt;
 
     $name = trim((string)($track['track_name'] ?? ''));
-    if ($name !== '' && !track_name_is_timestamp($name)) return $name;
+    if (!track_name_is_generic($name)) return $name;
 
     $ts = !empty($track['date_start']) ? strtotime((string)$track['date_start']) : false;
     if ($ts === false && $name !== '') $ts = strtotime($name);

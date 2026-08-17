@@ -6,6 +6,39 @@
 ================================================================================
 
 
+── 16. srpna 2026 (6) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  TITULEK SE SKLÁDÁ I U TRAS POJMENOVANÝCH „CLEANED TRACK“                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Detekce nic neříkajícího názvu hlídala jen časové razítko z Garminu.
+  Data ale ukázala, že to je jen polovina problému: z 387 tras s „pořádným“
+  názvem jich mělo 385 název „Cleaned Track“, který po sobě nechává filtrace
+  tras. Skutečné názvy byly přesně dva — „Výlet Zuberec“ a „Výlet Zuberec 2“.
+
+  Kromě razítka se proto za nic neříkající považují i názvy zapsané nástrojem
+  nebo přístrojem:
+
+    doslovně   Cleaned Track, Track, Trasa, Untitled, Unnamed, No name,
+               Bez názvu, New Track, Current Track  (bez ohledu na velikost písmen)
+    vzorem     Track 001, ACTIVE LOG 15, Trasa 3 — jméno nástroje a pořadí
+    prázdný název
+
+  Seznam je schválně krátký a doslovný, aby nesebral skutečné jméno:
+  „Výlet Zuberec“, „Track přes Ještěd“ i „Trasa kolem Máchova jezera“
+  zůstávají nedotčené.
+
+  Rozumný titulek má tím pádem 630 z 633 tras:
+
+    #1    Korozluky — výšlap 30. 3. 2014        (dřív Cleaned Track)
+    #300  Rudolice v Horách — výšlap 26. 5. 2019
+
+  Nadpis na stránce trasy ani seznam tras se dál nemění — tam zůstává
+  původní název z GPX.
+
+  Soubory: includes/track_title.php
+
 ── 16. srpna 2026 (5) ──────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐
