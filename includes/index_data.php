@@ -18,6 +18,7 @@ $sortOptions = [
     'Poznámka'                     => 'note',
     'Barva'                        => 'color',
     'Zařízení'                     => 'device',
+    'Místo'                        => 'place_name',
     'Start'                        => 'date_start',
     'Konec'                        => 'date_end',
     'Doba (s)'                     => 'duration',

@@ -157,6 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data['note']       = trim($_POST['note']       ?? '');
     $data['color']      = trim($_POST['color']      ?? '');
     $data['device']     = trim($_POST['device']     ?? '');
+    $data['place_name'] = trim($_POST['place_name'] ?? '');
     $data['bounds']     = trim($_POST['bounds']     ?? '');
     $data['file_hash']  = trim($_POST['file_hash']  ?? '');
 
@@ -181,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data[$k] = $val;
     }
 
-    foreach (['filename','track_name','alt_title','note','color','device','bounds','file_hash'] as $k) {
+    foreach (['filename','track_name','alt_title','note','color','device','place_name','bounds','file_hash'] as $k) {
         if ($data[$k] === '') $data[$k] = null;
     }
 
@@ -223,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     $fields = [
-        'filename','track_name','alt_title','note','color','device',
+        'filename','track_name','alt_title','note','color','device','place_name',
         'date_start','date_end','duration','moving_time','stopped_time',
         'distance_km','ascent','descent','elevation_min','elevation_max',
         'speed_max','speed_avg','speed_avg_total',
@@ -394,6 +395,11 @@ require __DIR__ . '/includes/layout_header.php';
             <div class="col">
                 <label for="device"><?= t('label_device') ?></label>
                 <input type="text" id="device" name="device" value="<?= h($track['device'] ?? '') ?>">
+
+                <label for="place_name"><?= t('label_place_name') ?></label>
+                <input type="text" id="place_name" name="place_name" maxlength="120"
+                       value="<?= h($track['place_name'] ?? '') ?>">
+                <div class="field-hint"><?= t('hint_place_name') ?></div>
             </div>
             <div class="col">
                 <label for="bounds"><?= t('label_bounds') ?></label>

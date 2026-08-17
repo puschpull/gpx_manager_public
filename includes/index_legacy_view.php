@@ -99,6 +99,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 t('th_note')             => "note",
                 t('th_color')            => "color",
                 t('th_device')           => "device",
+                t('th_place')            => "place_name",
                 t('th_date_start')       => "date_start",
                 t('th_date_end')         => "date_end",
                 t('th_duration')         => "duration",

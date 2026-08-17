@@ -2,12 +2,15 @@
 declare(strict_types=1);
 
 /**
- * Dávkové doplnění názvů míst (tracks.place_name) pro trasy, které mají
- * místo názvu jen časové razítko z přístroje.
+ * Dávkové doplnění názvů míst (tracks.place_name).
+ *
+ * Místo se ukazuje ve sloupci kompletní tabulky, v detailu trasy a jde
+ * upravit v editaci; u tras pojmenovaných časovým razítkem z něj navíc
+ * vzniká titulek.
  *
  * K funkčnosti to potřeba není — místo se doplní samo při prvním zobrazení
- * detailu. Smysl téhle dávky je jiný: projít všechna vzniklá jména naráz
- * a u nepovedených dopsat alternativní titulek v editaci trasy.
+ * detailu. Smysl dávky je jiný: projít všechna zjištěná jména naráz
+ * a nepovedená rovnou opravit.
  *
  * POST + CSRF only — GET zobrazí potvrzovací formulář. Každá dávka je
  * samostatný POST; pokračování řeší auto-odesílaný formulář (stejný postup
@@ -22,11 +25,11 @@ require_once __DIR__ . '/includes/track_title.php';
 // API, takže se dávka drží pod limitem doby běhu skriptu.
 $batchSize = 10;
 
-/** Trasy, u kterých se místo vůbec použije: razítkový název, žádný alt_title. */
-const REBUILD_PLACES_WHERE = "
-    (alt_title IS NULL OR alt_title = '')
-    AND track_name REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
-";
+/* Původně se místo zjišťovalo jen u tras s razítkovým názvem, protože jinde
+   nebylo k čemu. Od chvíle, kdy je místo i sloupcem v tabulce, v detailu
+   a v editaci, se doplňuje u všech tras — jinak by byl sloupec z poloviny
+   prázdný. */
+const REBUILD_PLACES_WHERE = "1";
 
 /* ===== GET: potvrzovací formulář ===== */
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -51,8 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 <body>
 <div class="card">
     <h2>📍 Doplnění názvů míst</h2>
-    <p>Trasy pojmenované jen časovým razítkem z přístroje:
-       <strong><?= $total ?></strong>, z toho bez zjištěného místa
+    <p>Tras celkem: <strong><?= $total ?></strong>, z toho bez zjištěného místa
        <strong><?= $missing ?></strong>.</p>
     <p>U každé se přečte start (a u přejezdové trasy i cíl) přímo z GPX
        a přes Mapy.com se zjistí název místa. Zpracovává se po
@@ -177,8 +179,9 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 <?php if ($done): ?>
     <div class="done">✅ Hotovo.</div>
     <div class="summary">
-        Nepovedené názvy oprav tak, že trase v editaci vyplníš
-        <strong>alternativní titulek</strong> — ten má přednost před vším.<br>
+        Nepovedený název přepiš v editaci trasy v poli <strong>Místo</strong>.
+        Celý titulek jde přebít <strong>alternativním titulkem</strong>,
+        ten má přednost před vším.<br>
         <a href="admin.php">← Zpět do administrace</a>
     </div>
 <?php else: ?>

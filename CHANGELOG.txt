@@ -6,6 +6,45 @@
 ================================================================================
 
 
+── 16. srpna 2026 (5) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MÍSTO JAKO PLNOHODNOTNÝ ÚDAJ — TABULKA, DETAIL, EDITACE                  │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Název místa vznikl kvůli titulkům, ale je to užitečná informace sama o sobě.
+  Nově je vidět na třech místech:
+
+  KOMPLETNÍ TABULKA (index-legacy.php)
+  Nový sloupec „Místo“ za sloupcem Zařízení. Je řaditelný — kliknutím na
+  hlavičku se výšlapy ze stejného výchozího bodu srovnají k sobě — a má
+  vlastní zaškrtávátko v panelu „Viditelnost sloupců“.
+
+  DETAIL TRASY
+  V řádku pod nadpisem vedle data, s ikonou špendlíku a vysvětlivkou.
+
+  EDITACE TRASY
+  Textové pole „Místo“ pod Zařízením. Automaticky zjištěnou hodnotu jde
+  přepsat a projeví se v tabulce, v detailu i v titulku.
+
+  DOPLŇUJE SE UŽ U VŠECH TRAS
+  Dosud se místo zjišťovalo jen u 245 tras s razítkovým názvem, protože jinde
+  nebylo k čemu. Jako sloupec v tabulce by ale bylo u zbývajících 388 tras
+  prázdné, takže se doplňuje u všech — hromadný nástroj i líné doplňování
+  při zobrazení detailu. Na lokální databázi doplněno 633 z 633 tras bez
+  jediného selhání.
+
+  POZOR NA RUČNÍ HODNOTY
+  Ruční úprava místa není chráněná proti hromadnému přepočtu: volba
+  „Přepočítat i trasy, které místo už mají“ přepíše i to, co jsi opravil
+  ručně. Bez ní se hotové trasy přeskakují, takže při běžném doplňování
+  se nic neztratí. Kdo chce mít jistotu, použije alternativní titulek —
+  ten má přednost před vším a hromadné přepočty se ho nedotýkají.
+
+  Soubory: includes/table_tracks.php, includes/index_legacy_view.php,
+           includes/index_data.php (řazení), includes/detail_view.php,
+           edit.php, rebuild_places.php, admin.php, lang/*.php
+
 ── 16. srpna 2026 (4) ──────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐

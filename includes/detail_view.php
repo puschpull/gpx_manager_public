@@ -15,6 +15,9 @@ $_isAdmin = !empty($_SESSION['is_admin']);
    U tras pojmenovaných časovým razítkem z Garminu se poskládá z místa,
    typu aktivity a data. Nadpis stránky ani seznam tras se tím nemění. */
 $page_title = track_display_title($pdo, $track);
+// Místo se doplní i u tras s pořádným názvem — v tabulce a v editaci
+// se zobrazuje u všech, ne jen u těch s razítkem.
+$_place = track_place_name($pdo, $track);
 
 function fmtDur($sec) {
     $sec = (int)$sec;
@@ -115,6 +118,12 @@ require __DIR__ . '/layout_header.php';
                     <span class="inline-flex items-center gap-1">
                         <i data-lucide="calendar" class="w-3.5 h-3.5" aria-hidden="true"></i>
                         <?= date('d.m.Y', strtotime($track['date_start'])) ?>
+                    </span>
+                <?php endif; ?>
+                <?php if (!empty($_place)): ?>
+                    <span class="inline-flex items-center gap-1" title="<?= htmlspecialchars(t('hint_place_name')) ?>">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5" aria-hidden="true"></i>
+                        <?= h($_place) ?>
                     </span>
                 <?php endif; ?>
                 <?php if (!empty($track['activity_type'])): ?>

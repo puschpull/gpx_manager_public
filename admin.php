@@ -92,10 +92,8 @@ $withoutThumbs = 0;
 // Trasy s razitkovym nazvem, u kterych se jeste nezjistovalo misto pro titulek
 $withoutPlaces = 0;
 try {
-    $withoutPlaces = (int)$pdo->query("SELECT COUNT(*) FROM tracks
-        WHERE (alt_title IS NULL OR alt_title = '')
-          AND track_name REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
-          AND place_name IS NULL")->fetchColumn();
+    $withoutPlaces = (int)$pdo->query(
+        "SELECT COUNT(*) FROM tracks WHERE place_name IS NULL")->fetchColumn();
 } catch (\Throwable $e) { /* pred migraci 0019 sloupec neexistuje */ }
 $orphanThumbs  = 0;
 if (is_dir($thumbDir)) {

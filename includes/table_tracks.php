@@ -18,6 +18,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
         <?= sort_th(t('th_color'), 'color', $sort_by, $sort_dir, 'col-color') ?>
         <?= sort_th(t('th_device'), 'device', $sort_by, $sort_dir, 'col-device') ?>
 
+        <?= sort_th(t('th_place'), 'place_name', $sort_by, $sort_dir, 'col-place_name') ?>
         <?= sort_th(t('th_date_start'), 'date_start', $sort_by, $sort_dir, 'col-date_start ' . ($rangeActive ? 'range-active nowrap' : 'nowrap')) ?>
         <?= sort_th(t('th_date_end'), 'date_end', $sort_by, $sort_dir, 'col-date_end ' . ($rangeActive ? 'range-active nowrap' : 'nowrap')) ?>
 
@@ -95,6 +96,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             <td class="col-note" data-label="Poznámka"><?= h($t['note']) ?></td>
             <td class="col-color" data-label="Barva"><?= h($t['color']) ?></td>
             <td class="col-device" data-label="Zařízení"><?= h($t['device']) ?></td>
+            <td class="col-place_name" data-label="Místo"><?= h($t['place_name'] ?? '') ?></td>
 
             <td class="col-date_start <?= $rangeActive && $inRange ? 'nowrap in-range' : 'nowrap' ?>"
                 data-label="Start"
