@@ -8,8 +8,13 @@
  * #timeMode, #similar-wrap, #similar-tracks) aby JS moduly fungovaly beze změny.
  */
 require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/track_title.php';
 $_isAdmin = !empty($_SESSION['is_admin']);
-$page_title = $track['track_name'] ?: $track['filename'];
+
+/* Titulek pro panel prohlížeče, záložky a náhled sdíleného odkazu.
+   U tras pojmenovaných časovým razítkem z Garminu se poskládá z místa,
+   typu aktivity a data. Nadpis stránky ani seznam tras se tím nemění. */
+$page_title = track_display_title($pdo, $track);
 
 function fmtDur($sec) {
     $sec = (int)$sec;
@@ -45,7 +50,7 @@ $_hasWeather = !empty($track['date_start']) && $_weatherLat && $_weatherLon;
    Bez těchhle značek se z odkazu na výšlap ukáže jen holá adresa.
    Obrázek dělá share_image.php: mapa s trasou 1200×630, generuje se
    až při prvním vyžádání. */
-$_ogTitle = trim((string)($track['alt_title'] ?: $track['track_name'] ?: $track['filename']));
+$_ogTitle = $page_title;   // stejný text jako v <title>, jen bez přípony „— GPX Manager“
 $_ogBits  = [];
 if (!empty($track['date_start']))  $_ogBits[] = date('j. n. Y', strtotime((string)$track['date_start']));
 if (!empty($track['distance_km'])) $_ogBits[] = number_format((float)$track['distance_km'], 1, ',', ' ') . ' km';

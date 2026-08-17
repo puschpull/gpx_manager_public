@@ -6,6 +6,89 @@
 ================================================================================
 
 
+── 16. srpna 2026 (4) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  ADMINISTRACE: HROMADNÉ DOPLNĚNÍ NÁZVŮ MÍST                               │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Místo pro titulek se doplňuje samo při prvním zobrazení detailu trasy,
+  takže k funkčnosti není hromadný průchod potřeba. Smysl má z jiného
+  důvodu: geokódování občas vrátí nesmysl a bez dávky by to člověk zjistil
+  až ve chvíli, kdy odkaz někam vloží.
+
+  Nový nástroj rebuild_places.php (Administrace → Hromadné přepočty) projde
+  trasy pojmenované časovým razítkem, zjistí u nich místo startu a průběžně
+  vypisuje tabulku trasa → místo → výsledný titulek. Nepovedený název se
+  opraví alternativním titulkem v editaci trasy, který má přednost před vším.
+
+  Dávka je 10 tras (u náhledů je 20) — každá trasa znamená jeden až dva
+  dotazy na cizí API, takže se dávka drží pod limitem doby běhu skriptu.
+  Postup je stejný jako u přegenerování náhledů: potvrzovací obrazovka,
+  POST s CSRF, mezi dávkami auto-odesílaný formulář.
+
+  Volba „Přepočítat i trasy, které místo už mají" slouží k opravě po změně
+  metody; bez ní se hotové trasy přeskakují.
+
+  V administraci je u položky vidět, kolika tras se to ještě týká. Počítadlo
+  je v try/catch, aby administrace fungovala i před spuštěním migrace 0019.
+
+  Soubory: rebuild_places.php, admin.php, lang/*.php
+
+── 16. srpna 2026 (3) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  ČITELNÝ TITULEK TRASY MÍSTO ČASOVÉHO RAZÍTKA Z GARMINU                   │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Garmin zapisuje do GPX jako název trasy okamžik, kdy záznam uložil —
+  „2026-08-15 14:40:14“. Takových tras je 245 z 633. Do včerejška to byla
+  kosmetika; od zavedení náhledů je to nadpis, který uvidí lidi v diskusi.
+  A je to ze všech údajů o výšlapu ten nejméně zajímavý: čas dokončení.
+
+  Nově se u takového názvu titulek poskládá:
+
+    Vidim — výšlap 15. 8. 2026                (okruh)
+    Korozluky → Velebudice — výšlap 12. 8. 2026   (přejezd)
+    Výšlap 15. 8. 2026 od 9:42                (bez známého místa)
+
+  Používá se na dvou místech: v <title> stránky (odtud panel prohlížeče,
+  záložky a odkaz kopírovaný do diskuse, kde zůstává přípona „— GPX Manager“)
+  a v og:title pro náhled odkazu, kde přípona nedává smysl.
+
+  ROZHODUJE START, NE TĚŽIŠTĚ
+  První verze brala název místa z těžiště trasy, protože ho máme v databázi.
+  Ukázalo se to jako špatná volba: okruh lesem má těžiště uprostřed lesa
+  a nejbližší vesnice je náhodná — u výšlapu z Vidimi vycházela Dobřeň,
+  vzdálená dva kilometry a bez vztahu k trase.
+
+  Rozhoduje proto start. Když trasa končí dál než 500 m od začátku, přidá se
+  i cíl. Start ani cíl v databázi nemáme, takže se čtou přímo z GPX: začátek
+  streamovaně po 16 kB, konec z posledního kusu souboru — trasa s tisíci body
+  se nemusí načítat celá do paměti. Těžiště zůstalo jako záloha pro případ,
+  že GPX nejde přečíst.
+
+  Detekce razítka je přísná (porovnává se celý název), takže
+  „2026-08-15 Vidim okruh“ ani „Cleaned Track“ se nedotkne. Alternativní
+  titulek z editace má přednost před vším.
+
+  Podstatné jméno se řídí aktivitou: Turistika a Pěšky → výšlap,
+  Kolo a E-bike → vyjížďka, Auto → výlet.
+
+  DATABÁZE
+  Migrace 0019 přidává tracks.place_name (VARCHAR(120), bez indexu — čte se
+  vždy jen jedna trasa). Tři stavy: NULL = nezjišťovalo se, '' = zkusilo se
+  a nepovedlo (znovu se už neobtěžuje), text = název místa. Plní se líně při
+  prvním zobrazení detailu, takže na API se sáhne jednou za život trasy;
+  bez klíče se nezapisuje nic, aby se to po jeho doplnění zkusilo znovu.
+
+  V APLIKACI SE NIC NEPŘEJMENOVALO
+  Nadpis stránky, seznam tras, filtr i export ukazují dál původní název
+  z GPX. Změna se týká jen titulku a značek pro sdílení.
+
+  Soubory: includes/track_title.php, includes/detail_view.php,
+           migrations/0019_track_place_name.sql, install.sql, lang/*.php
+
 ── 16. srpna 2026 (2) ──────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐

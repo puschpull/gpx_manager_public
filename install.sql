@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS tracks (
     bounds            JSON         DEFAULT NULL,
     centroid_lat      DOUBLE       DEFAULT NULL,
     centroid_lon      DOUBLE       DEFAULT NULL,
+    place_name        VARCHAR(120) DEFAULT NULL,
     trackpoints_count INT          DEFAULT NULL,
     is_favorite       TINYINT(1)   NOT NULL DEFAULT 0,
     difficulty        TINYINT UNSIGNED DEFAULT NULL,
