@@ -202,6 +202,8 @@ return [
     'filter_activity'     => 'Aktivita',
     'filter_search'       => 'Hľadať',
     'filter_color'        => 'Farba (Garmin)',
+    'filter_place'               => 'Miesto',
+    'filter_place_link'          => 'Zobraziť všetky trasy odtiaľto',
     'filter_category'     => 'Kategória',
     'filter_per_page'     => 'Počet na stránku',
     'filter_sort_by'      => 'Radiť podľa',

@@ -202,6 +202,8 @@ return [
     'filter_activity'     => 'Aktywność',
     'filter_search'       => 'Szukaj',
     'filter_color'        => 'Kolor (Garmin)',
+    'filter_place'               => 'Miejsce',
+    'filter_place_link'          => 'Pokaż wszystkie trasy stąd',
     'filter_category'     => 'Kategoria',
     'filter_per_page'     => 'Na stronę',
     'filter_sort_by'      => 'Sortuj wg',

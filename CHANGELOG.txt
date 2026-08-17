@@ -6,6 +6,43 @@
 ================================================================================
 
 
+── 16. srpna 2026 (7) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  VÝBĚR TRAS PODLE MÍSTA — HLEDÁNÍ, FILTR, PROKLIK                         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Místo bylo dosud jen k přečtení: sloupec v tabulce se dal řadit, ale vybrat
+  podle něj trasy nešlo. Tři doplnění to spravují.
+
+  HLEDÁNÍ
+  Pole „Hledat“ prohledávalo název, alternativní název, poznámku, soubor,
+  zařízení a kategorie. Nově i místo — napsat „Polevsko“ tedy vrátí výšlapy
+  odtamtud (v tomhle archivu devět).
+
+  FILTR
+  V panelu filtrů je nad Barvou rozbalovací seznam „Místo“ naplněný
+  skutečnými hodnotami z databáze s počty, seřazený podle četnosti: nahoře
+  Korozluky (54), Dlouhá Louka (41), Hora Svatého Šebestiána (36).
+  Filtruje se na přesnou shodu — na hledání podřetězce je pole „Hledat“.
+
+  PROKLIK
+  Název místa je odkaz v tabulce i v detailu trasy: jedno kliknutí zobrazí
+  všechny výšlapy odtamtud. Je to jen zkratka k témuž filtru, aby se nemusel
+  rozbalovat celý panel.
+
+  Ověřeno: filtr vrací 50 řádků na první stránce a zbylé 4 na druhé, součty
+  nahoře se přepočítají na výběr (425,4 km) a stránkování si parametr nese.
+
+  SESKUPENÍ SE NEDĚLALO
+  Tabulka rozdělená hlavičkami po místech by se u stránkovaného výpisu
+  (50 řádků na stránku) lámala přes stránky. Přehled „kde jsem byl kolikrát“
+  by patřil spíš do Statistik — zatím zůstává nezpracovaný.
+
+  Soubory: includes/track_filter.php, includes/index_data.php,
+           includes/index_legacy_view.php, includes/table_tracks.php,
+           includes/detail_view.php, lang/*.php
+
 ── 16. srpna 2026 (6) ──────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐

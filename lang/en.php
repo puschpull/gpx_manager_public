@@ -208,6 +208,8 @@ return [
     'filter_activity'     => 'Activity',
     'filter_search'       => 'Search',
     'filter_color'        => 'Color (Garmin)',
+    'filter_place'               => 'Place',
+    'filter_place_link'          => 'Show all tracks from here',
     'filter_category'     => 'Category',
     'filter_per_page'     => 'Per page',
     'filter_sort_by'      => 'Sort by',

@@ -67,6 +67,7 @@ function buildFilterSQL(?array $filters = null, string $prefix = ''): array
     if ($q !== '') {
         $clauses[] = "({$prefix}track_name LIKE :q
             OR {$prefix}alt_title LIKE :q
+            OR {$prefix}place_name LIKE :q
             OR {$prefix}note LIKE :q
             OR {$prefix}filename LIKE :q
             OR {$prefix}device LIKE :q
@@ -101,6 +102,15 @@ function buildFilterSQL(?array $filters = null, string $prefix = ''): array
     if ($activity !== '') {
         $clauses[] = "{$prefix}activity_type = :activity";
         $params[':activity'] = $activity;
+    }
+
+    // --- Place (obec u startu trasy) ---
+    // Přesná shoda, ne LIKE: hodnota jde z rozbalovacího seznamu naplněného
+    // skutečnými hodnotami z databáze. Na hledání podtextu je pole „q".
+    $place = trim($filters['place'] ?? '');
+    if ($place !== '') {
+        $clauses[] = "{$prefix}place_name = :place";
+        $params[':place'] = $place;
     }
 
     // --- Colour ---

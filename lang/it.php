@@ -202,6 +202,8 @@ return [
     'filter_activity'     => 'Attività',
     'filter_search'       => 'Cerca',
     'filter_color'        => 'Colore (Garmin)',
+    'filter_place'               => 'Luogo',
+    'filter_place_link'          => 'Mostra tutte le tracce da qui',
     'filter_category'     => 'Categoria',
     'filter_per_page'     => 'Per pagina',
     'filter_sort_by'      => 'Ordina per',

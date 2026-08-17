@@ -76,6 +76,7 @@ $elevation_max_val = trim($_GET['elevation_max_val'] ?? '');
 $elevation_max_max = trim($_GET['elevation_max_max'] ?? '');
 
 /* ===== Řazení ===== */
+$place    = trim($_GET['place'] ?? '');
 $sort_by  = $_GET['sort_by']  ?? '';
 $sort_dir = strtoupper($_GET['sort_dir'] ?? '');
 
@@ -133,6 +134,19 @@ try {
         $colorCounts[$row['color']] = (int)$row['cnt'];
     }
 } catch (Throwable $e) { error_log("index_data.php colors: " . $e->getMessage()); $colors = []; $colorCounts = []; }
+
+/* Místa do selectu — řazená podle četnosti, ať jsou nahoře ta, kam jezdíš nejčastěji */
+$places = [];
+$placeCounts = [];
+try {
+    $pstmt = $pdo->query("SELECT place_name, COUNT(*) AS cnt FROM tracks
+                          WHERE place_name IS NOT NULL AND place_name <> ''
+                          GROUP BY place_name ORDER BY cnt DESC, place_name ASC");
+    while ($row = $pstmt->fetch(PDO::FETCH_ASSOC)) {
+        $places[] = $row['place_name'];
+        $placeCounts[$row['place_name']] = (int)$row['cnt'];
+    }
+} catch (Throwable $e) { error_log("index_data.php places: " . $e->getMessage()); $places = []; $placeCounts = []; }
 
 $catCountStmt = $pdo->query("
     SELECT c.name, COUNT(tc.track_id) AS cnt

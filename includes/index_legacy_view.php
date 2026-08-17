@@ -219,6 +219,17 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                     <input type="text" name="q" value="<?= h($q) ?>" placeholder="<?= t('placeholder_search') ?>">
                 </div>
 
+                <!-- Místo -->
+                <div>
+                    <label><?= t('filter_place') ?></label>
+                    <select name="place">
+                        <option value=""><?= t('select_any') ?></option>
+                        <?php foreach ($places as $pl): ?>
+                            <option value="<?= h($pl) ?>" <?= ($place === $pl ? 'selected' : '') ?>><?= h($pl) ?> (<?= $placeCounts[$pl] ?? 0 ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <!-- Barva -->
                 <div>
                     <label><?= t('filter_color') ?></label>

@@ -121,10 +121,12 @@ require __DIR__ . '/layout_header.php';
                     </span>
                 <?php endif; ?>
                 <?php if (!empty($_place)): ?>
-                    <span class="inline-flex items-center gap-1" title="<?= htmlspecialchars(t('hint_place_name')) ?>">
+                    <a href="index-legacy.php?place=<?= urlencode($_place) ?>&amp;filter_submit=1"
+                       class="inline-flex items-center gap-1 hover:text-terracotta-500 transition-colors"
+                       title="<?= htmlspecialchars(t('filter_place_link', 'Zobrazit všechny trasy odtud')) ?>">
                         <i data-lucide="map-pin" class="w-3.5 h-3.5" aria-hidden="true"></i>
                         <?= h($_place) ?>
-                    </span>
+                    </a>
                 <?php endif; ?>
                 <?php if (!empty($track['activity_type'])): ?>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-terracotta-500 text-white text-xs font-medium">

@@ -208,6 +208,8 @@ return [
     'filter_activity'     => 'Aktivita',
     'filter_search'       => 'Hledat',
     'filter_color'        => 'Barva (Garmin)',
+    'filter_place'               => 'Místo',
+    'filter_place_link'          => 'Zobrazit všechny trasy odtud',
     'filter_category'     => 'Kategorie',
     'filter_per_page'     => 'Počet na stránku',
     'filter_sort_by'      => 'Řadit dle',

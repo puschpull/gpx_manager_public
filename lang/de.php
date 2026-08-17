@@ -202,6 +202,8 @@ return [
     'filter_activity'     => 'Aktivität',
     'filter_search'       => 'Suchen',
     'filter_color'        => 'Farbe (Garmin)',
+    'filter_place'               => 'Ort',
+    'filter_place_link'          => 'Alle Aufzeichnungen von hier anzeigen',
     'filter_category'     => 'Kategorie',
     'filter_per_page'     => 'Pro Seite',
     'filter_sort_by'      => 'Sortieren nach',

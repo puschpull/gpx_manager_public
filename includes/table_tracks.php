@@ -96,7 +96,11 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             <td class="col-note" data-label="Poznámka"><?= h($t['note']) ?></td>
             <td class="col-color" data-label="Barva"><?= h($t['color']) ?></td>
             <td class="col-device" data-label="Zařízení"><?= h($t['device']) ?></td>
-            <td class="col-place_name" data-label="Místo"><?= h($t['place_name'] ?? '') ?></td>
+            <td class="col-place_name" data-label="Místo"><?php if (!empty($t['place_name'])): ?>
+                <!-- Proklik = zkratka k filtru podle místa (jedno kliknutí místo rozbalení panelu) -->
+                <a href="index-legacy.php?place=<?= urlencode($t['place_name']) ?>&amp;filter_submit=1"
+                   title="<?= htmlspecialchars(t('filter_place_link', 'Zobrazit všechny trasy odtud')) ?>"><?= h($t['place_name']) ?></a>
+            <?php endif; ?></td>
 
             <td class="col-date_start <?= $rangeActive && $inRange ? 'nowrap in-range' : 'nowrap' ?>"
                 data-label="Start"
