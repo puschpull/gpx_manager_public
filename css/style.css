@@ -1297,3 +1297,13 @@ html.dark .btn:hover,
 html.dark .pgbtn:hover {
     color: #000;
 }
+
+/* Radar: trasa z posledních 7 dní, u které se snímky ještě dají stáhnout.
+   Nevrstvené pravidlo (viz poznámka o Tailwind @layer v CLAUDE.md). */
+.radar-todo { color: var(--warning-color, #bc5500); font-weight: 600; }
+
+/* Volba u importu (stáhnout radar) — zarovnat s tlačítky v liště */
+.import-opt {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--text-muted, inherit);
+}

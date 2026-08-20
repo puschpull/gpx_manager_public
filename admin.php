@@ -94,6 +94,21 @@ $withoutPlaces = 0;
 try {
     $withoutPlaces = (int)$pdo->query(
         "SELECT COUNT(*) FROM tracks WHERE place_name IS NULL")->fetchColumn();
+
+/* Radar ČHMÚ drží archiv jen ~7 dní zpět. U starších tras se nedá dělat nic,
+   takže má smysl hlídat jen ty čerstvé, kde se to ještě stihnout dá. */
+require_once __DIR__ . '/includes/radar_helper.php';
+$radarPending = [];
+try {
+    $_have = array_keys(radar_counts());
+    $_list = $_have ? implode(',', array_map('intval', $_have)) : '0';
+    $_st = $pdo->prepare("SELECT id, track_name, date_start FROM tracks
+                          WHERE id NOT IN ($_list)
+                            AND date_start IS NOT NULL AND date_start >= :since
+                          ORDER BY date_start DESC");
+    $_st->execute([':since' => date('Y-m-d H:i:s', time() - RADAR_ARCHIVE_D * 86400)]);
+    $radarPending = $_st->fetchAll(PDO::FETCH_ASSOC);
+} catch (\Throwable $e) { error_log('admin radar pending: ' . $e->getMessage()); }
 } catch (\Throwable $e) { /* pred migraci 0019 sloupec neexistuje */ }
 $orphanThumbs  = 0;
 if (is_dir($thumbDir)) {
@@ -323,6 +338,23 @@ require __DIR__ . '/includes/layout_header.php';
                     <span><?= t('tool_recalc_act') ?></span>
                 </a>
                 <div class="tool-desc"><?= t('desc_recalc_act') ?><?= $withoutActivity > 0 ? " — {$withoutActivity} ×" : '' ?></div>
+            </li>
+            <li>
+                <?php // Radar: jediné, s čím se dá ještě něco dělat, jsou trasy z posledních 7 dní ?>
+                <a href="index-legacy.php?radar=todo&amp;filter_submit=1">
+                    <span><?= t('tool_radar_pending') ?><?= count($radarPending) > 0 ? ' — ' . count($radarPending) . ' ×' : '' ?></span>
+                </a>
+                <div class="tool-desc">
+                    <?= t('desc_radar_pending') ?>
+                    <?php if ($radarPending): ?>
+                        <br><?php foreach (array_slice($radarPending, 0, 5) as $_rp): ?>
+                            <a href="detail.php?id=<?= (int)$_rp['id'] ?>">#<?= (int)$_rp['id'] ?>
+                                <?= htmlspecialchars(date('j. n.', strtotime((string)$_rp['date_start']))) ?></a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        — <?= t('radar_pending_none') ?>
+                    <?php endif; ?>
+                </div>
             </li>
             <li>
                 <a href="rebuild_places.php">

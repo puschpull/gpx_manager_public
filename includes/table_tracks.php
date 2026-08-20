@@ -19,6 +19,8 @@ $_isAdmin = !empty($_SESSION['is_admin']);
         <?= sort_th(t('th_device'), 'device', $sort_by, $sort_dir, 'col-device') ?>
 
         <?= sort_th(t('th_place'), 'place_name', $sort_by, $sort_dir, 'col-place_name') ?>
+        <?php // Radar není sloupec v databázi (snímky jsou soubory), takže se neřadí ?>
+        <th scope="col" class="col-radar"><?= htmlspecialchars(t('th_radar', 'Radar')) ?></th>
         <?= sort_th(t('th_date_start'), 'date_start', $sort_by, $sort_dir, 'col-date_start ' . ($rangeActive ? 'range-active nowrap' : 'nowrap')) ?>
         <?= sort_th(t('th_date_end'), 'date_end', $sort_by, $sort_dir, 'col-date_end ' . ($rangeActive ? 'range-active nowrap' : 'nowrap')) ?>
 
@@ -102,6 +104,15 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                    title="<?= htmlspecialchars(t('filter_place_link', 'Zobrazit všechny trasy odtud')) ?>"><?= h($t['place_name']) ?></a>
             <?php endif; ?></td>
 
+            <td class="col-radar" data-label="Radar"><?php
+                $_rn = $radarCounts[(int)$t['id']] ?? 0;
+                if ($_rn > 0) {
+                    echo '<span title="' . htmlspecialchars(t('radar_have', 'Stažené radarové snímky')) . '">🌧️ ' . $_rn . '</span>';
+                } elseif (radar_window_open($t['date_start'] ?? null)) {
+                    // Jen u těchhle se s tím ještě dá něco dělat — archiv ČHMÚ drží ~7 dní
+                    echo '<span class="radar-todo" title="' . htmlspecialchars(t('radar_todo', 'Radar zatím stažený není a archiv ČHMÚ ho brzy zahodí')) . '">⏳</span>';
+                }
+            ?></td>
             <td class="col-date_start <?= $rangeActive && $inRange ? 'nowrap in-range' : 'nowrap' ?>"
                 data-label="Start"
                 title="<?= h($t['date_start']) ?>">

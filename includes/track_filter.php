@@ -113,6 +113,29 @@ function buildFilterSQL(?array $filters = null, string $prefix = ''): array
         $params[':place'] = $place;
     }
 
+    /* --- Radar (srážkové snímky ČHMÚ) ---
+       Snímky jsou soubory v uploads/radar/, v databázi o nich není záznam —
+       filtr proto pracuje se seznamem id z adresáře. Tras s radarem jsou
+       jednotky až desítky, takže IN (...) je v pohodě.
+         have = má snímky   none = nemá   todo = nemá, ale ještě jde stáhnout */
+    $radar = trim($filters['radar'] ?? '');
+    if ($radar !== '') {
+        require_once __DIR__ . '/radar_helper.php';
+        $ids = array_keys(radar_counts());
+        $list = $ids ? implode(',', array_map('intval', $ids)) : '0';
+
+        if ($radar === 'have') {
+            $clauses[] = "{$prefix}id IN ($list)";
+        } elseif ($radar === 'none') {
+            $clauses[] = "{$prefix}id NOT IN ($list)";
+        } elseif ($radar === 'todo') {
+            $clauses[] = "({$prefix}id NOT IN ($list)
+                AND {$prefix}date_start IS NOT NULL
+                AND {$prefix}date_start >= :radar_since)";
+            $params[':radar_since'] = date('Y-m-d H:i:s', time() - RADAR_ARCHIVE_D * 86400);
+        }
+    }
+
     // --- Colour ---
     $color = trim($filters['color'] ?? '');
     if ($color !== '') {

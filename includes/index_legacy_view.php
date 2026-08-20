@@ -100,6 +100,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 t('th_color')            => "color",
                 t('th_device')           => "device",
                 t('th_place')            => "place_name",
+                t('th_radar')            => "radar",
                 t('th_date_start')       => "date_start",
                 t('th_date_end')         => "date_end",
                 t('th_duration')         => "duration",
@@ -227,6 +228,17 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                         <?php foreach ($places as $pl): ?>
                             <option value="<?= h($pl) ?>" <?= ($place === $pl ? 'selected' : '') ?>><?= h($pl) ?> (<?= $placeCounts[$pl] ?? 0 ?>)</option>
                         <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Radar (srážkové snímky ČHMÚ) -->
+                <div>
+                    <label><?= t('filter_radar') ?></label>
+                    <select name="radar">
+                        <option value=""><?= t('select_any') ?></option>
+                        <option value="have" <?= ($radar === 'have' ? 'selected' : '') ?>><?= t('filter_radar_have') ?></option>
+                        <option value="none" <?= ($radar === 'none' ? 'selected' : '') ?>><?= t('filter_radar_none') ?></option>
+                        <option value="todo" <?= ($radar === 'todo' ? 'selected' : '') ?>><?= t('filter_radar_todo') ?></option>
                     </select>
                 </div>
 

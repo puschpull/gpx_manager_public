@@ -76,7 +76,10 @@ $elevation_max_val = trim($_GET['elevation_max_val'] ?? '');
 $elevation_max_max = trim($_GET['elevation_max_max'] ?? '');
 
 /* ===== Řazení ===== */
+require_once __DIR__ . '/radar_helper.php';
+$radarCounts = radar_counts();      // [track_id => počet snímků], jedno čtení adresáře
 $place    = trim($_GET['place'] ?? '');
+$radar    = trim($_GET['radar'] ?? '');
 $sort_by  = $_GET['sort_by']  ?? '';
 $sort_dir = strtoupper($_GET['sort_dir'] ?? '');
 

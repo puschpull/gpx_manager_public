@@ -366,13 +366,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['ajax'] ?? '') === '1') {
         exit;
     }
 
+    /* Radar ČHMÚ: archiv drží jen ~7 dní, takže u čerstvě ušlé trasy je tohle
+       poslední pohodlná chvíle, kdy jde stáhnout. Volitelné (zaškrtávátko),
+       protože je to několik desítek snímků a import se o tu dobu protáhne.
+       Neúspěch import nikdy neshodí — trasa je uložená a radar jde dotáhnout
+       z přehrávače. */
+    $radarMsg = '';
+    if (!empty($_POST['fetch_radar'])) {
+        try {
+            require_once __DIR__ . '/includes/radar_helper.php';
+            $st = $pdo->prepare('SELECT date_start FROM tracks WHERE id = ?');
+            $st->execute([$newTrackId]);
+            $ds = $st->fetchColumn();
+
+            if (radar_window_open($ds !== false ? (string)$ds : null)) {
+                $r = radar_fetch_for_track($pdo, $newTrackId);
+                $radarMsg = ($r['ok'] ?? false)
+                    ? ' | Radar: ' . (int)($r['available'] ?? 0) . ' snímků'
+                    : ' | Radar se nepodařilo stáhnout';
+            } else {
+                $radarMsg = ' | Radar: mimo archiv ČHMÚ (starší než 7 dní)';
+            }
+        } catch (Throwable $e) {
+            error_log('import.php radar: ' . $e->getMessage());
+            $radarMsg = ' | Radar se nepodařilo stáhnout';
+        }
+    }
+
     echo json_encode([
         'ok'       => true,
         'status'   => 'inserted',
         'id'       => $newTrackId,
         'filename' => $finalName,
         'activity' => $activityType,
-        'message'  => '✅ Hotovo – soubor uložen.' . $activityMsg
+        'message'  => '✅ Hotovo – soubor uložen.' . $activityMsg . $radarMsg
     ]);
     exit;
 }
@@ -403,6 +430,10 @@ require __DIR__ . '/includes/layout_header.php';
         <option value="skip" selected><?= t('dup_mode_skip') ?></option>
         <option value="overwrite"><?= t('dup_mode_overwrite') ?></option>
     </select>
+    <label class="import-opt" title="<?= htmlspecialchars(t('import_radar_title')) ?>">
+        <input type="checkbox" id="fetchRadar" checked>
+        <?= htmlspecialchars(t('import_radar')) ?>
+    </label>
     <button id="pickBtn" class="btn-outdoor btn-outdoor-ghost"><?= t('btn_select_files') ?></button>
     <button id="startBtn" class="btn-outdoor btn-outdoor-primary"><?= t('btn_start_import') ?></button>
     <?php
@@ -522,6 +553,7 @@ function uploadOne(file, mode, onProgress) {
         const fd = new FormData();
         fd.append('_csrf_token', CSRF_TOKEN);
         fd.append('dup_mode', mode);
+        fd.append('fetch_radar', document.getElementById('fetchRadar').checked ? '1' : '');
         fd.append('file', file, file.name);
         xhr.send(fd);
     });

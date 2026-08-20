@@ -1,10 +1,53 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 16. srpna 2026
+  Poslední aktualizace: 17. srpna 2026
 
 ================================================================================
 
+
+── 17. srpna 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  RADAROVÉ SNÍMKY: KDE JSOU, KDE CHYBÍ A STAŽENÍ ROVNOU PŘI IMPORTU        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Radarové snímky ČHMÚ se ukládají jako soubory do uploads/radar/<id trasy>/
+  a v databázi o nich nebyl žádný záznam. Zjistit, u které trasy jsou a u které
+  ne, šlo jedině tak, že se otevřel detail, zapnul přehrávač a kliklo se na
+  „Srážkové pole“. U 633 tras nepoužitelné.
+
+  SLOUPEC V TABULCE
+  Kompletní tabulka má nový sloupec „Radar“ za sloupcem Místo:
+    🌧️ 66   snímky stažené, i s počtem
+    ⏳       trasa je z posledních 7 dní a radar zatím nemá
+    prázdno  starší trasa bez radaru — archiv ČHMÚ už nepomůže
+  Sloupec má vlastní zaškrtávátko ve Viditelnosti sloupců. Řadit nejde:
+  radar není sloupec v databázi. Přibyl proto filtr „Radar“ s volbami
+  má snímky / nemá snímky / ještě lze stáhnout.
+
+  PŘIPOMÍNKA V ADMINISTRACI
+  Archiv ČHMÚ drží zhruba 7 dní zpět, takže u starých tras se nedá dělat nic.
+  V kartě Přepočty je proto položka „🌧️ Radar k dotažení“ s počtem tras
+  z posledních 7 dní bez snímků, s proklikem na vyfiltrovaný seznam a odkazy
+  na prvních pět. Když není co řešit, píše „vše stažené“.
+
+  STAŽENÍ PŘI IMPORTU
+  V liště importu je zaškrtávátko „stáhnout radar“ (výchozí zapnuto). U trasy
+  z posledních 7 dní se snímky stáhnou rovnou po uložení a do hlášky přibude
+  „| Radar: 66 snímků“; u starší trasy se nic nestahuje. Selhání import nikdy
+  neshodí — trasa je uložená a radar jde dotáhnout z přehrávače jako dřív.
+  Import se tím prodlouží o desítky sekund, proto je to volba.
+
+  PŘESTAVBA
+  Stahování bylo zamčené uvnitř endpointu api/radar/fetch.php, takže z importu
+  nešlo zavolat. Je vytažené do includes/radar_helper.php, endpoint je teď jen
+  tenký obal a stejnou funkci volá import. Helper zároveň ví, kdo kolik snímků
+  má (jedno čtení adresáře na request) a jestli je u trasy archiv ještě otevřený.
+
+  Soubory: includes/radar_helper.php, api/radar/fetch.php, includes/table_tracks.php,
+           includes/index_legacy_view.php, includes/index_data.php,
+           includes/track_filter.php, admin.php, import.php, css/style.css, lang/*.php
 
 ── 16. srpna 2026 (7) ──────────────────────────────────────────────────────────
 
