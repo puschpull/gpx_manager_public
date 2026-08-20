@@ -6,6 +6,23 @@
 ================================================================================
 
 
+── 17. srpna 2026 (2) ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: NOVÉ SLOUPCE NEREAGOVALY NA VIDITELNOST                          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Zaškrtávátka u sloupců Místo a Radar nedělala nic. Skrývání sloupců totiž
+  nestojí na JavaScriptu — ten jen přidá na <body> třídu hide-col-<klíč>
+  a vlastní schování dělá CSS pravidlo, které je pro KAŽDÝ sloupec vypsané
+  ručně. U obou nových sloupců chybělo, takže se třída přidala a nic se
+  neskrylo.
+
+  Doplněno pro place_name i radar. Navíc porovnáno všech 36 přepínačů proti
+  pravidlům v css/index.css — žádný další bez pravidla není.
+
+  Soubory: css/index.css
+
 ── 17. srpna 2026 ──────────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐

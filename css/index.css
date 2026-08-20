@@ -175,6 +175,8 @@ body.hide-col-alt_title          .col-alt_title         { display: none !importa
 body.hide-col-note               .col-note              { display: none !important; }
 body.hide-col-color              .col-color             { display: none !important; }
 body.hide-col-device             .col-device            { display: none !important; }
+body.hide-col-place_name         .col-place_name        { display: none !important; }
+body.hide-col-radar              .col-radar             { display: none !important; }
 body.hide-col-date_start         .col-date_start        { display: none !important; }
 body.hide-col-date_end           .col-date_end          { display: none !important; }
 body.hide-col-duration           .col-duration          { display: none !important; }
