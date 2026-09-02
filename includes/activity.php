@@ -133,7 +133,7 @@ function foot_activities(): array {
  * Returns the localised display label for a raw activity_type DB value.
  *
  * DB stores Czech string values ('Pěšky', 'Turistika', …) — OPTION A from
- * AUDIT_REPORT.md TASK-25: keep Czech DB values, translate at render time.
+ * Rozhodnutí: v DB zůstávají české hodnoty, překládá se až při vykreslení.
  * Covers: QR-11, FE-16.
  */
 function activity_type_label(string $val): string {
