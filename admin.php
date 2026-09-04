@@ -38,6 +38,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])
         $flags[$fk] = in_array($fk, $posted, true);
     }
 
+    /* Vrstvy map: zapnuté a pořadí ve dvou sekcích. Aspoň jedna podkladová
+       mapa musí zůstat zapnutá — bez podkladu by mapa byla prázdná plocha. */
+    $layerDefs = map_layer_defs();
+    $onPosted  = (array)($_POST['map_layers_on'] ?? []);
+    $orderPost = (array)($_POST['map_layers_order'] ?? []);
+
+    $baseOn = array_filter(array_keys($layerDefs), static function ($k) use ($layerDefs, $onPosted) {
+        return $layerDefs[$k]['section'] === 'base' && in_array($k, $onPosted, true);
+    });
+
+    if (!$baseOn) {
+        header('Location: admin.php?saved=nobase');
+        exit;
+    }
+
+    $off = array_values(array_diff(array_keys($layerDefs), $onPosted));
+    $order = [];
+    foreach (['base', 'overlay'] as $sec) {
+        $known = array_keys(array_filter($layerDefs, static fn($d) => $d['section'] === $sec));
+        $order[$sec] = array_values(array_intersect((array)($orderPost[$sec] ?? []), $known));
+        foreach ($known as $k) {
+            if (!in_array($k, $order[$sec], true)) $order[$sec][] = $k;
+        }
+    }
+
+    set_app_config('map_layers_off',   $off);
+    set_app_config('map_layers_order', $order);
+
+    // Výška map — jedno nastavení pro všechny mapy v aplikaci
+    $mh = (string)($_POST['map_height'] ?? 'mid');
+    if (!array_key_exists($mh, map_height_options())) $mh = 'mid';
+
+    set_app_config('map_height',      $mh);
+    set_app_config('map_pages_full',  !empty($_POST['map_pages_full']));
     set_app_config('allowed_langs',  $langs);
     set_app_config('visible_pages',  $pages);
     set_app_config('nav_order',      $navOrder);
@@ -246,6 +280,12 @@ require __DIR__ . '/includes/layout_header.php';
     <?php if (isset($_GET['saved']) && $_GET['saved'] === 'access'): ?>
         <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-forest-100 dark:bg-forest-700 text-forest-700 dark:text-sand-100 text-sm">
             <i data-lucide="check-circle" class="w-4 h-4" aria-hidden="true"></i> <?= htmlspecialchars(t('admin_access_saved', 'Konfigurace přístupu uložena')) ?>
+        </div>
+    <?php endif; ?>
+    <?php if (isset($_GET['saved']) && $_GET['saved'] === 'nobase'): ?>
+        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-terracotta-500 text-white text-sm">
+            <i data-lucide="alert-triangle" class="w-4 h-4" aria-hidden="true"></i>
+            <?= htmlspecialchars(t('admin_nobase_error', 'Neuloženo: aspoň jedna podkladová mapa musí zůstat zapnutá.')) ?>
         </div>
     <?php endif; ?>
 </section>
@@ -534,6 +574,90 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
                 </li>
             <?php endforeach; ?>
             </ul>
+        </div>
+
+        <div class="admin-card" style="grid-column:span 2;">
+            <h3>🧱 <?= htmlspecialchars(t('admin_map_layers', 'Vrstvy map')) ?></h3>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+                <?= htmlspecialchars(t('admin_map_layers_hint', 'Odškrtnutá vrstva se v ovladači map vůbec nenabídne. Šipkami změň pořadí v seznamu. Platí pro všechny mapy v aplikaci.')) ?>
+            </p>
+
+            <?php foreach (['base' => t('admin_map_layers_base', 'Podkladové mapy'),
+                            'overlay' => t('admin_map_layers_overlay', 'Překryvné vrstvy')] as $_sec => $_secLabel): ?>
+                <h4 style="font-size:12px;margin:10px 0 6px;color:var(--text-muted);"><?= htmlspecialchars($_secLabel) ?></h4>
+                <ul class="map-layer-list" data-section="<?= $_sec ?>" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;">
+                <?php $_defs = map_layer_defs(); foreach (map_layer_order($_sec) as $_lk):
+                    $_d = $_defs[$_lk];
+                    $_missing = !empty($_d['needs']) && (!defined($_d['needs']) || constant($_d['needs']) === ''); ?>
+                    <li style="display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-secondary,var(--card-bg));">
+                        <input type="hidden" name="map_layers_order[<?= $_sec ?>][]" value="<?= htmlspecialchars($_lk) ?>">
+                        <input type="checkbox" name="map_layers_on[]" value="<?= htmlspecialchars($_lk) ?>"
+                               <?= map_layer_enabled($_lk) ? 'checked' : '' ?>>
+                        <span style="flex:1;<?= $_missing ? 'opacity:.55;' : '' ?>">
+                            <?= htmlspecialchars($_d['label'], ENT_QUOTES, 'UTF-8') ?>
+                            <?php if ($_missing): ?>
+                                <em style="font-size:11px;"> — <?= htmlspecialchars(t('mlayer_no_key', 'chybí API klíč, nezobrazí se')) ?></em>
+                            <?php endif; ?>
+                        </span>
+                        <button type="button" class="map-layer-up" style="padding:2px 8px;cursor:pointer;"
+                                aria-label="<?= htmlspecialchars(t('move_up', 'Posunout nahoru')) ?>"
+                                title="<?= htmlspecialchars(t('move_up', 'Posunout nahoru')) ?>">▲</button>
+                        <button type="button" class="map-layer-down" style="padding:2px 8px;cursor:pointer;"
+                                aria-label="<?= htmlspecialchars(t('move_down', 'Posunout dolů')) ?>"
+                                title="<?= htmlspecialchars(t('move_down', 'Posunout dolů')) ?>">▼</button>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php endforeach; ?>
+
+            <h4 style="font-size:12px;margin:12px 0 6px;color:var(--text-muted);">
+                <?= htmlspecialchars(t('admin_map_layers_ctx', 'Vrstvy vázané na konkrétní stránku')) ?>
+            </h4>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">
+                <?= htmlspecialchars(t('admin_map_layers_ctx_hint', 'Tyhle se odsud nevypínají — existují jen tam, kde mají smysl, a řídí se jinde.')) ?>
+            </p>
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-size:12px;opacity:.75;">
+                <?php foreach (map_context_layers() as $_cl => $_cw): ?>
+                    <li><?= htmlspecialchars($_cl, ENT_QUOTES, 'UTF-8') ?>
+                        <span style="color:var(--text-muted);">— <?= htmlspecialchars($_cw) ?></span></li>
+                <?php endforeach; ?>
+            </ul>
+
+            <script>
+            (function () {
+                document.querySelectorAll('.map-layer-list').forEach(function (list) {
+                    list.addEventListener('click', function (e) {
+                        var btn = e.target.closest('button');
+                        if (!btn) return;
+                        var li = btn.closest('li');
+                        if (btn.classList.contains('map-layer-up') && li.previousElementSibling) {
+                            li.parentNode.insertBefore(li, li.previousElementSibling);
+                            btn.focus();
+                        } else if (btn.classList.contains('map-layer-down') && li.nextElementSibling) {
+                            li.parentNode.insertBefore(li.nextElementSibling, li);
+                            btn.focus();
+                        }
+                    });
+                });
+            })();
+            </script>
+        </div>
+
+        <div class="admin-card">
+            <h3>🗺️ <?= htmlspecialchars(t('admin_map_size', 'Velikost map')) ?></h3>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+                <?= htmlspecialchars(t('admin_map_size_hint', 'Platí pro všechny mapy v aplikaci — detail trasy, plánovač, okolí, porovnání i heatmapy.')) ?>
+            </p>
+            <select name="map_height" style="width:100%;padding:6px;">
+                <?php $_mh = get_app_config('map_height', 'mid'); ?>
+                <?php foreach (map_height_options() as $mk => $mlabel): ?>
+                    <option value="<?= $mk ?>" <?= $_mh === $mk ? 'selected' : '' ?>><?= htmlspecialchars($mlabel, ENT_QUOTES, 'UTF-8') ?></option>
+                <?php endforeach; ?>
+            </select>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-top:10px;">
+                <input type="checkbox" name="map_pages_full" value="1" <?= get_app_config('map_pages_full', true) ? 'checked' : '' ?>>
+                <?= htmlspecialchars(t('admin_map_pages_full', 'Heatmapy a Hledání na mapě na celou výšku okna')) ?>
+            </label>
         </div>
 
         <div class="admin-card">

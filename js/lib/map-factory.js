@@ -134,7 +134,47 @@ window.GpxMapFactory = (function () {
             );
         }
 
+        /* Administrátor může vrstvy vypnout a přeskládat (Administrace → Vrstvy map).
+           Konfigurace přichází z includes/layout_header.php jako window.gpxMapLayers
+           a je vedená názvy vrstev — tedy tím, co je vidět v ovladači a co si
+           prohlížeč pamatuje jako naposledy zvolený podklad. */
+        baseLayers    = applyLayerConfig(baseLayers, "base");
+        overlayLayers = applyLayerConfig(overlayLayers, "overlay");
+
+        // Podklad přidaný na mapu mohl být právě vypnutý — vzít první zapnutý,
+        // ať mapa nezůstane bez podkladu.
+        if (!baseLayers["🗺️ OSM"]) {
+            map.removeLayer(baseOSM);
+            var prvni = Object.keys(baseLayers)[0];
+            if (prvni) { baseOSM = baseLayers[prvni]; baseOSM.addTo(map); }
+        }
+
         return { baseLayers: baseLayers, overlayLayers: overlayLayers, baseOSM: baseOSM };
+    }
+
+    /**
+     * Profiltruje a přeskládá vrstvy podle nastavení z administrace.
+     * Bez konfigurace (nebo když ji stránka nedostane) vrací vstup beze změny.
+     *
+     * @param {object} layers   { "název vrstvy": vrstva }
+     * @param {string} section  "base" | "overlay"
+     */
+    function applyLayerConfig(layers, section) {
+        var cfg = window.gpxMapLayers;
+        if (!cfg) return layers;
+
+        var off   = cfg.off || [];
+        var order = (cfg.order && cfg.order[section]) || [];
+        var out   = {};
+
+        // Nejdřív v pořadí ze správy, pak případné vrstvy, o kterých registr neví
+        order.forEach(function (name) {
+            if (layers[name] && off.indexOf(name) === -1) out[name] = layers[name];
+        });
+        Object.keys(layers).forEach(function (name) {
+            if (!out[name] && off.indexOf(name) === -1) out[name] = layers[name];
+        });
+        return out;
     }
 
     /**
@@ -419,10 +459,257 @@ window.GpxMapFactory = (function () {
         return wikimediaMarkers;
     }
 
+    /**
+     * Aktuální srážky z radaru ČHMÚ (opendata, bez klíče a bez registrace).
+     *
+     * Snímky jsou PNG v EPSG:3857 s pevným ohraničením, takže stačí
+     * L.imageOverlay — Leaflet obrázek roztáhne lineárně v mercatorových
+     * pixelech obrazovky, což je přesně to, co projekce vyžaduje.
+     *
+     * Pozor, tohle je jiný radar než ten v přehrávači výšlapu: ten ukazuje
+     * ARCHIV pro dobu trvání trasy a stahuje se na server. Tenhle ukazuje
+     * to, co prší TEĎ, a tahá se přímo z ČHMÚ do prohlížeče.
+     *
+     * @param {L.Map} map
+     * @param {object} i18n  texty {frame, opacity}
+     * @returns {L.ImageOverlay}
+     */
+    function createRadarNowOverlay(map, i18n) {
+        i18n = i18n || {};
+
+        // Ohraničení celého PNG. Odpovídá georeferenci z dokumentace ČHMÚ
+        // (JZ roh 48,0475 N / 11,267 E, 680×460 px po 1555,7 m v Mercatoru) —
+        // stejné číslo, jaké si dopočítává přehrávač v js/detail-replay.js.
+        var BOUNDS   = [[48.0475, 11.267], [52.1670, 20.7701]];
+        var BASE     = "https://opendata.chmi.cz/meteorology/weather/radar/composite/maxz/png_masked/";
+        var STEP_MS  = 5 * 60 * 1000;   // krok produktu maxz
+        var MAX_BACK = 5;               // dokumentované zpoždění je 3–15 min
+        var BLANK    = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+        // Rychlosti animace: doba jednoho snímku v ms
+        var SPEEDS = { slow: 900, mid: 550, fast: 300 };
+        // Poslední snímek se drží déle, ať je poznat, kde smyčka končí
+        var HOLD_LAST = 2.2;
+
+        var KEY_OPACITY = "gpx_radar_now_opacity";
+        var KEY_SPEED   = "gpx_radar_now_speed";
+        var KEY_COUNT   = "gpx_radar_now_frames";
+        var KEY_PLAY    = "gpx_radar_now_play";
+
+        function readLS(key, fallback) {
+            try { var v = localStorage.getItem(key); return v === null ? fallback : v; }
+            catch (e) { return fallback; }
+        }
+        function writeLS(key, value) {
+            try { localStorage.setItem(key, String(value)); } catch (e) { /* privátní režim */ }
+        }
+
+        var opacity = Math.min(100, Math.max(20, parseInt(readLS(KEY_OPACITY, "80"), 10) || 80));
+        var speed   = SPEEDS[readLS(KEY_SPEED, "mid")] ? readLS(KEY_SPEED, "mid") : "mid";
+        var count   = Math.min(24, Math.max(1, parseInt(readLS(KEY_COUNT, "12"), 10) || 12));
+        var playing = readLS(KEY_PLAY, "0") === "1";
+
+        var layer = L.imageOverlay(BLANK, BOUNDS, {
+            opacity: opacity / 100,
+            interactive: false,
+            attribution: 'radar &copy; <a href="https://opendata.chmi.cz" target="_blank" rel="noopener">ČHMÚ</a>'
+        });
+
+        var frames = [];        // [{ms, url}] vzestupně, nejnovější poslední
+        var idx = 0;
+        var playTimer = null;   // řetězený setTimeout (poslední snímek drží déle)
+        var loadTimer = null;   // obnova seznamu každých 5 minut
+        var loading = false;
+
+        /** YYYYMMDD.hhmm v UTC, zarovnané na pětiminutový krok. */
+        function stampOf(ms) {
+            var d = new Date(Math.floor(ms / STEP_MS) * STEP_MS);
+            function p(n) { return (n < 10 ? "0" : "") + n; }
+            return d.getUTCFullYear() + p(d.getUTCMonth() + 1) + p(d.getUTCDate())
+                 + "." + p(d.getUTCHours()) + p(d.getUTCMinutes());
+        }
+        function urlFor(ms) { return BASE + "pacz2gmaps3.z_max3d." + stampOf(ms) + ".0.png"; }
+
+        /**
+         * Existenci snímku ověřuje new Image(), ne fetch — obrázky CORS
+         * nepotřebují, kdežto fetch ano a ČHMÚ hlavičky neposílá.
+         * Vedlejší efekt je vítaný: co se ověří, je rovnou v cache prohlížeče,
+         * takže animace neškube.
+         */
+        function probe(url) {
+            return new Promise(function (resolve) {
+                var im = new Image();
+                im.onload  = function () { resolve(true); };
+                im.onerror = function () { resolve(false); };
+                im.src = url;
+            });
+        }
+
+        /** Načte posledních N existujících snímků, seřazených vzestupně. */
+        async function loadFrames() {
+            if (loading) return;
+            loading = true;
+            var base = Math.floor(Date.now() / STEP_MS) * STEP_MS;
+            var cand = [];
+            // Pár kroků navíc kvůli zpoždění publikace a občas chybějícímu snímku
+            for (var i = 0; i < count + MAX_BACK; i++) cand.push(base - i * STEP_MS);
+
+            var oks = await Promise.all(cand.map(function (ms) { return probe(urlFor(ms)); }));
+            var list = [];
+            for (var j = 0; j < cand.length && list.length < count; j++) {
+                if (oks[j]) list.push({ ms: cand[j], url: urlFor(cand[j]) });
+            }
+            loading = false;
+
+            if (!list.length) {
+                // Radar je doplněk — výpadek ČHMÚ nesmí nic rušit, jen se zapíše do konzole
+                if (window.GPX_DEBUG) console.warn("radar ČHMÚ: žádný snímek k dispozici");
+                return;
+            }
+            frames = list.reverse();
+            idx = frames.length - 1;          // po načtení stojíme na nejnovějším
+            show(idx);
+            if (playing) startPlay();
+        }
+
+        function show(i) {
+            if (!frames[i]) return;
+            idx = i;
+            layer.setUrl(frames[i].url);
+            control.setTime(new Date(frames[i].ms), i, frames.length);
+        }
+
+        function step() {
+            if (!frames.length) return;
+            var next = (idx + 1) % frames.length;
+            show(next);
+            var wait = SPEEDS[speed] * (next === frames.length - 1 ? HOLD_LAST : 1);
+            playTimer = setTimeout(step, wait);
+        }
+
+        function startPlay() {
+            stopPlay(false);
+            if (frames.length < 2) return;
+            playing = true;
+            writeLS(KEY_PLAY, "1");
+            control.setPlaying(true);
+            playTimer = setTimeout(step, SPEEDS[speed]);
+        }
+
+        function stopPlay(remember) {
+            if (playTimer) { clearTimeout(playTimer); playTimer = null; }
+            if (remember !== false) {
+                playing = false;
+                writeLS(KEY_PLAY, "0");
+            }
+            control.setPlaying(playing);
+        }
+
+        /* Ovladač v rohu mapy: čas snímku, přehrávání, rychlost, délka smyčky
+           a průhlednost. Do seznamu vrstev se tohle vložit nedá, je to jen
+           seznam zaškrtávátek. */
+        var control = L.control({ position: "bottomleft" });
+
+        control.onAdd = function () {
+            var div = L.DomUtil.create("div", "gpx-radar-ctl");
+            div.innerHTML =
+                '<div class="gpx-radar-time">🌧️ <span>–</span></div>' +
+                '<div class="gpx-radar-row">' +
+                  '<button type="button" class="gpx-radar-play" title="' + (i18n.play || "přehrát") + '">▶</button>' +
+                  '<select class="gpx-radar-speed" title="' + (i18n.speed || "rychlost") + '">' +
+                    '<option value="slow">0,5×</option>' +
+                    '<option value="mid">1×</option>' +
+                    '<option value="fast">2×</option>' +
+                  '</select>' +
+                  '<select class="gpx-radar-count" title="' + (i18n.frames || "délka smyčky") + '">' +
+                    '<option value="6">30 min</option>' +
+                    '<option value="12">1 h</option>' +
+                    '<option value="18">1,5 h</option>' +
+                    '<option value="24">2 h</option>' +
+                  '</select>' +
+                '</div>' +
+                '<label class="gpx-radar-op">' + (i18n.opacity || "průhlednost") +
+                ' <input type="range" min="20" max="100" step="5" value="' + opacity + '"></label>';
+            L.DomEvent.disableClickPropagation(div);
+
+            this._timeEl  = div.querySelector(".gpx-radar-time span");
+            this._playEl  = div.querySelector(".gpx-radar-play");
+            var speedEl   = div.querySelector(".gpx-radar-speed");
+            var countEl   = div.querySelector(".gpx-radar-count");
+            var slider    = div.querySelector("input[type=range]");
+
+            speedEl.value = speed;
+            countEl.value = String(count);
+
+            L.DomEvent.on(this._playEl, "click", function () {
+                if (playing) { stopPlay(); show(frames.length - 1); }
+                else startPlay();
+            });
+
+            L.DomEvent.on(speedEl, "change", function () {
+                speed = SPEEDS[speedEl.value] ? speedEl.value : "mid";
+                writeLS(KEY_SPEED, speed);
+                if (playing) startPlay();       // převzít nové tempo hned
+            });
+
+            L.DomEvent.on(countEl, "change", function () {
+                count = Math.min(24, Math.max(1, parseInt(countEl.value, 10) || 12));
+                writeLS(KEY_COUNT, count);
+                stopPlay(false);                // přehrávání si pamatujeme, jen ho na chvíli zastavíme
+                loadFrames();
+            });
+
+            L.DomEvent.on(slider, "input", function () {
+                var v = parseInt(slider.value, 10);
+                layer.setOpacity(v / 100);
+                writeLS(KEY_OPACITY, v);
+            });
+
+            return div;
+        };
+
+        /** Čas snímku v místním čase — bez něj uživatel nepozná stáří dat. */
+        control.setTime = function (d, i, total) {
+            if (!this._timeEl) return;
+            var hh = d.getHours(), mm = d.getMinutes();
+            var text = (i18n.frame || "snímek z") + " " + hh + ":" + (mm < 10 ? "0" : "") + mm;
+            if (total > 1) text += "  (" + (i + 1) + "/" + total + ")";
+            this._timeEl.textContent = text;
+        };
+
+        control.setPlaying = function (on) {
+            if (!this._playEl) return;
+            this._playEl.textContent = on ? "⏸" : "▶";
+            this._playEl.title = on ? (i18n.pause || "pauza") : (i18n.play || "přehrát");
+        };
+
+        map.on("overlayadd", function (e) {
+            if (e.layer !== layer) return;
+            control.addTo(map);
+            control.setPlaying(playing);
+            loadFrames();
+            if (loadTimer) clearInterval(loadTimer);
+            loadTimer = setInterval(loadFrames, STEP_MS);
+        });
+
+        map.on("overlayremove", function (e) {
+            if (e.layer !== layer) return;
+            // Vypnutá vrstva nesmí nic dělat na pozadí — ani časovač, ani požadavky
+            stopPlay(false);
+            if (loadTimer) { clearInterval(loadTimer); loadTimer = null; }
+            map.removeControl(control);
+            frames = [];
+        });
+
+        return layer;
+    }
+
     return {
         createBaseLayers:      createBaseLayers,
         createMapillaryOverlay: createMapillaryOverlay,
         createWikimediaLayer:  createWikimediaLayer,
         createLocateControl:   createLocateControl,
+        createRadarNowOverlay: createRadarNowOverlay,
+        applyLayerConfig:      applyLayerConfig,
     };
 })();

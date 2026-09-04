@@ -23,9 +23,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const { baseLayers, overlayLayers: _overlayBase, baseOSM } = window.GpxMapFactory.createBaseLayers(keys, map);
     const overlayMapillary = window.GpxMapFactory.createMapillaryOverlay(keys.mapillary || "");
+    /* Aktuální srážky z radaru ČHMÚ — jen v Plánovači a jen když je funkce
+       zapnutá v Administraci. Jinde by neměla smysl: u staré trasy dnešní déšť
+       nic neříká a v detailu by se navíc bila s radarem v přehrávači. */
+    const radarNow = (cfg.radarNow && window.GpxMapFactory.createRadarNowOverlay)
+        ? window.GpxMapFactory.createRadarNowOverlay(map, cfg.radarNowI18n || {})
+        : null;
+
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {});
+        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
+        radarNow ? { ["🌧️ " + ((cfg.radarNowI18n || {}).layer || "Aktuální srážky (ČHMÚ)")]: radarNow } : {});
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
+
+    // Vrstva se zapíná až po vytvoření ovladače, aby se zaškrtávátko srovnalo samo
+    if (radarNow) {
+        try {
+            if (localStorage.getItem("gpx_radar_now") === "1") radarNow.addTo(map);
+        } catch (e) { /* privátní režim prohlížeče */ }
+        map.on("overlayadd overlayremove", e => {
+            if (e.layer !== radarNow) return;
+            try { localStorage.setItem("gpx_radar_now", e.type === "overlayadd" ? "1" : "0"); } catch (err) {}
+        });
+    }
     if (window.GpxMapFactory.createLocateControl) window.GpxMapFactory.createLocateControl(map);
 
     const savedLayer = localStorage.getItem("gpx_map_layer");

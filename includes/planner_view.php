@@ -168,6 +168,17 @@ window.gpxPlannerData = {
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
+    // Aktuální srážky z ČHMÚ — volitelná funkce (Administrace → Volitelné funkce)
+    radarNow: <?= js_safe_json(feature_enabled('radar_now')) ?>,
+    radarNowI18n: {
+        layer:   <?= js_safe_json(t('layer_radar_now', 'Aktuální srážky (ČHMÚ)')) ?>,
+        frame:   <?= js_safe_json(t('radar_now_frame', 'snímek z')) ?>,
+        opacity: <?= js_safe_json(t('radar_now_opacity', 'průhlednost')) ?>,
+        play:    <?= js_safe_json(t('radar_now_play',   'přehrát')) ?>,
+        pause:   <?= js_safe_json(t('radar_now_pause',  'pauza')) ?>,
+        speed:   <?= js_safe_json(t('radar_now_speed',  'rychlost')) ?>,
+        frames:  <?= js_safe_json(t('radar_now_frames', 'délka smyčky')) ?>
+    },
     csrfToken: <?= js_safe_json(csrf_token()) ?>,
     personalPace: {
         foot: <?= js_safe_json($_paceFoot) ?>,

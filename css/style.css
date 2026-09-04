@@ -516,8 +516,8 @@ tr.in-range-row td { border-left: 4px solid var(--highlight-border); }
 }
 
 /* ====== Detail view – mapa a profil ====== */
+/* Výšku mapy řídí --gpx-map-h z includes/layout_header.php (nastavení v Administraci) */
 #map {
-    height: 500px !important;
     border: 1px solid var(--border-color);
     margin-bottom: 15px;
     border-radius: var(--radius-chip);
@@ -994,11 +994,6 @@ form textarea { min-height: 120px; }
     .track-nav-info {
         font-size: 13px;
         min-width: 70px;
-    }
-
-    /* ====== DETAIL — MAPA ====== */
-    #map {
-        height: 320px !important;
     }
 
     /* ====== DETAIL — VÝŠKOVÝ PROFIL ====== */

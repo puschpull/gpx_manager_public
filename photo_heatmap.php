@@ -138,7 +138,6 @@ require __DIR__ . '/includes/layout_header.php';
 <script src="<?= asset('js/lib/format-utils.js') ?>" defer></script>
 <script src="<?= asset('js/lightbox.js') ?>" defer></script>
 <style>
-    #map { height: calc(100vh - 200px) !important; min-height: 400px; }
     .heatmap-controls {
         display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
         margin: 10px 0; padding: 10px 14px;

@@ -59,6 +59,44 @@ if (!function_exists('t')) {
          takže tam musí zůstat i světlá zaškrtávátka — jinak by se invertovala. -->
     <style>:root { color-scheme: light; } html.dark { color-scheme: dark; } .leaflet-container { color-scheme: light; }</style>
 
+    <?php
+    /* Výška map — JEDINÉ místo, kde se řídí velikost mapy v celé aplikaci.
+       Nastavuje se v Administraci (app_config 'map_height'); stránky, kde je
+       mapa hlavní obsah, mohou dostat celou výšku okna.
+
+       Pravidlo je schválně tady a NEVRSTVENĚ: Tailwind utility jsou v @layer
+       a nevrstvené pravidlo je porazí bez ohledu na pořadí (viz CLAUDE.md).
+       Dřív se o výšku přetahovalo šest pravidel v pěti souborech a vyhrávalo
+       jedno s !important, takže většina z nich byla mrtvá. */
+    $_mapFull = in_array($currentScript, map_first_pages(), true)
+                && get_app_config('map_pages_full', true);
+    [$_mapH, $_mapMin] = map_height_css($_mapFull);
+    ?>
+    <style>
+        :root { --gpx-map-h: <?= $_mapH ?>; --gpx-map-min: <?= $_mapMin ?>; }
+        #map { height: var(--gpx-map-h); min-height: var(--gpx-map-min); }
+        /* Na telefonu nesmí ani volba „vysoká" sníst celou obrazovku */
+        @media (max-width: 640px) {
+            #map { height: min(var(--gpx-map-h), 60vh); min-height: 280px; }
+        }
+    </style>
+
+    <?php
+    /* Vrstvy map: co je vypnuté a v jakém pořadí se má nabízet.
+       Čte to js/lib/map-factory.js — jedno místo pro všech devět map. */
+    $_layerCfg = [
+        'off'   => array_values(array_map(
+            static fn($k) => map_layer_defs()[$k]['label'],
+            array_filter((array)get_app_config('map_layers_off', []),
+                         static fn($k) => isset(map_layer_defs()[$k])))),
+        'order' => [
+            'base'    => array_map(static fn($k) => map_layer_defs()[$k]['label'], map_layer_order('base')),
+            'overlay' => array_map(static fn($k) => map_layer_defs()[$k]['label'], map_layer_order('overlay')),
+        ],
+    ];
+    ?>
+    <script>window.gpxMapLayers = <?= js_safe_json($_layerCfg) ?>;</script>
+
     <!-- Admin/návštěvnický banner i hlavička jsou sticky na top:0. Banner má
          z-index 9999, hlavička 40 — po odrolování proto banner hlavičku překryl
          a z menu zbyl jen spodní proužek. Hlavička se proto lepí AŽ POD banner;

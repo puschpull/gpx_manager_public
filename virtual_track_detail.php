@@ -33,7 +33,6 @@ require __DIR__ . '/includes/layout_header.php';
 <script src="<?= asset('js/lib/format-utils.js') ?>" defer></script>
 <script src="<?= asset('js/lightbox.js') ?>" defer></script>
 <style>
-    #map { height: 60vh; min-height: 380px; border-radius: 10px; }
     .vt-meta { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; color:var(--text-muted); margin:8px 0 16px; }
     .vt-meta b { color: var(--text-color); }
     .vt-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; margin-top:16px; }

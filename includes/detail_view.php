@@ -284,7 +284,7 @@ require __DIR__ . '/layout_header.php';
     <div id="map"
          role="img"
          aria-label="<?= htmlspecialchars(sprintf(t('map_aria', 'Mapa trasy: %s'), $track['track_name'] ?: $track['filename'])) ?>"
-         class="w-full h-[60vh] min-h-[400px] rounded-2xl overflow-hidden shadow-card border border-sand-200 dark:border-forest-800"></div>
+         class="w-full rounded-2xl overflow-hidden shadow-card border border-sand-200 dark:border-forest-800"></div>
 </section>
 
 <?php if (feature_enabled('replay')): ?>

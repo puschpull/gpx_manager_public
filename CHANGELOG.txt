@@ -1,10 +1,89 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 17. srpna 2026
+  Poslední aktualizace: 4. září 2026
 
 ================================================================================
 
+
+── 4. září 2026 ───────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MAPY: AKTUÁLNÍ SRÁŽKY V PLÁNOVAČI, JEDNOTNÁ VELIKOST, SPRÁVA VRSTEV      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  AKTUÁLNÍ SRÁŽKY Z RADARU ČHMÚ (Plánovač)
+  Nová překryvná vrstva „🌧️ Aktuální srážky (ČHMÚ)" — otevřená data, žádný
+  klíč ani registrace. Snímky se tahají přímo do prohlížeče, nic se u nás
+  neukládá ani neproxuje.
+
+  Pozor na záměnu: v přehrávači výšlapu radar máme už dávno, ale ten ukazuje
+  ARCHIV pro dobu trvání trasy a stahuje se na server. Tenhle ukazuje, co
+  prší teď.
+
+  Vrstva je jen v Plánovači. Jinde by nedávala smysl — u trasy z roku 2019
+  dnešní déšť nic neříká a v detailu by se navíc bila s radarem v přehrávači.
+  Zapíná se v Administraci → Volitelné funkce, takže ji lze vypnout i pro
+  návštěvníky.
+
+  Ovladač v rohu mapy umí:
+    • čas snímku v místním čase (bez něj uživatel nepozná stáří dat)
+    • přehrávání smyčky posledních snímků, pauza vrací na nejnovější
+    • rychlost 0,5× / 1× / 2×
+    • délku smyčky 30 min / 1 h / 1,5 h / 2 h
+    • průhlednost 20–100 %
+  Vše kromě přehrávání se pamatuje mezi návštěvami.
+
+  Technické poznámky: PNG jsou v EPSG:3857, takže je stačí umístit jako
+  L.imageOverlay — Leaflet je roztáhne lineárně v mercatorových pixelech,
+  což projekce přesně vyžaduje. Ohraničení odpovídá georeferenci, kterou si
+  dopočítává přehrávač (ověřeno na tisícinu stupně). Existence snímku se
+  ověřuje přes new Image(), ne fetch: obrázky CORS nepotřebují, fetch ano.
+  Při vypnuté vrstvě neběží žádný časovač — ověřeno, 0 požadavků na
+  opendata.chmi.cz.
+
+  JEDNOTNÁ VELIKOST MAP + NASTAVENÍ
+  Devět map v aplikaci mělo šest různých předpisů výšky. Ukázalo se ale, že
+  to nebyla nejednotnost podle záměru: v css/style.css bylo
+  `#map { height: 500px !important }`, které přebíjelo úplně všechno —
+  i Tailwind třídy na detailu trasy (utility jsou v @layer, nevrstvené
+  pravidlo je porazí). Šest kusů CSS na pěti místech tedy bylo mrtvých.
+
+  Nově se výška řídí z JEDNOHO místa: nevrstvený blok v layout_header.php
+  vypíše proměnnou --gpx-map-h a jediné pravidlo #map. Žádné !important už
+  není potřeba, protože není s čím soupeřit. Zrušena mrtvá pravidla ve
+  style.css (desktop i mobil), nearby.css, compare.css, na prvku v detailu
+  a inline v heatmap.php, photo_heatmap.php, map_search.php a
+  virtual_track_detail.php.
+
+  V Administraci → Velikost map jsou čtyři volby: nízká (400 px), střední
+  (500 px, výchozí), vysoká (650 px) a podle výšky okna. Volný počet pixelů
+  schválně nenabízíme — 900 px na notebooku znamená, že pod mapou nic není.
+  Zaškrtávátko „Heatmapy a Hledání na mapě na celou výšku okna" (výchozí
+  zapnuto) zachovává dnešní chování tam, kde je mapa hlavní obsah.
+  Na telefonu platí strop min(nastavená výška, 60vh), nejméně 280 px.
+
+  SPRÁVA MAPOVÝCH VRSTEV
+  Administrace → Vrstvy map: přehled všech vrstev se zaškrtávátky a šipkami
+  pro pořadí, ve dvou oddělených sekcích (podkladové / překryvné) — míchat
+  je dohromady by nedávalo smysl.
+
+  Ovladatelných je šestnáct vrstev ze sdílené továrny, protože se chovají
+  stejně na všech devíti mapách. Šest vrstev vázaných na konkrétní stránku
+  (Moje trasa, Moje fotografie, Polohy fotek, Wikimedia, Mapillary, Aktuální
+  srážky) je jen vypsaných s poznámkou, odkud se řídí — přepínač, který by
+  na osmi z devíti stránek nic nedělal, by mátl.
+
+  Tři pojistky: aspoň jedna podkladová mapa musí zůstat zapnutá (jinak se
+  uložení odmítne a vypíše se hláška), zapamatovaná vrstva, kterou právě
+  vypneš, spadne na první zapnutou místo prázdné mapy, a vrstvy bez API
+  klíče jsou v seznamu vybledlé s poznámkou.
+
+  Soubory: js/lib/map-factory.js, js/planner.js, includes/layout_header.php,
+           includes/planner_view.php, includes/app_constants.php, admin.php,
+           includes/detail_view.php, css/{style,nearby,compare,planner}.css,
+           heatmap.php, photo_heatmap.php, map_search.php,
+           virtual_track_detail.php, lang/*.php
 
 ── 17. srpna 2026 (2) ──────────────────────────────────────────────────────────
 
