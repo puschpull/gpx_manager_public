@@ -747,6 +747,8 @@ return [
     'planner_restr_other'        => 'autre restriction',
     'planner_snap_note'          => 'Le point le plus éloigné a été déplacé vers le chemin le plus proche de',
     'planner_click_on_route'     => 'Un clic sur l’itinéraire n’ajoute pas de point. Placez les nouveaux points juste à côté de la ligne — le calcul les ramène de toute façon sur le chemin.',
+    'planner_radar_view_on'      => 'La couche des précipitations est activée — le planificateur n\'est plus qu\'une visionneuse radar. Les points ne peuvent être ni ajoutés ni déplacés.',
+    'planner_radar_view_blocked' => 'Aucun point n\'est ajouté pour l\'instant — la couche Précipitations actuelles est activée. Désactivez-la dans le sélecteur de couches pour continuer à planifier.',
     'planner_auto_on'          => 'Mode automatique : l\'itinéraire suit les chemins réels.',
 
     // ===== Plánovač — export/import plánů =====

@@ -753,6 +753,8 @@ return [
     'planner_restr_other'        => 'other restriction',
     'planner_snap_note'          => 'The farthest point was moved onto the nearest path by',
     'planner_click_on_route'     => 'Clicking the route did not add a point. Add new points just beside the line — routing snaps them to the path anyway.',
+    'planner_radar_view_on'      => 'The precipitation layer is on — the planner is now just a radar viewer. Points cannot be added or moved.',
+    'planner_radar_view_blocked' => 'No points are added right now — the Current precipitation layer is on. Turn it off in the layer picker to keep planning.',
     'planner_auto_on'          => 'Automatic mode: the route follows real paths.',
 
     // ===== Plánovač — export/import plánů =====

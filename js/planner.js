@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let manualMode = false;     // ruční režim: nové body se spojují rovnou čarou (přechod pole/lesa)
     let elevSample = [];        // [[lat,lng],…] — body odpovídající sloupcům výškového profilu
     let hoverMarker = null;     // společný ukazatel mapa ↔ profil
+    let radarViewMode = false;  // zapnutá vrstva srážek → plánovač jen prohlíží radar
 
     const statusEl   = document.getElementById("plan-status");
     const statsEl    = document.getElementById("plan-stats");
@@ -177,7 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
             w.lat = p.lat; w.lng = p.lng;
             scheduleCompute();
         });
-        m.on("click", () => removeWaypoint(w));
+        m.on("click", () => { if (!radarViewMode) removeWaypoint(w); });
+        if (radarViewMode && m.dragging) m.dragging.disable();   // plán načtený při zapnutém radaru
         w.marker = m;
         waypoints.push(w);
         refreshMarkers();
@@ -964,7 +966,58 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 4000);
     }
 
+    /* ===== Režim prohlížeče radaru =====
+       Zapnutá vrstva „Aktuální srážky" přepne plánovač do čtení: klikáním se
+       nepřidávají body, existující se nedají přetáhnout ani smazat kliknutím.
+       Když člověk sleduje, kam se déšť táhne, klikne a posouvá mapou často —
+       a každý takový klik by jinak zapsal bod do plánu. Tlačítka Zpět,
+       Vyčistit i Uložit zůstávají, ta se mačkají vědomě. */
+    let statusBeforeRadar = null;
+
+    function radarViewText() {
+        return i18n.radarViewOn
+            || "Vrstva srážek je zapnutá — plánovač je teď jen prohlížeč radaru. Body se nepřidávají ani nepřesouvají.";
+    }
+
+    function setRadarViewMode(on) {
+        if (radarViewMode === on) return;
+        radarViewMode = on;
+        waypoints.forEach(w => {
+            if (!w.marker || !w.marker.dragging) return;
+            if (on) w.marker.dragging.disable(); else w.marker.dragging.enable();
+        });
+        map.getContainer().classList.toggle("plan-radar-view", on);
+
+        if (on) {
+            statusBeforeRadar = statusEl ? { text: statusEl.textContent, cls: statusEl.className } : null;
+            setStatus(radarViewText(), "");
+        } else {
+            // původní hlášku vracíme jen když ji mezitím nic nepřepsalo
+            if (statusEl && statusEl.textContent === radarViewText()) {
+                if (statusBeforeRadar) {
+                    statusEl.textContent = statusBeforeRadar.text;
+                    statusEl.className   = statusBeforeRadar.cls;
+                } else {
+                    setStatus(i18n.clickHint || "", "");
+                }
+            }
+            statusBeforeRadar = null;
+        }
+    }
+
+    if (radarNow) {
+        map.on("overlayadd overlayremove", e => {
+            if (e.layer === radarNow) setRadarViewMode(e.type === "overlayadd");
+        });
+        if (map.hasLayer(radarNow)) setRadarViewMode(true);   // vrstva zapamatovaná z minule
+    }
+
     map.on("click", e => {
+        if (radarViewMode) {
+            flashStatus(i18n.radarViewBlocked
+                || "Body se teď nepřidávají — je zapnutá vrstva Aktuální srážky.");
+            return;
+        }
         if (pixelsFromRoute(e.latlng) <= CLICK_ROUTE_PX) {
             flashStatus(i18n.clickOnRoute
                 || "Klik na trasu bod nepřidal. Nový bod přidej kousek vedle čáry.");

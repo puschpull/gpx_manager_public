@@ -83,6 +83,10 @@
     cursor: grab;
 }
 
+/* Režim prohlížeče radaru — plán se needituje, ať je to na první pohled znát */
+.plan-radar-view .plan-wpt { cursor: default; opacity: .7; }
+.plan-radar-view .leaflet-marker-draggable { cursor: default; }
+
 /* Počasí pro plánovaný den */
 .plan-weather {
     display: flex; gap: 16px; flex-wrap: wrap; align-items: center;

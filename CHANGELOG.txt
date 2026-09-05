@@ -1,10 +1,34 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 4. září 2026
+  Poslední aktualizace: 5. září 2026
 
 ================================================================================
 
+
+── 5. září 2026 ───────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PLÁNOVAČ: ZAPNUTÝ RADAR = REŽIM PROHLÍŽEČE                               │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Dokud je v Plánovači zapnutá vrstva „🌧️ Aktuální srážky (ČHMÚ)", plánování
+  se vypne a mapa slouží jen k prohlížení radaru:
+    • klik do mapy nepřidá bod (místo toho se vypíše proč)
+    • body se nedají přetáhnout ani smazat kliknutím
+    • kurzor nad body a jejich vybledlá barva ukazují, že se needitují
+
+  Důvod: při sledování, kam se déšť táhne, se do mapy kliká a posouvá pořád —
+  a každý takový klik dosud zapsal bod do plánu. Přehrávání smyčky navíc
+  člověka drží u mapy dlouho, takže se to nasčítá.
+
+  Tlačítka Zpět, Vyčistit, Uložit i Export fungují dál; ta se mačkají vědomě.
+  Vypnutím vrstvy se plánovač okamžitě vrátí do normálu a stavový řádek
+  ukáže zase to, co v něm bylo předtím (například poznámky k trase).
+  Stav se drží i po znovunačtení stránky — vrstva se pamatuje z minule,
+  takže se plánovač rovnou otevře v režimu prohlížeče.
+
+  Soubory: js/planner.js, includes/planner_view.php, css/planner.css, lang/*.php
 
 ── 4. září 2026 ───────────────────────────────────────────────────────────────
 

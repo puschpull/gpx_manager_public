@@ -747,6 +747,8 @@ return [
     'planner_restr_other'        => 'altra limitazione',
     'planner_snap_note'          => 'Il punto più lontano è stato spostato sul sentiero più vicino di',
     'planner_click_on_route'     => 'Fare clic sul percorso non aggiunge un punto. Aggiungi i punti accanto alla linea: il calcolo li aggancia comunque al sentiero.',
+    'planner_radar_view_on'      => 'Il livello delle precipitazioni è attivo: il pianificatore ora è solo un visore radar. I punti non si aggiungono né si spostano.',
+    'planner_radar_view_blocked' => 'Adesso non vengono aggiunti punti: il livello Precipitazioni attuali è attivo. Disattivalo nel selettore dei livelli per continuare a pianificare.',
     'planner_auto_on'          => 'Modalità automatica: il percorso segue i sentieri reali.',
 
     // ===== Plánovač — export/import plánů =====

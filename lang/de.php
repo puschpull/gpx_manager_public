@@ -747,6 +747,8 @@ return [
     'planner_restr_other'        => 'sonstige Einschränkung',
     'planner_snap_note'          => 'Der entfernteste Punkt wurde auf den nächsten Weg verschoben um',
     'planner_click_on_route'     => 'Ein Klick auf die Route fügt keinen Punkt hinzu. Setze neue Punkte knapp neben die Linie — das Routing zieht sie ohnehin auf den Weg.',
+    'planner_radar_view_on'      => 'Die Niederschlagsebene ist an — der Planer ist jetzt nur eine Radaransicht. Punkte lassen sich weder hinzufügen noch verschieben.',
+    'planner_radar_view_blocked' => 'Es werden gerade keine Punkte hinzugefügt — die Ebene Aktueller Niederschlag ist an. Schalte sie in der Ebenenauswahl aus, um weiterzuplanen.',
     'planner_auto_on'          => 'Automatischer Modus: die Route folgt echten Wegen.',
 
     // ===== Plánovač — export/import plánů =====

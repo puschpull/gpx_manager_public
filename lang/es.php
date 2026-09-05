@@ -747,6 +747,8 @@ return [
     'planner_restr_other'        => 'otra restricción',
     'planner_snap_note'          => 'El punto más alejado se desplazó al camino más cercano',
     'planner_click_on_route'     => 'Al hacer clic sobre la ruta no se añade ningún punto. Añade los puntos junto a la línea: el enrutado los ajusta al camino igualmente.',
+    'planner_radar_view_on'      => 'La capa de precipitación está activada: el planificador es ahora solo un visor del radar. No se añaden ni se mueven puntos.',
+    'planner_radar_view_blocked' => 'Ahora no se añaden puntos: la capa Precipitación actual está activada. Desactívala en el selector de capas para seguir planificando.',
     'planner_auto_on'          => 'Modo automático: la ruta sigue los caminos reales.',
 
     // ===== Plánovač — export/import plánů =====

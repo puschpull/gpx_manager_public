@@ -753,6 +753,8 @@ return [
     'planner_restr_other'        => 'jiné omezení',
     'planner_snap_note'          => 'Nejvzdálenější bod se posunul na nejbližší cestu o',
     'planner_click_on_route'     => 'Klik na trasu bod nepřidal. Nový bod přidej kousek vedle čáry — routing ho stejně přichytí na cestu.',
+    'planner_radar_view_on'      => 'Vrstva srážek je zapnutá — plánovač je teď jen prohlížeč radaru. Body se nepřidávají ani nepřesouvají.',
+    'planner_radar_view_blocked' => 'Body se teď nepřidávají — je zapnutá vrstva Aktuální srážky. Vypni ji ve výběru vrstev a plánuj dál.',
     'planner_auto_on'          => 'Automatický režim: trasa se počítá po cestách.',
 
     // ===== Plánovač — export/import plánů =====

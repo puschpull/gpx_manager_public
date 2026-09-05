@@ -747,6 +747,8 @@ return [
     'planner_restr_other'        => 'inne ograniczenie',
     'planner_snap_note'          => 'Najdalszy punkt przesunięto na najbliższą ścieżkę o',
     'planner_click_on_route'     => 'Kliknięcie w trasę nie dodaje punktu. Nowy punkt dodaj tuż obok linii — routing i tak przyciągnie go do ścieżki.',
+    'planner_radar_view_on'      => 'Warstwa opadów jest włączona — planer działa teraz tylko jako podgląd radaru. Punktów nie da się dodawać ani przesuwać.',
+    'planner_radar_view_blocked' => 'Punkty nie są teraz dodawane — włączona jest warstwa Aktualne opady. Wyłącz ją w wyborze warstw, aby planować dalej.',
     'planner_auto_on'          => 'Tryb automatyczny: trasa biegnie po prawdziwych ścieżkach.',
 
     // ===== Plánovač — export/import plánů =====
