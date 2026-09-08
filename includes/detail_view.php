@@ -527,6 +527,10 @@ window.gpxDetailData = {
         error:    <?= js_safe_json(t('pl_error', 'Plán se nepodařilo načíst.')) ?>,
         noPlans:  <?= js_safe_json(t('pl_no_plans', 'Zatím nemáš uložený žádný plán s vypočítanou trasou.')) ?>,
         noGeom:   <?= js_safe_json(t('pl_no_geom', 'Tento plán nemá uloženou vypočítanou trasu.')) ?>,
+        <?php // Plán se přiřadí sám jen při skutečném překryvu — jinak zůstane nabídka prázdná ?>
+        pickNone: <?= js_safe_json(t('pl_pick_none', '— vyber plán —')) ?>,
+        matching: <?= js_safe_json(t('pl_matching', 'Hledám plán, který k trase sedí…')) ?>,
+        noMatch:  <?= js_safe_json(t('pl_no_match', 'K této trase žádný uložený plán nesedí. Pokud chceš přesto porovnat, vyber plán v nabídce.')) ?>,
         onPlan:   <?= js_safe_json(t('pl_on_plan', 'trasy podle plánu')) ?>,
         linkAdd:    <?= js_safe_json(t('pl_link_add',    'Uskutečněno touto trasou')) ?>,
         linkRemove: <?= js_safe_json(t('pl_link_remove', 'Zrušit propojení')) ?>,

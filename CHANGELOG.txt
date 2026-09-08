@@ -1,10 +1,40 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 5. září 2026
+  Poslední aktualizace: 8. září 2026
 
 ================================================================================
 
+
+── 8. září 2026 ───────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  POROVNÁNÍ S PLÁNEM SE NABÍDNE JEN U TRASY, KTERÁ PODLE PLÁNU OPRAVDU ŠLA │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Plán se dosud vybíral podle data a jinak podle nejbližšího těžiště — a to
+  klidně 25 km daleko. U výšlapu, který se nikdy neplánoval, tak naskočilo
+  porovnání s plánem odjinud a v souhrnu svítilo „0 % trasy podle plánu".
+  Návštěvník, který stránku vidí poprvé, netuší, co mu aplikace ukazuje.
+
+  Nově musí plán obstát geometricky: aspoň 60 % DÉLKY trasy musí vést do
+  40 m od plánu. Datum výletu a blízkost těžiště (do 8 km) už jen určují,
+  který plán se ověřuje jako první — samy o sobě nestačí. Výjimkou je plán
+  ručně označený jako „✔ Uskutečněno touto trasou": to je lidské rozhodnutí
+  a žádný důkaz nepotřebuje.
+
+  Když nesedí nic, zůstane v nabídce prázdná volba „— vyber plán —", do mapy
+  se nekreslí nic a panel se sám neotevře. Ruční výběr funguje dál, včetně
+  plánu, který nesedí — porovnat si můžeš cokoli s čímkoli.
+
+  Ověřují se nejvýš tři nejnadějnější plány a jen tehdy, když se panel má
+  opravdu otevřít; na trase bez plánu tak nepřibude žádný požadavek navíc.
+
+  Kontrolní data z ostrých tras: Radvanec 23. 8. proti svému plánu 94 %,
+  Vidim 15. 8. 84 % (obojí se otevře samo), zatímco Mlýny 6. 9. proti
+  nejbližšímu plánu 0 % (neotevře se, dřív se otevřelo).
+
+  Soubory: js/detail-plan.js, includes/detail_view.php, lang/*.php
 
 ── 5. září 2026 ───────────────────────────────────────────────────────────────
 

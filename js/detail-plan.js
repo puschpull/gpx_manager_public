@@ -128,6 +128,31 @@ document.addEventListener("gpxDataReady", (ev) => {
     function fmtKm(m)  { return (m / 1000).toFixed(2).replace(".", ",") + " km"; }
     function fmtM(m)   { return Math.round(m) + " m"; }
 
+    /* ============ Automatický výběr plánu ============
+       Plán se k trase přiřadí sám jen tehdy, když se opravdu překrývají.
+       Dřív stačilo těžiště do 25 km — u trasy, kterou nikdo neplánoval, tak
+       naskočilo porovnání s plánem odjinud a návštěvník viděl nesmysl. */
+    const AUTO_TOL_M        = 40;      // co je „na plánu" při automatickém rozhodování
+    const AUTO_MIN_PCT      = 60;      // aspoň tolik % délky trasy musí ležet na plánu
+    const AUTO_NEAR_M       = 8000;    // předfiltr podle těžiště (ušetří stahování geometrie)
+    const AUTO_MAX_CHECKS   = 3;       // kolik kandidátů se nejvýš ověřuje geometrií
+
+    /** Podíl DÉLKY trasy, který leží do `limit` metrů od načteného plánu (v %). */
+    function coveragePct(limit) {
+        if (!index) return 0;
+        let near = 0, total = 0, prevD = distToPlan(...toXY(trk[0]));
+        for (let i = 1; i < trk.length; i++) {
+            const [x, y] = toXY(trk[i]);
+            const d = distToPlan(x, y);
+            const segLen = window.GpxGeo.haversine(
+                trk[i - 1][0], trk[i - 1][1], trk[i][0], trk[i][1]);
+            total += segLen;
+            if (prevD <= limit && d <= limit) near += segLen;
+            prevD = d;
+        }
+        return total > 0 ? Math.round(100 * near / total) : 0;
+    }
+
     /* ============ Vykreslení ============ */
     function clearLayers() {
         if (planLayer) { map.removeLayer(planLayer); planLayer = null; }
@@ -259,23 +284,37 @@ document.addEventListener("gpxDataReady", (ev) => {
     }
 
     /* ============ Načítání ============ */
+    /** Geometrie plánu ze serveru — bez kreslení, ať jde plán i jen ověřit. */
+    async function fetchPlanGeom(id) {
+        const res = await fetch("api/planner/get.php?id=" + encodeURIComponent(id));
+        const d = await res.json();
+        const g = d && d.plan && d.plan.geometry;
+        if (!Array.isArray(g) || g.length < 2) return null;
+        const pts = g.filter(p => Array.isArray(p) && p.length >= 2
+                                  && !isNaN(p[0]) && !isNaN(p[1]));
+        return pts.length >= 2 ? pts : null;
+    }
+
+    /** Načtený plán se stane tím aktivním (geometrie + index pro hledání). */
+    function usePlanGeom(id, pts) {
+        planGeom = pts;
+        loadedId = id;
+        // Buňka 60 m — kompromis mezi počtem buněk a velikostí prohledávaného okolí
+        index = buildIndex(planGeom.map(toXY), 60);
+    }
+
     async function loadPlanGeometry(id) {
+        if (!id) { clearLayers(); return; }
         if (loadedId === id && planGeom) { drawPlan(); return; }
         if (statusEl) statusEl.textContent = i18n.loading || "…";
         try {
-            const res = await fetch("api/planner/get.php?id=" + encodeURIComponent(id));
-            const d = await res.json();
-            const g = d && d.plan && d.plan.geometry;
-            if (!Array.isArray(g) || g.length < 2) {
+            const pts = await fetchPlanGeom(id);
+            if (!pts) {
                 if (statusEl) statusEl.textContent = i18n.noGeom || "";
                 planGeom = null; index = null;
                 return;
             }
-            planGeom = g.filter(p => Array.isArray(p) && p.length >= 2
-                                     && !isNaN(p[0]) && !isNaN(p[1]));
-            loadedId = id;
-            // Buňka 60 m — kompromis mezi počtem buněk a velikostí prohledávaného okolí
-            index = buildIndex(planGeom.map(toXY), 60);
+            usePlanGeom(id, pts);
             drawPlan();
         } catch (err) {
             if (window.GPX_DEBUG) console.error("plan overlay:", err);
@@ -284,31 +323,55 @@ document.addEventListener("gpxDataReady", (ev) => {
     }
 
     /**
-     * Nejpravděpodobnější plán k této trase. Pořadí kritérií:
-     *   1. výslovné propojení (plán označený jako uskutečněný touto trasou),
-     *   2. shoda data plánu s datem výšlapu (přesný den),
-     *   3. nejbližší těžiště.
-     * Propojení je jediné z nich, které si zvolil člověk — proto vyhrává.
+     * Plán, který k této trase opravdu patří — nebo nic.
+     *
+     * Kritéria:
+     *   1. výslovné propojení (člověk plán označil jako uskutečněný touto
+     *      trasou) — jediné, které nepotřebuje důkaz,
+     *   2. jinak musí být plán geometricky sednutý: aspoň AUTO_MIN_PCT %
+     *      délky trasy do AUTO_TOL_M metrů od plánu. Shoda dne a blízkost
+     *      těžiště jen určují, kdo se ověřuje dřív — samy o sobě nestačí.
+     *
+     * Když nic nesedí, vrací null a nabídka zůstane prázdná. Většina tras
+     * se nikdy neplánovala a porovnání s náhodným plánem z okolí je matoucí
+     * — hlásilo by pár procent shody u výšlapu, který s plánem nemá nic
+     * společného.
      */
-    function bestPlanId() {
+    async function pickPlanId() {
         const usable = plans.filter(p => p.has_geometry);
         if (!usable.length) return null;
 
         const linked = usable.find(p => p.track_id && p.track_id === cfg.trackId);
         if (linked) return linked.id;
 
+        const lonC = trk.reduce((s, p) => s + p[1], 0) / trk.length;
         const trackDate = (cfg.trackDateStart || "").slice(0, 10);
-        const sameDay = usable.filter(p => p.plan_date && p.plan_date === trackDate);
-        const pool = sameDay.length ? sameDay : usable;
 
-        const c = [lat0, trk.reduce((s, p) => s + p[1], 0) / trk.length];
-        let best = pool[0], bestD = Infinity;
-        for (const p of pool) {
-            if (p.lat === null || p.lon === null) continue;
-            const d = window.GpxGeo.haversine(c[0], c[1], p.lat, p.lon);
-            if (d < bestD) { bestD = d; best = p; }
+        // Kandidáti: jen ti z okolí, ve stejný den napřed, pak podle vzdálenosti
+        const cands = usable
+            .filter(p => p.lat !== null && p.lon !== null)
+            .map(p => ({
+                p,
+                sameDay: !!(p.plan_date && trackDate && p.plan_date === trackDate),
+                dist: window.GpxGeo.haversine(lat0, lonC, p.lat, p.lon)
+            }))
+            .filter(c => c.dist <= AUTO_NEAR_M)
+            .sort((a, b) => (b.sameDay - a.sameDay) || (a.dist - b.dist))
+            .slice(0, AUTO_MAX_CHECKS);
+
+        for (const c of cands) {
+            try {
+                const pts = (loadedId === c.p.id && planGeom)
+                    ? planGeom : await fetchPlanGeom(c.p.id);
+                if (!pts) continue;
+                usePlanGeom(c.p.id, pts);
+                if (coveragePct(AUTO_TOL_M) >= AUTO_MIN_PCT) return c.p.id;
+            } catch (err) {
+                if (window.GPX_DEBUG) console.error("plan match:", err);
+            }
         }
-        return best ? best.id : null;
+        planGeom = null; index = null; loadedId = null;
+        return null;
     }
 
     async function loadPlanList() {
@@ -323,14 +386,20 @@ document.addEventListener("gpxDataReady", (ev) => {
         if (!plans.length) return false;
 
         sel.innerHTML = "";
+        // Prázdná první volba: dokud plán nesedí (nebo si ho nevybereš),
+        // ať se do mapy nekreslí něco, co s trasou nesouvisí
+        const empty = document.createElement("option");
+        empty.value = "";
+        empty.textContent = i18n.pickNone || "— vyber plán —";
+        sel.appendChild(empty);
+
         plans.forEach(p => {
             const o = document.createElement("option");
             o.value = p.id;
             o.textContent = p.name + (p.plan_date ? " (" + p.plan_date + ")" : "");
             sel.appendChild(o);
         });
-        const pick = bestPlanId();
-        if (pick) sel.value = String(pick);
+        sel.value = "";
         return true;
     }
 
@@ -359,8 +428,16 @@ document.addEventListener("gpxDataReady", (ev) => {
             }
             if (selWrap) selWrap.style.display = "";
             if (tolWrap) tolWrap.style.display = "";
+
+            // Nic vybraného → zkusit najít plán, který k trase sedí
+            if (!sel.value) {
+                if (statusEl) statusEl.textContent = i18n.matching || "…";
+                const pick = await pickPlanId();
+                sel.value = pick ? String(pick) : "";
+                if (!pick && statusEl) statusEl.textContent = i18n.noMatch || "";
+            }
             refreshLinkBtn();
-            loadPlanGeometry(parseInt(sel.value, 10));
+            if (sel.value) loadPlanGeometry(parseInt(sel.value, 10));
         });
     }
 
@@ -410,7 +487,17 @@ document.addEventListener("gpxDataReady", (ev) => {
 
     if (linkBtn) linkBtn.addEventListener("click", toggleLink);
 
-    if (sel) sel.addEventListener("change", () => { refreshLinkBtn(); loadPlanGeometry(parseInt(sel.value, 10)); });
+    if (sel) sel.addEventListener("change", () => {
+        refreshLinkBtn();
+        if (!sel.value) {                       // zpět na „— vyber plán —"
+            clearLayers();
+            planGeom = null; index = null; loadedId = null;
+            if (legendEl) legendEl.style.display = "none";
+            if (statusEl) statusEl.textContent = "";
+            return;
+        }
+        loadPlanGeometry(parseInt(sel.value, 10));
+    });
     if (tol) tol.addEventListener("change", () => { if (planOn && planGeom) analyse(); });
 
     // Panel se ukáže jen když vůbec existuje nějaký plán s geometrií
@@ -423,12 +510,12 @@ document.addEventListener("gpxDataReady", (ev) => {
         try { remembered = localStorage.getItem("gpx_plan_overlay") || "0"; } catch (e) {}
         if (remembered !== "1" || !btn) return;
 
-        // Volba se pamatuje napříč trasami, ale sama se zapne jen když je
-        // předvybraný plán opravdu z okolí této trasy — jinak by u výletu
-        // v jiném kraji naskočilo nesmyslné porovnání s 0 % shody.
-        const p = plans.find(x => String(x.id) === sel.value);
-        if (!p || p.lat === null) return;
-        const lonC = trk.reduce((s, q) => s + q[1], 0) / trk.length;
-        if (window.GpxGeo.haversine(lat0, lonC, p.lat, p.lon) <= 25000) btn.click();
+        // Volba se pamatuje napříč trasami, ale sama se zapne jen když k této
+        // trase nějaký plán opravdu sedí. Většina výšlapů se neplánovala —
+        // u nich se panel nechá zavřený a nikomu nic neskáče do mapy.
+        const pick = await pickPlanId();
+        if (!pick) return;
+        sel.value = String(pick);
+        btn.click();
     })();
 });
