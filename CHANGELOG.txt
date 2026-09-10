@@ -1,10 +1,38 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 8. září 2026
+  Poslední aktualizace: 10. září 2026
 
 ================================================================================
 
+
+── 10. září 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  OPRAVA: „Undefined array key" u instalace bez uloženého pořadí vrstev     │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Na instalaci, kde se pořadí mapových vrstev ještě nikdy neuložilo (čerstvá
+  instalace nebo přenesený web bez toho řádku v app_config), vypisovalo
+  PHP nad každou stránkou dvě varování:
+
+      Undefined array key "base"  … includes/app_constants.php on line 148
+      Undefined array key "overlay"
+
+  Příčina je priorita operátorů, ne chybějící data:
+
+      $saved = (array)get_app_config('map_layers_order', [])[$section] ?? [];
+
+  Přetypování (array) se váže těsněji než ??, takže PHP nejdřív sáhne na
+  chybějící klíč — a teprve pak by ho ?? nahradilo prázdným polem. Varování
+  je v tu chvíli už vypsané. Správně patří závorky kolem celého výrazu:
+
+      $saved = (array)(get_app_config('map_layers_order', [])[$section] ?? []);
+
+  Funkčně se nic nemění: pořadí vrstev se dál řídí nastavením z Administrace
+  a chybějící sekce spadne na výchozí pořadí.
+
+  Soubory: includes/app_constants.php
 
 ── 8. září 2026 ───────────────────────────────────────────────────────────────
 

@@ -145,7 +145,11 @@ function map_context_layers(): array {
 function map_layer_order(string $section): array {
     $all = array_keys(array_filter(map_layer_defs(),
         static fn($d) => $d['section'] === $section));
-    $saved = (array)get_app_config('map_layers_order', [])[$section] ?? [];
+    // Závorky kolem celého výrazu jsou nutné: přetypování se váže těsněji než
+    // ??, takže bez nich PHP na chybějící sekci sáhne dřív, než ji ?? nahradí
+    // výchozí hodnotou — a vypíše „Undefined array key". Vidí to instalace,
+    // kde se pořadí vrstev ještě nikdy neuložilo.
+    $saved = (array)(get_app_config('map_layers_order', [])[$section] ?? []);
     $order = array_values(array_intersect($saved, $all));
     foreach ($all as $k) {
         if (!in_array($k, $order, true)) $order[] = $k;
