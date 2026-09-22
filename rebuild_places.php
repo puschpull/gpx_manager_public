@@ -193,7 +193,7 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
             <button type="submit" class="btn-next">▶ Pokračovat ručně, pokud stránka nepokračuje sama</button>
         </div>
     </form>
-    <script>setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>
+    <script nonce="<?= csp_nonce() ?>">setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>
 <?php endif; ?>
 
 </body>

@@ -79,20 +79,17 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
     }
 }
 ?><!DOCTYPE html>
-<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>" x-data="{ dark: localStorage.getItem('gpx-theme') === 'dark' || (!localStorage.getItem('gpx-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" x-init="document.documentElement.classList.toggle('dark', dark)">
+<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= t('page_title_login') ?></title>
-    <script>(function(){var t=localStorage.getItem('gpx-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');})();</script>
+    <script nonce="<?= csp_nonce() ?>">(function(){var t=localStorage.getItem('gpx-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');})();</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">
-    <script defer
-            src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"
-            integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh"
-            crossorigin="anonymous"></script>
+    <?php // Alpine tu není potřeba: tmavý režim nastaví skript o řádek výš a nic jiného stránka nemá. ?>
     <!-- lucide@0.516.0 nemá UMD build (404) — sjednoceno na 0.469.0 jako v layout_header.php -->
     <script defer
             src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"
@@ -165,6 +162,6 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
     </div>
 </div>
 
-<script>if (window.lucide) lucide.createIcons();</script>
+<script nonce="<?= csp_nonce() ?>">if (window.lucide) lucide.createIcons();</script>
 </body>
 </html>

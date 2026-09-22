@@ -550,7 +550,6 @@ require __DIR__ . '/includes/layout_header.php';
     <!-- Smazání trasy -->
     <form method="post" action="delete.php"
           data-confirm-text="<?= htmlspecialchars(t('confirm_delete') . ' \'' . ($track['track_name'] ?: $track['filename']) . '\'' . t('confirm_delete_end'), ENT_QUOTES, 'UTF-8') ?>"
-          onsubmit="return confirm(this.dataset.confirmText);"
           style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
         <?= csrf_field() ?>
         <input type="hidden" name="id" value="<?= (int)$track['id'] ?>">
@@ -572,7 +571,7 @@ require __DIR__ . '/includes/layout_header.php';
     </form>
 
     <!-- JS pro klikatelné tagy kategorií -->
-    <script>
+    <script nonce="<?= csp_nonce() ?>">
     document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('categories');
         const tags  = document.querySelectorAll('.tag');

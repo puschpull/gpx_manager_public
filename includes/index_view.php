@@ -64,33 +64,20 @@ function gpx_chip_url($overrides = []) {
 
                 <!-- Stat counters -->
                 <div class="mt-7 grid grid-cols-3 gap-3 max-w-lg"
-                     x-data="{
-                        tracks: 0, km: 0, asc: 0,
-                        target: { tracks: <?= (int)($stats['total_tracks'] ?? 0) ?>, km: <?= (int)round($stats['total_km'] ?? 0) ?>, asc: <?= (int)round($stats['total_ascent'] ?? 0) ?> },
-                        animate() {
-                          const start = performance.now(), dur = 1100;
-                          const ease = t => 1 - Math.pow(1 - t, 3);
-                          const tick = (now) => {
-                            const t = Math.min(1, (now - start) / dur);
-                            const e = ease(t);
-                            this.tracks = Math.round(this.target.tracks * e);
-                            this.km = Math.round(this.target.km * e);
-                            this.asc = Math.round(this.target.asc * e);
-                            if (t < 1) requestAnimationFrame(tick);
-                          };
-                          requestAnimationFrame(tick);
-                        }
-                     }" x-init="animate()">
+                     x-data="statCounter"
+                     data-tracks="<?= (int)($stats['total_tracks'] ?? 0) ?>"
+                     data-km="<?= (int)round($stats['total_km'] ?? 0) ?>"
+                     data-asc="<?= (int)round($stats['total_ascent'] ?? 0) ?>">
                     <div class="card-outdoor p-4 text-center">
-                        <div class="stat-num text-2xl md:text-3xl font-semibold text-forest-700 dark:text-sand-100" x-text="tracks.toLocaleString('cs')">0</div>
+                        <div class="stat-num text-2xl md:text-3xl font-semibold text-forest-700 dark:text-sand-100" x-text="tracksText">0</div>
                         <div class="text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 mt-1"><?= htmlspecialchars(t('stat_tracks')) ?></div>
                     </div>
                     <div class="card-outdoor p-4 text-center">
-                        <div class="stat-num text-2xl md:text-3xl font-semibold text-terracotta-500" x-text="km.toLocaleString('cs')">0</div>
+                        <div class="stat-num text-2xl md:text-3xl font-semibold text-terracotta-500" x-text="kmText">0</div>
                         <div class="text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 mt-1">km</div>
                     </div>
                     <div class="card-outdoor p-4 text-center">
-                        <div class="stat-num text-2xl md:text-3xl font-semibold text-forest-600" x-text="asc.toLocaleString('cs')">0</div>
+                        <div class="stat-num text-2xl md:text-3xl font-semibold text-forest-600" x-text="ascText">0</div>
                         <div class="text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 mt-1">m ↑</div>
                     </div>
                 </div>
@@ -238,7 +225,7 @@ function gpx_chip_url($overrides = []) {
                         <?php if ($hasThumb): ?>
                             <img src="<?= htmlspecialchars($thumbPath) ?>" alt="<?= h($name) ?>" loading="lazy"
                                  class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                 onerror="this.style.display='none'">
+                                 data-img-fallback="hide">
                         <?php else: ?>
                             <div class="absolute inset-0 topo-bg opacity-25"></div>
                             <?php if ($color): ?>
@@ -375,7 +362,7 @@ function gpx_chip_url($overrides = []) {
 .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 </style>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 // Favorite toggle (volá api_toggle_favorite.php)
 document.addEventListener('click', async function (ev) {
     const btn = ev.target.closest('.js-fav');

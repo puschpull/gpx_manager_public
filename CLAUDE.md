@@ -8,7 +8,7 @@
 ## Project context
 
 **Název projektu**: GPX Manager
-**Stručný popis**: Self-hosted PHP webová aplikace pro správu GPS tras a fotek z výletů — import GPX, mapy, statistiky, fotogalerie, vícejazyčné UI, světlý/tmavý režim. Cílový uživatel: jednotlivec nebo malá skupina, nasazení na sdílený hosting (Webglobe v ČR) nebo lokálně (WAMP).
+**Stručný popis**: Self-hosted PHP webová aplikace pro správu GPS tras a fotek z výletů — import GPX, mapy, statistiky, fotogalerie, vícejazyčné UI, světlý/tmavý režim. Cílový uživatel: jednotlivec nebo malá skupina. Produkce autora běží od 15. 9. 2026 na VPS (Hetzner, CloudPanel, nginx, PHP 8.4), vývoj lokálně na WAMP; aplikace funguje i na běžném Apache hostingu.
 **Stage**: production (live na vlastní doméně autora, single-tenant per instalace)
 **Historie**: audit z 7/2026 (166 nálezů, 30 tasků) je hotový a odložený v `_archiv/` — do práce nevstupuje
 
@@ -28,8 +28,8 @@
 **Grafy**: Chart.js 4.x (CDN)
 **Ikony**: Lucide (CDN)
 **Auth**: IP allowlist (z `.env ADMIN_IPS`) + session-based login s bcrypt hashem (`password_hash`/`password_verify`), CSRF tokeny ručně přes `includes/security.php`
-**Hosting**: Apache + mod_rewrite (`.htaccess`), shared hosting (Webglobe) NEBO lokální WAMP/Docker
-**Observability**: PHP `error_log` (cíl: přesunout mimo webroot, do `logs/`)
+**Hosting**: produkce = VPS s CloudPanelem (nginx → Varnish → nginx, PHP 8.4 FPM, MySQL 8.4); vývoj = WAMP (Apache + `.htaccess`). Viz „Prostředí a nasazení"
+**Observability**: PHP `error_log` → `logs/errors.log`; výsledky nasazení v `deploy.log` na serveru (mimo webroot)
 **i18n**: vlastní pole v `lang/{cs,en,de,sk,es,fr,pl,it}.php`, funkce `t($key)`
 **Build**: žádný (Tailwind kompiluje se lokálně, `app.css` se commituje); cíl: minimální CI build krok
 
@@ -95,7 +95,7 @@ Kontrolní seznam, který má projít každá změna:
 - [ ] **Každý `simplexml_load_*` přes `safe_load_gpx()`** wrapper (LIBXML_NONET + DOCTYPE pre-check)
 - [ ] **Každý POST endpoint má `csrf_verify()`** v první 5 řádcích handleru
 - [ ] **Každý mutační endpoint má `$_isAdmin` check** (nebo explicitní visitor whitelist)
-- [ ] **`uploads/` MUSÍ mít `.htaccess`** blokující PHP execution
+- [ ] **`uploads/.htaccess` zůstává v repu** (Apache: zákaz PHP, HTML/SVG jako příloha) — na nginx totéž řeší serverová konfigurace
 - [ ] **Žádný `error_log` v `uploads/`** — pouze v `logs/` mimo webroot
 - [ ] **i18n klíče konzistentní** napříč 8 jazyky (`php scripts/lint_lang.php` projde)
 - [ ] **`declare(strict_types=1);`** v každém novém PHP souboru
@@ -116,11 +116,18 @@ Kontrolní seznam, který má projít každá změna:
 - Schema změny: výhradně přes `migrations/NNNN_*.sql`; spuštění `php migrate.php`
 - Při schema změně: nová migrace + srovnat `install.sql` (baseline pro čistou instalaci)
 
-### Apache (.htaccess)
-- HTTPS redirect, mod_deflate, mod_expires
-- Blokace `.env`, `.log`, `.sql`, `.md`, `setup.php` (po instalaci), `composer.*`, `package*.json`
-- `uploads/.htaccess` MUSÍ existovat (blokace `*.php`)
-- Security headers — single source of truth = `includes/security.php`, NE `.htaccess`
+### Prostředí a nasazení
+- **`APP_ENV`**: `local` jen když v kořeni existuje značkovací soubor **`.gpx-local`** (v `.gitignore`, na server se nedostane); bez něj `production` — s výjimkou adres `localhost` / `127.0.0.1`, ty jsou vždy vývoj (aby lokální instalace fungovala i bez značky). Na vývojovém PC soubor NEMAZAT — bez něj má session cookie příznak `secure` a přihlášení na `http://gpx/` nefunguje.
+- **Nasazení**: push do `main` → serverový cron do ~3 minut (`git fetch` + `merge --ff-only`). Co je v `main`, je za pár minut na produkci — pushovat jen otestované na localhostu.
+- **`composer install` ani `php migrate.php` cron NESPOUŠTÍ.** Commit s novou migrací nebo změnou `composer.*` vyžaduje ruční krok na serveru — uživatele na to vždy upozornit.
+- `migrate.php` při chybě končí exit kódem 1; CLI skripty vypisují chyby na stderr.
+- Na produkci se nic nedělá ručně, vše jde přes repozitář.
+
+### Webserver: Apache (lokálně) vs. nginx (produkce)
+- **`.htaccess` platí jen na Apache** (lokální WAMP, případně cizí Apache hosting): HTTPS redirect, mod_deflate, mod_expires, blokace `.env`, `.log`, `.sql`, `.md`, `setup.php`, `composer.*`, `package*.json`; `uploads/.htaccess` zakazuje PHP.
+- **nginx `.htaccess` nečte.** Na produkci stejné blokace řeší vhost a sdílená serverová konfigurace — spravuje je serverová správa (Cowork), ne tento repozitář. Změna v `.htaccess` se na produkci NEPROJEVÍ.
+- Security headers — single source of truth = `includes/security.php` (vhost je nepřidává, jinak by byly zdvojené).
+- Za proxy je v `REMOTE_ADDR` skutečná IP klienta (nastaveno ve vhostu). **Nikdy nečíst `X-Forwarded-For`** — hlavičku si podvrhne kdokoli.
 
 ### OpenStreetMap tile servery
 - Použito v `generate_thumb.php` pro track thumbnails
@@ -156,7 +163,8 @@ Kontrolní seznam, který má projít každá změna:
 - **Datum v `date_start` filtrech**: NEPOUŽÍVAT `DATE(date_start) = :d` (kills index) — vždy range `>= :from AND < :to`
 - **i18n klíče**: cs/en mají odlišnou velikost než ostatní jazyky — po každé změně `php scripts/lint_lang.php`
 - **`photos.php` AJAX endpointy** historicky neměly auth+CSRF check; pravidlo: každý mutační AJAX MUSÍ projít přes `ajax_endpoint()` wrapper s `['admin' => true, 'csrf' => true]`
-- **`setup.php` zůstává v repu**, ale produkční instalace ho VŽDY smaže nebo zablokuje přes `.htaccess`
+- **`setup.php` zůstává v repu**, ale produkční instalace ho VŽDY smaže nebo zablokuje (nginx: serverová konfigurace, Apache: `.htaccess`)
+- **Detekce prostředí podle `SERVER_ADDR` selhala** (9/2026): za nginx proxy je tam `127.0.0.1` i na produkci a web vypisoval chyby návštěvníkům. Prostředí se proto určuje značkovacím souborem `.gpx-local` (záložně adresou `localhost`), nikdy podle `SERVER_ADDR`
 - **`error_log` cesta v `config.php`** — jen `logs/errors.log`, NIKDY `uploads/`
 - **GPX bounds JSON** je užitečné pro UI, ale pro geo queries používej centroid_lat/lon sloupce — `bounds JSON` nelze indexovat
 - **JS globální `window.*`** je legacy komunikační bus — nové moduly přes `window.GpxBus` event bus
@@ -177,7 +185,7 @@ Kontrolní seznam, který má projít každá změna:
 ## Co NIKDY nedělat
 
 - **Necommitovat `.env`** ani žádné credentials (CI gitleaks scan to chytí)
-- **Nepushnout `setup.php` aktivní** do produkce bez `.htaccess` blokace nebo bez smazání
+- **Nepushnout `setup.php` aktivní** do produkce bez blokace na webserveru nebo bez smazání
 - **Nepřidávat `ALTER TABLE` do `db.php`** — pouze do `migrations/*.sql`
 - **Neimplementovat AJAX endpoint bez `ajax_endpoint()` wrapperu** — žádné ad-hoc dispatchery
 - **Neměnit DB schema jinak než novou migrací** v `migrations/` + srovnat `install.sql`

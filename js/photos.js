@@ -169,7 +169,7 @@ async function uploadFiles(files) {
                 ? ` <span style="color:var(--text-muted); font-size:11px;">${fmtSize(r.orig_size)} → ${fmtSize(r.stored_size)}</span>`
                 : '';
             div.innerHTML = `
-                <img src="${r.thumb_url}" onerror="this.style.opacity='.3'">
+                <img src="${r.thumb_url}" data-img-fallback="dim">
                 <div class="res-info">
                     <span class="badge-ok">✓</span> ${escHtml(r.file)}${sizeInfo}
                     <br><span class="badge-gps">${r.has_gps ? '📍 GPS nalezena' : '⚠ Bez GPS — nezobrazí se na mapě'}</span>
@@ -177,7 +177,7 @@ async function uploadFiles(files) {
                 </div>`;
         } else if (r.duplicate) {
             div.innerHTML = `
-                <img src="${r.thumb_url}" onerror="this.style.opacity='.3'">
+                <img src="${r.thumb_url}" data-img-fallback="dim">
                 <div class="res-info">
                     <span style="color:#e65c00; font-weight:700;">⚠ Duplikát</span> ${escHtml(r.file)}
                     <br><span class="badge-gps" style="color:#e65c00;">${escHtml(r.msg)}</span>

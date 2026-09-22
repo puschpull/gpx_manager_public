@@ -7,7 +7,7 @@ require __DIR__ . '/layout_header.php';
 <link rel="stylesheet" href="<?= asset('css/index.css') ?>">
 
 <!-- Okamžité načtení cookie visible_cols -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 (function() {
     const match = document.cookie.match(/visible_cols=([^;]+)/);
     if (!match) return;
@@ -55,7 +55,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
     <?php if ($_isAdmin || in_array('map_search', $_visiblePages)): ?><a class="btn" href="map_search.php"><?= t('btn_map_search') ?></a><?php endif; ?>
     <?php if ($_isAdmin || in_array('nearby', $_visiblePages)): ?><a class="btn" href="nearby.php"><?= t('btn_nearby') ?></a><?php endif; ?>
     <?php if ($_isAdmin || in_array('compare', $_visiblePages)): ?>
-    <button class="btn" id="compare-btn" onclick="openCompare()" disabled title="<?= t('title_compare_hint') ?>"><?= t('btn_compare') ?> (<span id="compare-count">0</span>)</button>
+    <button class="btn" id="compare-btn" disabled title="<?= t('title_compare_hint') ?>"><?= t('btn_compare') ?> (<span id="compare-count">0</span>)</button>
     <?php endif; ?>
     <span id="bulk-actions" class="bulk-actions" style="display:none;">
         <select id="bulk-action-select" class="select">
@@ -67,7 +67,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             <option value="set_color"><?= t('bulk_set_color') ?></option>
             <option value="delete"><?= t('bulk_delete') ?></option>
         </select>
-        <button class="btn btn-bulk" id="bulk-run-btn" onclick="runBulkAction()"><?= t('btn_bulk_run') ?></button>
+        <button class="btn btn-bulk" id="bulk-run-btn"><?= t('btn_bulk_run') ?></button>
     </span>
     <?php if ($_isAdmin || in_array('filter', $_visiblePages)): ?><a class="btn" href="filter.php"><?= t('btn_gpx_cleaner') ?></a><?php endif; ?>
     <a class="btn" href="index-legacy.php"><?= t('btn_reset_filter') ?></a>
@@ -549,7 +549,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
         crossorigin="anonymous"></script>
 
 <!-- Data pro graf -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxChartData = {
     labels:   <?= js_safe_json($chart_labels   ?? []) ?>,
     distance:  <?= js_safe_json($chart_distance  ?? []) ?>,
@@ -567,7 +567,7 @@ window.gpxChartData = {
 <script src="<?= asset('js/mobile-init.js') ?>" defer></script>
 
 <!-- Oblíbené — AJAX toggle -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 document.addEventListener('click', e => {
     const btn = e.target.closest('.fav-btn');
     if (!btn) return;
@@ -591,7 +591,7 @@ document.addEventListener('click', e => {
 </script>
 
 <!-- Porovnání tras + hromadné operace -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 const csrfToken = <?= js_safe_json(csrf_token()) ?>;
 
 function getSelectedIds() {
@@ -608,6 +608,10 @@ function updateSelectionUI() {
     if (compBtn) compBtn.disabled = ids.length < 2;
     if (bulkEl)  bulkEl.style.display = ids.length > 0 ? 'inline-flex' : 'none';
 }
+
+// Obsluhy tlačítek — dřív onclick="…" v HTML, ten se s CSP nonce nespouští
+document.getElementById('compare-btn')?.addEventListener('click', openCompare);
+document.getElementById('bulk-run-btn')?.addEventListener('click', runBulkAction);
 
 function openCompare() {
     const ids = getSelectedIds();

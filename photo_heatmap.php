@@ -183,7 +183,7 @@ require __DIR__ . '/includes/layout_header.php';
 <script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js" integrity="sha384-mFKkGiGvT5vo1fEyGCD3hshDdKmW3wzXW/x+fWriYJArD0R3gawT6lMvLboM22c0" crossorigin="anonymous"></script>
 <script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxHeatmapData = {
     apiKeys: {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,

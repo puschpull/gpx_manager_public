@@ -317,7 +317,7 @@ require __DIR__ . '/includes/layout_header.php';
     </div>
 </form>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 // Náhled jednotek při přepnutí
 document.querySelectorAll('input[name="units"]').forEach(radio => {
     radio.addEventListener('change', () => {

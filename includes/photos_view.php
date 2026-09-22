@@ -188,7 +188,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
             <button type="submit" class="btn" style="font-size:12px; padding:3px 8px;"><?= htmlspecialchars(t('photos_pager_go', 'Jít')) ?></button>
         </form>
         <select class="select" style="font-size:12px; padding:4px 8px;"
-                onchange="location.href='<?= h('?' . http_build_query(array_merge($_GET, ['page' => 1, 'per_page' => '__PP__', 'tab' => 'gallery']))) ?>'.replace('__PP__', this.value)">
+                data-href-template="<?= h('?' . http_build_query(array_merge($_GET, ['page' => 1, 'per_page' => '__VALUE__', 'tab' => 'gallery']))) ?>">
             <?php foreach ($GALLERY_PER_PAGE_OPTIONS as $pp): ?>
             <option value="<?= $pp ?>" <?= $pp === $galleryPerPage ? 'selected' : '' ?>><?= $pp ?> <?= htmlspecialchars(t('photos_per_page', 'fotek / strana')) ?></option>
             <?php endforeach; ?>
@@ -231,7 +231,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                          data-taken-at="<?= h($p['taken_at'] ?? '') ?>"
                          alt="<?= h($p['orig_name'] ?? $p['filename']) ?>"
                          loading="lazy"
-                         onerror="this.style.opacity='.3'">
+                         data-img-fallback="dim">
                     <div class="photo-meta">
                         <?php if ($p['taken_at']): ?>
                             📅 <?= substr($p['taken_at'], 0, 16) ?>
@@ -334,7 +334,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                  data-taken-at="<?= h($p['taken_at'] ?? '') ?>"
                  alt="<?= h($p['orig_name'] ?? $p['filename']) ?>"
                  loading="lazy"
-                 onerror="this.style.opacity='.3'">
+                 data-img-fallback="dim">
             <div class="photo-meta">
                 <?= h($p['orig_name'] ?? $p['filename']) ?><br>
                 <?php if ($p['taken_at']): ?>📅 <?= substr($p['taken_at'], 0, 16) ?><?php endif; ?>
@@ -379,7 +379,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                      data-taken-at="<?= h($p['taken_at'] ?? '') ?>"
                      alt="<?= h($p['orig_name'] ?? $p['filename']) ?>"
                      loading="lazy"
-                     onerror="this.style.opacity='.3'">
+                     data-img-fallback="dim">
                 <div class="photo-meta">
                     <?= h($p['orig_name'] ?? $p['filename']) ?><br>
                     <?php if ($p['taken_at']): ?>📅 <?= substr($p['taken_at'], 0, 16) ?><?php endif; ?>
@@ -427,7 +427,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                                      data-full-url="<?= h(photo_full_url($tp['filename'])) ?>"
                                      data-taken-at="<?= h($tp['taken_at'] ?? '') ?>"
                                      alt="<?= h($tp['orig_name'] ?? $tp['filename']) ?>"
-                                     onerror="this.src='';this.style.opacity='.3'"
+                                     data-img-fallback="dim-clear"
                                      title="<?= h(substr($tp['taken_at'] ?? '', 0, 16)) . ($tp['track_name'] ? ' · ' . h($tp['track_name']) : '') ?>">
                                 <?php endforeach; ?>
                             </div>

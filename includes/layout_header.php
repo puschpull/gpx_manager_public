@@ -20,7 +20,7 @@ if (!function_exists('t')) {
     function t($k, $default = null) { return $default ?? $k; }
 }
 ?><!DOCTYPE html>
-<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>" class="" x-data="{ dark: localStorage.getItem('gpx-theme') === 'dark' || (!localStorage.getItem('gpx-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" x-init="$watch('dark', v => { document.documentElement.classList.toggle('dark', v); localStorage.setItem('gpx-theme', v ? 'dark' : 'light'); }); document.documentElement.classList.toggle('dark', dark);">
+<html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>" class="" x-data="gpxApp">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +31,7 @@ if (!function_exists('t')) {
     <?= $page_head_extra ?? '' ?>
 
     <!-- Inline blok: nastav dark mode PŘED parsováním <body> — eliminuje FOUC (FE-6) -->
-    <script>
+    <script nonce="<?= csp_nonce() ?>">
         (function () {
             // Tailwind dark mode (gpx-theme klíč) — světlý/tmavý přepínač v hlavičce
             var t = localStorage.getItem('gpx-theme');
@@ -95,7 +95,7 @@ if (!function_exists('t')) {
         ],
     ];
     ?>
-    <script>window.gpxMapLayers = <?= js_safe_json($_layerCfg) ?>;</script>
+    <script nonce="<?= csp_nonce() ?>">window.gpxMapLayers = <?= js_safe_json($_layerCfg) ?>;</script>
 
     <!-- Admin/návštěvnický banner i hlavička jsou sticky na top:0. Banner má
          z-index 9999, hlavička 40 — po odrolování proto banner hlavičku překryl
@@ -222,12 +222,21 @@ if (!function_exists('t')) {
         .gpx-sm-inline-flex  { display: inline-flex; }
     }</style>
 
+    <!-- Obsluhy událostí místo onclick/onerror/onsubmit v HTML (ty CSP s nonce
+         nespouští). Záměrně BEZ defer — viz komentář v souboru. -->
+    <script src="<?= asset('js/csp-handlers.js') ?>"></script>
+
+    <!-- Komponenty Alpine (veškerá logika — CSP build neumí kód v HTML atributech).
+         Musí být PŘED Alpine: registruje se na událost alpine:init. -->
+    <script defer src="<?= asset('js/alpine-components.js') ?>"></script>
+
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
     <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>
 
-    <!-- Alpine.js (pro interaktivitu) -->
-    <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js" integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh" crossorigin="anonymous"></script>
+    <!-- Alpine.js — CSP build: nepotřebuje 'unsafe-eval' v Content-Security-Policy.
+         Výrazy v šablonách smějí být jen názvy vlastností/metod z js/alpine-components.js. -->
+    <script defer src="https://unpkg.com/@alpinejs/csp@3.14.1/dist/cdn.min.js" integrity="sha384-rCnzN/DdCU4dORuP99iqMm3OJPQKDUtMAjgeZ9nfqF9Fz4P/n4BGlOrtfsaiDNAL" crossorigin="anonymous"></script>
 
     <!-- Lucide icons -->
     <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>
@@ -260,7 +269,7 @@ if (!function_exists('t')) {
         'distance'        => t('param_distance', 'Vzdálenost'),
     ];
     ?>
-    <script>
+    <script nonce="<?= csp_nonce() ?>">
     window.gpxI18n = <?= js_safe_json($commonI18n) ?>;
     </script>
 </head>
@@ -275,7 +284,7 @@ if (!function_exists('t')) {
 </style>
 <?php if (function_exists('render_visitor_preview_banner')) render_visitor_preview_banner(); ?>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 // Odsazení sticky hlavičky o výšku bannerů nad ní (viz --gpx-banner-h výše).
 // Měří se za běhu, protože banner se na úzkém displeji zalomí do dvou řádků.
 (function () {
@@ -376,15 +385,15 @@ if (!function_exists('t')) {
                 ];
             ?>
             <!-- Language switcher — A11Y-004: aria-haspopup, aria-expanded, role=menu, role=menuitem, aria-current -->
-            <div x-data="{ open: false }" @click.outside="open = false" class="relative">
-                <button @click="open = !open" type="button"
+            <div x-data="dropdown" @click.outside="close" class="relative">
+                <button @click="toggle" type="button"
                         class="h-9 px-2.5 inline-flex items-center gap-1.5 rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors text-sm"
                         aria-label="<?= htmlspecialchars(t('lang_switcher', 'Přepnout jazyk')) ?>"
                         aria-haspopup="menu"
-                        :aria-expanded="open.toString()">
+                        :aria-expanded="expanded">
                     <span class="text-base leading-none" aria-hidden="true"><?= $langFlags[$currentLang] ?? '🌐' ?></span>
                     <span class="gpx-sm-inline uppercase font-medium tracking-wider text-xs"><?= htmlspecialchars($currentLang) ?></span>
-                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60" x-bind:class="open && 'rotate-180'" style="transition: transform .15s" aria-hidden="true"></i>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 opacity-60" x-bind:class="caretClass" style="transition: transform .15s" aria-hidden="true"></i>
                 </button>
                 <div x-show="open" x-cloak x-transition.opacity.duration.150ms
                      role="menu"
@@ -392,7 +401,7 @@ if (!function_exists('t')) {
                     <?php foreach ($allowedLangs as $lang): ?>
                         <?php $isActive = $lang === $currentLang; ?>
                         <a href="?app_lang=<?= htmlspecialchars($lang) ?>"
-                           onclick="document.cookie='app_lang=<?= htmlspecialchars($lang) ?>; path=/; max-age=31536000'"
+                           data-lang="<?= htmlspecialchars($lang) ?>"
                            role="menuitem"
                            <?= $isActive ? 'aria-current="true"' : '' ?>
                            class="flex items-center gap-2.5 px-3 py-2 text-sm transition-colors <?= $isActive
@@ -409,11 +418,11 @@ if (!function_exists('t')) {
             </div>
 
             <!-- Theme toggle -->
-            <button @click="dark = !dark" type="button"
+            <button @click="toggleDark" type="button"
                     class="w-9 h-9 inline-flex items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors"
-                    :aria-label="dark ? 'Light mode' : 'Dark mode'">
+                    :aria-label="darkLabel">
                 <i data-lucide="sun" class="w-5 h-5" x-show="dark" x-cloak aria-hidden="true"></i>
-                <i data-lucide="moon" class="w-5 h-5" x-show="!dark" x-cloak aria-hidden="true"></i>
+                <i data-lucide="moon" class="w-5 h-5" x-show="light" x-cloak aria-hidden="true"></i>
             </button>
 
             <?php
@@ -423,11 +432,11 @@ if (!function_exists('t')) {
             ?>
 
             <!-- Mobile menu (hamburger) — A11Y-003 -->
-            <button @click="$store.mobileNav.open = !$store.mobileNav.open" type="button"
+            <button @click="toggleNav" type="button"
                     id="mobile-nav-trigger"
                     aria-label="<?= htmlspecialchars(t('nav_menu', 'Menu')) ?>"
                     aria-controls="mobile-nav-drawer"
-                    :aria-expanded="$store.mobileNav.open.toString()"
+                    :aria-expanded="navExpanded"
                     class="md:hidden w-9 h-9 inline-flex items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800">
                 <i data-lucide="menu" class="w-5 h-5" aria-hidden="true"></i>
             </button>
@@ -436,20 +445,20 @@ if (!function_exists('t')) {
 </header>
 
 <!-- Mobile slide-over drawer — A11Y-003: role=dialog, aria-modal, focus trap via x-trap.noscroll -->
-<div x-data x-show="$store.mobileNav.open" x-cloak class="md:hidden fixed inset-0 z-50" @keydown.escape.window="$store.mobileNav.open = false">
+<div x-show="navOpen" x-cloak class="md:hidden fixed inset-0 z-50" @keydown.escape.window="closeNav">
     <!-- Backdrop -->
-    <div x-show="$store.mobileNav.open"
+    <div x-show="navOpen"
          x-transition:enter="transition-opacity ease-out duration-200"
          x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition-opacity ease-in duration-150"
          x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-         @click="$store.mobileNav.open = false"
+         @click="closeNav"
          class="absolute inset-0 bg-forest-900/60 backdrop-blur-sm"></div>
 
     <!-- Drawer panel -->
     <aside id="mobile-nav-drawer"
-           x-show="$store.mobileNav.open"
-           x-trap.noscroll="$store.mobileNav.open"
+           x-show="navOpen"
+           x-trap.noscroll="navOpen"
            role="dialog"
            aria-modal="true"
            aria-label="<?= htmlspecialchars(t('nav_menu', 'Navigační menu')) ?>"
@@ -462,7 +471,7 @@ if (!function_exists('t')) {
            class="absolute right-0 top-0 bottom-0 w-72 max-w-[85vw] bg-sand-50 dark:bg-forest-900 shadow-hover flex flex-col">
         <div class="h-16 px-4 flex items-center justify-between border-b border-sand-200 dark:border-forest-800 shrink-0">
             <span class="font-[Manrope] font-bold text-forest-700 dark:text-sand-100">GPX Manager</span>
-            <button @click="$store.mobileNav.open = false"
+            <button @click="closeNav"
                     aria-label="<?= htmlspecialchars(t('nav_close', 'Zavřít navigaci')) ?>"
                     class="w-9 h-9 inline-flex items-center justify-center rounded-md text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800">
                 <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
@@ -514,10 +523,5 @@ if (!function_exists('t')) {
     </aside>
 </div>
 
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.store('mobileNav', { open: false });
-    });
-</script>
 
 <main id="main-content" class="min-h-[calc(100vh-4rem)]">

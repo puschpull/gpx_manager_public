@@ -23,7 +23,7 @@
 
 <!-- Init Lucide ikon -->
 <!-- DOMContentLoaded se spustí až po všech defer skriptech — Lucide je pak garantovaně dostupný -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
     document.addEventListener('DOMContentLoaded', function () {
         if (window.lucide) lucide.createIcons();
     });

@@ -178,7 +178,7 @@ require __DIR__ . '/includes/layout_header.php';
 <!-- Sdílená map factory (geolokační tlačítko) -->
 <script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxMapSearchData = {
     apiKeys: {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,

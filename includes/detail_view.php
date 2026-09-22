@@ -401,7 +401,7 @@ require __DIR__ . '/layout_header.php';
         <a class="btn-outdoor btn-outdoor-ghost" href="<?= h(gpx_url($track['filename'])) ?>" download>
             <i data-lucide="file-down" class="w-4 h-4" aria-hidden="true"></i> GPX
         </a>
-        <button class="btn-outdoor btn-outdoor-ghost" id="qrToggleBtn" onclick="document.getElementById('qrBox').classList.toggle('qr-open')">
+        <button class="btn-outdoor btn-outdoor-ghost" id="qrToggleBtn" data-toggle-target="qrBox" data-toggle-class="qr-open">
             <i data-lucide="qr-code" class="w-4 h-4" aria-hidden="true"></i> QR
         </button>
 
@@ -506,7 +506,7 @@ require __DIR__ . '/layout_header.php';
 <script src="<?= asset('js/lightbox.js') ?>"></script>
 
 <!-- Data z PHP pro JS -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxDetailData = {
     trackId:      <?= js_safe_json($track ? (int)$track['id'] : null) ?>,
     dateStart:    <?= js_safe_json($track['date_start'] ?? null) ?>,
@@ -618,7 +618,7 @@ window.gpxDetailData = {
      U nové trasy trvá vykreslení z OSM dlaždic okolo 9 s; když ho spustí
      otevření detailu, je hotový dřív, než odkaz někam vložíš. Běží jen
      administrátorovi a jen jednou — podruhé endpoint jen potvrdí hotový soubor. -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
     window.addEventListener("load", function () {
         fetch("share_image.php?id=<?= (int)$track['id'] ?>&warm=1", { credentials: "same-origin" })
             .catch(function () { /* náhled odkazu není kritický */ });
@@ -643,7 +643,7 @@ window.gpxDetailData = {
 <script src="<?= asset('js/detail-weather.js') ?>"></script>
 
 <!-- Podobné trasy -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 (function() {
     const trackId = <?= (int)$track['id'] ?>;
 
@@ -694,7 +694,7 @@ window.gpxDetailData = {
                 card.className = 'card-outdoor block p-3 group';
                 card.innerHTML =
                     '<div class="aspect-[16/9] rounded-md overflow-hidden bg-gradient-to-br from-forest-400 to-forest-700 mb-3 relative">' +
-                        '<img src="<?= h(uploads_url('thumbs/')) ?>' + encodeURIComponent(thumbName) + '" class="w-full h-full object-cover" alt="" onerror="this.style.display=\'none\'">' +
+                        '<img src="<?= h(uploads_url('thumbs/')) ?>' + encodeURIComponent(thumbName) + '" class="w-full h-full object-cover" alt="" data-img-fallback="hide">' +
                     '</div>' +
                     '<div class="font-[Manrope] font-semibold text-forest-700 dark:text-sand-100 group-hover:text-terracotta-500 transition-colors line-clamp-1">' + escHtml(t.track_name || t.filename) + '</div>' +
                     '<div class="mt-1 text-sm text-forest-700/70 dark:text-sand-100/70">' +

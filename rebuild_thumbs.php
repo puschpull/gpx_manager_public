@@ -168,7 +168,7 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
         <input type="hidden" name="offset" value="0">
         <button type="submit" class="btn-restart">↺ Začít od začátku</button>
     </form>
-    <script>setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>
+    <script nonce="<?= csp_nonce() ?>">setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>
 <?php endif; ?>
 
 </body>

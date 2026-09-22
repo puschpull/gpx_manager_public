@@ -23,7 +23,8 @@ if (!$is_cli) {
     $remote = $_SERVER['REMOTE_ADDR'] ?? '';
     if (!in_array($remote, ['127.0.0.1', '::1'], true)) {
         http_response_code(403);
-        exit("403 Forbidden — migrate.php is only accessible from localhost or CLI.\n");
+        echo "403 Forbidden — migrate.php is only accessible from localhost or CLI.\n";
+        exit(1);
     }
     header('Content-Type: text/plain; charset=utf-8');
 }
@@ -41,7 +42,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 } catch (PDOException $e) {
-    exit("FAILED: DB connection — " . $e->getMessage() . "\n");
+    migrate_fail("FAILED: DB connection — " . $e->getMessage() . "\n");
 }
 
 // -------------------------------------------------------
@@ -60,7 +61,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS schema_migrations (
 // on session disconnect, so OOM-killed runs do not block forever.
 $lock = $pdo->query("SELECT GET_LOCK('gpx_manager_migrate', 30)")->fetchColumn();
 if ($lock !== '1' && $lock !== 1) {
-    exit("FAILED: Could not acquire migration lock (another migrate.php is running?).\n");
+    migrate_fail("FAILED: Could not acquire migration lock (another migrate.php is running?).\n");
 }
 
 // -------------------------------------------------------
@@ -70,7 +71,7 @@ $migrations_dir = __DIR__ . '/migrations';
 $files = glob($migrations_dir . '/[0-9][0-9][0-9][0-9]_*.sql');
 if ($files === false || count($files) === 0) {
     release_lock($pdo);
-    exit("No migration files found in migrations/.\n");
+    migrate_fail("FAILED: No migration files found in migrations/.\n");
 }
 sort($files);
 
@@ -111,7 +112,7 @@ foreach ($files as $path) {
     $sql = file_get_contents($path);
     if ($sql === false) {
         release_lock($pdo);
-        exit("FAILED: Cannot read {$name}\n");
+        migrate_fail("FAILED: Cannot read {$name}\n");
     }
 
     try {
@@ -125,7 +126,7 @@ foreach ($files as $path) {
         $count++;
     } catch (PDOException $e) {
         release_lock($pdo);
-        exit("FAILED: {$name} — " . $e->getMessage() . "\n");
+        migrate_fail("FAILED: {$name} — " . $e->getMessage() . "\n");
     }
 }
 
@@ -135,6 +136,20 @@ out("Done. {$count} migration(s) applied.");
 // -------------------------------------------------------
 //  Helpers
 // -------------------------------------------------------
+
+/**
+ * Chyba migrace: vypsat a skončit NENULOVÝM exit kódem. Dřív exit("FAILED …")
+ * s textem skončil kódem 0, takže skript, který migraci spustil (nasazení),
+ * selhání nepoznal.
+ */
+function migrate_fail(string $msg): never
+{
+    if (PHP_SAPI !== 'cli' && !headers_sent()) {
+        http_response_code(500);
+    }
+    echo $msg;
+    exit(1);
+}
 
 function out(string $msg): void
 {

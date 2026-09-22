@@ -52,17 +52,28 @@ define('MAPILLARY_TOKEN', $_ENV['MAPILLARY_TOKEN']  ?? '');
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 
 // Environment detection
-$serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
-if (in_array($serverAddr, ['127.0.0.1', '::1']) || str_contains($_SERVER['SERVER_NAME'] ?? '', 'local')) {
-    define('APP_ENV', 'local');
-} else {
-    define('APP_ENV', 'production');
-}
+// Local development = the marker file .gpx-local exists in the app root
+// (git-ignored, never deployed), or the site is opened as http://localhost /
+// http://127.0.0.1. Anything else is production — the safe default.
+// The old check (SERVER_ADDR = 127.0.0.1) broke behind a reverse proxy
+// (nginx → PHP-FPM), where 127.0.0.1 is the address on production too, and
+// the site showed PHP warnings to visitors.
+$_envHost = strtolower((string)($_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+$_envHost = (string)preg_replace('/:\d+$/', '', $_envHost);
+$_envLocalHost = in_array($_envHost, ['localhost', '127.0.0.1', '[::1]'], true);
+define('APP_ENV', (is_file(__DIR__ . '/.gpx-local') || $_envLocalHost) ? 'local' : 'production');
+unset($_envHost, $_envLocalHost);
 
 // Error handling based on environment
 error_reporting(E_ALL);
 
-if (APP_ENV === 'local') {
+if (PHP_SAPI === 'cli') {
+    // Command line (migrate.php, tools/*, cron): no visitor sees it — errors go
+    // to stderr so whoever ran the script sees them, and to the log
+    ini_set('display_errors', 'stderr');
+    ini_set('log_errors', 1);
+    ini_set('error_log', __DIR__ . '/logs/errors.log');
+} elseif (APP_ENV === 'local') {
     ini_set('display_errors', 1);
 } else {
     ini_set('display_errors', 0);
@@ -82,6 +93,13 @@ set_exception_handler(function (Throwable $e) {
         $e->getTraceAsString()
     );
     error_log($msg);
+
+    if (PHP_SAPI === 'cli') {
+        // Command line: text to stderr and a non-zero exit code, so a calling
+        // script (cron, deployment) notices the failure
+        fwrite(STDERR, $msg . "\n");
+        exit(1);
+    }
 
     if (APP_ENV !== 'local') {
         http_response_code(500);

@@ -58,17 +58,17 @@ function render_admin_menu(): void
     $itemClass = 'gpx-adminmenu-item transition-colors hover:bg-sand-100 dark:hover:bg-forest-700';
     $sepClass  = 'gpx-adminmenu-sep border-t border-sand-200 dark:border-forest-700';
     ?>
-    <div x-data="{ open: false }" @click.outside="open = false"
-         @keydown.escape.window="open = false"
+    <div x-data="dropdown" @click.outside="close"
+         @keydown.escape.window="close"
          class="gpx-sm-inline-flex relative">
-        <button @click="open = !open" type="button"
+        <button @click="toggle" type="button"
                 class="gpx-adminmenu-btn transition-colors hover:bg-sand-100 dark:hover:bg-forest-800"
                 aria-label="<?= $ariaLabel ?>"
                 aria-haspopup="menu"
-                :aria-expanded="open.toString()">
+                :aria-expanded="expanded">
             <i data-lucide="settings" aria-hidden="true"></i>
             <i data-lucide="chevron-down" class="gpx-adminmenu-caret"
-               :style="open ? 'transform:rotate(180deg)' : ''" aria-hidden="true"></i>
+               :style="caretStyle" aria-hidden="true"></i>
         </button>
         <div x-show="open" x-cloak x-transition.opacity.duration.150ms
              role="menu"

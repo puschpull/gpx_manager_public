@@ -161,7 +161,7 @@ require __DIR__ . '/layout_header.php';
         crossorigin="anonymous"></script>
 
 <!-- Data z PHP pro JS -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxPlannerData = {
     apiKeys: {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,

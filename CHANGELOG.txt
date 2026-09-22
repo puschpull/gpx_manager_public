@@ -1,10 +1,180 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 10. září 2026
+  Poslední aktualizace: 22. září 2026
 
 ================================================================================
 
+
+── 22. září 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  CSP: PŘÍPRAVA NA ODSTRANĚNÍ 'unsafe-inline' (NONCE + POZOROVÁNÍ)         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  'unsafe-inline' ve script-src je nejdůležitější díra v CSP: kdyby se do
+  stránky dostal cizí skript (XSS), prohlížeč ho spustí. Náhradou je nonce —
+  jednorázový náhodný kód, který dostane každý požadavek a který smí mít jen
+  naše vložené skripty. Nasazuje se ve třech etapách; tohle jsou první dvě.
+  PLATNÉ CSP SE ZATÍM NEMĚNÍ — 'unsafe-inline' v něm dál je.
+
+  Etapa 1 — kód připravený na nonce:
+    • csp_nonce() v includes/security.php; všech 35 vložených <script>
+      v šablonách má nonce="…" (stejný jako v hlavičce — ověřeno na 24 str.)
+    • 19 obsluh v HTML atributech (onclick/onerror/onsubmit/onchange), které
+      s nonce prohlížeč nespouští vůbec, přepsáno na data-* atributy
+      + jeden společný posluchač v js/csp-handlers.js:
+        data-confirm-text   potvrzení před odesláním formuláře
+        data-img-fallback   skrýt/ztlumit obrázek, který se nenačetl
+        data-toggle-target  QR kód v detailu
+        data-lang           cookie jazyka
+        data-href-template  počet fotek na stránku
+      Stará tabulka tras a import fotek mají posluchače ve vlastním skriptu.
+
+  Etapa 2 — pozorování: vedle platného CSP posílá každá stránka přísnou
+  verzi (nonce, bez 'unsafe-inline') v režimu Report-Only. Nic neblokuje,
+  jen hlásí do api/csp_report.php → logs/csp.log (jen POST, max 16 KB,
+  log max 5 MB, adresy bez parametrů, s ukázkou kódu). Na localhostu: 23
+  stránek + funkční testy všech přepsaných obsluh = 0 hlášení; kontrolní
+  vložený skript bez nonce a onclick nahlášeny správně.
+
+  Etapa 3 (až bude log na produkci několik dní čistý): přísná verze
+  nahradí platnou — změna jednoho řádku.
+
+  Oprava mimochodem: štítky „Naposledy" v importu fotek ze složky nikdy
+  nefungovaly — cesta vložená přes JSON.stringify do onclick="…" přinesla
+  uvozovky, které atribut ukončily. Teď data-dir + posluchač.
+
+  Soubory: includes/security.php, api/csp_report.php (nový),
+           js/csp-handlers.js (nový), js/photos.js, js/photo-import.js,
+           includes/layout_header.php a 26 dalších šablon (nonce)
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  CSP: OBRÁZKY JEN OD ZNÁMÝCH POSKYTOVATELŮ                                │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  img-src bylo „https:" — obrázek se smělo načíst odkudkoli. Nově jen:
+  vlastní server, ikony Leafletu (unpkg), OSM, Topo, Esri, Mapy.com,
+  Thunderforest, CyclOSM, ZTM ČÚZK, Waymarked Trails, radar ČHMÚ,
+  náhledy Wikimedie a QR kód pro sdílení.
+
+  Seznam ověřen dvakrát: nejdřív v pozorovacím režimu (Report-Only) na
+  9 stránkách a s ukázkovou dlaždicí z každé z 15 dlaždicových vrstev —
+  jediné hlášení byl kontrolní obrázek z example.com, který tam byl
+  schválně; pak s ostrým CSP (vše ze seznamu se načte, kontrola se
+  zablokuje). Mapillary sem nepatří — jeho dlaždice jsou data (connect-src).
+
+  POZOR při přidávání nové mapové vrstvy: poskytovatele je nutné doplnit
+  do seznamu v includes/security.php, jinak vrstva zůstane prázdná.
+
+  Soubory: includes/security.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  CSP: BEZ 'unsafe-eval' — ALPINE.JS JAKO CSP BUILD                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  'unsafe-eval' dovoluje prohlížeči spustit libovolný text jako kód. Měření
+  na 17 stránkách (CSP v pozorovacím režimu Report-Only) ukázalo, že ho
+  potřebuje jediná knihovna: Alpine.js. Leaflet, grafy, heatmapy, Mapillary
+  ani ikony ne.
+
+  Alpine teď běží jako CSP build (@alpinejs/csp 3.14.1, stejná verze), který
+  eval nepotřebuje. Ten ale neumí kód přímo v HTML atributech — přiřazení,
+  negaci, podmínku ani volání s parametry. Veškerá logika se proto přesunula
+  do js/alpine-components.js a šablony odkazují jen na názvy:
+
+      @click="open = !open"          →  @click="toggle"
+      x-show="!dark"                 →  x-show="light"
+      x-text="km.toLocaleString(…)"  →  x-text="kmText"
+
+  Komponenty: gpxApp (tmavý režim + mobilní menu, dřív Alpine.store),
+  dropdown (jazyk, menu admina), statCounter (počítadlo na úvodní stránce;
+  cílové hodnoty v data-* atributech, nově respektuje prefers-reduced-motion).
+  Přihlašovací stránka Alpine vůbec nepotřebovala — vyřazen.
+
+  Soubory: js/alpine-components.js (nový), includes/layout_header.php,
+           includes/partials/admin_banner.php, includes/index_view.php,
+           login.php, includes/security.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  NAHRÁVÁNÍ SOUBORŮ: LIMITY, ZIP BEZ ROZBALOVÁNÍ VŠEHO, OBNOVA VE FILTRU   │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Audit všech vstupů (import GPX, fotky, ZIP, fotky ze složky, import plánů,
+  Filtr): nahrávat smí jen admin s CSRF, fotky se překreslují do nového JPEG
+  pod vygenerovaným jménem, GPX se kontroluje podle obsahu, zakázané typy
+  (.php/.html/.svg/.xml) se nikde neuloží. Opravené mezery:
+
+  • Import GPX: vlastní strop 50 MB (dřív jen limit serveru 256 MB — tak velké
+    XML by vyčerpalo paměť). Ve jméně se vnitřní tečky mění na podtržítka:
+    „trasa.php.gpx" by na Apache bez uploads/.htaccess mohl skončit jako PHP.
+    Jména z Garminu vycházejí stejně jako dřív.
+
+  • Fotky: kontrola paměti PŘED překreslením. GD drží obrázek nekomprimovaný
+    a otočení podle EXIF vytvoří druhou kopii — velká fotka na výšku tak
+    dřív shodila PHP („Allowed memory size exhausted"). Nově se odmítne se
+    srozumitelnou hláškou a hlášky uvádějí skutečný důvod (pixely, velikost,
+    paměť, poškozený soubor) místo obecného „GD chyba".
+
+  • ZIP s fotkami: rozbalují se jen obrázky, položku po položce, každý pod
+    vlastním jménem (cesty uvnitř ZIPu vč. ../ se na disku nepoužijí).
+    Hlídá se velikost položky (50 MB, i proti lživé hlavičce), součet po
+    rozbalení (2 GB) a počet položek (5000). Dřív se rozbalil celý ZIP bez
+    kontroly — „ZIP bomba" mohla zaplnit disk.
+
+  • Filtr: když přepsání trasy vyčištěnou verzí selže, obnoví se verze těsně
+    před pokusem. Dřív se obnovoval nejstarší .bak (originál z prvního
+    čištění) a u vícekrát čištěné trasy se ztratily mezikroky.
+
+  Ověřeno skutečnými požadavky na testovací server s limity jako produkce:
+  GPX 51 MB (413), ZIP s ../, .php a 60MB „bombou", PNG 12000×12000 px,
+  rozbité GPX ve Filtru (soubor obnoven, otisk shodný).
+
+  Soubory: import.php, api/photos/upload.php, includes/photo_helper.php,
+           includes/filter_data.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  ÚKLID PO PŘECHODU NA NOVÝ HOSTING                                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  • migrate.php při chybě končí exit kódem 1. Dřív exit("FAILED …") s textem
+    skončil kódem 0, takže skript, který migraci spustil, selhání nepoznal.
+    Týká se připojení k DB, zámku, nečitelného souboru, chyby v SQL a chybějících
+    migrací (to je rozbitá instalace, ne „nic k práci").
+
+  • CLAUDE.md: prostředí přepsáno z Webglobe/Apache na VPS s nginx, nová sekce
+    „Prostředí a nasazení" (značka .gpx-local, cron, co cron nespouští),
+    rozdíl .htaccess (lokálně) vs. nginx (produkce), zákaz X-Forwarded-For.
+
+  • Audit výpisu verzí, cest a konfigurace: návštěvníkům se nic nevypisuje.
+    Verze PHP/MySQL v Administraci a cesty při importu fotek ze složky vidí
+    jen admin — ponecháno záměrně jako diagnostika.
+
+  Soubory: migrate.php, CLAUDE.md
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  DETEKCE PROSTŘEDÍ: ZNAČKOVACÍ SOUBOR MÍSTO HÁDÁNÍ PODLE IP               │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Aplikace dosud poznávala lokální vývoj podle SERVER_ADDR = 127.0.0.1.
+  Na novém hostingu (Hetzner, nginx → Varnish → nginx) tam ale 127.0.0.1 je
+  i na produkci — web se tvářil jako lokální a vypisoval PHP varování
+  návštěvníkům včetně cest na disku. Na serveru to zatím obcházelo podvržení
+  SERVER_ADDR ve vhostu.
+
+  Nově:
+    • LOKÁLNÍ VÝVOJ = existuje značkovací soubor .gpx-local v kořeni aplikace.
+      Je v .gitignore, takže se na server nikdy nedostane.
+    • Bez značky je to PRODUKCE — bezpečná výchozí volba (chyby jen do logu).
+    • Záložně: adresa localhost / 127.0.0.1 je vždy vývoj, aby lokální
+      instalace fungovala i bez značky. Za proxy je v adrese skutečná doména.
+    • Příkazová řádka (migrate.php, tools/, cron) vypisuje chyby na stderr
+      a nezachycená výjimka končí exit kódem 1 — dřív vypsala HTML stránku
+      „Chyba serveru" a skončila kódem 0, takže volající skript selhání nepoznal.
+
+  Nová instalace pro vývoj: vytvořit v kořeni prázdný soubor .gpx-local.
+
+  Soubory: config.php, .gitignore
 
 ── 10. září 2026 ──────────────────────────────────────────────────────────────
 

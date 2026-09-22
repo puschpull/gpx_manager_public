@@ -219,7 +219,7 @@ require __DIR__ . '/includes/layout_header.php';
 <script defer src="<?= asset('js/lib/map-factory.js') ?>"></script>
 <script src="<?= asset('js/detail-weather.js') ?>" defer></script>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxVtData = {
     apiKeys: {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,

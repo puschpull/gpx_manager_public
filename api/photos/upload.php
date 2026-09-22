@@ -70,26 +70,81 @@ ajax_endpoint(function (): array {
             }
 
             $tmpDir = sys_get_temp_dir() . '/gpx_photos_' . uniqid('', true);
-            mkdir($tmpDir, 0755, true);
-            $zip->extractTo($tmpDir);
-            $zip->close();
+            mkdir($tmpDir, 0700, true);
 
-            $imageExts = ['jpg', 'jpeg', 'png', 'webp'];
-            $imgLimit  = 200;
-            $imgCount  = 0;
-            $it = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($tmpDir, RecursiveDirectoryIterator::SKIP_DOTS)
-            );
-            foreach ($it as $f) {
-                if (!$f->isFile()) continue;
-                $ext = strtolower($f->getExtension());
-                if (!in_array($ext, $imageExts)) continue;
+            // Rozbaluje se jen to, co je potřeba — položku po položce, žádné
+            // extractTo(). Dřív se rozbalil celý ZIP (i ne-obrázky) bez hlídání
+            // velikosti, takže „ZIP bomba" (malý ZIP, gigabajty po rozbalení)
+            // mohla zaplnit disk. Každý obrázek se zapíše pod VLASTNÍM jménem,
+            // cesta uvnitř ZIPu (i s ../) se na disku vůbec nepoužije.
+            $imageExts  = ['jpg', 'jpeg', 'png', 'webp'];
+            $imgLimit   = 200;                        // fotek z jednoho ZIPu
+            $entryLimit = 5000;                       // položek, které se vůbec prohlédnou
+            $totalLimit = 2 * 1024 * 1024 * 1024;     // součet rozbalených dat
+            $imgCount   = 0;
+            $totalBytes = 0;
+            $stopMsg    = null;
+
+            $numEntries = min($zip->numFiles, $entryLimit);
+            if ($zip->numFiles > $entryLimit) {
+                $results[] = ['ok' => false, 'file' => $origName,
+                              'msg' => "ZIP má {$zip->numFiles} položek — prohlédnuto jen prvních {$entryLimit}"];
+            }
+
+            for ($e = 0; $e < $numEntries; $e++) {
+                $st = $zip->statIndex($e);
+                if ($st === false || str_ends_with($st['name'], '/')) continue;   // složka
+                $entryName = basename(str_replace('\\', '/', $st['name']));
+                $ext = strtolower(pathinfo($entryName, PATHINFO_EXTENSION));
+                if (!in_array($ext, $imageExts, true)) continue;
+
                 if ($imgCount >= $imgLimit) {
-                    $results[] = ['ok' => false, 'file' => '…', 'msg' => "Limit {$imgLimit} fotek/ZIP — zbytek přeskočen"];
+                    $stopMsg = "Limit {$imgLimit} fotek/ZIP — zbytek přeskočen";
                     break;
                 }
-                $results[] = process_single_photo($f->getPathname(), $f->getFilename(), (int)$f->getSize());
+                // Deklarovaná velikost ve hlavičce ZIPu — rychlé odmítnutí
+                if ($st['size'] > PHOTO_MAX_BYTES) {
+                    $results[] = ['ok' => false, 'file' => $entryName,
+                                  'msg' => 'Fotku nelze zpracovat: soubor je příliš velký (max ' . (PHOTO_MAX_BYTES >> 20) . ' MB)'];
+                    continue;
+                }
+                if ($totalBytes + $st['size'] > $totalLimit) {
+                    $stopMsg = 'ZIP je po rozbalení příliš velký (max ' . ($totalLimit >> 30) . ' GB) — zbytek přeskočen';
+                    break;
+                }
+
+                // Hlavičce se nevěří: kopíruje se nejvýš limit + 1 bajt
+                $in = $zip->getStream($st['name']);
+                if ($in === false) {
+                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => 'Položku ZIPu nelze přečíst'];
+                    continue;
+                }
+                $outPath = $tmpDir . '/' . $e . '.' . $ext;
+                $out = fopen($outPath, 'wb');
+                $written = $out ? stream_copy_to_stream($in, $out, PHOTO_MAX_BYTES + 1) : false;
+                fclose($in);
+                if ($out) fclose($out);
+
+                if ($written === false) {
+                    @unlink($outPath);
+                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => 'Položku ZIPu nelze rozbalit'];
+                    continue;
+                }
+                if ($written > PHOTO_MAX_BYTES) {
+                    @unlink($outPath);
+                    $results[] = ['ok' => false, 'file' => $entryName,
+                                  'msg' => 'Fotku nelze zpracovat: soubor je příliš velký (max ' . (PHOTO_MAX_BYTES >> 20) . ' MB)'];
+                    continue;
+                }
+                $totalBytes += $written;
+
+                $results[] = process_single_photo($outPath, $entryName, (int)$written);
+                @unlink($outPath);          // uvolnit místo hned, ne až na konci
                 $imgCount++;
+            }
+            $zip->close();
+            if ($stopMsg !== null) {
+                $results[] = ['ok' => false, 'file' => '…', 'msg' => $stopMsg];
             }
 
             _cleanup_dir($tmpDir);

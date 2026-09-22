@@ -127,29 +127,95 @@ function _exif_fraction(mixed $val): float {
  *                               Pass a value already obtained from read_photo_exif() to
  *                               avoid a second EXIF read (PERF-18).
  */
+/** Strop pro fotky: pixely (image bomb) a velikost souboru. */
+const PHOTO_MAX_PIXELS = 50_000_000;
+const PHOTO_MAX_BYTES  = 50 * 1024 * 1024;
+
+/**
+ * Důvod posledního selhání generate_photo_thumb() — pro srozumitelnou hlášku
+ * uživateli. Volání s textem ho nastaví, bez argumentu vrátí a vynuluje.
+ */
+function photo_thumb_error(?string $set = null): ?string {
+    static $last = null;
+    if ($set !== null) { $last = $set; return $set; }
+    $r = $last; $last = null;
+    return $r;
+}
+
+/** „256M" / „1G" / „-1" z php.ini → bajty (0 = bez limitu). */
+function photo_ini_bytes(string $v): int {
+    $v = trim($v);
+    if ($v === '' || $v === '-1') return 0;
+    $n = (int)$v;
+    return match (strtolower(substr($v, -1))) {
+        'g'     => $n * 1024 * 1024 * 1024,
+        'm'     => $n * 1024 * 1024,
+        'k'     => $n * 1024,
+        default => $n,
+    };
+}
+
+/**
+ * Vejde se překreslení obrázku do paměťového limitu PHP?
+ * GD drží obrázek nekomprimovaný (~4 B na pixel) a otočení podle EXIF
+ * (imagerotate) vytvoří druhou kopii v plné velikosti. Bez kontroly skončí
+ * velká otočená fotka z telefonu fatální chybou „Allowed memory size
+ * exhausted" místo srozumitelného odmítnutí.
+ */
+function photo_fits_in_memory(int $w, int $h, bool $rotate): bool {
+    $limit = photo_ini_bytes((string)ini_get('memory_limit'));
+    if ($limit === 0) return true;
+    $need = $w * $h * 4 * ($rotate ? 2 : 1) + 16 * 1024 * 1024;   // + rezerva na zmenšeninu
+    return memory_get_usage() + $need < $limit;
+}
+
 function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 400, ?int $orientation = null): bool {
     if (!extension_loaded('gd')) return false;
 
     $info = @getimagesize($srcPath);
     if (!$info || !isset($info[0], $info[1], $info[2])) {
         error_log("photo_helper: getimagesize failed for $srcPath");
+        photo_thumb_error('obrázek je poškozený nebo nečitelný');
         return false;
     }
     [$imgW, $imgH, $type] = $info;
 
     // SEC-018: Image bomb — reject oversized images before GD allocates memory
-    if ($imgW * $imgH > 50_000_000) {
+    if ($imgW * $imgH > PHOTO_MAX_PIXELS) {
         error_log("photo_helper: image too large ({$imgW}x{$imgH} = " . ($imgW * $imgH) . " px) for $srcPath");
+        photo_thumb_error(sprintf('příliš mnoho pixelů (%d Mpx, max %d Mpx)',
+            (int)round($imgW * $imgH / 1e6), PHOTO_MAX_PIXELS / 1_000_000));
         return false;
     }
     $fileSize = @filesize($srcPath);
-    if ($fileSize !== false && $fileSize > 50 * 1024 * 1024) {
+    if ($fileSize !== false && $fileSize > PHOTO_MAX_BYTES) {
         error_log("photo_helper: file too large ($fileSize bytes) for $srcPath");
+        photo_thumb_error(sprintf('soubor je příliš velký (max %d MB)', PHOTO_MAX_BYTES >> 20));
         return false;
     }
     // Only allow safe image types before handing to GD
     if (!in_array($type, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
         error_log("photo_helper: unsupported image type $type for $srcPath");
+        photo_thumb_error('nepodporovaný formát');
+        return false;
+    }
+
+    // EXIF orientace se zjišťuje PŘED načtením obrázku do paměti — rozhoduje
+    // o tom, kolik paměti bude potřeba (otočení = druhá kopie).
+    // PERF-18: use caller-supplied $orientation to avoid a second exif_read_data() call.
+    if ($type === IMAGETYPE_JPEG && extension_loaded('exif')) {
+        if ($orientation === null) {
+            $exifOri   = @exif_read_data($srcPath);
+            $orientation = isset($exifOri['Orientation']) ? (int)$exifOri['Orientation'] : 1;
+        }
+    } else {
+        $orientation = 1;
+    }
+    $rotate = in_array($orientation, [3, 6, 8], true);
+
+    if (!photo_fits_in_memory($imgW, $imgH, $rotate)) {
+        error_log("photo_helper: not enough memory for {$imgW}x{$imgH}" . ($rotate ? ' (rotated)' : '') . " — $srcPath");
+        photo_thumb_error(sprintf('na zpracování fotky %d Mpx nestačí paměť serveru', (int)round($imgW * $imgH / 1e6)));
         return false;
     }
 
@@ -159,15 +225,13 @@ function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 
         IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($srcPath) : false,
         default        => false,
     };
-    if (!$src) return false;
+    if (!$src) {
+        photo_thumb_error('obrázek se nepodařilo načíst (poškozený soubor)');
+        return false;
+    }
 
-    // EXIF orientation correction (JPEG only).
-    // PERF-18: use caller-supplied $orientation to avoid a second exif_read_data() call.
-    if ($type === IMAGETYPE_JPEG && extension_loaded('exif')) {
-        if ($orientation === null) {
-            $exifOri   = @exif_read_data($srcPath);
-            $orientation = isset($exifOri['Orientation']) ? (int)$exifOri['Orientation'] : 1;
-        }
+    // EXIF orientation correction (JPEG only)
+    if ($rotate) {
         switch ($orientation) {
             case 3: $src = imagerotate($src, 180, 0); break;
             case 6: $src = imagerotate($src, -90, 0); break;
@@ -353,8 +417,10 @@ function process_single_photo(string $tmpPath, string $origName, int $origSize):
     $thumbPath = uploads_fs('photos/thumbs/' . $filename);
 
     // Resize na max 1600 px a uložit jako JPEG
+    photo_thumb_error();   // vynulovat důvod z předchozí fotky
     if (!generate_photo_thumb($tmpPath, $destPath, 1600)) {
-        return ['ok' => false, 'file' => $origName, 'msg' => 'Nepodařilo se zpracovat obrázek (GD chyba)'];
+        $why = photo_thumb_error() ?? 'chyba knihovny GD';
+        return ['ok' => false, 'file' => $origName, 'msg' => 'Fotku nelze zpracovat: ' . $why];
     }
 
     // Thumbnail 400 px pro mapové popupy

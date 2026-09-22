@@ -249,7 +249,17 @@ if ($ajax !== '') {
             @copy($targetPath, $backupPath);
         }
 
+        // Dočasná kopie AKTUÁLNÍ verze pro případ, že nový obsah neprojde.
+        // .bak drží nejstarší verzi (originál z prvního čištění) — obnovovat
+        // z něj by u vícekrát čištěné trasy zahodilo všechny mezikroky.
+        $prevPath = $targetPath . '.prev-' . bin2hex(random_bytes(4));
+        $hasPrev  = is_file($targetPath) && @copy($targetPath, $prevPath);
+        $restore  = static function () use ($hasPrev, $prevPath, $targetPath): void {
+            if ($hasPrev) { @rename($prevPath, $targetPath); }
+        };
+
         if (file_put_contents($targetPath, $gpxContent) === false) {
+            $restore();   // i napůl zapsaný soubor vrátit do původního stavu
             http_response_code(500);
             echo json_encode(['error' => 'Zápis GPX selhal']);
             exit;
@@ -258,11 +268,12 @@ if ($ajax !== '') {
         require_once __DIR__ . '/gpx_parser.php';
         $parsed = parse_gpx($targetPath);
         if ($parsed === null) {
-            if (is_file($backupPath)) { @copy($backupPath, $targetPath); }  // obnovit, ať nezůstane rozbitý soubor
+            $restore();   // obnovit verzi těsně před tímto pokusem
             http_response_code(400);
             echo json_encode(['error' => 'Failed to parse cleaned GPX']);
             exit;
         }
+        if ($hasPrev) { @unlink($prevPath); }
         $fileHash = sha1_file($targetPath);
 
         // Centroid z bounds (pro geo dotazy)

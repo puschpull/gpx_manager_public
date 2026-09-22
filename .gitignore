@@ -47,3 +47,6 @@ setup.php.backup
 /uploads/_heatmap_rebuild.marker
 /uploads/_poi_cache/
 /uploads/radar/
+
+# Značka lokálního vývoje (APP_ENV=local) — nikdy do repa ani na server
+/.gpx-local

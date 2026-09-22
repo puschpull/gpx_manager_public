@@ -149,7 +149,7 @@ require __DIR__ . '/includes/layout_header.php';
 
 </div>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 const VT_CSRF = <?= json_encode(csrf_token()) ?>;
 
 <?php if ($_isAdmin): ?>

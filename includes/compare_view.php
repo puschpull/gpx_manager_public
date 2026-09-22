@@ -211,7 +211,7 @@ require __DIR__ . '/layout_header.php';
         crossorigin="anonymous"></script>
 
 <!-- Data z PHP pro JS -->
-<script>
+<script nonce="<?= csp_nonce() ?>">
 window.gpxCompareData = {
     tracks: <?= js_safe_json(array_map(function($t, $i) {
         return [

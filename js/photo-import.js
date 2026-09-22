@@ -52,10 +52,19 @@ function renderRecent() {
     if (!dirs.length) { recentEl.innerHTML = ''; return; }
     recentEl.innerHTML = '<span style="color:var(--text-muted)">Naposledy:</span> ' +
         dirs.map(d =>
-            `<a class="imp-recent-chip" href="#" onclick="event.preventDefault();useDir(${JSON.stringify(d)})">${escHtml(d)}</a>`
+            `<a class="imp-recent-chip" href="#" data-dir="${escHtml(d)}">${escHtml(d)}</a>`
         ).join('');
 }
 window.useDir = function(d) { dirInput.value = d; startScan(); };
+// Kliknutí na nedávnou složku. Dřív onclick="useDir(${JSON.stringify(d)})" —
+// uvozovky z JSON ukončily atribut, takže štítky nikdy nefungovaly;
+// s CSP nonce by se onclick navíc nespustil vůbec.
+recentEl.addEventListener('click', e => {
+    const chip = e.target.closest('.imp-recent-chip');
+    if (!chip) return;
+    e.preventDefault();
+    useDir(chip.dataset.dir);
+});
 renderRecent();
 
 /* ── Scan ───────────────────────────────────────────── */

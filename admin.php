@@ -491,7 +491,6 @@ require __DIR__ . '/includes/layout_header.php';
             <li>
                 <form method="post" action="login.php"
                       data-confirm-text="<?= htmlspecialchars(t('confirm_logout'), ENT_QUOTES, 'UTF-8') ?>"
-                      onsubmit="return confirm(this.dataset.confirmText);"
                       style="display:inline;">
                     <?= csrf_field() ?>
                     <input type="hidden" name="logout" value="1">
@@ -623,7 +622,7 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
                 <?php endforeach; ?>
             </ul>
 
-            <script>
+            <script nonce="<?= csp_nonce() ?>">
             (function () {
                 document.querySelectorAll('.map-layer-list').forEach(function (list) {
                     list.addEventListener('click', function (e) {
@@ -674,7 +673,7 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
                 </label>
             <?php endforeach; ?>
             </div>
-            <script>
+            <script nonce="<?= csp_nonce() ?>">
             (function () {
                 const list = document.getElementById('navOrderList');
                 if (!list) return;

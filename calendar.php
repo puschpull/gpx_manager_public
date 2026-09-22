@@ -289,7 +289,7 @@ require __DIR__ . '/includes/layout_header.php';
 
 <div id="calTooltip" class="cal-tooltip"></div>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 document.addEventListener('DOMContentLoaded', () => {
     const tooltip = document.getElementById('calTooltip');
     const grid = document.querySelector('.cal-grid');

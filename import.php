@@ -9,6 +9,9 @@ require_once __DIR__ . '/includes/generate_thumb.php';
 /* ===========================================================
    Odstranění diakritiky a nevhodných znaků z názvu souboru
    =========================================================== */
+/** Strop velikosti nahrávaného GPX (stejný jako u Filtru). */
+const GPX_MAX_BYTES = 50 * 1024 * 1024;
+
 function sanitizeFileName($name) {
     $map = [
         'á'=>'a','č'=>'c','ď'=>'d','é'=>'e','ě'=>'e','í'=>'i','ň'=>'n','ó'=>'o','ř'=>'r','š'=>'s','ť'=>'t','ú'=>'u','ů'=>'u','ý'=>'y','ž'=>'z',
@@ -93,10 +96,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['ajax'] ?? '') === '1') {
         exit;
     }
 
-    $cleanName = sanitizeFileName($origName);
-    if (!str_ends_with(strtolower($cleanName), '.gpx')) {
-        $cleanName .= '.gpx';
+    // Vlastní strop velikosti — bez něj platí jen limit serveru a tak velké
+    // XML by při čtení vyčerpalo paměť PHP. Běžný GPX má jednotky MB;
+    // 50 MB je stejný strop jako u Filtru.
+    if ((int)$f['size'] > GPX_MAX_BYTES || (int)@filesize($f['tmp_name']) > GPX_MAX_BYTES) {
+        http_response_code(413);
+        echo json_encode(['ok'=>false,'error'=>'Soubor je příliš velký (max ' . (GPX_MAX_BYTES >> 20) . ' MB).']);
+        exit;
     }
+
+    // Jméno: očištěný původní název BEZ vnitřních teček + vždy .gpx.
+    // „trasa.php.gpx" by na Apache bez uploads/.htaccess mohl skončit jako PHP
+    // (mod_mime bere každou příponu v názvu), proto tečky → podtržítka.
+    $cleanName = str_replace('.', '_', sanitizeFileName(pathinfo($origName, PATHINFO_FILENAME)));
+    if (trim($cleanName, '_-') === '') {
+        $cleanName = 'track';
+    }
+    $cleanName .= '.gpx';
 
     $tmpPath = $f['tmp_name'];
 
@@ -451,7 +467,7 @@ require __DIR__ . '/includes/layout_header.php';
 
 <div id="list" class="list"></div>
 
-<script>
+<script nonce="<?= csp_nonce() ?>">
 const CSRF_TOKEN = <?= json_encode(csrf_token()) ?>;
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');

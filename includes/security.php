@@ -60,6 +60,23 @@ function csrf_verify(): bool {
     return hash_equals($_SESSION['csrf_token'] ?? '', $token);
 }
 
+// --- CSP nonce ---
+
+/**
+ * Jednorázový kód pro vložené <script> bloky — nový pro každý požadavek.
+ * Každý vložený skript v šablonách MUSÍ mít  <script nonce="<?= csp_nonce() ?>">,
+ * jinak ho prohlížeč s CSP bez 'unsafe-inline' nespustí. Obsluhy v HTML
+ * atributech (onclick="…") se s nonce nespouštějí vůbec — viz js/csp-handlers.js.
+ * Funguje jen proto, že se HTML stránky necachují (Cache-Control: no-store).
+ */
+function csp_nonce(): string {
+    static $nonce = null;
+    if ($nonce === null) {
+        $nonce = base64_encode(random_bytes(18));
+    }
+    return $nonce;
+}
+
 // --- HTTP Security Headers ---
 
 function send_security_headers(): void {
@@ -87,16 +104,50 @@ function send_security_headers(): void {
     // CSP — covers all CDN domains used in the application (SEC-021)
     // 'unsafe-inline' for script-src and style-src is required because the codebase
     // uses inline <script> blocks and style="" attributes throughout *.php templates.
-    // 'unsafe-eval' is required by Alpine.js 3.x standard CDN build (uses new Function()
-    // internally to evaluate x-data/x-show/x-bind expressions). Long-term fix: migrate
-    // to Alpine CSP build (@alpinejs/csp) + Alpine.data() pattern — large refactor.
-    // Long-term goal: replace with nonces (separate task — large refactor).
+    // 'unsafe-eval' NENÍ potřeba (od 9/2026): Alpine běží jako CSP build
+    // (@alpinejs/csp) a logika komponent je v js/alpine-components.js.
+    // Měřeno na 17 stránkách — žádná jiná knihovna eval nepoužívá. Kdo by ho
+    // chtěl vrátit, musí nejdřív najít, co ho potřebuje.
+    // 'unsafe-inline' ve script-src se nahrazuje nonce (csp_nonce()) — po etapách, viz níže.
+    // Ve style-src zůstává záměrně: 200+ atributů style="" a vložené CSS je
+    // výrazně menší riziko než vložený skript.
+
+    // Odkud se smějí načítat obrázky. Dřív „https:" = odkudkoli.
+    // Seznam ověřen 9/2026 v režimu Report-Only: ukázková dlaždice ze všech
+    // 15 dlaždicových vrstev map + radar, Wikimedia, QR a ikony — nic mimo.
+    // NOVÁ MAPOVÁ VRSTVA = přidat sem jejího poskytovatele, jinak zůstane
+    // prázdná (bez chyby, jen se nezobrazí — v konzoli „Refused to load image").
+    $imgSrc = implode(' ', [
+        "'self'", 'data:', 'blob:',
+        'https://unpkg.com',                        // ikony Leafletu (vrstvy, celá obrazovka), špendlíky start/cíl
+        'https://*.tile.openstreetmap.org',         // OSM
+        'https://*.tile.opentopomap.org',           // Topo
+        'https://server.arcgisonline.com',          // satelit + stínování terénu (Esri)
+        'https://api.mapy.com',                     // Mapy.com (4 mapy + popisky)
+        'https://*.tile.thunderforest.com',         // Thunderforest
+        'https://*.tile-cyclosm.openstreetmap.fr',  // CyclOSM
+        'https://ags.cuzk.cz',                      // ZTM ČÚZK
+        'https://tile.waymarkedtrails.org',         // turistické / cyklo / MTB trasy
+        'https://opendata.chmi.cz',                 // aktuální radar (Plánovač)
+        'https://upload.wikimedia.org',             // náhledy fotek Wikimedia
+        'https://api.qrserver.com',                 // QR kód pro sdílení trasy
+    ]);
+
+    // script-src: ostrá verze zatím s 'unsafe-inline'; přísná (nonce, bez
+    // 'unsafe-inline') běží vedle v režimu Report-Only a jen hlásí, co by
+    // zablokovala (api/csp_report.php → logs/csp.log). Až bude log čistý,
+    // přísná verze nahradí ostrou — viz CHANGELOG, krok 5d.
+    $cdnScripts      = "https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net";
+    $scriptSrc       = "script-src 'self' 'unsafe-inline' " . $cdnScripts . "; ";
+    $scriptSrcStrict = "script-src 'self' 'nonce-" . csp_nonce() . "' 'report-sample' " . $cdnScripts . "; ";
+
     $csp = "default-src 'self'; "
-         . "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; "
+         . $scriptSrc
          . "style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; "
-         . "img-src 'self' data: blob: https:; "
+         . "img-src " . $imgSrc . "; "
          . "font-src 'self' https://fonts.gstatic.com; "
-         . "connect-src 'self' https://commons.wikimedia.org "
+         . "connect-src 'self' "
+         . "https://commons.wikimedia.org "
          . "https://*.tile.openstreetmap.org https://*.tile.opentopomap.org "
          . "https://server.arcgisonline.com https://api.mapy.com "
          . "https://*.tile.thunderforest.com https://tiles.mapillary.com "
@@ -105,4 +156,10 @@ function send_security_headers(): void {
          . "base-uri 'self'; "
          . "form-action 'self';";
     header("Content-Security-Policy: $csp");
+
+    // Pozorovací režim přísné verze (nic neblokuje). report-uri je relativní,
+    // funguje v kořeni webu i v podsložce (localhost/gpx/).
+    header("Content-Security-Policy-Report-Only: "
+         . str_replace($scriptSrc, $scriptSrcStrict, $csp)
+         . " report-uri api/csp_report.php;");
 }

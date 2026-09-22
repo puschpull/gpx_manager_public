@@ -351,7 +351,7 @@ require __DIR__ . '/includes/layout_header.php';
         integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 <script src="<?= asset('js/chart-theme.js') ?>"></script>
-<script>
+<script nonce="<?= csp_nonce() ?>">
 document.addEventListener('DOMContentLoaded', () => {
     const labels = <?= js_safe_json($chart_labels) ?>;
     const datasets = {
