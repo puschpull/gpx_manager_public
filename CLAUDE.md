@@ -123,7 +123,8 @@ Kontrolní seznam, který má projít každá změna:
 ### Prostředí a nasazení
 - **`APP_ENV`**: `local` jen když v kořeni existuje značkovací soubor **`.gpx-local`** (v `.gitignore`, na server se nedostane); bez něj `production` — s výjimkou adres `localhost` / `127.0.0.1`, ty jsou vždy vývoj (aby lokální instalace fungovala i bez značky). Na vývojovém PC soubor NEMAZAT — bez něj má session cookie příznak `secure` a přihlášení na `http://gpx/` nefunguje.
 - **Nasazení**: push do `main` → serverový cron do ~3 minut (`git fetch` + `merge --ff-only`). Co je v `main`, je za pár minut na produkci — pushovat jen otestované na localhostu.
-- **`composer install` ani `php migrate.php` cron NESPOUŠTÍ.** Commit s novou migrací nebo změnou `composer.*` vyžaduje ruční krok na serveru — uživatele na to vždy upozornit.
+- **Commit, který mění `migrations/` nebo `composer.json`/`composer.lock`, cron PODRŽÍ** (v `deploy.log` a na kartě Administrace → Nasazení: „ČEKÁ NA RUČNÍ NASAZENÍ"). Nasadí ho majitel ikonou **„Nasadit GPX"** na PC: záloha DB → kód → composer (`--no-scripts --no-plugins`) → `migrate.php`; při selhání se kód sám vrátí. Pozdější běžné commity čekají s ním (`--ff-only`). Po pushi takového commitu uživateli VŽDY připomenout ikonu. Klíč pro ikonu smí na serveru jen `stav`/`nasadit`.
+- **Migrace jen přidávají** (sloupce, tabulky, indexy) a jsou idempotentní — starý kód musí s rozšířenou DB fungovat, protože se na něj při selhání vrací. Pravidla v `migrations/README.md`.
 - `migrate.php` při chybě končí exit kódem 1; CLI skripty vypisují chyby na stderr.
 - Na produkci se nic nedělá ručně, vše jde přes repozitář.
 

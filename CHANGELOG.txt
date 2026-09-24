@@ -9,6 +9,37 @@
 ── 24. září 2026 ──────────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐
+│  NASAZOVÁNÍ: MIGRACE A COMPOSER IKONOU „NASADIT GPX" (BEZ SSH)            │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Dosud cron na serveru stahoval jen kód; migraci databáze nebo composer
+  bylo nutné spustit ručně přes SSH a mezitím běžel nový kód nad starou
+  databází. Nově:
+    • běžné změny nasazuje cron sám do 3 minut — beze změny
+    • commit, který mění migrations/ nebo composer.*, cron PODRŽÍ
+      („ČEKÁ NA RUČNÍ NASAZENÍ", vidět na kartě Administrace → Nasazení)
+    • ikona „Nasadit GPX" na PC: kontrola, že je vše pushnuté → stav
+      serveru → potvrzení → záloha databáze → kód → composer → migrace
+      → kontrola webu
+    • když composer nebo migrace selže, KÓD SE SÁM VRÁTÍ na předchozí
+      verzi a web běží dál beze změny; záloha DB je připravená
+
+  Bezpečnost: vyhrazený klíč smí na serveru jedině „stav" a „nasadit"
+  (restrict + command=), jiný příkaz se odmítne a zapíše; kdo by klíč
+  získal, nasadí nanejvýš to, co už je na GitHubu. composer běží bez
+  skriptů a pluginů. Záloha DB mimo webroot, posledních 10.
+
+  Nové: migrations/README.md — pravidla pro migrace (idempotentní, jen
+  přidávat, jen .sql se spouští, srovnat install.sql).
+
+  Ověřeno naostro 24. 9.: povolený příkaz projde, zakázaný odmítnut;
+  commit v migrations/ cron podržel; ikona nasadila (záloha 848 kB,
+  0 migrací); běžný commit cron nasadil sám. Serverovou část (skripty
+  mimo repozitář) nainstaloval Cowork.
+
+  Soubory v repu: migrations/README.md (nový), CLAUDE.md
+
+┌───────────────────────────────────────────────────────────────────────────┐
 │  ADMINISTRACE: KARTA „NASAZENÍ" (BEZ SSH)                                 │
 └───────────────────────────────────────────────────────────────────────────┘
 
