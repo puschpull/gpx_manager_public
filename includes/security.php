@@ -102,15 +102,16 @@ function send_security_headers(): void {
     }
 
     // CSP — covers all CDN domains used in the application (SEC-021)
-    // 'unsafe-inline' for script-src and style-src is required because the codebase
-    // uses inline <script> blocks and style="" attributes throughout *.php templates.
     // 'unsafe-eval' NENÍ potřeba (od 9/2026): Alpine běží jako CSP build
     // (@alpinejs/csp) a logika komponent je v js/alpine-components.js.
     // Měřeno na 17 stránkách — žádná jiná knihovna eval nepoužívá. Kdo by ho
     // chtěl vrátit, musí nejdřív najít, co ho potřebuje.
-    // 'unsafe-inline' ve script-src se nahrazuje nonce (csp_nonce()) — po etapách, viz níže.
-    // Ve style-src zůstává záměrně: 200+ atributů style="" a vložené CSS je
-    // výrazně menší riziko než vložený skript.
+    // 'unsafe-inline' ve script-src NENÍ (od 24. 9. 2026): vložené skripty smějí
+    // běžet jen s nonce (csp_nonce()), obsluhy v HTML atributech (onclick="…")
+    // neběží vůbec — náhrada je js/csp-handlers.js. Přechod ověřen dvěma dny
+    // v režimu Report-Only na produkci bez jediného hlášení.
+    // Ve style-src 'unsafe-inline' zůstává záměrně: 200+ atributů style=""
+    // a vložené CSS je výrazně menší riziko než vložený skript.
 
     // Odkud se smějí načítat obrázky. Dřív „https:" = odkudkoli.
     // Seznam ověřen 9/2026 v režimu Report-Only: ukázková dlaždice ze všech
@@ -133,13 +134,12 @@ function send_security_headers(): void {
         'https://api.qrserver.com',                 // QR kód pro sdílení trasy
     ]);
 
-    // script-src: ostrá verze zatím s 'unsafe-inline'; přísná (nonce, bez
-    // 'unsafe-inline') běží vedle v režimu Report-Only a jen hlásí, co by
-    // zablokovala (api/csp_report.php → logs/csp.log). Až bude log čistý,
-    // přísná verze nahradí ostrou — viz CHANGELOG, krok 5d.
-    $cdnScripts      = "https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net";
-    $scriptSrc       = "script-src 'self' 'unsafe-inline' " . $cdnScripts . "; ";
-    $scriptSrcStrict = "script-src 'self' 'nonce-" . csp_nonce() . "' 'report-sample' " . $cdnScripts . "; ";
+    // NOVÝ VLOŽENÝ SKRIPT musí mít atribut nonce z csp_nonce(), jinak neběží
+    // (vzor v docbloku csp_nonce() výše; v // komentáři nesmí být PHP koncová značka).
+    // 'report-sample' posílá v hlášení začátek zablokovaného kódu — podle něj
+    // se pozná, který skript nebo obsluha chybí.
+    $scriptSrc = "script-src 'self' 'nonce-" . csp_nonce() . "' 'report-sample' "
+               . "https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ";
 
     $csp = "default-src 'self'; "
          . $scriptSrc
@@ -154,12 +154,9 @@ function send_security_headers(): void {
          . "https://api.open-meteo.com https://archive-api.open-meteo.com; "
          . "frame-ancestors 'none'; "
          . "base-uri 'self'; "
-         . "form-action 'self';";
+         . "form-action 'self'; "
+         // Hlášení o zablokovaném obsahu → api/csp_report.php → logs/csp.log.
+         // Relativní adresa funguje v kořeni webu i v podsložce (localhost/gpx/).
+         . "report-uri api/csp_report.php;";
     header("Content-Security-Policy: $csp");
-
-    // Pozorovací režim přísné verze (nic neblokuje). report-uri je relativní,
-    // funguje v kořeni webu i v podsložce (localhost/gpx/).
-    header("Content-Security-Policy-Report-Only: "
-         . str_replace($scriptSrc, $scriptSrcStrict, $csp)
-         . " report-uri api/csp_report.php;");
 }

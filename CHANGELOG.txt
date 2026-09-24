@@ -1,10 +1,68 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 22. září 2026
+  Poslední aktualizace: 24. září 2026
 
 ================================================================================
 
+
+── 24. září 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  ADMINISTRACE: KARTA „NASAZENÍ" (BEZ SSH)                                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Nová karta na začátku Administrace ukazuje stav nasazení, který se dosud
+  dal zjistit jen přes SSH na serveru:
+    • na kterém commitu web běží (zkratka, popis, čas)
+    • jaký commit je na GitHubu a jestli se shodují — „aktuální", jinak
+      upozornění, že nasazení čeká nebo selhalo
+    • kdy cron naposledy kontroloval GitHub; po 10 minutách ticha (cron
+      běží každé 3 min) červené upozornění, že cron možná neběží (jen
+      tam, kde nasazovací log existuje)
+    • posledních 6 záznamů deploy.log s barvou stavu (nasazeno / pozor /
+      chyba), časy převedené z UTC na místní; víceřádková hláška gitu
+      (git ji vypíše PŘED řádkem „CHYBA") se připojí ke své chybě
+    • posledních 5 hlášení zablokovaného obsahu z logs/csp.log a jejich počet
+
+  Všechno se čte přímo ze souborů (.git/HEAD, refs, FETCH_HEAD, logy) —
+  žádné spouštění gitu ani volání GitHubu z webu. Čte se jen konec logů.
+  Když zdroj chybí nebo ho server nedovolí číst (deploy.log leží mimo
+  webroot), karta to napíše i s cestou; nic nespadne. Cestu k deploy.log
+  lze nastavit v .env (DEPLOY_LOG_FILE), výchozí je ../../logs/deploy.log
+  vedle webu.
+
+  Soubory: includes/deploy_status.php (nový),
+           includes/partials/admin_deploy_card.php (nový), admin.php,
+           lang/*.php (15 textů v 8 jazycích)
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  CSP BEZ 'unsafe-inline': VLOŽENÉ SKRIPTY JEN S NONCE (ETAPA 3)           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Dokončení z 22. září. Přísná verze CSP dva dny běžela na produkci jen
+  v pozorovacím režimu (Report-Only) — log hlášení zůstal prázdný.
+  Předem ověřeno, že prázdný log není jen nefunkční hlášení: kontrolní
+  vložený skript na produkci prohlížeč nahlásil a server přijal.
+
+  Nově PLATÍ: script-src bez 'unsafe-inline'. Vložený skript poběží jen
+  s jednorázovým nonce, který zná jen server — skript podstrčený
+  útočníkem (XSS) prohlížeč nespustí. Obsluhy v HTML atributech
+  (onclick="…") neběží vůbec; všechny byly nahrazeny už 22. 9.
+
+  Hlášení zůstávají zapnutá i pro platnou verzi (report-uri → logs/csp.log):
+  kdyby něco přestalo fungovat, v logu je vidět co a kde.
+
+  Ověřeno na localhostu s ostrou CSP: 24 stránek bez jediného hlášení
+  (vč. Virtuální trasy s největším vloženým skriptem), funkční testy QR,
+  tmavého režimu, menu, mobilního menu, potvrzení formuláře a nenačtených
+  obrázků; podstrčený cizí skript zablokován.
+
+  CLAUDE.md: nová pravidla pro kód — nonce u každého vloženého skriptu,
+  žádné on*="…", Alpine výrazy jen jako názvy, nová mapová vrstva do img-src.
+
+  Soubory: includes/security.php, CLAUDE.md, includes/layout_header.php
+           (komentář)
 
 ── 22. září 2026 ──────────────────────────────────────────────────────────────
 

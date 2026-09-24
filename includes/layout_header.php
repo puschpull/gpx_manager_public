@@ -121,7 +121,8 @@ if (!function_exists('t')) {
        hlavička jich nabízí jen ~947 — proto působilo natěsnaně. Ve svislém
        uspořádání šířku určuje popisek, ne ikona s textem, a menu se vejde
        do 752 px. Položka měří 58 px, hlavička má 64, takže se nezvyšuje.
-       Rozměry vybrané v menu_demo.php (varianta F2). */
+       Rozměry vybrané v 7/2026 porovnáním variant (varianta F2; ukázková
+       stránka menu_demo.php smazána 9/2026, je v historii gitu). */
     .gpx-topnav {
         align-items: center;
         gap: 8px;

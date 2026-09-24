@@ -178,6 +178,10 @@ $uploadsSizeMB = round($uploadsSize / 1024 / 1024, 1);
 // PHP a DB info
 $phpVersion = PHP_VERSION;
 $dbVersion = $pdo->query("SELECT VERSION()")->fetchColumn();
+
+// Stav nasazení (git + deploy.log + csp.log) — karta „Nasazení"
+require_once __DIR__ . '/includes/deploy_status.php';
+$deploy = deploy_status();
 ?>
 
 <?php
@@ -331,6 +335,8 @@ require __DIR__ . '/includes/layout_header.php';
 
 <!-- ===== NÁSTROJE ===== -->
 <div class="admin-grid">
+
+    <?php require __DIR__ . '/includes/partials/admin_deploy_card.php'; ?>
 
     <!-- Data -->
     <div class="admin-card">

@@ -105,6 +105,10 @@ Kontrolní seznam, který má projít každá změna:
 - [ ] **WCAG 2.2 AA** — kontrast ≥ 4.5:1 pro normální text ve světlém i tmavém režimu
 - [ ] **`prefers-reduced-motion` honored** — žádné animace bez respektování
 - [ ] **`<html lang>` reflektuje `app_lang()`**, ne hardcoded `cs`
+- [ ] **Každý vložený `<script>` má `nonce="<?= csp_nonce() ?>"`** — CSP je bez `'unsafe-inline'`, skript bez nonce neběží
+- [ ] **Žádné `onclick=` / `onerror=` / `onsubmit=` / `onchange=`** v šablonách ani v HTML z JavaScriptu — neběží; použij `data-*` atribut z `js/csp-handlers.js` nebo `addEventListener`
+- [ ] **Alpine výrazy jen jako názvy** (`@click="toggle"`, ne `@click="open = !open"`) — běží CSP build, logika patří do `js/alpine-components.js`
+- [ ] **Nový poskytovatel obrázků / mapová vrstva** = doplnit do `img-src` v `includes/security.php`
 
 ---
 
@@ -192,7 +196,7 @@ Kontrolní seznam, který má projít každá změna:
 - **Neměnit `security.php`** bez rozmyslu nad CSRF flow, parametry session a hlavičkami — a bez vysvětlení v commitu
 - **Nepřepisovat `parse_gpx()`** bez ohledu na XXE — každé čtení GPX jde přes `safe_load_gpx()`
 - **Nezavádět `console.log` v produkčním JS** bez `window.GPX_DEBUG` guardu
-- **Nepřidávat `unsafe-eval` nebo nové `unsafe-inline` do CSP** bez justification v ADR
+- **Nepřidávat `unsafe-eval` ani `unsafe-inline` do `script-src`** — obojí bylo v 9/2026 odstraněno; problém se skriptem řeš nonce nebo souborem, ne povolením (hlášení zablokovaného obsahu jsou v `logs/csp.log`)
 - **Nemergovat, co neproběhlo na localhostu** — skutečný rozhodčí je spuštěný kód, ne kontrola od modelu
 - **Nepřidávat dependency (Composer / CDN) bez review** — bezpečnost dodavatelského řetězce
 
