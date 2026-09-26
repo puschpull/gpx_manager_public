@@ -27,6 +27,12 @@
 
   Soubory: includes/security.php
 
+  Drobnost: hvězdička Oblíbené na přehledu tras byla po odebrání
+  z oblíbených černá (do obnovení stránky). Skript mazal atribut fill
+  a ikona bez něj dostala výchozí černou výplň; teď nastaví fill="none".
+  Při chybě uložení se vrací i výplň, ne jen barva.
+  Soubory: includes/index_view.php
+
 ── 24. září 2026 ──────────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐

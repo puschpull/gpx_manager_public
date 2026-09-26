@@ -375,11 +375,13 @@ document.addEventListener('click', async function (ev) {
     btn.setAttribute('aria-pressed', wasFav ? 'false' : 'true');
     btn.classList.toggle('text-terracotta-500');
     btn.classList.toggle('text-forest-700/60');
-    const icon = btn.querySelector('[data-lucide="star"], svg');
-    if (icon) {
-        if (!wasFav) icon.setAttribute('fill', 'currentColor');
-        else icon.removeAttribute('fill');
-    }
+    // Výplň hvězdy: 'none', ne removeAttribute — Lucide SVG bez atributu fill
+    // se vyplní výchozí černou (po odebrání z oblíbených byla hvězda černá)
+    const setFill = (fav) => {
+        const icon = btn.querySelector('[data-lucide="star"], svg');
+        if (icon) icon.setAttribute('fill', fav ? 'currentColor' : 'none');
+    };
+    setFill(!wasFav);
     try {
         const fd = new FormData();
         fd.append('id', id);
@@ -395,6 +397,7 @@ document.addEventListener('click', async function (ev) {
         btn.setAttribute('aria-pressed', wasFav ? 'true' : 'false');
         btn.classList.toggle('text-terracotta-500');
         btn.classList.toggle('text-forest-700/60');
+        setFill(wasFav);
         console.error('Favorite toggle failed:', e);
     }
 });
