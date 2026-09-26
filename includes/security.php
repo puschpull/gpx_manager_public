@@ -57,7 +57,12 @@ function csrf_field(): string {
 function csrf_verify(): bool {
     start_secure_session();
     $token = $_POST['_csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-    return hash_equals($_SESSION['csrf_token'] ?? '', $token);
+    $expected = $_SESSION['csrf_token'] ?? '';
+    // Prázdný token nesmí projít nikdy. Nová session token ještě nemá — a právě
+    // ji dostane cizí web: cross-site POST jde kvůli SameSite=Lax bez cookie,
+    // public_access.php nové session z povolené IP nastaví is_admin, a dřív
+    // hash_equals('', '') vrátilo true (ověřeno 26. 9. 2026 curl bez cookies).
+    return is_string($token) && $expected !== '' && hash_equals($expected, $token);
 }
 
 // --- CSP nonce ---

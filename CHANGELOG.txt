@@ -1,10 +1,31 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 24. září 2026
+  Poslední aktualizace: 26. září 2026
 
 ================================================================================
 
+
+── 26. září 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOST: CSRF OCHRANA PROPOUŠTĚLA POŽADAVEK BEZ TOKENU                │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Kontrola CSRF tokenu porovnávala token z požadavku s tokenem v session.
+  Nová session ale token ještě nemá — a porovnání dvou prázdných řetězců
+  vyšlo jako shoda. Nová session přitom vzniká přesně při útoku: formulář
+  z cizího webu se kvůli SameSite=Lax posílá bez cookie a aplikace nové
+  session z povolené IP (ADMIN_IPS) sama nastaví práva admina. Jakýkoli
+  web, který admin z povolené IP navštívil, tak mohl odeslat
+  administrátorský požadavek (např. smazání trasy).
+
+  Oprava: prázdný token neprojde nikdy. Ověřeno: požadavek bez cookie
+  i tokenu → 403; se session a správným tokenem (pole i hlavička) projde;
+  špatný, prázdný i podvržený token (pole místo textu) → 403; hvězdička
+  Oblíbené v aplikaci dál funguje. Nalezeno při zkouškách Cestopisu.
+
+  Soubory: includes/security.php
 
 ── 24. září 2026 ──────────────────────────────────────────────────────────────
 
