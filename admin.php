@@ -17,7 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !csrf_verify()) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_access_config'])) {
     // all_pages() does not include 'photos' + 'planner' — special extra pages
     // for visitors (planner burns Mapy.com quota → never visible by default)
-    $allPagesWithPhotos = array_merge(all_pages(), ['photos', 'planner']);
+    // 'story' = Cestopis — zveřejněné texty výletů; navíc jen se zapnutou funkcí
+    $allPagesWithPhotos = array_merge(all_pages(), ['photos', 'planner', 'story']);
 
     $langs  = array_values(array_intersect($_POST['allowed_langs']  ?? [], all_langs()));
     $pages  = array_values(array_intersect($_POST['allowed_pages']  ?? [], $allPagesWithPhotos));
@@ -524,7 +525,8 @@ $pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
     'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení','links'=>'🧭 Podobné weby',
     'photos'=>'📸 Fotografie (jen prohlížení)',
-    'planner'=>'🥾 Plánovač (bez ukládání — čerpá mapovou API kvótu!)'];
+    'planner'=>'🥾 Plánovač (bez ukládání — čerpá mapovou API kvótu!)',
+    'story'=>'📖 Cestopis (jen zveřejněné texty; funkce musí být zapnutá)'];
 ?>
 <div style="margin:24px 0;">
     <h2 style="font-size:17px;margin-bottom:12px;color:var(--text-color);">🔐 <?= htmlspecialchars(t('admin_access_config', 'Konfigurace přístupu pro návštěvníky')) ?></h2>

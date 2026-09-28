@@ -185,6 +185,7 @@ ADMIN_IPS=127.0.0.1,::1,123.456.789.0
 TF_API_KEY=
 MAPYCOM_API_KEY=
 MAPILLARY_TOKEN=
+ANTHROPIC_API_KEY=
 ```
 
 ### Krok 2 — Vygeneruj bcrypt hash hesla
@@ -384,6 +385,24 @@ Zobrazuje fotografie pořízené přímo na trasách, jako Street View.
 4. Vyplň název aplikace (např. `GPX Manager`) a potvrď
 5. Zkopíruj **Client Token**
 6. Vlož do `.env`: `MAPILLARY_TOKEN=tvůj_token_zde`
+
+---
+
+### Anthropic (Claude) — Cestopis (volitelné, placené)
+
+Funkce **Cestopis** nechá jazykový model napsat z dat trasy, názvů míst a případně fotek souvislý text o výletu. Jen tahle funkce stojí peníze — platí se podle spotřeby, jeden cestopis zhruba 0,05–0,35 $ (bez fotek levněji, s fotkami dráž). Bez klíče funguje zbytek aplikace beze změny.
+
+**Jak získat klíč:**
+1. Jdi na [platform.claude.com](https://platform.claude.com/) a zaregistruj se
+2. Nabij kredit (Billing) a u klíče nebo workspace nastav měsíční limit útraty
+3. V sekci **API Keys** vytvoř nový klíč (např. `gpx-cestopis`)
+4. Vlož do `.env`: `ANTHROPIC_API_KEY=tvůj_klíč_zde` (bez uvozovek)
+5. V aplikaci zapni **Administrace → Volitelné funkce → Cestopis** (ve výchozím stavu je vypnutý)
+6. Návštěvníkům zveřejněné cestopisy zpřístupníš v **Administrace → Konfigurace přístupu → Cestopis**
+
+Tabulky pro cestopisy vytvoří migrace `0020_track_stories.sql` (`php migrate.php`). V aplikaci je navíc měsíční strop útraty (výchozí 5 $), po jehož dosažení se aplikace před dalším generováním zeptá.
+
+> **Soukromí:** ke generování odchází do API poskytovatele (Anthropic) souhrn dat trasy a — jen když to zvolíš — zmenšené fotky. Souřadnice zastávek jdou do služeb OpenStreetMap kvůli názvům míst.
 
 ---
 

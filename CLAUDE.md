@@ -84,6 +84,7 @@
 - **GPX parser**: `includes/gpx_parser.php`
 - **Foto helpers**: `includes/photo_helper.php` (EXIF, auto-assign, thumb)
 - **Thumb generator**: `includes/generate_thumb.php` (OSM dlaždice s diskovou cache); velký obrázek pro sdílení dělá `includes/share_image.php`
+- **Cestopis** (volitelná funkce — text výletu psaný jazykovým modelem, vlastní ANTHROPIC_API_KEY): `src/Cestopis/`, načítá `includes/story_classes.php`, stránky `story.php` (čtení) a `story_admin.php` (správa), `api/story/*`, tabulky z migrace 0020. Pravidla a zjištění z dat v **`src/Cestopis/CLAUDE.md`** — před zásahem přečíst (proč model nesmí dostat výšky z fotek, proč se útrata nemaže)
 
 ---
 

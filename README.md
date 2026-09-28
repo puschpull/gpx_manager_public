@@ -8,6 +8,15 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 
 ## What's new
 
+### 2026-09 — travelogue
+
+- **Travelogue (optional, paid)** — a language model (Claude) writes a trip story from the
+  track data, place names from OpenStreetMap, named map points near the stops and optionally
+  the photos. It may only use the facts it is given. Every version is stored; pick a style
+  and model with a cost estimate, compare versions side by side, publish one. Readers open
+  it in a new tab from the track detail. Needs your own `ANTHROPIC_API_KEY`; off by default,
+  with a monthly spending cap.
+
 ### 2026-07 — planning, replay and real radar
 
 - **Trip planner** — click a route on the map, get it snapped to real paths via routing;
@@ -64,6 +73,7 @@ A web application for managing GPS tracks and photos from hikes and outdoor acti
 - **Filter & compare** — advanced filtering, side-by-side track comparison on map
 - **Heatmap**, **photo heatmap** and **activity calendar**
 - **GPX Cleaner** — strip GPS noise, stationary points and elevation spikes
+- **Travelogue** — optional AI-written trip story from track data, map and photos (own API key)
 - **Visitor mode** — public view-only access with configurable page visibility
 - **Multilingual UI** — Czech, English, German, Slovak, Spanish, French, Italian, Polish
 - **Light / dark mode**
@@ -83,6 +93,7 @@ PHP extensions: `pdo_mysql`, `simplexml`, `gd`, `exif`, `zip`
 
 Optional API keys (in `.env`) unlock extra map layers — Thunderforest, Mapy.com and
 Mapillary. Without a key the layer simply is not offered; nothing else breaks.
+`ANTHROPIC_API_KEY` enables the optional, usage-billed Travelogue feature.
 
 ---
 

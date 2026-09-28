@@ -66,14 +66,23 @@ function nav_menu_order(): array {
 /**
  * Volitelné funkce aplikace (Administrace → Volitelné funkce).
  * Uloženo v app_config 'feature_flags' jako {klíč: bool}. Když klíč
- * v konfiguraci chybí (nová funkce, čistá instalace), je ZAPNUTO.
+ * v konfiguraci chybí (nová funkce, čistá instalace), je ZAPNUTO —
+ * kromě funkcí z feature_flags_default_off().
  */
 function feature_enabled(string $key): bool {
     $cfg = get_app_config('feature_flags', null);
     if (!is_array($cfg) || !array_key_exists($key, $cfg)) {
-        return true;
+        return !in_array($key, feature_flags_default_off(), true);
     }
     return (bool)$cfg[$key];
+}
+
+/**
+ * Funkce, které se musí zapnout vědomě: stojí peníze nebo potřebují
+ * vlastní klíč. 'story' = Cestopis (placené API jazykového modelu).
+ */
+function feature_flags_default_off(): array {
+    return ['story'];
 }
 
 /**
@@ -88,6 +97,7 @@ function feature_flag_labels(): array {
         'plan_overlay'   => '🗺️ ' . t('ft_plan_overlay', 'Porovnání s plánem (detail trasy)'),
         'baro_note'      => '⛰️ ' . t('ft_baro_note', 'Vysvětlení rozdílu výšky start/cíl (okruhy)'),
         'radar_now'      => '🌧️ ' . t('ft_radar_now', 'Aktuální srážky z radaru ČHMÚ (Plánovač)'),
+        'story'          => '📖 ' . t('ft_story', 'Cestopis — text výletu psaný AI (placené API, vlastní klíč)'),
     ];
 }
 

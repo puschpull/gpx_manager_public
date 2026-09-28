@@ -201,6 +201,48 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ------------------------------------------------------------
+--  Tabulky: track_stories, story_geocode_cache, story_poi_cache
+--  (Cestopis — volitelná funkce, migrace 0020)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS track_stories (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    track_id       INT          NOT NULL,
+    style          VARCHAR(20)  NOT NULL,
+    model          VARCHAR(60)  NOT NULL,
+    with_map       TINYINT(1)   NOT NULL DEFAULT 0,
+    photo_mode     VARCHAR(10)  NOT NULL DEFAULT 'none',
+    photos_sent    SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+    status         VARCHAR(10)  NOT NULL DEFAULT 'running',
+    error_message  VARCHAR(500) DEFAULT NULL,
+    is_published   TINYINT(1)   NOT NULL DEFAULT 0,
+    input_tokens   INT UNSIGNED DEFAULT NULL,
+    output_tokens  INT UNSIGNED DEFAULT NULL,
+    cost_usd       DECIMAL(8,4) DEFAULT NULL,
+    duration_s     SMALLINT UNSIGNED DEFAULT NULL,
+    facts_json     JSON         DEFAULT NULL,
+    story          MEDIUMTEXT   DEFAULT NULL,
+    created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at    TIMESTAMP    NULL DEFAULT NULL,
+    INDEX idx_ts_track (track_id, is_published),
+    INDEX idx_ts_created (created_at),
+    CONSTRAINT fk_ts_track FOREIGN KEY (track_id) REFERENCES tracks(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS story_geocode_cache (
+    cache_key   VARCHAR(32)  NOT NULL PRIMARY KEY,
+    lat         DOUBLE       NOT NULL,
+    lon         DOUBLE       NOT NULL,
+    place_name  VARCHAR(160) NOT NULL DEFAULT '',
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS story_poi_cache (
+    cache_key   CHAR(32)     NOT NULL PRIMARY KEY,
+    payload     MEDIUMTEXT   NOT NULL,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ------------------------------------------------------------
 --  Výchozí konfigurace aplikace
 -- ------------------------------------------------------------
 -- Pozn.: seznamy musí odpovídat all_langs() / all_pages() v includes/app_constants.php

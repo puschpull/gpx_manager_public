@@ -185,6 +185,7 @@ ADMIN_IPS=127.0.0.1,::1,123.456.789.0
 TF_API_KEY=
 MAPYCOM_API_KEY=
 MAPILLARY_TOKEN=
+ANTHROPIC_API_KEY=
 ```
 
 ### Step 2 — Generate a bcrypt Password Hash
@@ -384,6 +385,24 @@ Displays photos taken directly on trails and roads, similar to Street View.
 4. Enter an application name (e.g. `GPX Manager`) and confirm
 5. Copy the **Client Token**
 6. Add to `.env`: `MAPILLARY_TOKEN=your_token_here`
+
+---
+
+### Anthropic (Claude) — Travelogue (optional, paid)
+
+The **Travelogue** feature lets a language model write a trip story from the track data, place names and optionally photos. This is the only feature that costs money — it is billed by usage, roughly $0.05–0.35 per story (cheaper without photos). Without the key the rest of the app works unchanged.
+
+**How to get a key:**
+1. Go to [platform.claude.com](https://platform.claude.com/) and sign up
+2. Add credit (Billing) and set a monthly spend limit for the key or workspace
+3. In **API Keys**, create a new key (e.g. `gpx-travelogue`)
+4. Add it to `.env`: `ANTHROPIC_API_KEY=your_key_here` (no quotes)
+5. In the app, enable **Administration → Optional features → Travelogue** (off by default)
+6. To show published stories to visitors, tick **Administration → Access configuration → Travelogue**
+
+The tables are created by migration `0020_track_stories.sql` (`php migrate.php`). The app also has a monthly spending cap (default $5) and asks for confirmation before generating beyond it.
+
+> **Privacy:** generating sends a summary of the track data to the API provider (Anthropic) and — only if you choose so — downscaled photos. Stop coordinates are sent to OpenStreetMap services to look up place names.
 
 ---
 

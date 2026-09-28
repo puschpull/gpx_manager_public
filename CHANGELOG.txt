@@ -9,6 +9,49 @@
 ── 26. září 2026 ──────────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐
+│  NOVÉ: CESTOPIS — TEXT VÝLETU PSANÝ AI (VOLITELNÉ, PLACENÉ)               │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  K trase lze nechat jazykový model (Claude od Anthropic) napsat souvislý
+  text o výletu. Model dostane uzavřený seznam ověřených faktů: časy
+  a délky zastávek (určené podle fotek), souhrnná čísla trasy, názvy míst
+  z OpenStreetMap, pojmenované body z mapy do 150 m od zastávek (vyhlídky,
+  vrcholy, jeskyně…) a — jen na výslovnou volbu — zmenšené fotky. Nic jiného
+  použít nesmí; výšky z fotek (barometr telefonu) záměrně nedostane.
+
+  Správa (admin, detail trasy → „Správa cestopisu"):
+    • volba stylu (věcný / vypravěčský / literární), modelu (Opus / Sonnet),
+      bodů z mapy a fotek (žádné / z delších zastavení / ze všech)
+    • odhad ceny před generováním; měsíční strop útraty (výchozí 5 $) —
+      když by ho nová verze překročila, aplikace se zeptá Ano/Ne
+    • generování běží na pozadí (s fotkami až ~2 min), stránku lze zavřít;
+      druhé spuštění pro tutéž trasu se odmítne (nic se neplatí dvakrát)
+    • každá verze se uloží i s cenou a s tím, co model dostal; verze lze
+      porovnat vedle sebe, zobrazit v náhledu, zveřejnit (veřejná vždy jen
+      jedna) nebo smazat (útrata za smazanou verzi v součtu zůstává)
+
+  Čtení: detail trasy → „Cestopis" otevře zveřejněnou verzi v nové kartě —
+  text, čísla, zastávky s místy, body z mapy a fotkami (fotky se otevírají
+  ve stejné kartě, listuje se šipkami ← → přes celý výlet, Esc zavře; na
+  telefonu posunem prstu). Stránka jen čte
+  uloženou verzi, nic nestojí. Návštěvníci ji uvidí jen se zaškrtnutou
+  stránkou „Cestopis" v Konfiguraci přístupu (výchozí: skrytá).
+
+  Zapnutí: vlastní klíč ANTHROPIC_API_KEY v .env (platform.claude.com)
+  a Administrace → Volitelné funkce → Cestopis (výchozí: VYPNUTO).
+  Orientační ceny (výlet se 123 fotkami, Opus): věcný ~0,05 $, literární
+  s mapou ~0,07 $, literární s 37 fotkami ~0,34 $.
+
+  Migrace 0020 (track_stories, story_geocode_cache, story_poi_cache) —
+  spustí se přes php migrate.php. Instalace a klíč:
+  instructions/cs.md (API klíče).
+
+  Soubory: src/Cestopis/*, story.php, story_admin.php, api/story/*,
+  includes/story_*.php, css/story.css, js/story-admin.js,
+  migrations/0020_track_stories.sql, install.sql, detail trasy, admin.php,
+  lang/*, .env.example
+
+┌───────────────────────────────────────────────────────────────────────────┐
 │  BEZPEČNOST: CSRF OCHRANA PROPOUŠTĚLA POŽADAVEK BEZ TOKENU                │
 └───────────────────────────────────────────────────────────────────────────┘
 

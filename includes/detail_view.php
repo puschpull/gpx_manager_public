@@ -9,6 +9,7 @@
  */
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/track_title.php';
+require_once __DIR__ . '/story_link.php';
 $_isAdmin = !empty($_SESSION['is_admin']);
 
 /* Titulek pro panel prohlížeče, záložky a náhled sdíleného odkazu.
@@ -183,6 +184,18 @@ require __DIR__ . '/layout_header.php';
                 <a href="edit.php?id=<?= (int)$track['id'] ?>&<?= h(http_build_query($_GET)) ?>" class="btn-outdoor btn-outdoor-ghost">
                     <i data-lucide="pencil" class="w-4 h-4" aria-hidden="true"></i>
                     <?= htmlspecialchars(t('btn_edit_track')) ?>
+                </a>
+                <?php if (feature_enabled('story')): ?>
+                <a href="story_admin.php?id=<?= (int)$track['id'] ?>" class="btn-outdoor btn-outdoor-ghost">
+                    <i data-lucide="notebook-pen" class="w-4 h-4" aria-hidden="true"></i>
+                    <?= htmlspecialchars(t('story_btn_admin', 'Správa cestopisu')) ?>
+                </a>
+                <?php endif; ?>
+            <?php endif; ?>
+            <?php if (story_visible_to_user() && story_published_id($pdo, (int)$track['id']) !== null): ?>
+                <a href="story.php?id=<?= (int)$track['id'] ?>" target="_blank" rel="noopener" class="btn-outdoor btn-outdoor-ghost">
+                    <i data-lucide="book-open" class="w-4 h-4" aria-hidden="true"></i>
+                    <?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?>
                 </a>
             <?php endif; ?>
             <a href="filter.php?id=<?= (int)$track['id'] ?><?= h($navQs) ?>" class="btn-outdoor btn-outdoor-ghost" title="<?= htmlspecialchars(t('btn_clean_track')) ?>">
