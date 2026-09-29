@@ -9,6 +9,20 @@
 ── 29. září 2026 ──────────────────────────────────────────────────────────────
 
 ┌───────────────────────────────────────────────────────────────────────────┐
+│  CESTOPIS JAKO ČASOPISOVÝ ČLÁNEK                                          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Stránka cestopisu (story.php) má podobu článku: velká úvodní fotka
+  nahoře, první odstavec s ozdobnou iniciálou a v textu jedna fotka na
+  každé dva odstavce — střídavě vpravo a vlevo s obtékáním, s popiskem
+  (místo, bod z mapy poblíž, čas). Kompletní galerie je pod čarou
+  „Všechny fotky z výletu". Na mobilu jsou fotky pod sebou přes celou šířku.
+  Fotky vybírá program sám a zdarma (includes/story_layout.php) podle
+  časů zmíněných v odstavcích — funguje i pro už vygenerované verze,
+  nic se neposílá do API. Klik na fotku v textu otevře prohlížeč na jejím
+  místě v galerii.
+
+┌───────────────────────────────────────────────────────────────────────────┐
 │  CESTOPIS VIDITELNÝ V PŘEHLEDECH                                          │
 └───────────────────────────────────────────────────────────────────────────┘
 
