@@ -221,9 +221,11 @@ final class Narrator
           si zaslouží zvláštní zmínku; krátké průchody klidně shrň dohromady.
         - Časy používej střídmě: přesný čas jen u startu, nejdelšího
           zastavení a konce, a to číslem tak, jak je ve faktech (13:31).
-          Jinak piš volně („před polednem", „za chvíli", „o kus dál") —
-          nepřepočítávej časy na slovní obraty typu „tři minuty po půl
-          druhé", v tom se snadno splete. Nikdy nevypisuj řadu časů za sebou.
+          Denní dobu slovy ber VÝHRADNĚ z pole „cast_dne" zastávky
+          („časně odpoledne jsme…"). Sám z hodin nic neodvozuj a nepoužívej
+          obraty vztažené k hodinám („před polednem", „po půl dvanácté",
+          „krátce po třetí") — v přepočtu se snadno splete. Jinak stačí
+          „za chvíli", „o kus dál". Nikdy nevypisuj řadu časů za sebou.
         - Nehodnoť a nevykládej („pak už šlo všechno jinak", „kvůli tomu se
           šlo", „výlet začal doopravdy") — to ve faktech není. Popisuj, co se
           stalo, a nech čtenáře, ať si to domyslí.

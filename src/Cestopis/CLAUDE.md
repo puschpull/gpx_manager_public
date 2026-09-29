@@ -267,3 +267,6 @@ Do API se kvůli tomu nic neposílá — model zná jen čísla zastávek.
 přepočítal 13:31 na „třiatřicet minut po půl druhé“ (= 14:03) a přidal výklady
 („po ní už šlo všechno jinak“). Pokyn proto chce přesné časy číslem, bez
 slovních přepočtů, a zakazuje hodnocení a výklad.
+Verze #5 i tak psala „před polednem“ u 12:14 a „po půl dvanácté“ u 12:28 → denní
+dobu teď počítá `FactSheet::partOfDay()` do pole `cast_dne` u každé zastávky
+a model smí slovní denní dobu brát jen odtud.

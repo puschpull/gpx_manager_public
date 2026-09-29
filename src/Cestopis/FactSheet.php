@@ -109,6 +109,25 @@ final class FactSheet
     }
 
     /**
+     * Denní doba slovy, spočítaná tady — model ji jen převezme. Když si ji
+     * odvozoval z hodin sám, psal „před polednem" u 12:14 a „po půl dvanácté"
+     * u 12:28 (verze #4 a #5 trasy 574, 29. 9. 2026).
+     */
+    private static function partOfDay(\DateTimeInterface $t): string
+    {
+        $m = (int) $t->format('G') * 60 + (int) $t->format('i');
+        return match (true) {
+            $m < 9 * 60 => 'ráno',
+            $m < 11 * 60 + 45 => 'dopoledne',
+            $m < 12 * 60 + 15 => 'kolem poledne',
+            $m < 14 * 60 => 'časně odpoledne',
+            $m < 17 * 60 => 'odpoledne',
+            $m < 19 * 60 => 'podvečer',
+            default => 'večer',
+        };
+    }
+
+    /**
      * @param list<Stop> $stops
      * @return list<array<string,mixed>>
      */
@@ -121,6 +140,7 @@ final class FactSheet
                 'poradi' => $i + 1,
                 'od' => $stop->startAt->format('H:i'),
                 'do' => $stop->endAt->format('H:i'),
+                'cast_dne' => self::partOfDay($stop->startAt),
                 'trvani_minut' => (int) round($stop->durationSeconds() / 60),
                 'pocet_fotek' => $stop->photoCount(),
                 'delsi_zastaveni' => $stop->isRest(),
