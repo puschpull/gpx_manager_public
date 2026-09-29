@@ -920,6 +920,7 @@ return [
     'story_err_cap'            => 'The cap must be a number 0–1000.',
     'story_btn_read'           => 'Travelogue',
     'story_all_photos'       => 'All photos from the trip',
+    'story_photo_mark'       => 'photo from stop {n}',
     'story_preview'            => 'Preview',
     'story_preview_banner'     => 'Preview of version #{id} — not published, visitors cannot see it.',
     'story_not_found'          => 'There is no published travelogue for this track yet.',

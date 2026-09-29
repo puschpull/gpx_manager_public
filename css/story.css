@@ -203,12 +203,12 @@ html.dark .story-btn-primary { color: #0f1713; }
 
 .story-mag::after { content: ""; display: block; clear: both; }
 .story-mag .story-fig-right,
-.story-mag .story-fig-left { width: 52%; margin-top: .35rem; margin-bottom: 1.1rem; }
+.story-mag .story-fig-left { width: 52%; margin-top: .35rem; margin-bottom: 1.1rem; clear: both; } /* další fotka až pod předchozí — vysoká fotka na výšku by jinak sevřela text */
 .story-mag .story-fig-portrait { width: 38%; }
-/* Sloupec textu uprostřed, fotky přesahují do volného místa po stranách */
+/* Sloupec textu uprostřed, fotky zarovnané s jeho okraji */
 .story-mag { margin-left: auto; margin-right: auto; }
-.story-mag .story-fig-right { float: right; margin-left: 1.5rem; margin-right: -5rem; }
-.story-mag .story-fig-left  { float: left;  margin-right: 1.5rem; margin-left: -5rem; }
+.story-mag .story-fig-right { float: right; margin-left: 1.5rem; }
+.story-mag .story-fig-left  { float: left;  margin-right: 1.5rem; }
 
 /* Úvodní odstavec větší, s ozdobnou iniciálou */
 .story-mag .story-mag-lead { font-size: 1.15em; }
@@ -222,11 +222,7 @@ html.dark .story-btn-primary { color: #0f1713; }
     background: var(--border-color);
 }
 
-/* Úzké obrazovky: bez obtékání a přesahů, fotka přes celou šířku */
-@media (max-width: 960px) {
-    .story-mag .story-fig-right { margin-right: 0; }
-    .story-mag .story-fig-left  { margin-left: 0; }
-}
+/* Úzké obrazovky: bez obtékání, fotka přes celou šířku */
 @media (max-width: 640px) {
     .story-mag .story-fig-right,
     .story-mag .story-fig-left,

@@ -4,7 +4,8 @@ declare(strict_types=1);
 /**
  * Cestopis — rozmístění fotek do textu (časopisová podoba story.php).
  *
- * Bez modelu a zdarma: text je psaný chronologicky, takže se fotky párují
+ * Nové verze nesou značky „[foto N]“ od modelu (src/Cestopis/StoryText.php)
+ * — ty mají přednost. Starší verze bez značek: bez modelu a zdarma: text je psaný chronologicky, takže se fotky párují
  * s odstavci podle času. Časy „11:16“ / „12.28“ zmíněné v odstavci určí,
  * o které části výletu odstavec mluví; odstavec bez času převezme odhad
  * od sousedů. Jedna fotka na dva odstavce + jedna úvodní nahoře.
@@ -52,10 +53,15 @@ function story_para_times(array $paras, int $tripFrom, int $tripTo): array {
  * @param list<string> $paras   odstavce textu
  * @param list<array>  $stops   zastávky ze story.php (od, do, misto, okoli, photos, delsi, trvani)
  * @param array<int, array{0:int,1:int}> $dims  [photo_id => [šířka, výška]]
+ * @param array<int,int> $marks  značky od modelu [index odstavce => pořadí zastávky];
+ *                               prázdné (starší verze) = rozmístit podle časů
  * @return array{hero: ?array, after: array<int, array>}  after = [index odstavce => fotka za ním]
  */
-function story_article_layout(array $paras, array $stops, array $dims): array {
+function story_article_layout(array $paras, array $stops, array $dims, array $marks = []): array {
     $layout = ['hero' => null, 'after' => []];
+    // Pořadí zastávky ve faktech (1…) — na něj odkazují značky „[foto N]“
+    foreach ($stops as $i => &$s) $s['poradi'] = $i + 1;
+    unset($s);
     $stops = array_values(array_filter($stops, static fn($s) => $s['photos'] !== []));
     $n = count($paras);
     if ($stops === [] || $n === 0) {
@@ -84,6 +90,31 @@ function story_article_layout(array $paras, array $stops, array $dims): array {
             'orient'  => ($w > 0 && $h > $w) ? 'portrait' : 'landscape',
         ];
     };
+
+    // Značky od modelu: fotka přesně tam, kde text o zastávce mluví.
+    // Neplatné číslo (zastávka neexistuje / nemá fotky) se tiše vynechá.
+    if ($marks !== []) {
+        $idx = [];
+        foreach ($stops as $i => $s) $idx[$s['poradi']] = $i;
+        $used = [];
+        $last = -2;
+        foreach ($marks as $at => $poradi) {
+            if (!isset($idx[$poradi]) || isset($used[$idx[$poradi]]) || $at >= $n) continue;
+            // Jedna fotka na dva odstavce: mezi fotkami aspoň jeden odstavec
+            if ($at - $last < 2) continue;
+            $last = $at;
+            $used[$idx[$poradi]] = true;
+            $layout['after'][$at] = $item($stops[$idx[$poradi]]);
+        }
+        // Úvodní fotka: nejvýraznější zastávka, kterou text ještě neukázal
+        $heroIdx = null;
+        foreach ($stops as $i => $s) {
+            if (isset($used[$i])) continue;
+            if ($heroIdx === null || $s['score'] > $stops[$heroIdx]['score']) $heroIdx = $i;
+        }
+        $layout['hero'] = $item($stops[$heroIdx ?? 0]);
+        return $layout;
+    }
 
     // Úvodní fotka: nejvýraznější zastávka celého výletu
     $heroIdx = 0;

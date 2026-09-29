@@ -18,7 +18,7 @@ final class Narrator
         'literary' => 'Piš literárně — jako fejeton nebo cestopisná črta: obrazně, s rytmem vět, '
             . 's citem pro detail. Obrazy a přirovnání ale stav JEN na tom, co je ve faktech nebo '
             . 'na přiložených fotkách; jazyk smí být bohatý, obsah ne vymyšlený. Čísla v textu '
-            . 'používej střídmě (časy zastávek ano), souhrn čísel patří do závěrečného odstavce.',
+            . 'používej střídmě, souhrn čísel patří do závěrečného odstavce.',
     ];
 
     /** Modely, které jde zvolit, a jejich ceník v USD za 1M tokenů [vstup, výstup] (9/2026). */
@@ -188,7 +188,7 @@ final class Narrator
         $photoHint = $withPhotos
             ? '- Pojmenovaný objekt z v_okoli spolu s fotkou téže zastávky dává textu místo i obraz — využij to.'
             : '- Vysoký počet fotek na jedné zastávce naznačuje, že tam bylo něco'
-                . "\n  zajímavého. Smíš to konstatovat — ale ne hádat, co to bylo.";
+                . "\n  zajímavého. Smíš naznačit, že bylo co fotit — ale ne hádat, co to bylo.";
 
         return <<<PROMPT
         Jsi zapisovatel cestovního deníku. Dostaneš strukturovaná fakta o jednom
@@ -216,17 +216,44 @@ final class Narrator
 
         CO NAOPAK DĚLEJ:
 
-        - Veď text chronologicky podle zastávek.
-        - Zmiň konkrétní časy a čísla — jsou to nejcennější údaje, které máš.
-        - Delší zastavení („delsi_zastaveni": true) si zaslouží zvláštní
-          zmínku; krátké průchody klidně shrň dohromady.
+        - Veď text chronologicky, ale odstavce stav podle úseků výletu
+          a míst, ne podle hodin. Delší zastavení („delsi_zastaveni": true)
+          si zaslouží zvláštní zmínku; krátké průchody klidně shrň dohromady.
+        - Časy používej střídmě: přesný čas jen u startu, nejdelšího
+          zastavení a konce, a to číslem tak, jak je ve faktech (13:31).
+          Jinak piš volně („před polednem", „za chvíli", „o kus dál") —
+          nepřepočítávej časy na slovní obraty typu „tři minuty po půl
+          druhé", v tom se snadno splete. Nikdy nevypisuj řadu časů za sebou.
+        - Nehodnoť a nevykládej („pak už šlo všechno jinak", „kvůli tomu se
+          šlo", „výlet začal doopravdy") — to ve faktech není. Popisuj, co se
+          stalo, a nech čtenáře, ať si to domyslí.
+        - Nepočítej fotky ve větách („jedenáct snímků"); počet fotek ti jen
+          napovídá, kde bylo co fotit. Slova „zastávka" a „zastavení"
+          používej málo a střídej je s jinými obraty.
+        - Pište jako člověk, který vzpomíná: střídej krátké a delší věty,
+          vyhni se výčtům, šablonovitým spojkám („poté", „následně")
+          a opakování stejné stavby vět.
         {$photoHint}
-        - Na závěr shrň čísla výletu v jednom krátkém odstavci.
+        - Na závěr jeden krátký odstavec se souhrnem — jen hlavní čísla
+          (délka, převýšení, celkový čas), ne všechno, co ve faktech je.
+
+        FOTKY V TEXTU:
+
+        Text se zobrazí jako článek s fotkami. Za odstavec, který mluví
+        o určité zastávce, vlož na samostatný řádek značku [foto N],
+        kde N je „poradi" té zastávky ve faktech. Jedna značka na každé
+        dva odstavce (mezi dvěma značkami vždy aspoň dva odstavce textu),
+        každá zastávka nejvýš jednou, žádná značka
+        před prvním ani za posledním (souhrnným) odstavcem. Vybírej
+        zastávky s více fotkami nebo delším zastavením. Značka musí
+        odpovídat tomu, o čem odstavec opravdu je. Mimo značky na fotky
+        v textu neodkazuj („na fotce vidíme…").
 
         {$styles[$style]}
 
-        Výstup: čistý text členěný na odstavce. Žádné nadpisy, žádný markdown,
-        žádný úvodní ani závěrečný komentář o tom, co jsi udělal.
+        Výstup: čistý text členěný na odstavce (prázdný řádek mezi nimi)
+        se značkami [foto N]. Žádné nadpisy, žádný markdown, žádný úvodní
+        ani závěrečný komentář o tom, co jsi udělal.
         PROMPT;
     }
 

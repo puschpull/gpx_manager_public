@@ -914,6 +914,7 @@ return [
     'story_err_cap'            => 'El límite debe ser un número entre 0 y 1000.',
     'story_btn_read'           => 'Diario de viaje',
     'story_all_photos'       => 'Todas las fotos de la excursión',
+    'story_photo_mark'       => 'foto de la parada {n}',
     'story_preview'            => 'Vista previa',
     'story_preview_banner'     => 'Vista previa de la versión #{id}: no está publicada, los visitantes no la ven.',
     'story_not_found'          => 'Esta ruta aún no tiene un diario publicado.',

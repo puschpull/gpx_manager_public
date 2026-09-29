@@ -8,10 +8,14 @@ declare(strict_types=1);
 
 /** Text verze → odstavce (prázdný řádek = nový odstavec). */
 $_storyParagraphs = static function (?string $text): string {
+    // Značky fotek („[foto N]“) jen naznačit — kam model fotku umístil
+    $st = \GpxManager\Cestopis\StoryText::split((string)$text);
     $out = '';
-    foreach (preg_split('/\n\s*\n/', trim((string)$text)) ?: [] as $p) {
-        if (trim($p) !== '') {
-            $out .= '<p>' . nl2br(h(trim($p))) . "</p>\n";
+    foreach ($st['paras'] as $i => $p) {
+        $out .= '<p>' . nl2br(h($p)) . "</p>\n";
+        if (isset($st['photos'][$i])) {
+            $out .= '<p class="story-hint">📷 ' . h(str_replace('{n}', (string)$st['photos'][$i],
+                t('story_photo_mark', 'fotka ze zastávky {n}'))) . "</p>\n";
         }
     }
     return $out;

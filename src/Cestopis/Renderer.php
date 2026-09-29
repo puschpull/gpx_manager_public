@@ -44,7 +44,7 @@ final class Renderer
             $radios .= sprintf('<input type="radio" name="verze" id="%s"%s>', $id, $n === $last ? ' checked' : '');
             $labels .= sprintf('<label for="%s">%s</label>', $id, $this->e($this->shortLabel($s)));
             $paragraphs = '';
-            foreach (preg_split('/\n\s*\n/', trim($s['story'])) as $p) {
+            foreach (StoryText::split((string) $s['story'])['paras'] as $p) {
                 $paragraphs .= '<p>' . nl2br($this->e(trim($p))) . "</p>\n";
             }
             $texts .= sprintf(

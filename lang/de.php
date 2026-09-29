@@ -914,6 +914,7 @@ return [
     'story_err_cap'            => 'Das Limit muss eine Zahl von 0–1000 sein.',
     'story_btn_read'           => 'Reisebericht',
     'story_all_photos'       => 'Alle Fotos der Tour',
+    'story_photo_mark'       => 'Foto von Halt {n}',
     'story_preview'            => 'Vorschau',
     'story_preview_banner'     => 'Vorschau der Version #{id} — nicht veröffentlicht, Besucher sehen sie nicht.',
     'story_not_found'          => 'Zu dieser Tour gibt es noch keinen veröffentlichten Reisebericht.',

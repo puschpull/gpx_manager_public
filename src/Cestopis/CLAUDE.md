@@ -252,3 +252,18 @@ jen pro trasu 574.
       ?v= u návštěvníka ignorováno) a snímky v prohlížeči.
 - [ ] Fáze 4: changelog, manuál, instalace (vlastní API klíč), merge do main,
       ikona „Nasadit GPX" (migrace), klíč do `.env` na serveru, public repo
+
+## Fotky v textu (časopisová podoba, 29. 9. 2026)
+
+Model vkládá mezi odstavce značky `[foto N]` (N = `poradi` zastávky ve faktech),
+pokyn je v `Narrator::systemPrompt` (sekce FOTKY V TEXTU). `StoryText::split()`
+text rozdělí na odstavce a značky; nikde se nezobrazují jako text (správa je jen
+naznačí „📷 fotka ze zastávky N“). `includes/story_layout.php` pak: se značkami
+dá fotku přesně tam (mezi fotkami aspoň jeden odstavec, neplatné číslo se
+vynechá), bez značek (verze před 29. 9.) rozmístí fotky podle časů v odstavcích.
+Do API se kvůli tomu nic neposílá — model zná jen čísla zastávek.
+
+**Zjištění z verze #4 (574):** když model dostal pokyn psát časy „volně“,
+přepočítal 13:31 na „třiatřicet minut po půl druhé“ (= 14:03) a přidal výklady
+(„po ní už šlo všechno jinak“). Pokyn proto chce přesné časy číslem, bez
+slovních přepočtů, a zakazuje hodnocení a výklad.

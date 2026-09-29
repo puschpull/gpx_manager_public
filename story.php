@@ -92,18 +92,16 @@ if ($story !== null) {
 $_storyParas = [];
 $_storyLayout = ['hero' => null, 'after' => []];
 if ($story !== null) {
-    $_storyParas = array_values(array_filter(
-        array_map('trim', preg_split('/\n\s*\n/', trim((string)$story['story'])) ?: []),
-        static fn($p) => $p !== ''
-    ));
+    $_st = \GpxManager\Cestopis\StoryText::split((string)$story['story']);
+    $_storyParas = $_st['paras'];
     $_dims = [];
     $_stmt = $pdo->prepare('SELECT id, width, height FROM track_photos WHERE track_id = ?');
     $_stmt->execute([$trackId]);
     foreach ($_stmt->fetchAll(PDO::FETCH_ASSOC) as $_r) {
         $_dims[(int)$_r['id']] = [(int)$_r['width'], (int)$_r['height']];
     }
-    $_storyLayout = story_article_layout($_storyParas, $_storyStops, $_dims);
-    unset($_dims, $_r);
+    $_storyLayout = story_article_layout($_storyParas, $_storyStops, $_dims, $_st['photos']);
+    unset($_dims, $_r, $_st);
 }
 unset($_stmt, $_v);
 
