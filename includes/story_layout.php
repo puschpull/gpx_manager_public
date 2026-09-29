@@ -85,7 +85,7 @@ function story_article_layout(array $paras, array $stops, array $dims, array $ma
         $near = $s['okoli'][0]['nazev'] ?? null;
         $dist = (int)($s['okoli'][0]['vzdalenost_m'] ?? PHP_INT_MAX);
         // Objekt přímo na místě (viz FactSheet::AT_POI_M) je lepší popisek než obec
-        $cap = ($near !== null && $dist <= GpxManagerCestopisFactSheet::AT_POI_M)
+        $cap = ($near !== null && $dist <= \GpxManager\Cestopis\FactSheet::AT_POI_M)
             ? $near
             : trim(($s['misto'] ?? '') . ($near ? ', poblíž ' . $near : ''), ', ');
         return [
