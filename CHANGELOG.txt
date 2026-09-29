@@ -1,10 +1,24 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 26. září 2026
+  Poslední aktualizace: 29. září 2026
 
 ================================================================================
 
+
+── 29. září 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  CESTOPIS VIDITELNÝ V PŘEHLEDECH                                          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Trasy se zveřejněným cestopisem jsou poznat bez otevírání detailu:
+  • Titulní strana — na náhledu trasy štítek „📖 Cestopis".
+  • Přehledová tabulka — úzký sloupec 📖 s odkazem na cestopis (nová
+    záložka); dá se skrýt v „Viditelnost sloupců".
+  • Filtr „Cestopis": má cestopis / nemá cestopis.
+  Vše se ukazuje jen tomu, kdo cestopisy smí vidět (funkce zapnutá,
+  návštěvník jen s povolenou stránkou Cestopis); jinak se filtr ignoruje.
 
 ── 26. září 2026 ──────────────────────────────────────────────────────────────
 
