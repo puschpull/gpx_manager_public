@@ -919,6 +919,7 @@ return [
     'story_err_delete'         => 'Tuto verzi teď smazat nejde.',
     'story_err_cap'            => 'Strop musí být číslo 0–1000.',
     'story_btn_read'           => 'Cestopis',
+    'story_all_photos'       => 'Všechny fotky z výletu',
     'story_preview'            => 'Náhled',
     'story_preview_banner'     => 'Náhled verze #{id} — není zveřejněná, návštěvníci ji nevidí.',
     'story_not_found'          => 'K této trase zatím není zveřejněný cestopis.',

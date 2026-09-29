@@ -913,6 +913,7 @@ return [
     'story_err_delete'         => 'Tej wersji nie można teraz usunąć.',
     'story_err_cap'            => 'Limit musi być liczbą 0–1000.',
     'story_btn_read'           => 'Dziennik podróży',
+    'story_all_photos'       => 'Wszystkie zdjęcia z wycieczki',
     'story_preview'            => 'Podgląd',
     'story_preview_banner'     => 'Podgląd wersji #{id} — nie jest opublikowana, odwiedzający jej nie widzą.',
     'story_not_found'          => 'Dla tej trasy nie ma jeszcze opublikowanego dziennika.',

@@ -30,7 +30,20 @@ require __DIR__ . '/layout_header.php';
             </p>
         <?php endif; ?>
 
-        <header class="story-read-head">
+        <?php
+        // Fotka v článku: odkaz na velkou fotku, prohlížeč ji najde v galerii dole
+        $_fig = static function (array $it, string $cls): string {
+            $p = $it['photo'];
+            return '<figure class="story-fig ' . $cls . '">'
+                . '<a href="' . h(photo_full_url($p->filename)) . '" data-story-inline>'
+                . '<img src="' . h(photo_full_url($p->filename)) . '" loading="lazy" data-img-fallback="dim" alt="' . h($it['caption']) . '">'
+                . '</a><figcaption>' . h($it['caption']) . '</figcaption></figure>';
+        };
+        ?>
+        <header class="story-read-head story-mag-head">
+            <?php if ($_storyLayout['hero'] !== null): ?>
+                <?= $_fig($_storyLayout['hero'], 'story-fig-hero') ?>
+            <?php endif; ?>
             <h1 class="story-h1"><?= h($_storyTitle) ?></h1>
             <p class="story-muted">
                 <?php if (!empty($track['date_start'])): ?>
@@ -42,9 +55,16 @@ require __DIR__ . '/layout_header.php';
             </p>
         </header>
 
-        <div class="story-text story-read-text">
-            <?php foreach (preg_split('/\n\s*\n/', trim((string)$story['story'])) ?: [] as $_p): ?>
-                <?php if (trim($_p) !== ''): ?><p><?= nl2br(h(trim($_p))) ?></p><?php endif; ?>
+        <div class="story-text story-read-text story-mag">
+            <?php $_side = 0; foreach ($_storyParas as $_i => $_p): ?>
+                <p<?= $_i === 0 ? ' class="story-mag-lead"' : '' ?>><?= nl2br(h($_p)) ?></p>
+                <?php if (isset($_storyLayout['after'][$_i])):
+                    $_it = $_storyLayout['after'][$_i];
+                    // Střídavě vpravo / vlevo; fotka na výšku je užší
+                    $_cls = ($_side++ % 2 === 0 ? 'story-fig-right' : 'story-fig-left')
+                          . ($_it['orient'] === 'portrait' ? ' story-fig-portrait' : ''); ?>
+                    <?= $_fig($_it, $_cls) ?>
+                <?php endif; ?>
             <?php endforeach; ?>
         </div>
 
@@ -65,7 +85,8 @@ require __DIR__ . '/layout_header.php';
         </dl>
 
         <?php if ($_storyStops !== [] || $_storyOther !== []): ?>
-            <h2 class="story-h2"><?= h(t('story_stops', 'Zastávky a fotky')) ?></h2>
+            <hr class="story-rule">
+            <h2 class="story-h2"><?= h(t('story_all_photos', 'Všechny fotky z výletu')) ?></h2>
             <?php foreach ($_storyStops as $_i => $_s): if ($_s['photos'] === []) continue;
                 $_cap = ($_i + 1) . '. ' . ($_s['misto'] ?? t('story_stop', 'Zastávka')); ?>
                 <section class="story-stop">

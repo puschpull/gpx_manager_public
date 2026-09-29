@@ -182,3 +182,57 @@ html.dark .story-btn-primary { color: #0f1713; }
     font-size: 13px; color: var(--text-muted);
 }
 .story-read-foot p { margin: 0 0 .35rem; }
+
+/* ====== Cestopis — časopisová podoba (story.php) ======
+   Fotky vybírá includes/story_layout.php: úvodní nahoře, pak jedna na dva
+   odstavce, střídavě vpravo / vlevo s obtékáním. Celá galerie je pod čarou. */
+
+.story-fig { margin: 0; }
+.story-fig a { display: block; }
+.story-fig img {
+    display: block; width: 100%; height: auto;
+    border-radius: 10px; background: var(--bg-secondary);
+}
+.story-fig figcaption {
+    margin-top: .4rem; font-size: 13px; line-height: 1.4;
+    color: var(--text-muted); font-style: italic;
+}
+
+.story-fig-hero { margin: 0 0 1.25rem; }
+.story-fig-hero img { max-height: 70vh; object-fit: cover; border-radius: 14px; }
+
+.story-mag::after { content: ""; display: block; clear: both; }
+.story-mag .story-fig-right,
+.story-mag .story-fig-left { width: 52%; margin-top: .35rem; margin-bottom: 1.1rem; }
+.story-mag .story-fig-portrait { width: 38%; }
+/* Sloupec textu uprostřed, fotky přesahují do volného místa po stranách */
+.story-mag { margin-left: auto; margin-right: auto; }
+.story-mag .story-fig-right { float: right; margin-left: 1.5rem; margin-right: -5rem; }
+.story-mag .story-fig-left  { float: left;  margin-right: 1.5rem; margin-left: -5rem; }
+
+/* Úvodní odstavec větší, s ozdobnou iniciálou */
+.story-mag .story-mag-lead { font-size: 1.15em; }
+.story-mag .story-mag-lead::first-letter {
+    float: left; font-size: 3.4em; line-height: .9; font-weight: 800;
+    margin: .08em .12em 0 0; color: var(--accent-color);
+}
+
+.story-rule {
+    clear: both; border: 0; height: 1px; margin: 2.5rem 0 0;
+    background: var(--border-color);
+}
+
+/* Úzké obrazovky: bez obtékání a přesahů, fotka přes celou šířku */
+@media (max-width: 960px) {
+    .story-mag .story-fig-right { margin-right: 0; }
+    .story-mag .story-fig-left  { margin-left: 0; }
+}
+@media (max-width: 640px) {
+    .story-mag .story-fig-right,
+    .story-mag .story-fig-left,
+    .story-mag .story-fig-portrait { float: none; width: 100%; margin: .25rem 0 1.25rem; }
+    .story-fig-hero img { max-height: 55vh; }
+}
+/* Titulek a datum zarovnané se sloupcem textu (šířka jako .story-read-text) */
+.story-mag-head .story-h1,
+.story-mag-head > .story-muted { max-width: 42rem; margin-left: auto; margin-right: auto; }

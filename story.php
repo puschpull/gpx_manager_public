@@ -17,6 +17,7 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/track_title.php';
 require_once __DIR__ . '/includes/story_helper.php';
+require_once __DIR__ . '/includes/story_layout.php';
 
 $trackId = (int)($_GET['id'] ?? 0);
 $_isAdmin = !empty($_SESSION['is_admin']);
@@ -66,6 +67,8 @@ if ($story !== null) {
             'do'     => (string)($z['do'] ?? ''),
             'misto'  => $z['misto'] ?? null,
             'okoli'  => (array)($z['v_okoli'] ?? []),
+            'delsi'  => !empty($z['delsi_zastaveni']),
+            'trvani' => (int)($z['trvani_minut'] ?? 0),
             'photos' => [],
         ];
     }
@@ -84,6 +87,23 @@ if ($story !== null) {
             $_storyOther[] = $p;
         }
     }
+}
+// Časopisová podoba: odstavce + fotky vložené do textu (includes/story_layout.php)
+$_storyParas = [];
+$_storyLayout = ['hero' => null, 'after' => []];
+if ($story !== null) {
+    $_storyParas = array_values(array_filter(
+        array_map('trim', preg_split('/\n\s*\n/', trim((string)$story['story'])) ?: []),
+        static fn($p) => $p !== ''
+    ));
+    $_dims = [];
+    $_stmt = $pdo->prepare('SELECT id, width, height FROM track_photos WHERE track_id = ?');
+    $_stmt->execute([$trackId]);
+    foreach ($_stmt->fetchAll(PDO::FETCH_ASSOC) as $_r) {
+        $_dims[(int)$_r['id']] = [(int)$_r['width'], (int)$_r['height']];
+    }
+    $_storyLayout = story_article_layout($_storyParas, $_storyStops, $_dims);
+    unset($_dims, $_r);
 }
 unset($_stmt, $_v);
 

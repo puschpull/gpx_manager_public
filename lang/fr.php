@@ -913,6 +913,7 @@ return [
     'story_err_delete'         => 'Cette version ne peut pas être supprimée maintenant.',
     'story_err_cap'            => 'Le plafond doit être un nombre entre 0 et 1000.',
     'story_btn_read'           => 'Carnet de voyage',
+    'story_all_photos'       => 'Toutes les photos de la sortie',
     'story_preview'            => 'Aperçu',
     'story_preview_banner'     => 'Aperçu de la version #{id} — non publiée, les visiteurs ne la voient pas.',
     'story_not_found'          => 'Aucun carnet publié pour ce parcours pour l’instant.',
