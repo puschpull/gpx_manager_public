@@ -16,6 +16,9 @@ namespace GpxManager\Cestopis;
  */
 final class FactSheet
 {
+    /** Objekt z mapy blíž než tohle = zastávka byla přímo u něj (GPS telefonu ± 10–30 m). */
+    public const AT_POI_M = 50;
+
     /**
      * @param array<string,mixed> $track řádek z tabulky tracks
      * @param list<Stop> $stops
@@ -42,7 +45,9 @@ final class FactSheet
             $notes[] = 'Položky v_okoli jsou pojmenované objekty z mapy OpenStreetMap do '
                 . PoiFinder::RADIUS_M . ' m od zastávky. Že je objekt poblíž, NEZNAMENÁ, že jsme ho '
                 . 'navštívili nebo viděli — piš „nedaleko", „kousek od", ne „prohlédli jsme si". '
-                . 'Vzdálenost je jen přibližná.';
+                . 'Vzdálenost je jen přibližná. VÝJIMKA: pole u_objektu znamená, že objekt byl '
+                . 'přímo na místě zastávky (do ' . self::AT_POI_M . ' m) — tam jsme byli, piš „u zříceniny X", '
+                . '„u jeskyně X" a zastávku pojmenuj podle něj, ne podle pole misto.';
         }
         if ($withPhotos) {
             $notes[] = 'K zastávkám uvedeným v prilozene_fotky jsou přiloženy fotky (vždy s označením '
@@ -150,6 +155,12 @@ final class FactSheet
                     : null,
             ];
             if (!empty($pois[$i])) {
+                // Objekt do AT_POI_M = místo, kde jsme přímo stáli. Název obce
+                // z Nominatimu je jen přibližný („Vesnička" místo zříceniny
+                // Pustý zámek 20 m od zastávky — trasa z 27. 9. 2026).
+                if ($pois[$i][0]['vzdalenost_m'] <= self::AT_POI_M) {
+                    $row['u_objektu'] = $pois[$i][0]['druh'] . ' ' . $pois[$i][0]['nazev'];
+                }
                 $row['v_okoli'] = $pois[$i];
             }
             $out[] = $row;

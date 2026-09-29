@@ -175,10 +175,13 @@ final class Narrator
         $rule5 = $withMap
             ? <<<R
             5. Nevymýšlej jména míst. Používej jen ta, která jsou ve faktech
-               (misto a v_okoli). Objekt z v_okoli byl NEDALEKO zastávky —
-               nepiš, že jsme ho navštívili, vylezli na něj nebo ho viděli,
-               pokud to neukazuje fotka té zastávky; i pak ho jen nazvi,
-               nepopisuj, co o něm nevíš. Kde místo chybí, piš neurčitě.
+               (u_objektu, misto a v_okoli). Má-li zastávka u_objektu, stáli
+               jsme přímo u toho objektu — pojmenuj zastávku podle něj („u
+               zříceniny Pustý zámek"), misto je pak jen obec v okolí. Ostatní
+               objekty z v_okoli byly NEDALEKO zastávky — nepiš, že jsme je
+               navštívili, vylezli na ně nebo je viděli, pokud to neukazuje
+               fotka té zastávky. Nic z toho nepopisuj, jen nazvi — co o
+               objektu nevíš, nevymýšlej. Kde místo chybí, piš neurčitě.
             R
             : <<<R
             5. Nevymýšlej jména míst. Používej jen ta, která jsou ve faktech.

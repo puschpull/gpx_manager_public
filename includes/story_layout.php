@@ -83,7 +83,11 @@ function story_article_layout(array $paras, array $stops, array $dims, array $ma
         $p = $s['photos'][intdiv(count($s['photos']), 2)];
         [$w, $h] = $dims[$p->id] ?? [0, 0];
         $near = $s['okoli'][0]['nazev'] ?? null;
-        $cap = trim(($s['misto'] ?? '') . ($near ? ', poblíž ' . $near : ''), ', ');
+        $dist = (int)($s['okoli'][0]['vzdalenost_m'] ?? PHP_INT_MAX);
+        // Objekt přímo na místě (viz FactSheet::AT_POI_M) je lepší popisek než obec
+        $cap = ($near !== null && $dist <= GpxManagerCestopisFactSheet::AT_POI_M)
+            ? $near
+            : trim(($s['misto'] ?? '') . ($near ? ', poblíž ' . $near : ''), ', ');
         return [
             'photo'   => $p,
             'caption' => ($cap !== '' ? $cap . ' · ' : '') . $p->takenAt->format('H:i'),

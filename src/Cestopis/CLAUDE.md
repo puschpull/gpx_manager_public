@@ -270,3 +270,9 @@ slovních přepočtů, a zakazuje hodnocení a výklad.
 Verze #5 i tak psala „před polednem“ u 12:14 a „po půl dvanácté“ u 12:28 → denní
 dobu teď počítá `FactSheet::partOfDay()` do pole `cast_dne` u každé zastávky
 a model smí slovní denní dobu brát jen odtud.
+
+**Objekt přímo na místě (`u_objektu`, 29. 9. 2026):** u trasy z 27. 9. (Prysk)
+Nominatim pojmenoval nejdelší zastávku „Vesnička“, přitom 20 m od ní je zřícenina
+Pustý zámek – Fredevald, kde se fotilo nejvíc. Objekt z mapy do
+`FactSheet::AT_POI_M` (50 m) se proto zapíše jako `u_objektu` a model zastávku
+pojmenuje podle něj; stejně tak popisek fotky v článku.
