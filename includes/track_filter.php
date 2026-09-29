@@ -136,6 +136,19 @@ function buildFilterSQL(?array $filters = null, string $prefix = ''): array
         }
     }
 
+    /* --- Cestopis ---
+       have = má zveřejněný cestopis   none = nemá.
+       Kdo cestopisy nevidí (funkce vypnutá / návštěvník bez povolení),
+       tomu se filtr tiše ignoruje — jinak by z výsledků poznal, které trasy ho mají. */
+    $story = trim($filters['story'] ?? '');
+    if ($story === 'have' || $story === 'none') {
+        require_once __DIR__ . '/story_link.php';
+        if (story_visible_to_user()) {
+            $exists = story_exists_sql("{$prefix}id");
+            $clauses[] = $story === 'have' ? $exists : "NOT $exists";
+        }
+    }
+
     // --- Colour ---
     $color = trim($filters['color'] ?? '');
     if ($color !== '') {

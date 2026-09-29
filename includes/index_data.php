@@ -80,6 +80,10 @@ require_once __DIR__ . '/radar_helper.php';
 $radarCounts = radar_counts();      // [track_id => počet snímků], jedno čtení adresáře
 $place    = trim($_GET['place'] ?? '');
 $radar    = trim($_GET['radar'] ?? '');
+require_once __DIR__ . '/story_link.php';
+$storyVisible = story_visible_to_user();
+$storyIds     = $storyVisible ? story_track_ids($pdo) : [];   // [track_id => true]
+$story        = $storyVisible ? trim($_GET['story'] ?? '') : '';
 $sort_by  = $_GET['sort_by']  ?? '';
 $sort_dir = strtoupper($_GET['sort_dir'] ?? '');
 

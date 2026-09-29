@@ -27,6 +27,7 @@ function build_query(array $override = []): string {
         'elevation_min_val', 'elevation_max_val', 'elevation_inv',
         'date_from', 'date_to', 'date_inv',
         'sort_by', 'sort_dir',
+        'story',
         'per_page', 'page', 'filter_submit',
     ];
 

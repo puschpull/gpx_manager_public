@@ -59,6 +59,13 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             title="<?= htmlspecialchars(t('th_photos', 'Fotky')) ?>">
             <span aria-hidden="true">📸</span>
         </th>
+        <?php if ($storyVisible): ?>
+        <th scope="col" class="col-story"
+            aria-label="<?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?>"
+            title="<?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?>">
+            <span aria-hidden="true">📖</span>
+        </th>
+        <?php endif; ?>
         <?= sort_th(
             '<span aria-hidden="true">⭐</span><span class="sr-only">' . htmlspecialchars(t('th_favorite', 'Oblíbené')) . '</span>',
             'is_favorite',
@@ -213,6 +220,14 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                     <span style="color:var(--text-muted);">—</span>
                 <?php endif; ?>
             </td>
+            <?php if ($storyVisible): ?>
+            <td class="col-story" data-label="<?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?>">
+                <?php if (isset($storyIds[(int)$t['id']])): ?>
+                    <a href="story.php?id=<?= (int)$t['id'] ?>" target="_blank" rel="noopener"
+                       title="<?= htmlspecialchars(t('story_open_title', 'Otevřít cestopis')) ?>">📖</a>
+                <?php endif; ?>
+            </td>
+            <?php endif; ?>
             <td class="col-favorite" data-label="Oblíbené">
                 <?php if ($_isAdmin): ?>
                 <button class="fav-btn" data-id="<?= (int)$t['id'] ?>" title="<?= t('title_toggle_fav') ?>">

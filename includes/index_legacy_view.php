@@ -128,8 +128,10 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 t('th_gpx')              => "gpx",
                 t('th_map')              => "map",
                 "📸"                     => "photos",
+                "📖"                     => "story",
                 t('th_action')           => "action"
             ];
+            if (!$storyVisible) unset($colList['📖']);
             ?>
 
             <div class="column-toggle-panel">
@@ -241,6 +243,18 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                         <option value="todo" <?= ($radar === 'todo' ? 'selected' : '') ?>><?= t('filter_radar_todo') ?></option>
                     </select>
                 </div>
+
+                <?php if ($storyVisible): ?>
+                <!-- Cestopis (jen když ho uživatel smí vidět) -->
+                <div>
+                    <label><?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?></label>
+                    <select name="story">
+                        <option value=""><?= t('select_any') ?></option>
+                        <option value="have" <?= ($story === 'have' ? 'selected' : '') ?>><?= t('filter_story_have', 'má cestopis') ?></option>
+                        <option value="none" <?= ($story === 'none' ? 'selected' : '') ?>><?= t('filter_story_none', 'nemá cestopis') ?></option>
+                    </select>
+                </div>
+                <?php endif; ?>
 
                 <!-- Barva -->
                 <div>

@@ -241,6 +241,10 @@ function gpx_chip_url($overrides = []) {
                             <?php if ($act): ?>
                                 <span class="px-2 py-0.5 rounded-full bg-terracotta-500 text-white text-[11px] font-medium"><?= htmlspecialchars($act) ?></span>
                             <?php endif; ?>
+                            <?php if (isset($storyIds[$tid])): ?>
+                                <span class="px-2 py-0.5 rounded-full bg-white/90 text-forest-700 text-[11px] font-medium backdrop-blur"
+                                      title="<?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?>">📖 <?= htmlspecialchars(t('story_btn_read', 'Cestopis')) ?></span>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Decorative route icon -->

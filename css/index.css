@@ -204,6 +204,7 @@ body.hide-col-difficulty          .col-difficulty         { display: none !impor
 body.hide-col-activity           .col-activity          { display: none !important; }
 body.hide-col-favorite           .col-favorite          { display: none !important; }
 body.hide-col-photos             .col-photos            { display: none !important; }
+body.hide-col-story              .col-story             { display: none !important; }
 body.hide-col-action             .col-action            { display: none !important; }
 
 /* ====== COMPARE CHECKBOX ====== */
