@@ -1,10 +1,26 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 29. září 2026
+  Poslední aktualizace: 2. října 2026
 
 ================================================================================
 
+
+── 2. října 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MÍSTOPISNÝ CESTOPIS A RUČNÍ ÚPRAVA TEXTU                                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Cestopis nemusí být jen přepis záznamu trasy. Nově jde uložit vlastní
+  text — místopisný článek o místech, kudy trasa vede (historie, příroda,
+  rodáci), s prameny pod článkem. Nic se neplatí, API klíč není potřeba.
+  • Správa cestopisu → „Vlastní text“: text, prameny („Název | https://…“
+    na řádek) a výběr fotek kliknutím na náhled (vloží značku [foto N/k];
+    značka nad prvním odstavcem určí úvodní fotku).
+  • U každé verze tlačítko „Upravit“ — úprava se uloží jako nová verze,
+    původní zůstává.
+  • Stránka cestopisu ukáže pod článkem seznam pramenů.
 
 ── 29. září 2026 ──────────────────────────────────────────────────────────────
 

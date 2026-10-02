@@ -100,7 +100,7 @@ if ($story !== null) {
     foreach ($_stmt->fetchAll(PDO::FETCH_ASSOC) as $_r) {
         $_dims[(int)$_r['id']] = [(int)$_r['width'], (int)$_r['height']];
     }
-    $_storyLayout = story_article_layout($_storyParas, $_storyStops, $_dims, $_st['photos']);
+    $_storyLayout = story_article_layout($_storyParas, $_storyStops, $_dims, $_st['photos'], $_st['hero']);
     unset($_dims, $_r, $_st);
 }
 unset($_stmt, $_v);

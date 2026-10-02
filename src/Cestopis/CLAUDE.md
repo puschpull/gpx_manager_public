@@ -276,3 +276,35 @@ Nominatim pojmenoval nejdelší zastávku „Vesnička“, přitom 20 m od ní j
 Pustý zámek – Fredevald, kde se fotilo nejvíc. Objekt z mapy do
 `FactSheet::AT_POI_M` (50 m) se proto zapíše jako `u_objektu` a model zastávku
 pojmenuje podle něj; stejně tak popisek fotky v článku.
+
+## Místopisný cestopis (vlastní text, od 2. 10. 2026)
+
+Uživatel nechce minutové časy a rychlosti (ty jsou v tabulce a profilu), ale
+článek o místech, kudy trasa vede: historie, pověsti, rodáci, příroda. Takový
+text píše **Claude Code v konverzaci** z ověřených pramenů, ne API — kredit API
+se neplatí. Verze má `style = 'local'` (místopisný), `model = 'rucne'`, cenu 0;
+do `facts_json` přibude `prameny` (seznam {nazev, url}, zobrazí se pod článkem)
+a `puvod` ({typ: rucne, z_verze}). Ruční úprava jakékoli verze ve Správě
+cestopisu = NOVÁ verze se stejnými fakty jako původní (čísla zastávek ve
+značkách se nesmí přečíslovat).
+
+**Postup „napiš místopis pro trasu X“:**
+1. `php tools/cestopis/bin/cestopis.php ID --mista` — místa do 400 m od celé
+   trasy (obce do 1,2 km), seřazená podle km, s odkazem na Wikipedii/Wikidata
+   (`CorridorFinder`, Overpass přes cache `PoiFinder::query`). Zdarma.
+2. `--jen-fakta` — čísla zastávek (`poradi`), časy a `u_objektu` pro značky fotek.
+3. Dohledat 5–8 nejzajímavějších míst (cs.wikipedia, stránky obcí, Památkový
+   katalog, hrady.cz…). **Každé tvrzení ze zdroje**; nejisté vynechat; text
+   vlastními slovy, nekopírovat. Pozor na chyby i ve Wikipedii — 2. 10. 2026
+   stránka Líska uváděla rodáka „František Seidel 1859“, správně Josef Seidel.
+4. Rozlišovat „u zříceniny“ (trasa vede, `u_objektu` / do ~50 m) a „kousek
+   stranou“; nepsat, že jsme šli kolem kostela, když to data neukazují.
+5. Soubor: text s `[foto N]` / `[foto N/k]` (k-tá fotka zastávky; značka nad
+   prvním odstavcem = úvodní fotka), pak řádek `PRAMENY:` a pod ním
+   `Název | https://…`. Uložit lokálně: `--ulozit=soubor.txt` → koncept,
+   náhled `story.php?id=ID&v=…`.
+6. Na web: uživatel vloží text a prameny do Správy cestopisu → „Vlastní text“
+   (api/story/save.php). Id trasy na webu je jiné; čísla zastávek se počítají
+   z fotek stejně (StopDetector), takže při stejných fotkách sedí.
+
+Kroky 1, 2 a 5 používají příkazovou řádku tools/cestopis, která ve veřejném repu není — ve veřejné verzi se vlastní text vkládá jen přes Správu cestopisu.

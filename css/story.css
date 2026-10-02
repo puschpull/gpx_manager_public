@@ -232,3 +232,30 @@ html.dark .story-btn-primary { color: #0f1713; }
 /* Titulek a datum zarovnané se sloupcem textu (šířka jako .story-read-text) */
 .story-mag-head .story-h1,
 .story-mag-head > .story-muted { max-width: 42rem; margin-left: auto; margin-right: auto; }
+
+/* Prameny místopisného cestopisu (pod článkem) */
+.story-sources { max-width: 42rem; margin: 2rem auto 0; font-size: 14px; }
+.story-sources ul { margin: 0; padding-left: 1.2rem; }
+.story-sources li { margin: .2rem 0; }
+.story-sources a { color: var(--link-color); word-break: break-word; }
+
+/* ====== Cestopis — vlastní text a ruční úprava (story_admin.php) ====== */
+.story-editor { margin-bottom: 1rem; }
+.story-editor .story-ed-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin: .75rem 0 .3rem; }
+.story-editor textarea {
+    width: 100%; box-sizing: border-box; padding: .6rem .75rem;
+    font: inherit; font-size: 15px; line-height: 1.55;
+    color: var(--text-color); background: var(--bg-secondary);
+    border: 1px solid var(--border-color); border-radius: 8px; resize: vertical;
+}
+.story-picker { margin: .9rem 0; }
+.story-picker summary { cursor: pointer; font-weight: 600; }
+.story-picker-stop { margin: .6rem 0; }
+.story-picker-photos { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .3rem; }
+.story-picker-photos button {
+    padding: 0; border: 2px solid transparent; border-radius: 6px; background: none;
+    cursor: pointer; line-height: 0;
+}
+.story-picker-photos button:hover,
+.story-picker-photos button:focus-visible { border-color: var(--accent-color); outline: none; }
+.story-picker-photos img { width: 84px; height: 63px; object-fit: cover; border-radius: 4px; }

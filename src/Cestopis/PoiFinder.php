@@ -175,8 +175,11 @@ final class PoiFinder
         return null;
     }
 
-    /** @return list<array<string,mixed>>|null */
-    private function query(string $query): ?array
+    /**
+     * Dotaz na Overpass s cache a záložním serverem (používá i CorridorFinder).
+     * @return list<array<string,mixed>>|null  null = služba selhala
+     */
+    public function query(string $query): ?array
     {
         $key = md5($query);
         $stmt = $this->pdo->prepare(

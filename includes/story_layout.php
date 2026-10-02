@@ -53,11 +53,12 @@ function story_para_times(array $paras, int $tripFrom, int $tripTo): array {
  * @param list<string> $paras   odstavce textu
  * @param list<array>  $stops   zastávky ze story.php (od, do, misto, okoli, photos, delsi, trvani)
  * @param array<int, array{0:int,1:int}> $dims  [photo_id => [šířka, výška]]
- * @param array<int,int> $marks  značky od modelu [index odstavce => pořadí zastávky];
- *                               prázdné (starší verze) = rozmístit podle časů
+ * @param array<int, array{stop:int, pick:?int}> $marks  značky z textu (StoryText::split)
+ *        [index odstavce => zastávka a případně k-tá fotka]; prázdné (starší verze) = podle časů
+ * @param ?array{stop:int, pick:?int} $heroMark  úvodní fotka zvolená v textu
  * @return array{hero: ?array, after: array<int, array>}  after = [index odstavce => fotka za ním]
  */
-function story_article_layout(array $paras, array $stops, array $dims, array $marks = []): array {
+function story_article_layout(array $paras, array $stops, array $dims, array $marks = [], ?array $heroMark = null): array {
     $layout = ['hero' => null, 'after' => []];
     // Pořadí zastávky ve faktech (1…) — na něj odkazují značky „[foto N]“
     foreach ($stops as $i => &$s) $s['poradi'] = $i + 1;
@@ -78,9 +79,10 @@ function story_article_layout(array $paras, array $stops, array $dims, array $ma
     $tripFrom = $stops[0]['from'];
     $tripTo   = end($stops)['to'];
 
-    $item = static function (array $s) use ($dims): array {
-        // Prostřední snímek ze salvy bývá ten „hlavní“
-        $p = $s['photos'][intdiv(count($s['photos']), 2)];
+    $item = static function (array $s, ?int $pick = null) use ($dims): array {
+        // Ruční výběr = k-tá fotka zastávky; jinak prostřední ze salvy (bývá ta „hlavní“)
+        $ph = $s['photos'];
+        $p = $pick !== null ? $ph[max(0, min(count($ph) - 1, $pick - 1))] : $ph[intdiv(count($ph), 2)];
         [$w, $h] = $dims[$p->id] ?? [0, 0];
         $near = $s['okoli'][0]['nazev'] ?? null;
         $dist = (int)($s['okoli'][0]['vzdalenost_m'] ?? PHP_INT_MAX);
@@ -97,26 +99,32 @@ function story_article_layout(array $paras, array $stops, array $dims, array $ma
 
     // Značky od modelu: fotka přesně tam, kde text o zastávce mluví.
     // Neplatné číslo (zastávka neexistuje / nemá fotky) se tiše vynechá.
+    $idx = [];
+    foreach ($stops as $i => $s) $idx[$s['poradi']] = $i;
+    $heroFixed = ($heroMark !== null && isset($idx[$heroMark['stop']]))
+        ? $item($stops[$idx[$heroMark['stop']]], $heroMark['pick']) : null;
+
     if ($marks !== []) {
-        $idx = [];
-        foreach ($stops as $i => $s) $idx[$s['poradi']] = $i;
         $used = [];
         $last = -2;
-        foreach ($marks as $at => $poradi) {
-            if (!isset($idx[$poradi]) || isset($used[$idx[$poradi]]) || $at >= $n) continue;
-            // Jedna fotka na dva odstavce: mezi fotkami aspoň jeden odstavec
-            if ($at - $last < 2) continue;
+        foreach ($marks as $at => $mk) {
+            $i = $idx[$mk['stop']] ?? null;
+            if ($i === null || $at >= $n || isset($used[$i . '/' . $mk['pick']])) continue;
+            // Značky od modelu (bez výběru fotky): mezi fotkami aspoň jeden
+            // odstavec. Ručně zvolenou fotku nechat tam, kam ji autor dal.
+            if ($mk['pick'] === null && $at - $last < 2) continue;
             $last = $at;
-            $used[$idx[$poradi]] = true;
-            $layout['after'][$at] = $item($stops[$idx[$poradi]]);
+            $used[$i . '/' . $mk['pick']] = true;
+            $used[$i] = true;
+            $layout['after'][$at] = $item($stops[$i], $mk['pick']);
         }
-        // Úvodní fotka: nejvýraznější zastávka, kterou text ještě neukázal
+        // Úvodní fotka: zvolená v textu, jinak nejvýraznější zastávka, kterou text ještě neukázal
         $heroIdx = null;
         foreach ($stops as $i => $s) {
             if (isset($used[$i])) continue;
             if ($heroIdx === null || $s['score'] > $stops[$heroIdx]['score']) $heroIdx = $i;
         }
-        $layout['hero'] = $item($stops[$heroIdx ?? 0]);
+        $layout['hero'] = $heroFixed ?? $item($stops[$heroIdx ?? 0]);
         return $layout;
     }
 
@@ -125,7 +133,7 @@ function story_article_layout(array $paras, array $stops, array $dims, array $ma
     foreach ($stops as $i => $s) {
         if ($s['score'] > $stops[$heroIdx]['score']) $heroIdx = $i;
     }
-    $layout['hero'] = $item($stops[$heroIdx]);
+    $layout['hero'] = $heroFixed ?? $item($stops[$heroIdx]);
     $used = [$heroIdx => true];
 
     // Čas odstavců; odstavce bez času dostanou odhad lineárně mezi sousedy

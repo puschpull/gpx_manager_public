@@ -33,6 +33,67 @@ final class StoryGenerator
         $this->repo = new Repository($pdo);
     }
 
+    /** Styl verze psané mimo API (místopisný cestopis). */
+    public const STYLE_LOCAL = 'local';
+    /** „Model“ verze psané nebo upravené ručně (ne API) — cena 0. */
+    public const MODEL_MANUAL = 'rucne';
+
+    /**
+     * Místa podél celé trasy (CorridorFinder) — podklad pro místopisný text.
+     * Zdarma, jen OpenStreetMap.
+     * @return list<array<string,mixed>>
+     */
+    public function corridor(int $trackId): array
+    {
+        $file = $this->repo->gpxFilename($trackId);
+        if ($file === null) {
+            throw new \RuntimeException("Trasa {$trackId} neexistuje.");
+        }
+        $path = dirname(rtrim($this->photoDir, '/\\')) . DIRECTORY_SEPARATOR . $file;
+        return (new CorridorFinder(new PoiFinder($this->pdo, $this->userAgent, $this->caBundle)))
+            ->find(CorridorFinder::readGpx($path));
+    }
+
+    /**
+     * Uloží text napsaný mimo API jako novou verzi (koncept, cena 0).
+     *
+     * Úprava existující verze ($baseId) převezme její fakta beze změny —
+     * značky „[foto N]“ v textu odkazují na čísla zastávek té verze a ta se
+     * nesmí přečíslovat. Nový místopisný text si fakta spočítá (zdarma,
+     * z cache), aby šly vložit fotky ze zastávek.
+     *
+     * @param list<array{nazev:string, url:string}> $sources prameny (zobrazí se pod článkem)
+     */
+    public function saveManual(int $trackId, string $text, array $sources, ?int $baseId = null): int
+    {
+        $text = trim(str_replace("\r\n", "\n", $text));
+        if ($text === '') {
+            throw new \InvalidArgumentException('Text je prázdný.');
+        }
+        $style = self::STYLE_LOCAL;
+        if ($baseId !== null) {
+            $base = $this->repo->story($baseId);
+            if ($base === null || (int) $base['track_id'] !== $trackId || $base['status'] !== 'done') {
+                throw new \RuntimeException("Verze #{$baseId} k této trase neexistuje.");
+            }
+            $facts = (array) $base['facts'];
+            $style = (string) $base['style'];
+        } else {
+            try {
+                ['track' => $track, 'stops' => $stops, 'pois' => $pois] = $this->prepare($trackId);
+                $facts = (new FactSheet())->build($track, $stops, $this->repo->categories($trackId), $pois);
+            } catch (\RuntimeException $e) {
+                // Trasa bez fotek: místopisný text jde i bez nich, jen bez fotek v článku
+                Log::warn($e->getMessage());
+                $facts = [];
+            }
+        }
+        $facts['prameny'] = array_values($sources);
+        $facts['puvod'] = ['typ' => 'rucne', 'z_verze' => $baseId];
+
+        return $this->repo->saveManual($trackId, $style, self::MODEL_MANUAL, $text, $facts);
+    }
+
     public function repository(): Repository
     {
         return $this->repo;

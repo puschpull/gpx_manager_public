@@ -124,7 +124,19 @@ function story_endpoint_guard(): ?array {
 
 /** Krátký popis varianty verze, např. „literární · Opus · mapa · 23 fotek". */
 function story_variant_label(array $s): string {
-    $parts = [story_styles()[$s['style']] ?? $s['style']];
+    $styles = story_styles() + [StoryGenerator::STYLE_LOCAL => t('story_style_local', 'místopisný')];
+    $parts = [$styles[$s['style']] ?? $s['style']];
+    if ($s['model'] === StoryGenerator::MODEL_MANUAL) {
+        // Psaný / upravený mimo API: bez modelu a mapy, cena 0
+        $parts[] = !empty($s['facts']['puvod']['z_verze'])
+            ? str_replace('{id}', (string)$s['facts']['puvod']['z_verze'], t('story_edited_from', 'ručně upravená verze #{id}'))
+            : t('story_manual', 'vlastní text');
+        $n = count((array)($s['facts']['prameny'] ?? []));
+        if ($n > 0) {
+            $parts[] = $n . ' ' . t('story_sources_short', 'pramenů');
+        }
+        return implode(' · ', $parts);
+    }
     $parts[] = str_contains((string)$s['model'], 'sonnet') ? 'Sonnet' : 'Opus';
     if ($s['with_map']) {
         $parts[] = t('story_map_short', 'mapa');

@@ -56,6 +56,35 @@ foreach ($_storyVersions as $_v) {
     }
 }
 $_storyVisitorsSee = in_array('story', (array)get_app_config('visible_pages', all_pages()), true);
-unset($_stmt, $_v);
+
+// Vlastní text: fotky po zastávkách pro vkládání značek „[foto N/k]“.
+// Stejné shlukování jako při ukládání faktů (StopDetector), takže čísla
+// zastávek sedí; bez názvů míst (ty by stály dotazy na Nominatim).
+$_storyPickStops = [];
+$_storyPhotoList = $_storyRepo->photos($trackId);
+if ($_storyPhotoList !== []) {
+    foreach ((new \GpxManager\Cestopis\StopDetector())->detect($_storyPhotoList) as $_n => $_stop) {
+        $_storyPickStops[] = [
+            'n'      => $_n + 1,
+            'od'     => $_stop->startAt->format('H:i'),
+            'do'     => $_stop->endAt->format('H:i'),
+            'photos' => array_map(static fn($p) => [
+                'thumb' => photo_thumb_url($p->filename),
+                'time'  => $p->takenAt->format('H:i'),
+            ], $_stop->photos),
+        ];
+    }
+}
+// Texty a prameny hotových verzí pro tlačítko „Upravit“
+$_storyEdVersions = [];
+foreach ($_storyVersions as $_v) {
+    if ($_v['status'] === 'done') {
+        $_storyEdVersions[(int)$_v['id']] = [
+            'text'    => (string)$_v['story'],
+            'sources' => \GpxManager\Cestopis\StoryText::formatSources((array)($_v['facts']['prameny'] ?? [])),
+        ];
+    }
+}
+unset($_stmt, $_v, $_n, $_stop, $_storyPhotoList);
 
 require __DIR__ . '/includes/story_admin_view.php';

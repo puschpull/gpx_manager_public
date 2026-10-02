@@ -8,14 +8,16 @@ declare(strict_types=1);
 
 /** Text verze → odstavce (prázdný řádek = nový odstavec). */
 $_storyParagraphs = static function (?string $text): string {
-    // Značky fotek („[foto N]“) jen naznačit — kam model fotku umístil
+    // Značky fotek („[foto N]“, „[foto N/k]“) jen naznačit — kam fotka přijde
     $st = \GpxManager\Cestopis\StoryText::split((string)$text);
-    $out = '';
+    $mark = static fn(array $m): string => '<p class="story-hint">📷 ' . h(str_replace('{n}',
+        $m['stop'] . ($m['pick'] !== null ? '/' . $m['pick'] : ''),
+        t('story_photo_mark', 'fotka ze zastávky {n}'))) . "</p>\n";
+    $out = $st['hero'] !== null ? $mark($st['hero']) : '';
     foreach ($st['paras'] as $i => $p) {
         $out .= '<p>' . nl2br(h($p)) . "</p>\n";
         if (isset($st['photos'][$i])) {
-            $out .= '<p class="story-hint">📷 ' . h(str_replace('{n}', (string)$st['photos'][$i],
-                t('story_photo_mark', 'fotka ze zastávky {n}'))) . "</p>\n";
+            $out .= $mark($st['photos'][$i]);
         }
     }
     return $out;
@@ -128,6 +130,42 @@ require __DIR__ . '/layout_header.php';
         </aside>
     </div>
 
+    <form class="story-card story-editor" id="story-editor" novalidate>
+        <h2 id="story-ed-title"><?= h(t('story_ed_new', 'Vlastní text (místopisný cestopis)')) ?></h2>
+        <p class="story-hint"><?= h(t('story_ed_hint', 'Text napsaný mimo API — např. místopisný článek z ověřených pramenů. Uloží se jako nová verze (koncept), nic se neplatí. Odstavce odděl prázdným řádkem. Fotku vložíš kliknutím na náhled níže; značka nad prvním odstavcem určí úvodní fotku.')) ?></p>
+        <input type="hidden" name="base_id" value="">
+        <label class="story-ed-label" for="story-ed-text"><?= h(t('story_text', 'Text')) ?></label>
+        <textarea id="story-ed-text" name="text" rows="16" spellcheck="true"></textarea>
+        <label class="story-ed-label" for="story-ed-sources"><?= h(t('story_sources_title', 'Prameny')) ?></label>
+        <textarea id="story-ed-sources" name="sources" rows="4" placeholder="Název | https://…"></textarea>
+        <p class="story-hint"><?= h(t('story_ed_sources_hint', 'Jeden pramen na řádek: „Název | https://…“. Zobrazí se pod článkem.')) ?></p>
+
+        <?php if ($_storyPickStops !== []): ?>
+        <details class="story-picker">
+            <summary><?= h(t('story_ed_photos', 'Vložit fotku')) ?> (<?= (string)count($_storyPickStops) ?> <?= h(t('story_ed_stops', 'zastávek')) ?>)</summary>
+            <?php foreach ($_storyPickStops as $_ps): ?>
+                <div class="story-picker-stop">
+                    <strong><?= (string)$_ps['n'] ?>.</strong>
+                    <span class="story-muted"><?= h($_ps['od']) ?><?= $_ps['do'] !== $_ps['od'] ? '–' . h($_ps['do']) : '' ?></span>
+                    <div class="story-picker-photos">
+                        <?php foreach ($_ps['photos'] as $_k => $_pp): $_code = '[foto ' . $_ps['n'] . '/' . ($_k + 1) . ']'; ?>
+                            <button type="button" data-story-mark="<?= h($_code) ?>" title="<?= h($_code . ' · ' . $_pp['time']) ?>">
+                                <img src="<?= h($_pp['thumb']) ?>" loading="lazy" alt="<?= h($_code) ?>">
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </details>
+        <?php endif; ?>
+
+        <div class="story-actions">
+            <button type="submit" class="story-btn story-btn-primary" <?= !$_storyEnabled ? 'disabled' : '' ?>>💾 <?= h(t('story_ed_save', 'Uložit jako novou verzi')) ?></button>
+            <button type="button" class="story-btn" id="story-ed-cancel" hidden><?= h(t('story_ed_cancel', 'Zrušit úpravu')) ?></button>
+            <span class="story-hint" id="story-ed-status" role="status" aria-live="polite"></span>
+        </div>
+    </form>
+
     <div class="story-card story-versions" id="story-versions">
         <div class="story-versions-head">
             <h2><?= h(t('story_versions', 'Verze')) ?> (<?= (string)count($_storyVersions) ?>)</h2>
@@ -184,6 +222,9 @@ require __DIR__ . '/layout_header.php';
                     <?php elseif ($_s['is_published']): ?>
                         <button type="button" class="story-btn" data-story-action="unpublish" data-id="<?= (string)$_s['id'] ?>"><?= h(t('story_unpublish', 'Stáhnout ze zveřejnění')) ?></button>
                     <?php endif; ?>
+                    <?php if ($_s['status'] === 'done'): ?>
+                        <button type="button" class="story-btn" data-story-edit="<?= (string)$_s['id'] ?>">✏️ <?= h(t('story_edit', 'Upravit')) ?></button>
+                    <?php endif; ?>
                     <button type="button" class="story-btn story-btn-danger" data-story-action="delete" data-id="<?= (string)$_s['id'] ?>">🗑 <?= h(t('story_delete', 'Smazat')) ?></button>
                 </div>
                 <?php endif; ?>
@@ -220,6 +261,20 @@ window.GPX_STORY = {
     }
 };
 </script>
+<script nonce="<?= csp_nonce() ?>">
+window.GPX_STORY_ED = {
+    versions: <?= js_safe_json((object)$_storyEdVersions) ?>,
+    i18n: {
+        titleNew:   <?= js_safe_json(t('story_ed_new', 'Vlastní text (místopisný cestopis)')) ?>,
+        titleEdit:  <?= js_safe_json(t('story_ed_edit', 'Úprava verze #{id} — uloží se jako nová verze')) ?>,
+        saving:     <?= js_safe_json(t('story_ed_saving', 'Ukládám…')) ?>,
+        saved:      <?= js_safe_json(t('story_ed_saved', 'Uloženo jako verze #{id}.')) ?>,
+        discard:    <?= js_safe_json(t('story_ed_discard', 'Rozepsaný text v editoru se zahodí. Pokračovat?')) ?>,
+        error:      <?= js_safe_json(t('error', 'Chyba')) ?>
+    }
+};
+</script>
 <script src="<?= asset('js/story-admin.js') ?>"></script>
+<script src="<?= asset('js/story-editor.js') ?>"></script>
 
 </div><?php require __DIR__ . '/layout_footer.php'; ?>

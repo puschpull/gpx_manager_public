@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 foreach ([
     'Log', 'Geo', 'Photo', 'Stop', 'StopDetector', 'FactSheet', 'Geocoder', 'PoiFinder',
-    'PhotoPicker', 'Narrator', 'Renderer', 'Repository', 'StoryGenerator', 'StoryText',
+    'PhotoPicker', 'Narrator', 'Renderer', 'Repository', 'StoryGenerator', 'StoryText', 'CorridorFinder',
 ] as $_storyClass) {
     require_once __DIR__ . '/../src/Cestopis/' . $_storyClass . '.php';
 }

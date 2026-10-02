@@ -127,8 +127,23 @@ require __DIR__ . '/layout_header.php';
             <?php endif; ?>
         <?php endif; ?>
 
+        <?php $_sources = (array)($story['facts']['prameny'] ?? []); if ($_sources !== []): ?>
+            <section class="story-sources">
+                <h2 class="story-h2"><?= h(t('story_sources_title', 'Prameny')) ?></h2>
+                <ul>
+                    <?php foreach ($_sources as $_src): if (!preg_match('~^https?://~i', (string)($_src['url'] ?? ''))) continue; ?>
+                        <li><a href="<?= h((string)$_src['url']) ?>" target="_blank" rel="noopener nofollow"><?= h((string)($_src['nazev'] ?? $_src['url'])) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
+        <?php endif; ?>
+
         <footer class="story-read-foot">
+            <?php if (($story['model'] ?? '') === \GpxManager\Cestopis\StoryGenerator::MODEL_MANUAL): ?>
+                <p><?= h(t('story_manual_note', 'Text připravil jazykový model Claude z pramenů uvedených výše a mohl být ručně upraven. Může obsahovat nepřesnosti.')) ?></p>
+            <?php else: ?>
             <p><?= h(t('story_ai_note', 'Text napsal jazykový model (Claude od Anthropic) z dat záznamu trasy, názvů míst, bodů z mapy a fotek. Může obsahovat nepřesnosti.')) ?></p>
+            <?php endif; ?>
             <?php if (!empty($story['with_map']) || !empty($story['facts']['zastavky'])): ?>
                 <p><?= h(t('story_osm_note', 'Názvy míst a body z mapy © přispěvatelé OpenStreetMap.')) ?></p>
             <?php endif; ?>

@@ -111,6 +111,34 @@ final class Repository
         }
     }
 
+    /** Soubor GPX trasy (jméno v uploads/), nebo null. */
+    public function gpxFilename(int $trackId): ?string
+    {
+        $stmt = $this->pdo->prepare('SELECT filename FROM tracks WHERE id = ?');
+        $stmt->execute([$trackId]);
+        $f = $stmt->fetchColumn();
+        return $f === false || $f === null ? null : (string) $f;
+    }
+
+    /**
+     * Uloží text napsaný mimo API (místopisný cestopis, ruční úprava) jako
+     * hotovou verzi — koncept, cena 0. Do útraty se nepočítá nic.
+     * @param array<string,mixed> $facts
+     */
+    public function saveManual(int $trackId, string $style, string $model, string $story, array $facts): int
+    {
+        $this->pdo->prepare(
+            "INSERT INTO track_stories (track_id, style, model, with_map, photo_mode, status, cost_usd,
+                                        duration_s, facts_json, story, finished_at)
+             VALUES (?, ?, ?, 1, 'none', 'done', 0, 0, ?, ?, CURRENT_TIMESTAMP)"
+        )->execute([
+            $trackId, $style, $model,
+            json_encode($facts, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            $story,
+        ]);
+        return (int) $this->pdo->lastInsertId();
+    }
+
     /**
      * @param array<string,mixed> $facts
      * @param array{input_tokens:int, output_tokens:int, model:string} $usage
