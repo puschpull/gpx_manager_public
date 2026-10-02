@@ -43,14 +43,23 @@ final class StoryText
             if ($marks === []) {
                 continue;
             }
+            // Víc značek na jednom místě: ručně vybraná fotka („[foto N/k]“)
+            // má přednost před obecnou („[foto N]“), jinak platí první
+            $pick = null;
+            foreach ($marks as $mk) {
+                if ($mk['pick'] !== null) { $pick = $mk; break; }
+            }
+            $mark = $pick ?? $marks[0];
             if ($paras === []) {
                 // Samostatná značka před prvním odstavcem = úvodní fotka
-                $hero ??= $marks[0];
+                if ($hero === null || ($hero['pick'] === null && $mark['pick'] !== null)) {
+                    $hero = $mark;
+                }
                 continue;
             }
             $at = count($paras) - 1;
-            if (!isset($photos[$at])) {
-                $photos[$at] = $marks[0];
+            if (!isset($photos[$at]) || ($photos[$at]['pick'] === null && $mark['pick'] !== null)) {
+                $photos[$at] = $mark;
             }
         }
 
