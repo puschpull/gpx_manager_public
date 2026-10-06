@@ -1,10 +1,36 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 2. října 2026
+  Poslední aktualizace: 6. října 2026
 
 ================================================================================
 
+
+── 6. října 2026 ──────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ ADMINISTRACE (VÝCHOZÍ), PŮVODNÍ ZŮSTÁVÁ NA PŘEPNUTÍ                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Administrace (admin.php) má nový, přehlednější vzhled. Původní zůstává
+  — nahoře na stránce je přepínač „Vzhled administrace: Nový / Původní“.
+  Volba se pamatuje (app_config 'admin_ui'), výchozí je nová. Obě verze
+  ukládají stejná nastavení, takže přepínání nic nerozbije.
+  • Navigace po sekcích vlevo (na mobilu vodorovná lišta): Přehled, Údržba
+    dat, Návštěvníci, Pořadí menu, Mapy, Volitelné funkce, Systém, Stránky.
+  • Přehled: místo řady čísel seznam „Vyžaduje pozornost“ — co chybí
+    (obtížnost, aktivita, náhled, název místa, radar) a vedle tlačítko
+    nástroje, který to opraví.
+  • Nasazení: stav na jeden pohled, log nasazení a CSP hlášení rozbalovací.
+  • Nastavení webu: přepínače místo zaškrtávátek, lišta s uložením drží
+    u spodního okraje a hlásí „Máte neuložené změny“ (i varování při
+    odchodu ze stránky), tlačítko Zahodit změny.
+  • Hláška po uložení se ukáže u formuláře, ke kterému patří.
+  • Světlý i tmavý režim, mobil bez vodorovného posouvání.
+  Soubory: admin.php (rozcestník + nová verze), admin_classic.php (původní
+           admin.php), includes/admin_new_data.php, includes/admin_new_view.php,
+           includes/partials/admin_ui_switch.php, css/admin-new.css,
+           js/admin-new.js, lang/*.php (8× — 41 nových klíčů)
 
 ── 2. října 2026 ──────────────────────────────────────────────────────────────
 
