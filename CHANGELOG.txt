@@ -27,6 +27,8 @@
     odchodu ze stránky), tlačítko Zahodit změny.
   • Hláška po uložení se ukáže u formuláře, ke kterému patří.
   • Světlý i tmavý režim, mobil bez vodorovného posouvání.
+  • „Bez aktivity“ počítá trasy bez typu aktivity — totéž, co opraví nástroj
+    Rozpoznat aktivity (dřív trasy bez kategorie, které nástroj nezpracuje).
   Soubory: admin.php (rozcestník + nová verze), admin_classic.php (původní
            admin.php), includes/admin_new_data.php, includes/admin_new_view.php,
            includes/partials/admin_ui_switch.php, css/admin-new.css,

@@ -130,13 +130,11 @@ try {
     error_log('admin_new difficulty query: ' . $e->getMessage());
 }
 
-// Trasy bez kategorie aktivity (stejná definice jako v původní administraci)
-$_actCats = ['Pěšky', 'Turistika', 'Běh', 'Kolo', 'E-bike', 'Auto'];
-$_st = $pdo->prepare('SELECT COUNT(DISTINCT tc.track_id) FROM track_categories tc
-                      JOIN categories c ON c.id = tc.category_id
-                      WHERE c.name IN (' . implode(',', array_fill(0, count($_actCats), '?')) . ')');
-$_st->execute($_actCats);
-$adm['no_activity'] = max(0, $adm['tracks'] - (int)$_st->fetchColumn());
+// Trasy bez typu aktivity — stejná podmínka, jakou zpracuje recalc_activity.php
+// (tlačítko u položky). Dřív se počítaly trasy bez KATEGORIE aktivity, jenže
+// trasu s vyplněným activity_type nástroj nezpracuje, takže počet nešel opravit.
+$adm['no_activity'] = (int)$pdo->query(
+    "SELECT COUNT(*) FROM tracks WHERE activity_type IS NULL OR activity_type = ''")->fetchColumn();
 
 // Trasy bez zjištěného místa pro titulek (sloupec přidala migrace 0019)
 $adm['no_place'] = 0;
