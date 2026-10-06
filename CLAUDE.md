@@ -16,7 +16,7 @@
 
 ## Stack
 
-**Backend**: PHP 8.0+ (cíl 8.2+), žádný framework, čistý monolit
+**Backend**: PHP 8.1+ (syntaxe max 8.1 — viz Konvence kódu), žádný framework, čistý monolit
 **Database**: MySQL 5.7+ / MariaDB 10.3+ přes PDO (prepared statements)
 **Frontend**:
 - Server-rendered HTML přes inline PHP
@@ -38,6 +38,7 @@
 ## Konvence kódu
 
 - **PHP**: PSR-12 styl, `declare(strict_types=1);` POVINNĚ v nových souborech. V existujících je dopsaný všude kromě HTML šablon (`includes/*_view.php`, `table_tracks.php`, `pager_*.php`, `layout_*.php`) a stránek, které samy generují HTML (`stats.php`, `calendar.php`, `admin.php`, `edit.php`, `settings.php`, `login.php`, `import.php`, `heatmap.php`, `photo_heatmap.php`, `map_search.php`, `virtual_tracks*.php`) — tam je přes 370 volání `htmlspecialchars()`/`h()` s implicitní konverzí int→string, které by `strict_types` shodilo za běhu na konkrétní datové cestě. Do těch souborů ho nepřidávej, dokud nebudou volání přetypovaná. Stav: 101/127 souborů.
+- **Verze PHP v kódu**: syntaxe nejvýš **PHP 8.1** (`readonly` vlastnosti, `never`, `strval(...)` už používá `src/Cestopis/` a `migrate.php`). Novinky z 8.2+ NEPOUŽÍVAT, i když produkce i WAMP běží na 8.4: `readonly class`, typy `true`/`null`/`false` a DNF, typované konstanty tříd, `#[\Override]`, `json_validate()`, property hooks, asymetrická viditelnost, `new Foo()->x` bez závorek. Důvod: aplikace má běžet i na běžném hostingu a cloudové sezení Claude Code má PHP 8.3, takže `php -l` syntaxi 8.4 neprojde. `composer.json` zatím uvádí `^8.0`, což je nepřesné.
 - **Naming**: **snake_case** pro funkce (`get_app_config`, `csrf_verify`), camelCase je legacy dluh
 - **Strings**: všechny user-facing texty přes `t('key')` z lang souborů; technické komentáře v češtině jsou OK, ale komentáře v kódu by měly být postupně angličtinou (kód má identifikátory anglické)
 - **DB**: výhradně prepared statements, NIKDY `$pdo->quote()` se string konkatenací
