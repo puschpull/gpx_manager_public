@@ -996,4 +996,9 @@ return [
     'adm2_ui_label'        => 'Vzhľad administrácie',
     'adm2_ui_new'          => 'Nový',
     'adm2_ui_classic'      => 'Pôvodný',
+
+    // Fotky — řazení časové osy
+    'photos_timeline_sort' => 'Zoradenie',
+    'photos_timeline_asc'  => 'Od najstarších',
+    'photos_timeline_desc' => 'Od najnovších',
 ];

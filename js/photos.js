@@ -448,20 +448,57 @@ document.querySelectorAll('.photo-grid').forEach(initGridLightbox);
 })();
 
 /* ===================== Lightbox — timeline ===================== */
+// The order of thumbnails is read on click, not on load: the sort switch
+// below reverses it, and the lightbox arrows must follow what is on screen.
 document.querySelectorAll('[data-timeline-day]').forEach(dayEl => {
-    const imgs = Array.from(dayEl.querySelectorAll('img[data-full-url]'));
-    imgs.forEach((img, i) => {
-        img.addEventListener('click', (e) => {
-            const photos = imgs.map(el => ({
-                full_url: el.dataset.fullUrl,
-                alt:      el.alt,
-                taken_at: el.dataset.takenAt || ''
-            }));
-            // A11Y-012: pass trigger so focus returns after close
-            window.gpxLightbox?.open(photos, i, e.currentTarget);
-        });
+    dayEl.addEventListener('click', (e) => {
+        const img = e.target.closest('img[data-full-url]');
+        if (!img) return;
+        const imgs = Array.from(dayEl.querySelectorAll('img[data-full-url]'));
+        const photos = imgs.map(el => ({
+            full_url: el.dataset.fullUrl,
+            alt:      el.alt,
+            taken_at: el.dataset.takenAt || ''
+        }));
+        // A11Y-012: pass trigger so focus returns after close
+        window.gpxLightbox?.open(photos, imgs.indexOf(img), img);
     });
 });
+
+/* ===================== Časová osa — řazení (zapamatované) ===================== */
+// The server renders oldest first; "desc" reverses months, days and photos
+// in place. The choice is kept per browser, like the light/dark theme.
+(function () {
+    const list = document.querySelector('[data-timeline-list]');
+    if (!list) return;
+    const KEY = 'gpx-photos-timeline-order';
+    const buttons = document.querySelectorAll('[data-timeline-order]');
+
+    function reverseChildren(parent, selector) {
+        Array.from(parent.children).filter(el => el.matches(selector))
+            .reverse().forEach(el => parent.appendChild(el));
+    }
+
+    function apply(order) {
+        if (order !== 'asc' && order !== 'desc') return;
+        if (order !== list.dataset.order) {
+            reverseChildren(list, '.timeline-month');
+            list.querySelectorAll('.timeline-days').forEach(el => reverseChildren(el, '.timeline-day'));
+            list.querySelectorAll('.timeline-thumbs').forEach(el => reverseChildren(el, 'img'));
+            list.dataset.order = order;
+        }
+        buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.timelineOrder === order)));
+    }
+
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) { /* private mode */ }
+    if (saved) apply(saved);
+
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+        apply(btn.dataset.timelineOrder);
+        try { localStorage.setItem(KEY, btn.dataset.timelineOrder); } catch (e) { /* private mode */ }
+    }));
+})();
 
 /* ===================== Hromadné operace (Bulk) ===================== */
 const bulkBar       = document.getElementById('bulkActionBar');

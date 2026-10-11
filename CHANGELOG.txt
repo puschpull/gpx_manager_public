@@ -1,10 +1,23 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 6. října 2026
+  Poslední aktualizace: 11. října 2026
 
 ================================================================================
 
+
+── 11. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  FOTKY: ŘAZENÍ ČASOVÉ OSY                                                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Na stránce Fotografie má záložka „Časová osa“ nahoře přepínač
+  „Řazení: Od nejstarších / Od nejnovějších“. Obrátí pořadí měsíců, dnů
+  i fotek ve dni; prohlížeč fotek (šipky) jde ve stejném pořadí. Volba se
+  pamatuje v prohlížeči (localStorage), výchozí zůstává od nejstarších.
+  Soubory: includes/photos_view.php, js/photos.js, css/photos-outdoor.css,
+           lang/*.php (8× — 3 nové klíče)
 
 ── 6. října 2026 ──────────────────────────────────────────────────────────────
 

@@ -395,6 +395,21 @@
 .dark .gallery-pager input[type="number"] { background: #243028; color: #f5f1ea; border-color: #2d4a3e; }
 
 /* ====== Timeline ====== */
+/* Řazení časové osy (přepínač nahoře v záložce) */
+.timeline-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 12px; font-size: 14px; }
+.timeline-sort-label { color: #55665d; margin-right: 2px; }
+.dark .timeline-sort-label { color: #b9c4bc; }
+.timeline-sort-btn {
+  border: 1px solid #e8e0d2; background: #fff; color: #2d4a3e; font: inherit; font-weight: 600;
+  padding: 5px 12px; border-radius: 8px; cursor: pointer;
+}
+.timeline-sort-btn:hover { background: #f5f1ea; }
+.timeline-sort-btn[aria-pressed="true"] { background: #2d4a3e; border-color: #2d4a3e; color: #fff; }
+.timeline-sort-btn:focus-visible { outline: 2px solid #a85f2f; outline-offset: 2px; }
+.dark .timeline-sort-btn { background: #243028; border-color: #34503f; color: #f5f1ea; }
+.dark .timeline-sort-btn:hover { background: #2f3d34; }
+.dark .timeline-sort-btn[aria-pressed="true"] { background: #5b8a75; border-color: #5b8a75; color: #0f1713; }
+
 .timeline-month {
     margin-bottom: 16px;
     border: 1px solid #e8e0d2;
