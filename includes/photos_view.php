@@ -398,6 +398,13 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     <?php if (empty($timeline)): ?>
         <p style="color:var(--text-muted); font-size:14px;"><?= htmlspecialchars(t('photos_timeline_empty', 'Žádné fotky s datem pořízení.')) ?></p>
     <?php else: ?>
+        <?php // Řazení přepíná js/photos.js (obrátí pořadí v prohlížeči), volba se pamatuje v localStorage ?>
+        <div class="timeline-sort" role="group" aria-labelledby="timelineSortLabel">
+            <span id="timelineSortLabel" class="timeline-sort-label"><?= htmlspecialchars(t('photos_timeline_sort', 'Řazení')) ?>:</span>
+            <button type="button" class="timeline-sort-btn" data-timeline-order="asc" aria-pressed="true">↑ <?= htmlspecialchars(t('photos_timeline_asc', 'Od nejstarších')) ?></button>
+            <button type="button" class="timeline-sort-btn" data-timeline-order="desc" aria-pressed="false">↓ <?= htmlspecialchars(t('photos_timeline_desc', 'Od nejnovějších')) ?></button>
+        </div>
+        <div class="timeline-list" data-timeline-list data-order="asc">
         <?php foreach ($timeline as $month => $days): ?>
             <?php
             $monthNum   = substr($month, 5, 2);
@@ -436,6 +443,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                 </div>
             </details>
         <?php endforeach; ?>
+        </div>
     <?php endif; ?>
 </div>
 <?php endif; ?>

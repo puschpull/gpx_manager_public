@@ -1002,4 +1002,9 @@ return [
     'adm2_ui_label'        => 'Vzhled administrace',
     'adm2_ui_new'          => 'Nový',
     'adm2_ui_classic'      => 'Původní',
+
+    // Fotky — řazení časové osy
+    'photos_timeline_sort' => 'Řazení',
+    'photos_timeline_asc'  => 'Od nejstarších',
+    'photos_timeline_desc' => 'Od nejnovějších',
 ];
