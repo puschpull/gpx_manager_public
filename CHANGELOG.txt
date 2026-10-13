@@ -1,10 +1,25 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 11. října 2026
+  Poslední aktualizace: 13. října 2026
 
 ================================================================================
 
+
+── 13. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  FOTKY: NAHRANÉ FOTKY SI PONECHAJÍ METADATA                               │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Při nahrání se fotka zmenšuje na 1600 px přes PHP GD, které zahodí
+  všechna metadata, a originál se neukládá — fotky na webu neměly GPS,
+  datum, fotoaparát ani barevný profil. Po zmenšení se do fotky nově
+  vloží původní EXIF a ICC profil beze změny; přepíše se jen Orientation
+  na 1 (pixely jsou už otočené), rozměry podle zmenšeniny a odpojí se
+  vložený náhled. XMP se nepřenáší. Když metadata nejde přečíst, fotka
+  se uloží jako dosud, nahrání neselže.
+  Soubory: includes/jpeg_metadata.php (nový), includes/photo_helper.php
 
 ── 11. října 2026 ─────────────────────────────────────────────────────────────
 

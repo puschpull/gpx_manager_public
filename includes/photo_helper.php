@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/gpx_parser.php'; // pro haversine()
 require_once __DIR__ . '/helpers.php';    // uploads_fs() / uploads_url()
+require_once __DIR__ . '/jpeg_metadata.php'; // jpeg_copy_metadata()
 
 // Zajistit existenci adresářů (jen pokud uploads/ je na lokálním filesystemu)
 foreach ([uploads_fs('photos/'), uploads_fs('photos/thumbs/')] as $_dir) {
@@ -422,6 +423,9 @@ function process_single_photo(string $tmpPath, string $origName, int $origSize):
         $why = photo_thumb_error() ?? 'chyba knihovny GD';
         return ['ok' => false, 'file' => $origName, 'msg' => 'Fotku nelze zpracovat: ' . $why];
     }
+    // GD dropped EXIF/ICC — put the original ones back (Orientation = 1).
+    // Must run before the 400 px thumbnail, which reads Orientation from $destPath.
+    jpeg_copy_metadata($tmpPath, $destPath);
 
     // Thumbnail 400 px pro mapové popupy
     generate_photo_thumb($destPath, $thumbPath, 400);
