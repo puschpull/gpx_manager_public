@@ -143,6 +143,13 @@ if (!function_exists('t')) {
     .gpx-topnav-item svg  { width: 30px; height: 30px; }
     .gpx-topnav-item span { font-size: 12px; }
 
+    /* Co se do šířky nevejde, jde do „Více" (js/topnav-overflow.js nastavuje
+       atribut hidden). .gpx-topnav-item má display:flex nevrstveně, a to by
+       výchozí [hidden]{display:none} prohlížeče přebilo — proto výslovně. */
+    .gpx-topnav [hidden]  { display: none !important; }
+    .gpx-topnav-more      { position: relative; }
+    .gpx-topnav-more-btn  { background: none; border: 0; cursor: pointer; font-family: inherit; }
+
     /* ===== Barvy hlavičky si řídíme sami =====
        Stránky, které vedle Tailwindu načítají i legacy css/style.css
        (Detailní tabulka, Trasy v okolí, Virtuální trasy, Fotky v okolí,
@@ -357,10 +364,10 @@ if (!function_exists('t')) {
                 }
                 $navItems[] = [$_nHref, $_nIcon, $_nLabel];
             }
-            foreach ($navItems as [$href, $icon, $label]):
+            foreach ($navItems as $_navIdx => [$href, $icon, $label]):
                 $active = ($currentScript === $href);
             ?>
-                <a href="<?= $href ?>"<?= $active ? ' aria-current="page"' : '' ?>
+                <a href="<?= $href ?>"<?= $active ? ' aria-current="page"' : '' ?> data-nav-idx="<?= $_navIdx ?>"
                    class="gpx-topnav-item transition-colors
                           <?= $active
                               ? 'bg-forest-100 dark:bg-forest-800 font-semibold'
@@ -369,6 +376,30 @@ if (!function_exists('t')) {
                     <span><?= htmlspecialchars($label) ?></span>
                 </a>
             <?php endforeach; ?>
+
+            <!-- „Více": položky, které se do šířky nevejdou. Které to jsou, počítá
+                 js/topnav-overflow.js (atribut hidden); bez skriptu zůstane skryté. -->
+            <div x-data="dropdown" @click.outside="close" @keydown.escape.window="close"
+                 class="gpx-topnav-more" hidden>
+                <button @click="toggle" type="button"
+                        class="gpx-topnav-item gpx-topnav-more-btn transition-colors hover:bg-sand-100 dark:hover:bg-forest-800"
+                        aria-haspopup="menu" :aria-expanded="expanded">
+                    <i data-lucide="ellipsis" aria-hidden="true"></i>
+                    <span><?= htmlspecialchars(t('nav_more', 'Více')) ?> ▾</span>
+                </button>
+                <div x-show="open" x-cloak x-transition.opacity.duration.150ms role="menu"
+                     class="gpx-adminmenu-panel rounded-lg bg-white dark:bg-forest-800 border border-sand-200 dark:border-forest-700 shadow-hover">
+                    <?php foreach ($navItems as $_navIdx => [$href, $icon, $label]):
+                        $active = ($currentScript === $href); ?>
+                        <a href="<?= $href ?>" role="menuitem" data-nav-more="<?= $_navIdx ?>" hidden
+                           <?= $active ? 'aria-current="page"' : '' ?>
+                           class="gpx-adminmenu-item transition-colors hover:bg-sand-100 dark:hover:bg-forest-700<?= $active ? ' font-semibold' : '' ?>">
+                            <i data-lucide="<?= $icon ?>" aria-hidden="true"></i>
+                            <span><?= htmlspecialchars($label) ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </nav>
 
         <div class="gpx-topnav-right flex items-center gap-2">
@@ -444,6 +475,9 @@ if (!function_exists('t')) {
         </div>
     </div>
 </header>
+<!-- Hned za hlavičkou a bez defer: rozdělí menu dřív, než se vykreslí zbytek
+     stránky, takže přetečení ani na okamžik neprobleskne. -->
+<script src="<?= asset('js/topnav-overflow.js') ?>"></script>
 
 <!-- Mobile slide-over drawer — A11Y-003: role=dialog, aria-modal, focus trap via x-trap.noscroll -->
 <div x-show="navOpen" x-cloak class="md:hidden fixed inset-0 z-50" @keydown.escape.window="closeNav">
