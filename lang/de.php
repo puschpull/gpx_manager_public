@@ -669,6 +669,13 @@ return [
     'pn_results'           => 'Nächste Fotos',
     'pn_distance'          => 'Entfernung',
 
+    // ===== Trasy v okolí (nearby) =====
+    'nb_limit'              => 'Anzahl der Touren',
+    'nb_click_prompt'       => 'Klicken Sie auf die Karte — ich finde die nächsten Touren.',
+    'nb_export_zip'         => 'Alle herunterladen (ZIP)',
+    'nb_col_export'         => 'Export',
+    'nb_download_gpx'       => 'GPX herunterladen',
+
     // ===== Pořadí horního menu (admin) =====
     'admin_nav_order'        => 'Reihenfolge des Hauptmenüs',
     'admin_nav_order_hint'   => 'Mit den Pfeilen die Reihenfolge der Menüpunkte ändern. Gilt für Admin und Besucher.',

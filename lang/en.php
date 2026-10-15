@@ -675,6 +675,13 @@ return [
     'pn_results'           => 'Nearest photos',
     'pn_distance'          => 'Distance',
 
+    // ===== Trasy v okolí (nearby) =====
+    'nb_limit'              => 'Number of tracks',
+    'nb_click_prompt'       => 'Click on the map — I will find the nearest tracks.',
+    'nb_export_zip'         => 'Download all (ZIP)',
+    'nb_col_export'         => 'Export',
+    'nb_download_gpx'       => 'Download GPX',
+
     // ===== Pořadí horního menu (admin) =====
     'admin_nav_order'        => 'Top menu order',
     'admin_nav_order_hint'   => 'Use the arrows to reorder the top menu items. Applies to admin and visitors.',

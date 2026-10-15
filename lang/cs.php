@@ -675,6 +675,13 @@ return [
     'pn_results'           => 'Nejbližší fotografie',
     'pn_distance'          => 'Vzdálenost',
 
+    // ===== Trasy v okolí (nearby) =====
+    'nb_limit'              => 'Počet tras',
+    'nb_click_prompt'       => 'Klikněte na mapu — najdu nejbližší trasy.',
+    'nb_export_zip'         => 'Stáhnout vše (ZIP)',
+    'nb_col_export'         => 'Export',
+    'nb_download_gpx'       => 'Stáhnout GPX',
+
     // ===== Pořadí horního menu (admin) =====
     'admin_nav_order'        => 'Pořadí horního menu',
     'admin_nav_order_hint'   => 'Šipkami změň pořadí položek v horním menu. Platí pro admina i návštěvníky.',
