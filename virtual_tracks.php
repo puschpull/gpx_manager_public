@@ -26,7 +26,7 @@ $candidateCount = (int)$pdo->query("
       AND lat IS NOT NULL AND lon IS NOT NULL AND taken_at IS NOT NULL
 ")->fetchColumn();
 
-$page_title = 'Virtuální trasy';
+$page_title = t('nav_virtual_tracks', 'Virtuální trasy');
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
@@ -50,13 +50,13 @@ require __DIR__ . '/includes/layout_header.php';
 
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
-        <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i> Zpět na seznam
+        <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i> <?= htmlspecialchars(preg_replace('/^←\s*/u', '', t('back_to_list'))) ?>
     </a>
     <h1 class="font-[Manrope] text-3xl md:text-4xl font-extrabold tracking-tight text-forest-700 dark:text-sand-100 flex items-center gap-3">
         <i data-lucide="route" class="w-8 h-8 text-terracotta-500" aria-hidden="true"></i>
-        Virtuální trasy
+        <?= htmlspecialchars(t('nav_virtual_tracks', 'Virtuální trasy')) ?>
     </h1>
-    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm">Trasy poskládané z GPS fotek (bez GPX záznamu) — chytré roztřídění nepřiřazených fotek do výletů</p>
+    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm"><?= htmlspecialchars(t('vt_subtitle')) ?></p>
 </section>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 mt-6 pb-12 vt-wrap">
@@ -64,49 +64,47 @@ require __DIR__ . '/includes/layout_header.php';
 <?php if ($_isAdmin): ?>
 <!-- ===== Generátor ===== -->
 <div class="vt-card vt-gen">
-    <h3 style="margin:0 0 10px; font-size:16px;">🛠 Vytvořit z nepřiřazených fotek</h3>
+    <h3 style="margin:0 0 10px; font-size:16px;"><?= htmlspecialchars(t('vt_gen_title')) ?></h3>
     <p style="font-size:13px; color:var(--text-muted); margin:0 0 12px;">
-        Nepřiřazených fotek s GPS a časem: <strong><?= $candidateCount ?></strong>.
-        Fotky se shluknou do výletů podle časové mezery i skoku v poloze.
-        <em>Vzdálenost je přibližná (vzdušná čára mezi fotkami).</em>
+        <?= str_replace('{n}', '<strong>' . (int)$candidateCount . '</strong>', htmlspecialchars(t('vt_gen_candidates'))) ?>
+        <?= htmlspecialchars(t('vt_gen_cluster_info')) ?>
+        <em><?= htmlspecialchars(t('vt_gen_approx')) ?></em>
     </p>
     <div style="margin-bottom:12px;">
-        <label title="Když je mezi dvěma po sobě jdoucími fotkami delší pauza než tato hodnota, začne nový výlet. Vyšší = méně a větších tras (slévá); nižší = víc a menších tras (dělí i na přestávku).">
-            Časová mezera (h) ⓘ: <input type="number" id="gapHours" value="4" min="0.5" step="0.5"
-                title="Nová trasa při časové pauze delší než tolik hodin. Pro celodenní výšlapy 4–6 h.">
+        <label title="<?= htmlspecialchars(t('vt_gap_hours_tip')) ?>">
+            <?= htmlspecialchars(t('vt_gap_hours_label')) ?> ⓘ: <input type="number" id="gapHours" value="4" min="0.5" step="0.5"
+                title="<?= htmlspecialchars(t('vt_gap_hours_input_tip')) ?>">
         </label>
-        <label title="Když jsou dvě po sobě jdoucí fotky dál od sebe než tato vzdálenost, začne nový výlet — i při malém časovém odstupu. Vyšší = toleruje skoky (i ulítlou GPS fotku); nižší = líp dělí různá místa, ale ulítlá fotka může trasu falešně roztrhnout.">
-            Skok v poloze (km) ⓘ: <input type="number" id="gapKm" value="5" min="0.5" step="0.5"
-                title="Nová trasa při skoku v poloze větším než tolik km. Vyšší toleruje chybný GPS fix.">
+        <label title="<?= htmlspecialchars(t('vt_gap_km_tip')) ?>">
+            <?= htmlspecialchars(t('vt_gap_km_label')) ?> ⓘ: <input type="number" id="gapKm" value="5" min="0.5" step="0.5"
+                title="<?= htmlspecialchars(t('vt_gap_km_input_tip')) ?>">
         </label>
-        <label title="Shluky s méně fotkami než tato hodnota se nezahrnou — virtuální trasa z nich nevznikne a fotky zůstanou nepřiřazené (nic se nesmaže). Vyšší = jen „pořádné“ trasy; nižší = i dvojice fotek se stane trasou.">
-            Min. fotek na trasu ⓘ: <input type="number" id="minPhotos" value="3" min="2" step="1"
-                title="Shluky s méně fotkami se přeskočí (zůstanou nepřiřazené).">
+        <label title="<?= htmlspecialchars(t('vt_min_photos_tip')) ?>">
+            <?= htmlspecialchars(t('vt_min_photos_label')) ?> ⓘ: <input type="number" id="minPhotos" value="3" min="2" step="1"
+                title="<?= htmlspecialchars(t('vt_min_photos_input_tip')) ?>">
         </label>
     </div>
     <details style="margin-bottom:12px; font-size:12px; color:var(--text-muted);">
-        <summary style="cursor:pointer; user-select:none;">ⓘ Jak volby fungují</summary>
+        <summary style="cursor:pointer; user-select:none;"><?= htmlspecialchars(t('vt_help_summary')) ?></summary>
         <div style="padding:8px 0 0 4px; line-height:1.6;">
-            Fotky se seřadí podle času a projdou jedna po druhé. Nový výlet začne, když je vůči předchozí fotce
-            <strong>časová mezera</strong> větší než zadané hodiny <em>nebo</em> <strong>skok v poloze</strong> větší než zadané km
-            (stačí jedna z podmínek). Shluk se nakonec zahodí, pokud nemá aspoň <strong>min. fotek na trasu</strong>.
-            <br>• Trhá to jeden výlet na víc kousků → zvyš časovou mezeru a/nebo skok v poloze.
-            <br>• Slévá to dva různé výlety do jednoho → sniž je.
-            <br>• Vznikají zbytečné mini-trasy → zvyš „min. fotek“.
-            <br><em>Náhled nic nezapisuje — klidně si hodnoty vyzkoušej.</em>
+            <?= htmlspecialchars(t('vt_help_1')) ?>
+            <br><?= htmlspecialchars(t('vt_help_2')) ?>
+            <br><?= htmlspecialchars(t('vt_help_3')) ?>
+            <br><?= htmlspecialchars(t('vt_help_4')) ?>
+            <br><em><?= htmlspecialchars(t('vt_help_5')) ?></em>
         </div>
     </details>
-    <button class="vt-btn" id="previewBtn">👁 Náhled (nic nezapíše)</button>
-    <button class="vt-btn vt-btn-primary" id="createBtn" style="display:none;">✅ Vytvořit trasy</button>
+    <button class="vt-btn" id="previewBtn"><?= htmlspecialchars(t('vt_btn_preview')) ?></button>
+    <button class="vt-btn vt-btn-primary" id="createBtn" style="display:none;"><?= htmlspecialchars(t('vt_btn_create')) ?></button>
     <div id="previewResult" style="margin-top:14px;"></div>
 </div>
 <?php endif; ?>
 
 <!-- ===== Seznam virtuálních tras ===== -->
 <div class="vt-card">
-    <h3 style="margin:0 0 12px; font-size:16px;">📋 Seznam (<?= count($vtracks) ?>)</h3>
+    <h3 style="margin:0 0 12px; font-size:16px;"><?= htmlspecialchars(str_replace('{n}', (string)count($vtracks), t('vt_list_title'))) ?></h3>
     <?php if (empty($vtracks)): ?>
-        <p class="vt-empty">Zatím žádné virtuální trasy.<?= $_isAdmin ? ' Vytvoř je z nepřiřazených fotek výše.' : '' ?></p>
+        <p class="vt-empty"><?= htmlspecialchars(t('vt_empty')) ?><?= $_isAdmin ? ' ' . htmlspecialchars(t('vt_empty_admin')) : '' ?></p>
     <?php else: ?>
         <?php foreach ($vtracks as $vt): ?>
         <?php
@@ -119,15 +117,15 @@ require __DIR__ . '/includes/layout_header.php';
             <div style="display:flex; align-items:center; gap:12px;">
                 <?php if ($vtThumbUrl): ?>
                 <a href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>" style="flex-shrink:0;">
-                    <img src="<?= h($vtThumbUrl) ?>" alt="náhled trasy" width="120" height="60"
+                    <img src="<?= h($vtThumbUrl) ?>" alt="<?= htmlspecialchars(t('vt_thumb_alt')) ?>" width="120" height="60"
                          style="width:120px; height:60px; object-fit:cover; border-radius:6px; border:1px solid var(--border-color);">
                 </a>
                 <?php endif; ?>
                 <div>
-                    <a class="name" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>"><?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?></a>
+                    <a class="name" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>"><?= h($vt['name'] ?: str_replace('{id}', (string)$vt['id'], t('vt_default_name'))) ?></a>
                     <div class="meta">
                         📅 <?= $vt['date_start'] ? h(date('j. n. Y', strtotime($vt['date_start']))) : '—' ?>
-                        · 📸 <?= (int)$vt['photo_count'] ?> fotek
+                        · 📸 <?= h(str_replace('{n}', (string)(int)$vt['photo_count'], t('photos_count'))) ?>
                         · 📏 ≈<?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?> km
                         <?php if ($vt['ascent'] !== null): ?> · ↑<?= (int)$vt['ascent'] ?> m<?php endif; ?>
                     </div>
@@ -137,9 +135,9 @@ require __DIR__ . '/includes/layout_header.php';
                 </div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
-                <a class="vt-btn" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>" style="padding:5px 10px; font-size:12px;">🗺 Detail</a>
+                <a class="vt-btn" href="virtual_track_detail.php?id=<?= (int)$vt['id'] ?>" style="padding:5px 10px; font-size:12px;"><?= htmlspecialchars(t('vt_btn_detail')) ?></a>
                 <?php if ($_isAdmin): ?>
-                <button class="vt-del" data-id="<?= (int)$vt['id'] ?>" data-name="<?= h($vt['name']) ?>">🗑 Smazat</button>
+                <button class="vt-del" data-id="<?= (int)$vt['id'] ?>" data-name="<?= h($vt['name']) ?>"><?= htmlspecialchars(t('vt_btn_delete')) ?></button>
                 <?php endif; ?>
             </div>
         </div>
@@ -151,6 +149,8 @@ require __DIR__ . '/includes/layout_header.php';
 
 <script nonce="<?= csp_nonce() ?>">
 const VT_CSRF = <?= json_encode(csrf_token()) ?>;
+const I18N = <?= js_safe_json(array_combine($_vtJs = ['vt_js_computing', 'vt_js_error', 'vt_js_no_cluster', 'vt_js_proposal_label', 'vt_js_proposal', 'vt_js_name_aria', 'vt_js_suggest_btn', 'vt_js_finding_places', 'vt_js_suggest_failed', 'err_prefix', 'vt_js_confirm_create', 'vt_js_creating', 'vt_js_reloading', 'vt_js_confirm_delete'], array_map('t', $_vtJs))) ?>;
+const T = (k, p) => { let s = I18N[k] ?? k; if (p) for (const x in p) s = s.split('{' + x + '}').join(p[x]); return s; };
 
 <?php if ($_isAdmin): ?>
 (function () {
@@ -172,24 +172,24 @@ const VT_CSRF = <?= json_encode(csrf_token()) ?>;
 
     $('previewBtn').addEventListener('click', () => {
         lastParams = readParams();
-        box().innerHTML = '⏳ Počítám…';
+        box().innerHTML = T('vt_js_computing');
         fetch('api/virtual_tracks/preview.php', { method: 'POST', body: paramsForm(lastParams) })
             .then(r => r.json())
             .then(d => {
-                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
+                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || T('vt_js_error')); return; }
                 if (d.cluster_count === 0) {
-                    box().innerHTML = `Z ${d.candidates} nepřiřazených fotek nevznikla žádná trasa (zkus menší „min. fotek" nebo větší mezery). Nezařazeno: ${d.rejected}.`;
+                    box().textContent = T('vt_js_no_cluster', { candidates: d.candidates, rejected: d.rejected });
                     $('createBtn').style.display = 'none';
                     return;
                 }
-                let html = `<p><strong>Návrh:</strong> ${d.cluster_count} výletů z ${d.candidates} fotek (nezařazeno ${d.rejected}). Název uprav ručně, nebo nech doplnit dle místa:</p>`;
+                let html = `<p><strong>${T('vt_js_proposal_label')}</strong> ${T('vt_js_proposal', { clusters: d.cluster_count, candidates: d.candidates, rejected: d.rejected })}</p>`;
                 d.clusters.forEach((c, i) => {
                     html += `<div class="vt-preview-row">
                         <div style="font-size:12px;color:var(--text-muted);margin-bottom:3px;">${i+1}. 📸 ${c.photo_count} · 📏 ≈${c.distance_km} km${c.ascent!=null?` · ↑${c.ascent} m`:''}</div>
-                        <input type="text" class="vt-name-input" data-idx="${i}" aria-label="Název trasy ${i+1}" style="width:100%;max-width:560px;padding:5px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--card-bg);color:var(--text-color);font-size:13px;">
+                        <input type="text" class="vt-name-input" data-idx="${i}" aria-label="${T('vt_js_name_aria', { n: i + 1 })}" style="width:100%;max-width:560px;padding:5px 8px;border:1px solid var(--border-color);border-radius:6px;background:var(--card-bg);color:var(--text-color);font-size:13px;">
                     </div>`;
                 });
-                html += `<div style="margin-top:10px;"><button class="vt-btn" id="suggestNamesBtn" type="button">✨ Navrhnout názvy dle míst</button></div>`;
+                html += `<div style="margin-top:10px;"><button class="vt-btn" id="suggestNamesBtn" type="button">${T('vt_js_suggest_btn')}</button></div>`;
                 box().innerHTML = html;
                 // předvyplň datum-only názvy přes .value (bez HTML escapování)
                 d.clusters.forEach((c, i) => {
@@ -207,34 +207,34 @@ const VT_CSRF = <?= json_encode(csrf_token()) ?>;
         const sb = $('suggestNamesBtn');
         if (!sb || !lastParams) return;
         const orig = sb.textContent;
-        sb.disabled = true; sb.textContent = '⏳ Hledám místa…';
+        sb.disabled = true; sb.textContent = T('vt_js_finding_places');
         fetch('api/virtual_tracks/suggest_names.php', { method: 'POST', body: paramsForm(lastParams) })
             .then(r => r.json())
             .then(d => {
-                if (!d.ok) { alert('Návrh názvů selhal: ' + (d.error || '?')); return; }
+                if (!d.ok) { alert(T('vt_js_suggest_failed') + (d.error || '?')); return; }
                 (d.names || []).forEach((nm, i) => {
                     const inp = box().querySelector(`.vt-name-input[data-idx="${i}"]`);
                     if (inp && nm) inp.value = nm;
                 });
             })
-            .catch(e => alert('Chyba: ' + e.message))
+            .catch(e => alert(T('err_prefix') + e.message))
             .finally(() => { sb.disabled = false; sb.textContent = orig; });
     }
 
     $('createBtn').addEventListener('click', () => {
         if (!lastParams) return;
-        if (!confirm('Vytvořit virtuální trasy podle náhledu? Fotky se přiřadí k těmto trasám.')) return;
+        if (!confirm(T('vt_js_confirm_create'))) return;
         // sesbírej názvy z polí PŘED přepsáním obsahu boxu
         const fd = paramsForm(lastParams);
         box().querySelectorAll('.vt-name-input').forEach(inp => {
             fd.append('names[' + inp.dataset.idx + ']', inp.value);
         });
-        box().innerHTML = '⏳ Vytvářím…';
+        box().innerHTML = T('vt_js_creating');
         fetch('api/virtual_tracks/create.php', { method: 'POST', body: fd })
             .then(r => r.json())
             .then(d => {
-                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
-                box().innerHTML = '✅ ' + d.message + ' Stránka se obnoví…';
+                if (!d.ok) { box().innerHTML = '⚠️ ' + (d.error || T('vt_js_error')); return; }
+                box().textContent = '✅ ' + d.message + ' ' + T('vt_js_reloading');
                 setTimeout(() => location.reload(), 1200);
             })
             .catch(e => { box().innerHTML = '⚠️ ' + e.message; });
@@ -243,7 +243,7 @@ const VT_CSRF = <?= json_encode(csrf_token()) ?>;
     document.querySelectorAll('.vt-del').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
-            if (!confirm(`Smazat virtuální trasu „${btn.dataset.name || ('#'+id)}"? Fotky se vrátí mezi nepřiřazené (nesmažou se).`)) return;
+            if (!confirm(T('vt_js_confirm_delete', { name: btn.dataset.name || ('#' + id) }))) return;
             const fd = new FormData();
             fd.append('_csrf_token', VT_CSRF);
             fd.append('id', id);
@@ -251,9 +251,9 @@ const VT_CSRF = <?= json_encode(csrf_token()) ?>;
                 .then(r => r.json())
                 .then(d => {
                     if (d.ok) { const row = document.getElementById('vt-row-' + id); if (row) row.remove(); }
-                    else alert('Chyba: ' + (d.error || '?'));
+                    else alert(T('err_prefix') + (d.error || '?'));
                 })
-                .catch(e => alert('Chyba: ' + e.message));
+                .catch(e => alert(T('err_prefix') + e.message));
         });
     });
 })();

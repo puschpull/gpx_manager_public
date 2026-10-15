@@ -17,14 +17,16 @@ $stmt->execute([$vtId]);
 $vt = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$vt) {
-    $page_title = 'Virtuální trasa nenalezena';
+    $page_title = t('vtd_not_found');
     require __DIR__ . '/includes/layout_header.php';
-    echo '<div class="mx-auto max-w-7xl px-4 sm:px-6 pt-10"><p>Virtuální trasa nenalezena. <a href="virtual_tracks.php">← Zpět</a></p></div>';
+    echo '<div class="mx-auto max-w-7xl px-4 sm:px-6 pt-10"><p>' . htmlspecialchars(t('vtd_not_found'))
+       . ' <a href="virtual_tracks.php">← ' . htmlspecialchars(t('vtd_back')) . '</a></p></div>';
     require __DIR__ . '/includes/layout_footer.php';
     exit;
 }
 
-$page_title = $vt['name'] ?: ('Virtuální trasa #' . $vt['id']);
+$_vtDefaultName = str_replace('{id}', (string)$vt['id'], t('vt_default_name'));
+$page_title = $vt['name'] ?: $_vtDefaultName;
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -52,14 +54,14 @@ require __DIR__ . '/includes/layout_header.php';
 
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="virtual_tracks.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
-        <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i> Zpět na virtuální trasy
+        <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i> <?= htmlspecialchars(t('vtd_back_to_list')) ?>
     </a>
     <h1 class="font-[Manrope] text-2xl md:text-3xl font-extrabold tracking-tight text-forest-700 dark:text-sand-100 flex items-center gap-3">
         <i data-lucide="route" class="w-7 h-7 text-terracotta-500" aria-hidden="true"></i>
-        <span id="vtName"><?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?></span>
+        <span id="vtName"><?= h($vt['name'] ?: $_vtDefaultName) ?></span>
         <?php if ($_isAdmin): ?>
-        <button id="renameBtn" title="Přejmenovat" style="background:none;border:none;cursor:pointer;font-size:16px;">✏️</button>
-        <button id="suggestNameBtn" title="Navrhnout název dle místa (Mapy.com)" style="background:none;border:none;cursor:pointer;font-size:16px;">✨</button>
+        <button id="renameBtn" title="<?= htmlspecialchars(t('vtd_rename')) ?>" style="background:none;border:none;cursor:pointer;font-size:16px;">✏️</button>
+        <button id="suggestNameBtn" title="<?= htmlspecialchars(t('vtd_suggest_name')) ?>" style="background:none;border:none;cursor:pointer;font-size:16px;">✨</button>
         <?php endif; ?>
     </h1>
 </section>
@@ -67,12 +69,12 @@ require __DIR__ . '/includes/layout_header.php';
 <div class="mx-auto max-w-7xl px-4 sm:px-6 mt-4 pb-12">
     <div class="vt-meta">
         <span>📅 <b><?= $vt['date_start'] ? h(date('j. n. Y', strtotime($vt['date_start']))) : '—' ?></b></span>
-        <span>📸 <b><?= (int)$vt['photo_count'] ?></b> fotek</span>
-        <span>📏 ≈<b id="vtDist"><?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?></b> km <em style="opacity:.7;">(vzdušná čára mezi fotkami)</em></span>
-        <?php if ($vt['ascent'] !== null): ?><span>↑ <b><?= (int)$vt['ascent'] ?> m</b> · ↓ <b><?= (int)$vt['descent'] ?> m</b> <em style="opacity:.7;">(z výšky fotek, přibližné)</em></span><?php endif; ?>
+        <span>📸 <?= str_replace('{n}', '<b>' . (int)$vt['photo_count'] . '</b>', htmlspecialchars(t('photos_count'))) ?></span>
+        <span>📏 ≈<b id="vtDist"><?= h(number_format((float)$vt['distance_km'], 2, ',', ' ')) ?></b> km <em style="opacity:.7;"><?= htmlspecialchars(t('vtd_air_distance')) ?></em></span>
+        <?php if ($vt['ascent'] !== null): ?><span>↑ <b><?= (int)$vt['ascent'] ?> m</b> · ↓ <b><?= (int)$vt['descent'] ?> m</b> <em style="opacity:.7;"><?= htmlspecialchars(t('vtd_elev_approx')) ?></em></span><?php endif; ?>
     </div>
     <?php if ($_isAdmin): ?>
-    <p style="font-size:12px; color:var(--text-muted); margin:-8px 0 12px;">💡 Tip: fotku na mapě můžeš myší <strong>přetáhnout</strong> na správné místo (oprava chybné GPS polohy) — poloha se uloží automaticky.</p>
+    <p style="font-size:12px; color:var(--text-muted); margin:-8px 0 12px;"><?= htmlspecialchars(t('vtd_tip_drag')) ?></p>
     <?php endif; ?>
 
     <?php
@@ -84,8 +86,8 @@ require __DIR__ . '/includes/layout_header.php';
         <div class="card-outdoor p-3 w-52">
             <div class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 mb-2 pb-2 border-b border-sand-200 dark:border-forest-700">
                 <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-                Počasí
-                <span class="ml-auto normal-case opacity-60" title="Data z klimatického modelu ERA5 (~10 km rozlišení). Mohou se lišit od skutečnosti.">~ model</span>
+                <?= htmlspecialchars(t('weather_title')) ?>
+                <span class="ml-auto normal-case opacity-60" title="<?= htmlspecialchars(t('weather_model_tip')) ?>">~ model</span>
             </div>
             <div id="weather-widget">
                 <div class="flex items-center gap-2 mb-3">
@@ -110,18 +112,18 @@ require __DIR__ . '/includes/layout_header.php';
     <!-- Editace metadat (admin) -->
     <div class="card-outdoor p-3 mb-4" style="display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start;">
         <label style="display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer;">
-            <input type="checkbox" id="vtFav" <?= !empty($vt['is_favorite']) ? 'checked' : '' ?>> ⭐ Oblíbená
+            <input type="checkbox" id="vtFav" <?= !empty($vt['is_favorite']) ? 'checked' : '' ?>> <?= htmlspecialchars(t('vtd_favorite')) ?>
         </label>
         <label style="display:flex; align-items:center; gap:6px; font-size:13px;">
-            🎨 Barva trasy:
+            <?= htmlspecialchars(t('vtd_color')) ?>
             <input type="color" id="vtColor" value="<?= h($vt['color'] ?: '#e91e63') ?>" style="width:40px; height:26px; padding:0; border:1px solid var(--border-color); border-radius:4px; cursor:pointer;">
-            <button id="vtColorReset" class="vt-btn" style="padding:3px 8px; font-size:12px;" title="Výchozí barva">↺</button>
+            <button id="vtColorReset" class="vt-btn" style="padding:3px 8px; font-size:12px;" title="<?= htmlspecialchars(t('vtd_color_default')) ?>">↺</button>
         </label>
         <label style="display:flex; flex-direction:column; gap:4px; font-size:13px; flex:1; min-width:220px;">
-            📝 Poznámka:
+            <?= htmlspecialchars(t('vtd_note')) ?>
             <textarea id="vtNote" rows="2" style="width:100%; padding:6px; border:1px solid var(--border-color); border-radius:6px; background:var(--card-bg); color:var(--text-color); resize:vertical;"><?= h($vt['note'] ?? '') ?></textarea>
         </label>
-        <button id="vtSave" class="vt-btn vt-btn-primary" style="align-self:center;">💾 Uložit</button>
+        <button id="vtSave" class="vt-btn vt-btn-primary" style="align-self:center;"><?= htmlspecialchars(t('vtd_save')) ?></button>
         <span id="vtSaveMsg" style="font-size:12px; color:var(--text-muted); align-self:center;"></span>
     </div>
     <?php elseif (!empty($vt['note'])): ?>
@@ -132,21 +134,21 @@ require __DIR__ . '/includes/layout_header.php';
     <!-- Rozdělení trasy na úseky (re-tuning naživo) -->
     <details class="card-outdoor p-3 mb-4" id="vtSplitBox">
         <summary style="cursor:pointer; user-select:none; font-weight:600; font-size:14px;">
-            ✂️ Rozdělit trasu na úseky
-            <span style="font-weight:400; color:var(--text-muted);">— dolaď parametry shlukování naživo (nic se neuloží, dokud nedáš „Rozdělit")</span>
+            <?= htmlspecialchars(t('vtd_split_title')) ?>
+            <span style="font-weight:400; color:var(--text-muted);"><?= htmlspecialchars(t('vtd_split_sub')) ?></span>
         </summary>
         <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; font-size:13px;">
-            <label title="Nový úsek, když je mezi po sobě jdoucími fotkami pauza delší než tolik hodin.">
-                Časová mezera (h): <input type="number" id="splitGapHours" value="4" min="0.5" step="0.5">
+            <label title="<?= htmlspecialchars(t('vtd_split_gap_hours_tip')) ?>">
+                <?= htmlspecialchars(t('vt_gap_hours_label')) ?>: <input type="number" id="splitGapHours" value="4" min="0.5" step="0.5">
             </label>
-            <label title="Nový úsek, když je skok v poloze mezi fotkami větší než tolik km.">
-                Skok v poloze (km): <input type="number" id="splitGapKm" value="5" min="0.5" step="0.5">
+            <label title="<?= htmlspecialchars(t('vtd_split_gap_km_tip')) ?>">
+                <?= htmlspecialchars(t('vt_gap_km_label')) ?>: <input type="number" id="splitGapKm" value="5" min="0.5" step="0.5">
             </label>
-            <label title="Úseky s méně fotkami se přilepí k časově nejbližšímu sousednímu úseku (žádná fotka se neztratí).">
-                Min. fotek na úsek: <input type="number" id="splitMinPhotos" value="3" min="2" step="1">
+            <label title="<?= htmlspecialchars(t('vtd_split_min_tip')) ?>">
+                <?= htmlspecialchars(t('vtd_split_min_label')) ?>: <input type="number" id="splitMinPhotos" value="3" min="2" step="1">
             </label>
-            <button class="vt-btn" id="splitPreviewBtn">👁 Náhled</button>
-            <button class="vt-btn vt-btn-primary" id="splitApplyBtn" style="display:none;">✂️ Rozdělit</button>
+            <button class="vt-btn" id="splitPreviewBtn"><?= htmlspecialchars(t('vtd_preview')) ?></button>
+            <button class="vt-btn vt-btn-primary" id="splitApplyBtn" style="display:none;"><?= htmlspecialchars(t('vtd_split_btn')) ?></button>
         </div>
         <div id="splitResult" style="margin-top:12px;"></div>
     </details>
@@ -154,38 +156,38 @@ require __DIR__ . '/includes/layout_header.php';
 
     <?php if ($_isAdmin): ?>
     <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">
-        🧭 Odhad trasy po cestách:
+        <?= htmlspecialchars(t('vtd_route_estimate')) ?>
         <select id="routeProfile" style="padding:3px 6px; border:1px solid var(--border-color); border-radius:6px; background:var(--card-bg); color:var(--text-color); font-size:13px;">
-            <optgroup label="Pěšky">
-                <option value="foot_hiking">🥾 turistická (značené stezky)</option>
-                <option value="foot_fast">🚶 pěšky nejkratší (chodník/pěšina)</option>
+            <optgroup label="<?= htmlspecialchars(t('vtd_grp_foot')) ?>">
+                <option value="foot_hiking"><?= htmlspecialchars(t('vtd_prof_foot_hiking_long')) ?></option>
+                <option value="foot_fast"><?= htmlspecialchars(t('vtd_prof_foot_fast_long')) ?></option>
             </optgroup>
-            <optgroup label="Kolo">
-                <option value="bike_road">🚲 cyklostezka (asfalt)</option>
-                <option value="bike_mountain">🚵 terénní cyklotrasa</option>
+            <optgroup label="<?= htmlspecialchars(t('vtd_grp_bike')) ?>">
+                <option value="bike_road"><?= htmlspecialchars(t('vtd_prof_bike_road_long')) ?></option>
+                <option value="bike_mountain"><?= htmlspecialchars(t('vtd_prof_bike_mountain_long')) ?></option>
             </optgroup>
-            <optgroup label="Auto">
-                <option value="car_fast">🚗 silnice (rychlá)</option>
-                <option value="car_short">🚗 silnice (nejkratší)</option>
+            <optgroup label="<?= htmlspecialchars(t('vtd_grp_car')) ?>">
+                <option value="car_fast"><?= htmlspecialchars(t('vtd_prof_car_fast')) ?></option>
+                <option value="car_short"><?= htmlspecialchars(t('vtd_prof_car_short')) ?></option>
             </optgroup>
         </select>
         <strong id="routeReadout" style="font-weight:600; color:var(--text-color);"></strong>
-        <span style="opacity:.6;">— přepni profil, trasa se hned překreslí</span>
+        <span style="opacity:.6;"><?= htmlspecialchars(t('vtd_route_hint')) ?></span>
     </div>
 
     <details id="vtCompareBox" style="font-size:13px; margin:-2px 0 10px;">
-        <summary>🔬 Porovnat varianty na mapě <span style="opacity:.7;">— vykreslí zaškrtnuté profily naráz různými barvami</span></summary>
+        <summary><?= htmlspecialchars(t('vtd_compare_title')) ?> <span style="opacity:.7;"><?= htmlspecialchars(t('vtd_compare_sub')) ?></span></summary>
         <div style="margin-top:8px;">
             <div style="display:flex; flex-wrap:wrap; gap:8px 16px; margin-bottom:8px;">
-                <label><input type="checkbox" class="cmp-prof" value="foot_hiking" checked> 🥾 turistická</label>
-                <label><input type="checkbox" class="cmp-prof" value="foot_fast" checked> 🚶 pěšky nejkratší</label>
-                <label><input type="checkbox" class="cmp-prof" value="bike_road"> 🚲 cyklostezka</label>
-                <label><input type="checkbox" class="cmp-prof" value="bike_mountain"> 🚵 terénní cyklo</label>
-                <label><input type="checkbox" class="cmp-prof" value="car_fast"> 🚗 silnice (rychlá)</label>
-                <label><input type="checkbox" class="cmp-prof" value="car_short"> 🚗 silnice (nejkratší)</label>
+                <label><input type="checkbox" class="cmp-prof" value="foot_hiking" checked> <?= htmlspecialchars(t('vtd_prof_foot_hiking')) ?></label>
+                <label><input type="checkbox" class="cmp-prof" value="foot_fast" checked> <?= htmlspecialchars(t('vtd_prof_foot_fast')) ?></label>
+                <label><input type="checkbox" class="cmp-prof" value="bike_road"> <?= htmlspecialchars(t('vtd_prof_bike_road')) ?></label>
+                <label><input type="checkbox" class="cmp-prof" value="bike_mountain"> <?= htmlspecialchars(t('vtd_prof_bike_mountain')) ?></label>
+                <label><input type="checkbox" class="cmp-prof" value="car_fast"> <?= htmlspecialchars(t('vtd_prof_car_fast')) ?></label>
+                <label><input type="checkbox" class="cmp-prof" value="car_short"> <?= htmlspecialchars(t('vtd_prof_car_short')) ?></label>
             </div>
-            <button class="vt-btn" id="compareBtn">🔬 Porovnat zaškrtnuté</button>
-            <button class="vt-btn" id="compareClearBtn" style="display:none;">✕ Skrýt porovnání</button>
+            <button class="vt-btn" id="compareBtn"><?= htmlspecialchars(t('vtd_compare_btn')) ?></button>
+            <button class="vt-btn" id="compareClearBtn" style="display:none;"><?= htmlspecialchars(t('vtd_compare_hide')) ?></button>
             <div id="compareLegend" style="margin-top:10px;"></div>
         </div>
     </details>
@@ -194,14 +196,14 @@ require __DIR__ . '/includes/layout_header.php';
     <?php if ($_isAdmin): ?>
     <div id="vtSectionBox" class="card-outdoor p-3 mb-4" style="font-size:13px;">
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <strong>🧭✂️ Trasa po úsecích</strong>
-            <span style="opacity:.7;">— rozděl trasu na úseky a každému dej jiný způsob pohybu (pěšky / kolo / silnice)</span>
+            <strong><?= htmlspecialchars(t('vtd_sec_title')) ?></strong>
+            <span style="opacity:.7;"><?= htmlspecialchars(t('vtd_sec_sub')) ?></span>
         </div>
         <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-            <button class="vt-btn" id="secEditToggle">✏️ Zadat úseky klikáním</button>
-            <button class="vt-btn vt-btn-primary" id="secCompute" style="display:none;">🧭 Spočítat po úsecích</button>
-            <button class="vt-btn" id="secReset" style="display:none;">↺ Vyčistit</button>
-            <button class="vt-btn" id="secHide" style="display:none;">✕ Skrýt</button>
+            <button class="vt-btn" id="secEditToggle"><?= htmlspecialchars(t('vtd_sec_edit')) ?></button>
+            <button class="vt-btn vt-btn-primary" id="secCompute" style="display:none;"><?= htmlspecialchars(t('vtd_sec_compute')) ?></button>
+            <button class="vt-btn" id="secReset" style="display:none;"><?= htmlspecialchars(t('vtd_sec_reset')) ?></button>
+            <button class="vt-btn" id="secHide" style="display:none;"><?= htmlspecialchars(t('vtd_sec_hide')) ?></button>
         </div>
         <div id="secHint" style="margin-top:8px; opacity:.75;"></div>
         <div id="secList" style="margin-top:10px;"></div>
@@ -209,7 +211,7 @@ require __DIR__ . '/includes/layout_header.php';
     </div>
     <?php endif; ?>
 
-    <div id="map" role="img" aria-label="Mapa virtuální trasy"></div>
+    <div id="map" role="img" aria-label="<?= htmlspecialchars(t('vtd_map_aria')) ?>"></div>
     <div id="vt-gallery" class="vt-gallery"></div>
 </div>
 
@@ -229,8 +231,12 @@ window.gpxVtData = {
     vtId: <?= (int)$vt['id'] ?>,
     csrf: <?= json_encode(csrf_token()) ?>,
     isAdmin: <?= $_isAdmin ? 'true' : 'false' ?>,
-    color: <?= js_safe_json($vt['color'] ?: '') ?>
+    color: <?= js_safe_json($vt['color'] ?: '') ?>,
+    i18n: <?= js_safe_json(array_combine($_vtdJs = ['vtd_layer_line', 'vtd_layer_photos', 'vtd_layer_dots', 'vtd_layer_route', 'vtd_prof_foot_hiking', 'vtd_prof_foot_fast', 'vtd_prof_bike_road', 'vtd_prof_bike_mountain', 'vtd_prof_car_fast', 'vtd_prof_car_short', 'vtd_js_computing', 'vtd_js_route_failed', 'vtd_js_route_error', 'vtd_js_pick_one', 'vtd_js_computing_variants', 'vtd_js_failed', 'vtd_js_move_failed', 'err_prefix', 'vtd_js_new_name', 'vtd_js_suggest_failed', 'vtd_js_suggest_prompt', 'vtd_js_saving', 'vtd_js_saved', 'vt_js_error', 'vt_js_computing', 'vtd_js_split_whole', 'vtd_js_split_into', 'photos_count', 'vtd_js_segment', 'vtd_js_split_note', 'vtd_js_confirm_split', 'vtd_js_splitting', 'vt_js_reloading', 'vtd_js_remove_flag', 'vtd_js_photos_range', 'vtd_js_done_editing', 'vtd_sec_edit', 'vtd_js_sec_hint', 'vtd_js_still_loading', 'vtd_js_computing_sections', 'vtd_js_total', 'vtd_js_restored'], array_map('t', $_vtdJs))) ?>
 };
+const I18N = window.gpxVtData.i18n;
+const T = (k, p) => { let s = I18N[k] ?? k; if (p) for (const x in p) s = s.split('{' + x + '}').join(p[x]); return s; };
+const LOCALE = document.documentElement.lang || 'cs';
 
 // Pro widget počasí (detail-weather.js čte window.gpxDetailData)
 window.gpxDetailData = {
@@ -261,12 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionRouteLayer = L.layerGroup();  // spočítaná trasa po úsecích (obarvená dle úseku)
 
     const overlayLayers = {
-        "✏️ Spojnice fotek (čárkovaná)": photoLine,
-        "📸 Moje fotografie":            photoThumbs,
-        "📍 Polohy fotek na trase":      photoDots,
+        [T('vtd_layer_line')]:   photoLine,
+        [T('vtd_layer_photos')]: photoThumbs,
+        [T('vtd_layer_dots')]:   photoDots,
     };
     // Odhad trasy po cestách (přepínač profilu / porovnání / úseky) je nástroj jen pro admina
-    if (window.gpxVtData.isAdmin) overlayLayers["🧭 Odhad trasy po cestách"] = routeLayer;
+    if (window.gpxVtData.isAdmin) overlayLayers[T('vtd_layer_route')] = routeLayer;
     Object.assign(overlayLayers, overlayBase);  // 🥾 Waymarked
     if (overlayMapillary) overlayLayers["📷 Fotografie (Mapillary)"] = overlayMapillary;
     overlayLayers["🖼️ Fotografie (Wikimedia)"] = wikimediaMarkers;
@@ -280,14 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on("baselayerchange", e => localStorage.setItem("gpx_map_layer", e.name));
 
     // === Odhad trasy po cestách (Mapy.com routing) — profil přepínatelný ===
-    const PROFILE_LABEL = {
-        foot_hiking:   '🥾 turistická',
-        foot_fast:     '🚶 pěšky nejkratší',
-        bike_road:     '🚲 cyklostezka',
-        bike_mountain: '🚵 terénní cyklo',
-        car_fast:      '🚗 silnice (rychlá)',
-        car_short:     '🚗 silnice (nejkratší)',
-    };
+    const PROFILE_LABEL = {};
+    ['foot_hiking', 'foot_fast', 'bike_road', 'bike_mountain', 'car_fast', 'car_short']
+        .forEach(p => { PROFILE_LABEL[p] = T('vtd_prof_' + p); });
     const routeReadout = document.getElementById('routeReadout');
     function fmtDuration(sec) {
         sec = Math.round(sec);
@@ -300,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         routeLoading = true;
         routeLayer.clearLayers();
         const profile = (document.getElementById('routeProfile') || {}).value || 'foot_hiking';
-        if (routeReadout) routeReadout.textContent = '⏳ počítám…';
+        if (routeReadout) routeReadout.textContent = T('vtd_js_computing');
         fetch('api/virtual_tracks/route.php?id=' + window.gpxVtData.vtId + '&profile=' + encodeURIComponent(profile))
             .then(r => r.json())
             .then(d => {
@@ -314,13 +315,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     map.removeLayer(routeLayer);
                     if (routeReadout) routeReadout.textContent = '';
-                    alert('Odhad trasy se nepodařil: ' + (d.error || '?'));
+                    alert(T('vtd_js_route_failed') + (d.error || '?'));
                 }
             })
             .catch(err => {
                 map.removeLayer(routeLayer);
                 if (routeReadout) routeReadout.textContent = '';
-                alert('Chyba při výpočtu trasy: ' + err.message);
+                alert(T('vtd_js_route_error') + err.message);
             })
             .finally(() => { routeLoading = false; });
     }
@@ -362,11 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (compareBtn) compareBtn.addEventListener('click', () => {
         const profiles = [...document.querySelectorAll('.cmp-prof:checked')].map(c => c.value);
-        if (!profiles.length) { if (compareLegend) compareLegend.textContent = 'Zaškrtni aspoň jednu variantu.'; return; }
+        if (!profiles.length) { if (compareLegend) compareLegend.textContent = T('vtd_js_pick_one'); return; }
         compareLayer.clearLayers();
         if (!map.hasLayer(compareLayer)) compareLayer.addTo(map);
         compareClearBtn.style.display = '';
-        compareLegend.innerHTML = '⏳ počítám ' + profiles.length + ' variant…';
+        compareLegend.textContent = T('vtd_js_computing_variants', { n: profiles.length });
 
         Promise.all(profiles.map(profile =>
             fetch('api/virtual_tracks/route.php?id=' + window.gpxVtData.vtId + '&profile=' + encodeURIComponent(profile))
@@ -391,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     rows += `<div style="padding:2px 0; display:flex; align-items:center; gap:8px; opacity:.6;">
                         <span class="split-seg-sw" style="background:${color}; opacity:.4;"></span>
-                        <span>${lbl} — ⚠️ ${d.error || 'nepodařilo se'}</span></div>`;
+                        <span>${lbl} — ⚠️ ${d.error || T('vtd_js_failed')}</span></div>`;
                 }
             });
             compareLegend.innerHTML = rows;
@@ -413,14 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const rawOvl = localStorage.getItem(VT_OVL_KEY);
     let activeOverlays;
     if (rawOvl === null) {
-        activeOverlays = ["✏️ Spojnice fotek (čárkovaná)", "🧭 Odhad trasy po cestách", "📸 Moje fotografie"];
+        activeOverlays = [T('vtd_layer_line'), T('vtd_layer_route'), T('vtd_layer_photos')];
     } else {
         try { activeOverlays = JSON.parse(rawOvl) || []; } catch (e) { activeOverlays = []; }
     }
     activeOverlays.forEach(name => {
         if (!overlayLayers[name]) return;
         overlayLayers[name].addTo(map);
-        if (name === "🧭 Odhad trasy po cestách") loadRoute();
+        if (name === T('vtd_layer_route')) loadRoute();
         if (name === "🖼️ Fotografie (Wikimedia)" && wikimediaMarkers.loadPhotos) setTimeout(() => wikimediaMarkers.loadPhotos(), 800);
     });
 
@@ -489,10 +490,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if (d.ok) {
                                     if (distEl && d.distance_km != null) distEl.textContent = String(d.distance_km).replace('.', ',');
                                 } else {
-                                    alert('Uložení polohy selhalo: ' + (d.error || '?'));
+                                    alert(T('vtd_js_move_failed') + (d.error || '?'));
                                 }
                             })
-                            .catch(e => alert('Chyba: ' + e.message));
+                            .catch(e => alert(T('err_prefix') + e.message));
                     });
                 }
             });
@@ -512,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rb = document.getElementById('renameBtn');
         if (rb) rb.addEventListener('click', () => {
             const cur = document.getElementById('vtName').textContent;
-            const name = prompt('Nový název virtuální trasy:', cur);
+            const name = prompt(T('vtd_js_new_name'), cur);
             if (!name || name.trim() === '' || name === cur) return;
             const fd = new FormData();
             fd.append('_csrf_token', window.gpxVtData.csrf);
@@ -520,8 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fd.append('name', name.trim());
             fetch('api/virtual_tracks/rename.php', { method: 'POST', body: fd })
                 .then(r => r.json())
-                .then(d => { if (d.ok) document.getElementById('vtName').textContent = d.name; else alert('Chyba: ' + (d.error || '?')); })
-                .catch(e => alert('Chyba: ' + e.message));
+                .then(d => { if (d.ok) document.getElementById('vtName').textContent = d.name; else alert(T('err_prefix') + (d.error || '?')); })
+                .catch(e => alert(T('err_prefix') + e.message));
         });
 
         // Návrh názvu dle místa (Mapy.com reverse-geocode) → předvyplní editovatelný prompt
@@ -532,9 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('api/virtual_tracks/suggest_name.php?id=' + encodeURIComponent(window.gpxVtData.vtId))
                 .then(r => r.json())
                 .then(d => {
-                    if (!d.ok) { alert('Návrh názvu selhal: ' + (d.error || '?')); return; }
+                    if (!d.ok) { alert(T('vtd_js_suggest_failed') + (d.error || '?')); return; }
                     const cur = document.getElementById('vtName').textContent;
-                    const name = prompt('Návrh názvu dle místa (uprav nebo potvrď):', d.name);
+                    const name = prompt(T('vtd_js_suggest_prompt'), d.name);
                     if (!name || name.trim() === '' || name === cur) return;
                     const fd = new FormData();
                     fd.append('_csrf_token', window.gpxVtData.csrf);
@@ -542,10 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     fd.append('name', name.trim());
                     fetch('api/virtual_tracks/rename.php', { method: 'POST', body: fd })
                         .then(r => r.json())
-                        .then(d2 => { if (d2.ok) document.getElementById('vtName').textContent = d2.name; else alert('Chyba: ' + (d2.error || '?')); })
-                        .catch(e => alert('Chyba: ' + e.message));
+                        .then(d2 => { if (d2.ok) document.getElementById('vtName').textContent = d2.name; else alert(T('err_prefix') + (d2.error || '?')); })
+                        .catch(e => alert(T('err_prefix') + e.message));
                 })
-                .catch(e => alert('Chyba: ' + e.message))
+                .catch(e => alert(T('err_prefix') + e.message))
                 .finally(() => { snb.textContent = orig; snb.disabled = false; });
         });
 
@@ -562,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const saveBtn = document.getElementById('vtSave');
         if (saveBtn) saveBtn.addEventListener('click', () => {
             const msg = document.getElementById('vtSaveMsg');
-            msg.textContent = '⏳ ukládám…';
+            msg.textContent = T('vtd_js_saving');
             const fd = new FormData();
             fd.append('_csrf_token', window.gpxVtData.csrf);
             fd.append('id', window.gpxVtData.vtId);
@@ -571,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fd.append('note', document.getElementById('vtNote').value);
             fetch('api/virtual_tracks/update.php', { method: 'POST', body: fd })
                 .then(r => r.json())
-                .then(d => { msg.textContent = d.ok ? '✓ uloženo' : ('⚠️ ' + (d.error || 'chyba')); })
+                .then(d => { msg.textContent = d.ok ? T('vtd_js_saved') : ('⚠️ ' + (d.error || T('vt_js_error'))); })
                 .catch(e => { msg.textContent = '⚠️ ' + e.message; });
         });
 
@@ -617,31 +618,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (splitPreviewBtn) splitPreviewBtn.addEventListener('click', () => {
-            splitResult.innerHTML = '⏳ Počítám…';
+            splitResult.innerHTML = T('vt_js_computing');
             splitApplyBtn.style.display = 'none';
             splitLastSegments = null;
             fetch('api/virtual_tracks/resplit_preview.php', { method: 'POST', body: splitParams() })
                 .then(r => r.json())
                 .then(d => {
-                    if (!d.ok) { splitResult.innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
+                    if (!d.ok) { splitResult.innerHTML = '⚠️ ' + (d.error || T('vt_js_error')); return; }
                     if (!d.segment_count || d.segment_count <= 1) {
-                        splitResult.innerHTML = `Trasa zůstává vcelku (${d.photo_total} fotek, 1 úsek) — pro rozdělení zkus menší časovou mezeru nebo menší skok v poloze.`;
+                        splitResult.textContent = T('vtd_js_split_whole', { n: d.photo_total });
                         clearSplitPreview();
                         return;
                     }
                     splitLastSegments = d.segments;
                     drawSplitPreview(d.segments);
-                    let html = `<p style="margin:0 0 6px;"><strong>Rozdělilo by se na ${d.segment_count} úseků</strong> (${d.photo_total} fotek):</p>`;
+                    let html = `<p style="margin:0 0 6px;"><strong>${T('vtd_js_split_into', { n: d.segment_count })}</strong> (${T('photos_count', { n: d.photo_total })}):</p>`;
                     d.segments.forEach((s, i) => {
                         const color  = SPLIT_COLORS[i % SPLIT_COLORS.length];
-                        const dlabel = s.date_start ? new Date(s.date_start.replace(' ', 'T')).toLocaleDateString('cs-CZ') : '';
+                        const dlabel = s.date_start ? new Date(s.date_start.replace(' ', 'T')).toLocaleDateString(LOCALE) : '';
                         const km     = String(s.distance_km).replace('.', ',');
                         html += `<div style="padding:3px 0; display:flex; align-items:center; gap:8px;">
                             <span class="split-seg-sw" style="background:${color};"></span>
-                            <span>Úsek ${i + 1} — 📸 ${s.photo_count} · 📏 ≈${km} km${s.ascent != null ? ` · ↑${s.ascent} m` : ''}${dlabel ? ` · 📅 ${dlabel}` : ''}</span>
+                            <span>${T('vtd_js_segment', { n: i + 1 })} — 📸 ${s.photo_count} · 📏 ≈${km} km${s.ascent != null ? ` · ↑${s.ascent} m` : ''}${dlabel ? ` · 📅 ${dlabel}` : ''}</span>
                         </div>`;
                     });
-                    html += `<p style="margin:8px 0 0; color:var(--text-muted); font-size:12px;">Náhled je obarvený na mapě (nic se zatím neuložilo). „Rozdělit" nechá původní trasu jako 1. úsek (název/poznámku/barvu/⭐ si nechá), ostatní vytvoří jako nové trasy.</p>`;
+                    html += `<p style="margin:8px 0 0; color:var(--text-muted); font-size:12px;">${T('vtd_js_split_note')}</p>`;
                     splitResult.innerHTML = html;
                     splitApplyBtn.style.display = '';
                 })
@@ -650,14 +651,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (splitApplyBtn) splitApplyBtn.addEventListener('click', () => {
             if (!splitLastSegments || splitLastSegments.length < 2) return;
-            if (!confirm(`Rozdělit trasu na ${splitLastSegments.length} úseků? Původní trasa si nechá 1. úsek, zbytek vznikne jako nové virtuální trasy.`)) return;
-            splitResult.innerHTML = '⏳ Rozděluji…';
+            if (!confirm(T('vtd_js_confirm_split', { n: splitLastSegments.length }))) return;
+            splitResult.innerHTML = T('vtd_js_splitting');
             splitApplyBtn.style.display = 'none';
             fetch('api/virtual_tracks/resplit_apply.php', { method: 'POST', body: splitParams() })
                 .then(r => r.json())
                 .then(d => {
-                    if (!d.ok) { splitResult.innerHTML = '⚠️ ' + (d.error || 'Chyba'); return; }
-                    splitResult.innerHTML = '✅ ' + d.message + ' Stránka se obnoví…';
+                    if (!d.ok) { splitResult.innerHTML = '⚠️ ' + (d.error || T('vt_js_error')); return; }
+                    splitResult.textContent = '✅ ' + d.message + ' ' + T('vt_js_reloading');
                     setTimeout(() => location.reload(), 1300);
                 })
                 .catch(e => { splitResult.innerHTML = '⚠️ ' + e.message; });
@@ -732,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!p) return;
                 const m = L.marker([p.lat, p.lon], {
                     icon: L.divIcon({ className: '', html: '<div class="sec-flag">🚩</div>', iconSize: [20, 20], iconAnchor: [3, 18] }),
-                    title: 'Klikni pro odebrání zlomu'
+                    title: T('vtd_js_remove_flag')
                 });
                 m.on('click', () => { secBoundaries = secBoundaries.filter(b => b !== idx); afterBoundaryChange(); });
                 sectionEditLayer.addLayer(m);
@@ -753,12 +754,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (r.length_m != null)   info += '≈ ' + (r.length_m / 1000).toFixed(1).replace('.', ',') + ' km';
                         if (r.duration_s != null) info += (info ? ' · ' : '') + '~' + fmtDuration(r.duration_s);
                     } else {
-                        info = '⚠️ ' + (r.error || 'chyba');
+                        info = '⚠️ ' + (r.error || T('vt_js_error'));
                     }
                 }
                 html += `<div class="sec-row">
                     <span class="split-seg-sw" style="background:${color};"></span>
-                    <span>Úsek ${j + 1} <span style="opacity:.6;">(fotky ${from + 1}–${to + 1})</span>:</span>
+                    <span>${T('vtd_js_segment', { n: j + 1 })} <span style="opacity:.6;">${T('vtd_js_photos_range', { from: from + 1, to: to + 1 })}</span>:</span>
                     <select data-start="${s}" class="sec-prof">${secProfileOptions(prof)}</select>
                     <span class="sec-info" style="opacity:.85;">${info}</span>
                 </div>`;
@@ -790,9 +791,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function enterSecMode() {
             secMode = true;
-            secEditToggle.textContent = '✓ Hotovo se zadáváním';
+            secEditToggle.textContent = T('vtd_js_done_editing');
             secEditToggle.classList.add('vt-btn-primary');
-            secHint.innerHTML = 'Klikni na mapu v místě, kde se měnil způsob pohybu — zlom se přichytí k nejbližší fotce. Klikni na 🚩 pro odebrání. Pak vyber profil každému úseku a dej <strong>Spočítat po úsecích</strong>.';
+            secHint.textContent = T('vtd_js_sec_hint');
             if (!map.hasLayer(sectionEditLayer)) sectionEditLayer.addTo(map);
             renderSectionEdit();
             renderSectionList(null);
@@ -800,13 +801,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         function exitSecMode() {
             secMode = false;
-            secEditToggle.textContent = '✏️ Zadat úseky klikáním';
+            secEditToggle.textContent = T('vtd_sec_edit');
             secEditToggle.classList.remove('vt-btn-primary');
             if (secMapClickBound) { map.off('click', secMapClick); secMapClickBound = false; }
         }
 
         if (secEditToggle) secEditToggle.addEventListener('click', () => {
-            if (!vtPhotos.length) { secHint.textContent = 'Trasa se ještě načítá, zkus to za chvilku…'; return; }
+            if (!vtPhotos.length) { secHint.textContent = T('vtd_js_still_loading'); return; }
             secMode ? exitSecMode() : enterSecMode();
         });
 
@@ -835,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sectionRouteLayer.clearLayers();
             if (!map.hasLayer(sectionRouteLayer)) sectionRouteLayer.addTo(map);
             if (map.hasLayer(sectionEditLayer)) map.removeLayer(sectionEditLayer);
-            secTotal.textContent = '⏳ počítám ' + starts.length + ' úseků…';
+            secTotal.textContent = T('vtd_js_computing_sections', { n: starts.length });
             secHide.style.display = '';
 
             const reqs = starts.map((s, j) => {
@@ -860,7 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
                 renderSectionList(results);
-                let t = `Celkem: ≈ ${(totLen / 1000).toFixed(1).replace('.', ',')} km`;
+                let t = T('vtd_js_total', { km: (totLen / 1000).toFixed(1).replace('.', ',') });
                 if (anyDur) t += ` · ~${fmtDuration(totDur)}`;
                 secTotal.textContent = t;
                 if (allBounds.length) {
@@ -878,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderSectionList(null);
                 secCompute.style.display = '';
                 secReset.style.display   = '';
-                secHint.innerHTML = 'Načteny uložené úseky. Klikni <strong>Spočítat po úsecích</strong>, nebo <strong>Zadat úseky klikáním</strong> pro úpravu.';
+                secHint.textContent = T('vtd_js_restored');
             }
         }
         if (vtPhotos.length) secRestore();

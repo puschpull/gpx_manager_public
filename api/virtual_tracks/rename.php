@@ -16,11 +16,11 @@ ajax_endpoint(function () use ($pdo): array {
     $name = trim((string)($_POST['name'] ?? ''));
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
     if ($name === '') {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Název nesmí být prázdný'];
+        return ['ok' => false, 'error' => t('api_vt_name_empty')];
     }
     $name = mb_substr($name, 0, 255);
     $stmt = $pdo->prepare("UPDATE virtual_tracks SET name = ? WHERE id = ?");

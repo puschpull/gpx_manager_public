@@ -21,7 +21,7 @@ ajax_endpoint(function () use ($pdo): array {
     $minPhotos = max(2,   (int)($_POST['min_photos']  ?? 3));
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
 
     $photos = vt_fetch_track_photos($pdo, $id);

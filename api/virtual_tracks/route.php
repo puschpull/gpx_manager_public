@@ -20,13 +20,13 @@ require_once __DIR__ . '/../../includes/ajax.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
-        return ['ok' => false, 'error' => 'Chybí Mapy.com API klíč.'];
+        return ['ok' => false, 'error' => t('api_vt_no_mapy_key')];
     }
 
     $vtId = (int)($_GET['id'] ?? 0);
     if (!$vtId) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
 
     $stmt = $pdo->prepare("
@@ -38,7 +38,7 @@ ajax_endpoint(function () use ($pdo): array {
     $stmt->execute([$vtId]);
     $pts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     if (count($pts) < 2) {
-        return ['ok' => false, 'error' => 'Trasa má málo bodů.'];
+        return ['ok' => false, 'error' => t('api_vt_few_points')];
     }
 
     // Volitelný úsek [from..to] (indexy do chronologického pořadí fotek) — mód po úsecích.
@@ -50,7 +50,7 @@ ajax_endpoint(function () use ($pdo): array {
         $from = max(0, min($from, $n - 1));
         $to   = max(0, min($to,   $n - 1));
         if ($to - $from < 1) {
-            return ['ok' => false, 'error' => 'Úsek má málo bodů.'];
+            return ['ok' => false, 'error' => t('api_vt_section_few')];
         }
         $pts = array_slice($pts, $from, $to - $from + 1);
     }
@@ -107,25 +107,25 @@ ajax_endpoint(function () use ($pdo): array {
         $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         if ($body === false || $http >= 400) {
-            return ['ok' => false, 'error' => "Mapy.com routing selhal (HTTP $http)."];
+            return ['ok' => false, 'error' => str_replace('{code}', (string)$http, t('api_vt_routing_http'))];
         }
     } else {
         $ctx = stream_context_create(['http' => ['timeout' => 20, 'header' => "Accept: application/json\r\n"]]);
         $body = @file_get_contents($url, false, $ctx);
         if ($body === false) {
-            return ['ok' => false, 'error' => 'Mapy.com routing nelze kontaktovat.'];
+            return ['ok' => false, 'error' => t('api_vt_routing_unreachable')];
         }
     }
 
     $data = json_decode((string)$body, true);
     if (!is_array($data)) {
-        return ['ok' => false, 'error' => 'Neplatná odpověď z Mapy.com.'];
+        return ['ok' => false, 'error' => t('api_vt_routing_bad')];
     }
 
     // Najít GeoJSON LineString souřadnice [lon,lat] kdekoli v odpovědi
     $coordsLonLat = vt_find_linestring($data);
     if (!$coordsLonLat) {
-        return ['ok' => false, 'error' => 'Odpověď neobsahuje geometrii trasy.'];
+        return ['ok' => false, 'error' => t('api_vt_routing_no_geom')];
     }
 
     // lon,lat → lat,lon pro Leaflet

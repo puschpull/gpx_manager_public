@@ -22,7 +22,7 @@ ajax_endpoint(function () use ($pdo): array {
     $res    = vt_cluster_photos($photos, $gapHours, $gapKm, $minPhotos);
 
     if (empty($res['clusters'])) {
-        return ['ok' => true, 'created' => 0, 'assigned' => 0, 'message' => 'Žádné výlety k vytvoření.'];
+        return ['ok' => true, 'created' => 0, 'assigned' => 0, 'message' => t('api_vt_no_trips')];
     }
 
     $insVt = $pdo->prepare("
@@ -90,6 +90,6 @@ ajax_endpoint(function () use ($pdo): array {
         'created'  => $created,
         'assigned' => $assigned,
         'rejected' => count($res['rejected']),
-        'message'  => "Vytvořeno {$created} virtuálních tras, přiřazeno {$assigned} fotek.",
+        'message'  => strtr(t('api_vt_created'), ['{created}' => (string)$created, '{assigned}' => (string)$assigned]),
     ];
 }, ['csrf' => true, 'admin' => true, 'name' => 'virtual_tracks/create']);

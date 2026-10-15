@@ -129,7 +129,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'photo') {
 ?>
 
 <?php
-$page_title = 'Foto-heatmapa';
+$page_title = t('nav_photo_heatmap', 'Foto-heatmapa');
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -157,25 +157,25 @@ require __DIR__ . '/includes/layout_header.php';
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
         <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
-        Zpět na seznam
+        <?= htmlspecialchars(preg_replace('/^←\s*/u', '', t('back_to_list'))) ?>
     </a>
     <h1 class="font-[Manrope] text-3xl md:text-4xl font-extrabold tracking-tight text-forest-700 dark:text-sand-100 flex items-center gap-3">
         <i data-lucide="camera" class="w-8 h-8 text-terracotta-500" aria-hidden="true"></i>
-        Foto-heatmapa
+        <?= htmlspecialchars(t('nav_photo_heatmap', 'Foto-heatmapa')) ?>
     </h1>
-    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm">Hustota fotografií napříč všemi výlety — přibliž pro zobrazení jednotlivých fotek</p>
+    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm"><?= htmlspecialchars(t('ph_subtitle')) ?></p>
 </section>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 mt-6 pb-12">
 
 <div class="heatmap-controls">
-    <label>Poloměr: <input type="range" id="heatRadius" min="5" max="40" value="18"> <span id="radiusVal">18</span>px</label>
-    <label>Intenzita: <input type="range" id="heatIntensity" min="0.1" max="1" step="0.05" value="0.5"> <span id="intensityVal">0.5</span></label>
-    <label>Rozostření: <input type="range" id="heatBlur" min="5" max="30" value="15"> <span id="blurVal">15</span>px</label>
+    <label><?= htmlspecialchars(t('heat_radius')) ?>: <input type="range" id="heatRadius" min="5" max="40" value="18"> <span id="radiusVal">18</span>px</label>
+    <label><?= htmlspecialchars(t('heat_intensity')) ?>: <input type="range" id="heatIntensity" min="0.1" max="1" step="0.05" value="0.5"> <span id="intensityVal">0.5</span></label>
+    <label><?= htmlspecialchars(t('heat_blur')) ?>: <input type="range" id="heatBlur" min="5" max="30" value="15"> <span id="blurVal">15</span>px</label>
 </div>
 
-<div id="heatmap-status" class="heatmap-status" aria-live="polite">Načítání dat...</div>
-<div id="map" role="img" aria-label="Foto-heatmapa"></div>
+<div id="heatmap-status" class="heatmap-status" aria-live="polite"><?= htmlspecialchars(t('heat_loading')) ?></div>
+<div id="map" role="img" aria-label="<?= htmlspecialchars(t('nav_photo_heatmap', 'Foto-heatmapa')) ?>"></div>
 
 <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script defer src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js" integrity="sha384-FON5fTjCTtPuBgUS1r2H/PGXstH0Rk23YKjZmB6qITkbFqBcqtey/rPo9eXwOWpx" crossorigin="anonymous"></script>
@@ -189,8 +189,10 @@ window.gpxHeatmapData = {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
-    }
+    },
+    i18n: <?= js_safe_json(array_combine($_phJs = ['ph_layer_heat', 'ph_layer_dots', 'ph_layer_thumbs', 'ph_loaded', 'ph_no_gps', 'ph_load_error'], array_map('t', $_phJs))) ?>
 };
+const T = (k, p) => { let s = window.gpxHeatmapData.i18n[k] ?? k; if (p) for (const x in p) s = s.split('{' + x + '}').join(p[x]); return s; };
 
 document.addEventListener('DOMContentLoaded', () => {
     // preferCanvas: tečky (až 9k+ circleMarkerů) se kreslí přes canvas → plynulé
@@ -214,9 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const photoMarkers = L.layerGroup();   // náhledy (výřez)
 
     const overlayLayers = {
-        "🔥 Heatmapa hustoty": heatLayer,
-        "📍 Polohy fotek – tečky": photoDots,
-        "📸 Moje fotky – náhledy (při přiblížení)": photoMarkers,
+        [T('ph_layer_heat')]: heatLayer,
+        [T('ph_layer_dots')]: photoDots,
+        [T('ph_layer_thumbs')]: photoMarkers,
         ..._overlayBase,
         ...(overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {}),
     };
@@ -244,8 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('photo_heatmap.php?ajax=heatdata')
         .then(r => r.json())
         .then(data => {
-            statusEl.textContent = `Načteno ${data.total_photos.toLocaleString('cs')} fotografií`;
-            if (!data.points.length) { statusEl.textContent = 'Žádné fotky s GPS.'; return; }
+            statusEl.textContent = T('ph_loaded', { n: data.total_photos.toLocaleString(document.documentElement.lang || 'cs') });
+            if (!data.points.length) { statusEl.textContent = T('ph_no_gps'); return; }
 
             let minLat=90, maxLat=-90, minLon=180, maxLon=-180;
             data.points.forEach(p => {
@@ -255,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds([[minLat, minLon], [maxLat, maxLon]], { padding: [30, 30] });
             heatLayer.setLatLngs(data.points);
         })
-        .catch(err => { statusEl.textContent = 'Chyba při načítání: ' + err.message; });
+        .catch(err => { statusEl.textContent = T('ph_load_error') + err.message; });
 
     function updateHeat() {
         const r = parseInt(radiusSlider.value), i = parseFloat(intensitySlider.value), b = parseInt(blurSlider.value);

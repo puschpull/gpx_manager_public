@@ -15,7 +15,7 @@ ajax_endpoint(function () use ($pdo): array {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
 
     $sets = [];
@@ -30,7 +30,7 @@ ajax_endpoint(function () use ($pdo): array {
         // povolíme jen #RRGGBB nebo prázdné (zrušení barvy)
         if ($color !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
             http_response_code(400);
-            return ['ok' => false, 'error' => 'Neplatná barva'];
+            return ['ok' => false, 'error' => t('api_vt_bad_color')];
         }
         $sets[] = 'color = :color';
         $params[':color'] = $color !== '' ? $color : null;
@@ -42,7 +42,7 @@ ajax_endpoint(function () use ($pdo): array {
 
     if (!$sets) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Nic k uložení'];
+        return ['ok' => false, 'error' => t('api_vt_nothing')];
     }
 
     $pdo->prepare("UPDATE virtual_tracks SET " . implode(', ', $sets) . " WHERE id = :id")
