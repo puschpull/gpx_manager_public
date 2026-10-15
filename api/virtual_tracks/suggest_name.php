@@ -16,13 +16,13 @@ require_once __DIR__ . '/../../includes/virtual_track_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
-        return ['ok' => false, 'error' => 'Chybí Mapy.com API klíč.'];
+        return ['ok' => false, 'error' => t('api_vt_no_mapy_key')];
     }
 
     $vtId = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
     if ($vtId <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
 
     $meta = $pdo->prepare("SELECT date_start, photo_count FROM virtual_tracks WHERE id = ?");
@@ -30,7 +30,7 @@ ajax_endpoint(function () use ($pdo): array {
     $vt = $meta->fetch(\PDO::FETCH_ASSOC);
     if (!$vt) {
         http_response_code(404);
-        return ['ok' => false, 'error' => 'Trasa nenalezena'];
+        return ['ok' => false, 'error' => t('api_vt_not_found')];
     }
 
     $stmt = $pdo->prepare("
@@ -41,7 +41,7 @@ ajax_endpoint(function () use ($pdo): array {
     $stmt->execute([$vtId]);
     $pts = $stmt->fetchAll(\PDO::FETCH_ASSOC);
     if (count($pts) < 1) {
-        return ['ok' => false, 'error' => 'Trasa nemá body s GPS.'];
+        return ['ok' => false, 'error' => t('api_vt_no_gps')];
     }
 
     $name = vt_suggest_name_from_points($pts, (string)$vt['date_start'], (int)$vt['photo_count']);

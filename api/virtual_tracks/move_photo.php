@@ -21,7 +21,7 @@ ajax_endpoint(function () use ($pdo): array {
     if (!$photoId || $lat === null || $lon === null
         || $lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Neplatné parametry'];
+        return ['ok' => false, 'error' => t('api_vt_bad_params')];
     }
 
     // Ověřit, že fotka patří virtuální trase (jinak posun nepovolíme)
@@ -30,7 +30,7 @@ ajax_endpoint(function () use ($pdo): array {
     $vtId = $stmt->fetchColumn();
     if (!$vtId) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Fotka nepatří žádné virtuální trase'];
+        return ['ok' => false, 'error' => t('api_vt_photo_not_vt')];
     }
     $vtId = (int)$vtId;
 

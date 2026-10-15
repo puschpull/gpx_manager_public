@@ -17,7 +17,7 @@ require_once __DIR__ . '/../../includes/virtual_track_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
     if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
-        return ['ok' => false, 'error' => 'Chybí Mapy.com API klíč.'];
+        return ['ok' => false, 'error' => t('api_vt_no_mapy_key')];
     }
 
     $gapHours  = max(0.1, (float)($_POST['gap_hours'] ?? 4));

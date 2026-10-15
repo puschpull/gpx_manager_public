@@ -277,7 +277,7 @@ function vt_compute_stats(array $clusterPhotos): array
     $dateEnd   = (string)$clusterPhotos[$n - 1]['taken_at'];
     $hasAlt    = $eleRef !== null;
 
-    $name = 'Virtuální trasa — ' . date('j. n. Y', (int)strtotime($dateStart)) . " ({$n} fotek)";
+    $name = strtr(t('vt_auto_name'), ['{date}' => date('j. n. Y', (int)strtotime($dateStart)), '{n}' => (string)$n]);
 
     return [
         'name'         => $name,
@@ -491,9 +491,9 @@ function vt_suggest_name_from_points(array $points, string $dateStart, int $phot
     $datePart = date('j. n. Y', (int)strtotime($dateStart));
     $places   = vt_collect_places($points, $maxPlaces);
     if ($places) {
-        return 'Virtuální trasa — ' . implode(', ', $places) . ' - ' . $datePart . " ({$photoCount} fotek)";
+        return strtr(t('vt_auto_name_places'), ['{places}' => implode(', ', $places), '{date}' => $datePart, '{n}' => (string)$photoCount]);
     }
-    return 'Virtuální trasa — ' . $datePart . " ({$photoCount} fotek)";
+    return strtr(t('vt_auto_name'), ['{date}' => $datePart, '{n}' => (string)$photoCount]);
 }
 
 /**

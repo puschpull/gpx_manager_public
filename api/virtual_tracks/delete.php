@@ -17,7 +17,7 @@ ajax_endpoint(function () use ($pdo): array {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
     // ON DELETE SET NULL vrátí fotky do nepřiřazených automaticky
     $stmt = $pdo->prepare("DELETE FROM virtual_tracks WHERE id = ?");

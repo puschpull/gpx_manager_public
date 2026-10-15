@@ -22,7 +22,7 @@ ajax_endpoint(function () use ($pdo): array {
     $minPhotos = max(2,   (int)($_POST['min_photos']  ?? 3));
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id'];
+        return ['ok' => false, 'error' => t('api_vt_missing_id')];
     }
 
     $photos   = vt_fetch_track_photos($pdo, $id);
@@ -33,7 +33,7 @@ ajax_endpoint(function () use ($pdo): array {
             'ok'            => true,
             'created'       => 0,
             'segment_count' => count($segments),
-            'message'       => 'Trasa se podle těchto parametrů nerozpadá — zůstává vcelku.',
+            'message'       => t('api_vt_no_split'),
         ];
     }
 
@@ -96,6 +96,6 @@ ajax_endpoint(function () use ($pdo): array {
         'created'       => $created,
         'segment_count' => count($segments),
         'new_ids'       => $newVtIds,
-        'message'       => 'Trasa rozdělena na ' . count($segments) . " úseků — vzniklo {$created} nových tras.",
+        'message'       => strtr(t('api_vt_split_done'), ['{n}' => (string)count($segments), '{created}' => (string)$created]),
     ];
 }, ['csrf' => true, 'admin' => true, 'name' => 'virtual_tracks/resplit_apply']);
