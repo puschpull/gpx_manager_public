@@ -96,3 +96,41 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
     vertical-align: middle;
 }
+
+/* Ovládání (počet tras) — stejný vzhled jako .pn-controls na Fotkách v okolí */
+.nearby-controls {
+    display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+    margin-bottom: 12px; padding: 10px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-chip);
+}
+
+.nearby-controls label {
+    font-size: 13px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+}
+
+.nearby-controls select {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-control);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+/* Nadpis výsledků + tlačítko ZIP */
+.nearby-results-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+
+.nearby-results-head h2 { margin: 0; }
+
+/* Tabulka může být na mobilu širší než obrazovka */
+.nearby-results { overflow-x: auto; }
+
+.nearby-gpx-link {
+    display: inline-flex; align-items: center; gap: 4px;
+}

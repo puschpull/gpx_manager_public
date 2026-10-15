@@ -101,7 +101,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let nearestMarkers = [];
     let isLoading = false;
 
+    let lastPoint = null;
+
     const statusEl = document.getElementById("nearby-status");
+    const limitSel = document.getElementById("nearbyLimit");
+
+    // Zvolený počet tras si prohlížeč pamatuje (jen pohodlí, smí selhat)
+    try {
+        const savedLimit = localStorage.getItem("gpx_nearby_limit");
+        if (limitSel && savedLimit && [...limitSel.options].some(o => o.value === savedLimit)) {
+            limitSel.value = savedLimit;
+        }
+    } catch (_) { /* úložiště nedostupné */ }
 
     function setStatus(text, cls) {
         if (!statusEl) return;
@@ -118,10 +129,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ===== Kliknutí na mapu =====
-    map.on("click", async (e) => {
+    map.on("click", (e) => {
         if (isLoading) return;
+        lastPoint = e.latlng;
+        search(e.latlng.lat, e.latlng.lng);
+    });
 
-        const { lat, lng } = e.latlng;
+    // Změna počtu → přepočítat pro poslední kliknutý bod
+    if (limitSel) limitSel.addEventListener("change", () => {
+        try { localStorage.setItem("gpx_nearby_limit", limitSel.value); } catch (_) { /* nevadí */ }
+        if (lastPoint && !isLoading) search(lastPoint.lat, lastPoint.lng);
+    });
+
+    // ===== Hledání nejbližších tras k bodu =====
+    async function search(lat, lng) {
+        const limit = parseInt(limitSel?.value || "8", 10);
 
         // Umístit/přesunout osový kříž na kliknutý bod
         if (clickMarker) {
@@ -159,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setStatus(`Hledám nejbližší trasy k bodu [${lat.toFixed(5)}, ${lng.toFixed(5)}]...`, "loading");
 
         try {
-            const res = await fetch(`nearby.php?ajax=1&lat=${lat}&lon=${lng}`);
+            const res = await fetch(`nearby.php?ajax=1&lat=${lat}&lon=${lng}&limit=${limit}`);
             if (!res.ok) throw new Error("HTTP " + res.status);
             const data = await res.json();
 
@@ -184,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             tracks.forEach((track, i) => {
                 const color = NEARBY_COLORS[i] || '#999';
-                const gpxUrl = `uploads/${encodeURIComponent(track.filename)}`;
+                const gpxUrl = track.gpx_url || `uploads/${encodeURIComponent(track.filename)}`;
 
                 fetch(gpxUrl)
                     .then(r => {
@@ -268,6 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
             setStatus("Chyba při komunikaci se serverem.", "error");
             isLoading = false;
         }
-    });
+    }
 
 });

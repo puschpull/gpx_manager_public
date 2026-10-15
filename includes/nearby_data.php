@@ -6,6 +6,79 @@ require_once __DIR__ . '/../includes/helpers.php';
 
 $allowedLangs = available_langs();
 
+// How many nearest tracks the user may ask for (UI select offers 4–20)
+const NEARBY_LIMIT_MIN = 4;
+const NEARBY_LIMIT_MAX = 20;
+
+// ====== ZIP export of the found tracks ======
+// GET nearby.php?export=zip&ids=12,34,56 — read-only download, same access
+// as the page itself (check_page_access('nearby') ran in nearby.php). The GPX
+// files are public anyway (detail.php links them directly).
+if (isset($_GET['export']) && $_GET['export'] === 'zip') {
+    $ids = array_values(array_unique(array_filter(
+        array_map('intval', explode(',', (string)($_GET['ids'] ?? ''))),
+        static fn(int $id) => $id > 0
+    )));
+    $ids = array_slice($ids, 0, NEARBY_LIMIT_MAX);
+
+    if (!$ids) {
+        http_response_code(400);
+        exit('No tracks selected.');
+    }
+    if (!class_exists('ZipArchive')) {
+        http_response_code(500);
+        exit('PHP ZipArchive is not available.');
+    }
+
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("SELECT id, filename FROM tracks WHERE id IN ($placeholders)");
+    $stmt->execute($ids);
+    $byId = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $byId[(int)$row['id']] = (string)$row['filename'];
+    }
+
+    $tmpZip = tempnam(sys_get_temp_dir(), 'gpxnb');
+    $zip    = new ZipArchive();
+    if ($tmpZip === false || $zip->open($tmpZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        http_response_code(500);
+        exit('Could not create ZIP archive.');
+    }
+
+    // Keep the order of the request (= nearest first); skip missing files
+    $added = 0;
+    $used  = [];
+    foreach ($ids as $id) {
+        if (!isset($byId[$id])) continue;
+        $path = uploads_fs($byId[$id]);
+        if (!is_file($path)) {
+            error_log('nearby zip: missing GPX file ' . $byId[$id]);
+            continue;
+        }
+        $entry = basename($byId[$id]);
+        if (isset($used[$entry])) $entry = $id . '_' . $entry;
+        $used[$entry] = true;
+        $zip->addFile($path, $entry);
+        $added++;
+    }
+    $zip->close();
+
+    if ($added === 0) {
+        @unlink($tmpZip);
+        http_response_code(404);
+        exit('No GPX file found on disk.');
+    }
+
+    $zipName = 'trasy_v_okoli_' . date('Y-m-d_His') . '_(' . $added . ').zip';
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $zipName . '"');
+    header('Content-Length: ' . filesize($tmpZip));
+    header('Cache-Control: no-store');
+    readfile($tmpZip);
+    unlink($tmpZip);
+    exit;
+}
+
 // ====== AJAX endpoint ======
 if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     header('Content-Type: application/json; charset=utf-8');
@@ -37,6 +110,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo json_encode(['error' => 'Chybí souřadnice bodu.']);
         exit;
     }
+
+    $limit = max(NEARBY_LIMIT_MIN, min(NEARBY_LIMIT_MAX, (int)($_GET['limit'] ?? 8)));
 
     // ====== Refactored: SQL BBOX pre-filter na centroid (PERF-8, BE-12, DB-10) ======
     // GPX parsing bylo O(30 souborů) per request — eliminováno.
@@ -110,9 +185,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $candidates[] = $t;
     }
 
-    // Předřazení podle centroidu, vzít top 30 kandidátů
+    // Předřazení podle centroidu, vzít top kandidáty (aspoň 30, u většího
+    // limitu dvojnásobek — přesná vzdálenost pořadí ještě přehází)
     usort($candidates, fn($a, $b) => $a['_dist_m'] <=> $b['_dist_m']);
-    $candidates = array_slice($candidates, 0, 30);
+    $candidates = array_slice($candidates, 0, max(30, $limit * 2));
 
     // Přesný výpočet: u top 30 kandidátů najdi SKUTEČNÝ nejbližší bod trasy
     // (parsování GPX, jako v původní verzi před TASK-11). Centroid sloužil jen
@@ -157,6 +233,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $results[] = [
             'id'                  => (int)$t['id'],
             'filename'            => $t['filename'],
+            'gpx_url'             => gpx_url((string)$t['filename']),
             'track_name'          => $t['track_name'],
             'distance_km'         => round((float)$t['distance_km'], 2),
             'ascent'              => round((float)$t['ascent'], 0),
@@ -170,8 +247,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         ];
     }
 
-    // Finální top 8 (kandidáti už jsou seřazeni podle skutečné vzdálenosti)
-    $results = array_slice($results, 0, 8);
+    // Finální top N (kandidáti už jsou seřazeni podle skutečné vzdálenosti)
+    $results = array_slice($results, 0, $limit);
 
     echo json_encode(['tracks' => $results], JSON_UNESCAPED_UNICODE);
     exit;

@@ -14,6 +14,18 @@ const NEARBY_COLORS = [
     '#42d4f4', // azurová
     '#f032e6', // magenta
     '#bfef45', // limetková
+    '#469990', // petrolejová
+    '#9a6324', // hnědá
+    '#800000', // vínová
+    '#808000', // olivová
+    '#000075', // námořnická modrá
+    '#ffe119', // žlutá
+    '#e377c2', // růžová
+    '#2f4f4f', // tmavě šedozelená
+    '#00a86b', // nefritová
+    '#ff7f50', // korálová
+    '#7b68ee', // břidlicově modrá
+    '#a9a9a9', // šedá
 ];
 
 /* Delegáty na sdílené lib (js/lib/format-utils.js) */
@@ -29,6 +41,7 @@ function renderNearbyTable(tracks) {
     if (!tbody || !wrap) return;
 
     tbody.innerHTML = '';
+    const dlLabel = window.gpxNearbyData?.i18n?.downloadGpx || 'Stáhnout GPX';
 
     if (!tracks || tracks.length === 0) {
         wrap.style.display = 'none';
@@ -52,9 +65,18 @@ function renderNearbyTable(tracks) {
             <td>${t.descent}</td>
             <td>${formatDate(t.date_start)}</td>
             <td>${formatDuration(t.duration)}</td>
+            <td><a class="nearby-gpx-link" href="${escapeHtml(t.gpx_url)}" download title="${escapeHtml(dlLabel)}">⬇ GPX</a></td>
         `;
+        // Stažení nemá zároveň otevřít detail trasy (klik na řádek)
+        tr.querySelector('.nearby-gpx-link').addEventListener('click', e => e.stopPropagation());
         tbody.appendChild(tr);
     });
+
+    // Všechny nalezené trasy jako ZIP (pořadí = od nejbližší)
+    const zipLink = document.getElementById('nearby-zip');
+    if (zipLink) {
+        zipLink.href = 'nearby.php?export=zip&ids=' + tracks.map(t => t.id).join(',');
+    }
 
     wrap.style.display = 'block';
 }

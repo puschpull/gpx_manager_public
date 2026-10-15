@@ -25,9 +25,20 @@ require __DIR__ . '/layout_header.php';
 <div class="mx-auto max-w-7xl px-4 sm:px-6 mt-6 pb-12">
 
 
+<!-- Ovládání: počet tras -->
+<div class="nearby-controls">
+    <label for="nearbyLimit"><?= htmlspecialchars(t('nb_limit', 'Počet tras')) ?>:
+        <select id="nearbyLimit">
+            <?php foreach ([4, 6, 8, 10, 12, 15, 20] as $_n): ?>
+            <option value="<?= $_n ?>"<?= $_n === 8 ? ' selected' : '' ?>><?= $_n ?></option>
+            <?php endforeach; ?>
+        </select>
+    </label>
+</div>
+
 <!-- Instrukce -->
-<div id="nearby-status" class="nearby-status">
-    Klikněte na mapu pro nalezení 8 nejbližších tras
+<div id="nearby-status" class="nearby-status" aria-live="polite">
+    <?= htmlspecialchars(t('nb_click_prompt', 'Klikněte na mapu — najdu nejbližší trasy.')) ?>
 </div>
 
 <!-- Mapa — A11Y-021: skip link + role="img" + aria-label -->
@@ -40,7 +51,13 @@ require __DIR__ . '/layout_header.php';
 
 <!-- Tabulka výsledků -->
 <div id="nearby-results" class="nearby-results" style="display:none;">
-    <h2>Nalezené nejbližší trasy</h2>
+    <div class="nearby-results-head">
+        <h2>Nalezené nejbližší trasy</h2>
+        <a id="nearby-zip" class="btn-outdoor btn-outdoor-ghost" href="#">
+            <i data-lucide="file-archive" class="w-4 h-4" aria-hidden="true"></i>
+            <?= htmlspecialchars(t('nb_export_zip', 'Stáhnout vše (ZIP)')) ?>
+        </a>
+    </div>
     <table class="nearby-table">
         <thead>
             <tr>
@@ -53,6 +70,7 @@ require __DIR__ . '/layout_header.php';
                 <th>Klesání (m)</th>
                 <th>Datum</th>
                 <th>Doba</th>
+                <th><?= htmlspecialchars(t('nb_col_export', 'Export')) ?></th>
             </tr>
         </thead>
         <tbody id="nearby-tbody"></tbody>
@@ -84,6 +102,9 @@ window.gpxNearbyData = {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
+    },
+    i18n: {
+        downloadGpx: <?= js_safe_json(t('nb_download_gpx', 'Stáhnout GPX')) ?>
     }
 };
 </script>
