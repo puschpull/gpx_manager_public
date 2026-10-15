@@ -1,10 +1,93 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 13. října 2026
+  Poslední aktualizace: 15. října 2026
 
 ================================================================================
 
+
+── 15. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  HORNÍ MENU: POLOŽKY NAVÍC DO „VÍCE"                                      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Horní menu se ukazuje od šířky 768 px, ale všech deset položek (admin)
+  potřebuje kolem 1 240 px — mezi tím přetékalo a celá stránka šla
+  posouvat do strany. Nově se v liště ukáže tolik položek, kolik se
+  vejde, a zbytek je v rozbalovacím „Více ▾" na konci menu. Počítá se
+  za běhu, takže to sedí pro admina i návštěvníka, v každém jazyce i při
+  změně velikosti okna. Aktuální stránka zůstává v liště, dokud to jde;
+  když je ve „Více", je „Více" zvýrazněné. Na mobilu se nic nemění
+  (hamburger). Doplněny chybějící překlady položek Virtuální trasy
+  a Foto-heatmapa (dosud všude česky).
+  Soubory: includes/layout_header.php, js/topnav-overflow.js (nový),
+           lang/*.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PŘEKLADY: MAPOVÉ VRSTVY A HEATMAPA TRAS                                  │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Názvy podkladových map a vrstev (Waymarked, stínování terénu,
+  turistické body, Mapillary, Wikimedia, Moje trasa/fotografie…), body
+  zájmu a tlačítko „Moje poloha" byly na všech mapách česky. Nově se
+  překládají na jednom místě (registr vrstev v app_constants.php)
+  a mapová knihovna je dostává podle klíčů, takže vypnutí a pořadí
+  vrstev z Administrace platí v každém jazyce. Přeložena i stránka
+  Heatmapa tras. Výběr výchozí mapy v Nastavení se nově staví z registru
+  — opravena tím stará chyba, kdy volba Thunderforest nic nedělala
+  (seznam měl jinou ikonu než mapa). Po změně jazyka se jednou vrátí
+  výchozí podklad (prohlížeč si ho pamatuje pod názvem).
+  Soubory: includes/app_constants.php, includes/layout_header.php,
+           js/lib/map-factory.js, heatmap.php, settings.php, js/*-map.js,
+           js/planner.js, js/photo-nearby.js, map_search.php,
+           photo_heatmap.php, virtual_track_detail.php, lang/*.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PŘEKLADY: VIRTUÁLNÍ TRASY A FOTO-HEATMAPA                                │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Stránky Virtuální trasy (seznam, generátor, detail s rozdělením,
+  odhadem trasy po cestách a úseky) a Foto-heatmapa měly všechny texty
+  napevno česky — i v JavaScriptu (hlášky, potvrzení, vrstvy mapy)
+  a v odpovědích API. Nově jdou přes jazykové soubory ve všech
+  8 jazycích (155 klíčů); datum a čísla se formátují podle jazyka
+  stránky. Výchozí název nově vytvořené virtuální trasy je v jazyce
+  admina; existující názvy a poznámky se nemění (jsou to data).
+  Česky dál zůstávají jen názvy sdílených mapových vrstev (Waymarked,
+  stínování terénu, Mapillary…), které jsou společné pro všechny mapy.
+  Soubory: virtual_tracks.php, virtual_track_detail.php,
+           photo_heatmap.php, includes/virtual_track_helper.php,
+           api/virtual_tracks/*.php, lang/*.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PŘEKLADY: CHYBĚJÍCÍ KLÍČE A JEJICH KONTROLA                              │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Kód používal 19 textů, které nebyly v žádném jazykovém souboru — ve
+  všech jazycích se proto ukazoval český výchozí text, a na detailu
+  každé trasy dokonce technický název „h2_elevation" místo nadpisu
+  výškového profilu. Doplněno do všech 8 jazyků (výškový profil, filtr
+  a záložka virtuálních tras ve Fotografiích, ukládání presetu filtrů,
+  položky Administrace pro foto-heatmapu a virtuální trasy aj.).
+  Kontrola scripts/lint_lang.php (běží i v CI) nově projde kód a ohlásí
+  každý text, který kód používá, ale jazykové soubory ho nemají.
+  Soubory: lang/*.php, scripts/lint_lang.php
+
+── 14. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  TRASY V OKOLÍ: VOLBA POČTU A EXPORT                                      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Počet nalezených tras jde zvolit (4, 6, 8, 10, 12, 15 nebo 20; dosud
+  pevně 8), prohlížeč si volbu pamatuje a změna přepočítá poslední bod.
+  Každá trasa má vlastní barvu (paleta rozšířena na 20). Nalezené trasy
+  jde stáhnout jako GPX jednotlivě (nový sloupec Export) i všechny
+  najednou jako ZIP, seřazené od nejbližší. ZIP má stejný přístup jako
+  stránka; GPX jsou volně stažitelné i z detailu trasy.
+  Soubory: includes/nearby_data.php, includes/nearby_view.php,
+           js/nearby-map.js, js/nearby-data.js, css/nearby.css, lang/*.php
 
 ── 13. října 2026 ─────────────────────────────────────────────────────────────
 
