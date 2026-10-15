@@ -136,7 +136,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'rebuild') {
 ?>
 
 <?php
-$page_title = 'Heatmapa tras';
+$page_title = t('hm_title');
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -178,31 +178,31 @@ require __DIR__ . '/includes/layout_header.php';
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
         <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
-        Zpět na seznam
+        <?= htmlspecialchars(preg_replace('/^←\s*/u', '', t('back_to_list'))) ?>
     </a>
     <h1 class="font-[Manrope] text-3xl md:text-4xl font-extrabold tracking-tight text-forest-700 dark:text-sand-100 flex items-center gap-3">
         <i data-lucide="flame" class="w-8 h-8 text-terracotta-500" aria-hidden="true"></i>
-        Heatmapa tras
+        <?= htmlspecialchars(t('hm_title')) ?>
     </h1>
-    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm">Hustota navštívených oblastí napříč všemi trasami</p>
+    <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm"><?= htmlspecialchars(t('hm_subtitle')) ?></p>
 </section>
 
 <div class="mx-auto max-w-7xl px-4 sm:px-6 mt-6 pb-12">
 
 
 <div class="heatmap-controls">
-    <label>Poloměr: <input type="range" id="heatRadius" min="5" max="40" value="18"> <span id="radiusVal">18</span>px</label>
-    <label>Intenzita: <input type="range" id="heatIntensity" min="0.1" max="1" step="0.05" value="0.5"> <span id="intensityVal">0.5</span></label>
-    <label>Rozostření: <input type="range" id="heatBlur" min="5" max="30" value="15"> <span id="blurVal">15</span>px</label>
-    <button class="btn-outdoor btn-outdoor-ghost" id="rebuildBtn" title="Přečte všechny GPX soubory a vytvoří detailnější heatmapu (může trvat minuty)">
-        <i data-lucide="refresh-cw" class="w-4 h-4" aria-hidden="true"></i> Detailní heatmapa
+    <label><?= htmlspecialchars(t('heat_radius')) ?>: <input type="range" id="heatRadius" min="5" max="40" value="18"> <span id="radiusVal">18</span>px</label>
+    <label><?= htmlspecialchars(t('heat_intensity')) ?>: <input type="range" id="heatIntensity" min="0.1" max="1" step="0.05" value="0.5"> <span id="intensityVal">0.5</span></label>
+    <label><?= htmlspecialchars(t('heat_blur')) ?>: <input type="range" id="heatBlur" min="5" max="30" value="15"> <span id="blurVal">15</span>px</label>
+    <button class="btn-outdoor btn-outdoor-ghost" id="rebuildBtn" title="<?= htmlspecialchars(t('hm_rebuild_tip')) ?>">
+        <i data-lucide="refresh-cw" class="w-4 h-4" aria-hidden="true"></i> <?= htmlspecialchars(t('hm_rebuild_btn')) ?>
     </button>
     <?php if (is_file($cacheFile)): ?>
         <span style="font-size:11px; color:var(--text-muted);">Cache: <?= date('d.m.Y H:i', filemtime($cacheFile)) ?></span>
     <?php endif; ?>
 </div>
 
-<div id="heatmap-status" class="heatmap-status" aria-live="polite">Načítání dat...</div>
+<div id="heatmap-status" class="heatmap-status" aria-live="polite"><?= htmlspecialchars(t('heat_loading')) ?></div>
 <!-- A11Y-021: sr-only text summary + role="img" + aria-label; summary updated by JS -->
 <p id="heatmap-sr-summary" class="sr-only" aria-live="polite"></p>
 <a href="#heatmap-status" class="sr-only-focusable">
@@ -242,8 +242,11 @@ window.gpxHeatmapData = {
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
-    csrfToken: <?= js_safe_json(csrf_token()) ?>
+    csrfToken: <?= js_safe_json(csrf_token()) ?>,
+    i18n: <?= js_safe_json(array_combine($_hmJs = ['heat_loading', 'hm_mode_detailed', 'hm_mode_quick', 'hm_loaded', 'heatmap_summary', 'ph_load_error', 'hm_confirm_rebuild', 'hm_rebuilding'], array_map('t', $_hmJs))) ?>
 };
+const I18N = window.gpxHeatmapData.i18n;
+const T = (k, p) => { let s = I18N[k] ?? k; if (p) for (const x in p) s = s.split('{' + x + '}').join(p[x]); return s; };
 
 document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { fullscreenControl: true }).setView([50.0, 14.5], 8);
@@ -255,8 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlayMapillary = window.GpxMapFactory.createMapillaryOverlay(keys.mapillary || "");
     const wikimediaMarkers = window.GpxMapFactory.createWikimediaLayer(map);
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
-        { "🖼️ Fotografie (Wikimedia)": wikimediaMarkers }
+        overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
+        { [window.GpxMapFactory.layerName("wikimedia")]: wikimediaMarkers }
     );
 
     // Obnovit uloženou vrstvu (factory přidala OSM automaticky)
@@ -276,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusEl = document.getElementById('heatmap-status');
 
     function loadHeatData(url, fetchOptions) {
-        statusEl.textContent = 'Načítání dat...';
+        statusEl.textContent = T('heat_loading');
 
         fetch(url, fetchOptions || {})
             .then(r => {
@@ -286,13 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return r.json();
             })
             .then(data => {
-                const modeLabel = data.mode === 'detailed' ? ' (detailní)' : ' (rychlý náhled)';
+                const modeLabel = ' ' + (data.mode === 'detailed' ? T('hm_mode_detailed') : T('hm_mode_quick'));
                 statusEl.textContent =
-                    `Načteno ${data.points.length.toLocaleString('cs')} bodů z ${data.total_tracks} tras${modeLabel}`;
+                    T('hm_loaded', { points: data.points.length.toLocaleString(document.documentElement.lang || 'cs'), tracks: data.total_tracks }) + modeLabel;
                 // A11Y-021: update sr-only summary for screen readers
                 const srSummary = document.getElementById('heatmap-sr-summary');
                 if (srSummary) {
-                    srSummary.textContent = `Heatmapa zobrazuje ${data.total_tracks} tras${modeLabel}.`;
+                    srSummary.textContent = T('heatmap_summary').replace('%d', data.total_tracks) + modeLabel + '.';
                 }
 
                 if (data.points.length === 0) return;
@@ -326,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).addTo(map);
             })
             .catch(err => {
-                statusEl.textContent = 'Chyba při načítání: ' + err.message;
+                statusEl.textContent = T('ph_load_error') + err.message;
             });
     }
 
@@ -352,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tlačítko pro detailní rebuild (admin only — CSRF token required)
     document.getElementById('rebuildBtn').addEventListener('click', () => {
-        if (!confirm('Toto přečte všechny GPX soubory a může trvat několik minut. Pokračovat?')) return;
-        statusEl.textContent = 'Generuji detailní heatmapu — čtení GPX souborů...';
+        if (!confirm(T('hm_confirm_rebuild'))) return;
+        statusEl.textContent = T('hm_rebuilding');
         loadHeatData('heatmap.php?ajax=rebuild', {
             headers: { 'X-CSRF-Token': window.gpxHeatmapData.csrfToken }
         });

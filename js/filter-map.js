@@ -65,8 +65,8 @@ window.FilterMap = (function () {
         function loadWikimediaPhotos() { wikimediaMarkers.loadPhotos(); }
 
         const overlayLayers = Object.assign({}, _overlayBase,
-            overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
-            { "🖼️ Fotografie (Wikimedia)": wikimediaMarkers }
+            overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
+            { [window.GpxMapFactory.layerName("wikimedia")]: wikimediaMarkers }
         );
 
         // Obnova uložené vrstvy

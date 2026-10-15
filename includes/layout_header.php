@@ -93,6 +93,9 @@ if (!function_exists('t')) {
             'base'    => array_map(static fn($k) => map_layer_defs()[$k]['label'], map_layer_order('base')),
             'overlay' => array_map(static fn($k) => map_layer_defs()[$k]['label'], map_layer_order('overlay')),
         ],
+        // Přeložené názvy podle klíče — z nich staví vrstvy js/lib/map-factory.js
+        'labels' => array_map(static fn($d) => $d['label'], map_layer_defs()) + map_context_layer_names(),
+        'texts'  => map_factory_texts(),
     ];
     ?>
     <script nonce="<?= csp_nonce() ?>">window.gpxMapLayers = <?= js_safe_json($_layerCfg) ?>;</script>

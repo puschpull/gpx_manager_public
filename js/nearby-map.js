@@ -53,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadWikimediaPhotos() { wikimediaMarkers.loadPhotos(); }
 
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
-        { "🖼️ Fotografie (Wikimedia)": wikimediaMarkers }
+        overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
+        { [window.GpxMapFactory.layerName("wikimedia")]: wikimediaMarkers }
     );
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     savedOverlays.forEach(name => {
         if (overlayLayers[name]) {
             overlayLayers[name].addTo(map);
-            if (name === "🖼️ Fotografie (Wikimedia)") {
+            if (name === window.GpxMapFactory.layerName("wikimedia")) {
                 setTimeout(() => loadWikimediaPhotos(), 1500);
             }
         }
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const overlays = JSON.parse(localStorage.getItem("gpx_map_overlays") || "[]");
         if (!overlays.includes(e.name)) overlays.push(e.name);
         localStorage.setItem("gpx_map_overlays", JSON.stringify(overlays));
-        if (e.name === "🖼️ Fotografie (Wikimedia)") loadWikimediaPhotos();
+        if (e.name === window.GpxMapFactory.layerName("wikimedia")) loadWikimediaPhotos();
     });
 
     map.on("overlayremove", e => {

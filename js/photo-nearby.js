@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function loadWikimediaPhotos() { wikimediaMarkers.loadPhotos(); }
 
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
-        { "🖼️ Fotografie (Wikimedia)": wikimediaMarkers }
+        overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
+        { [window.GpxMapFactory.layerName("wikimedia")]: wikimediaMarkers }
     );
 
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
