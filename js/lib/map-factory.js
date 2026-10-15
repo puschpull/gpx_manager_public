@@ -9,6 +9,34 @@
 window.GpxMapFactory = (function () {
     "use strict";
 
+    /* Názvy vrstev a texty přicházejí přeložené z includes/layout_header.php
+       (window.gpxMapLayers.labels / .texts, podle klíčů). Výchozí české hodnoty
+       jsou pro stránku bez hlavičky. Název je zároveň identifikátor, pod kterým
+       si prohlížeč pamatuje zvolený podklad a zapnuté vrstvy. */
+    var DEFAULT_NAMES = {
+        osm: "🗺️ OSM", topo: "🏞️ Topo", esri: "🌍 Satelit (Esri)",
+        mapy_basic: "🗺️ Mapy.com základní", mapy_out: "🧭 Mapy.com turistická",
+        mapy_winter: "❄️ Mapy.com zimní", mapy_aerial: "✈️ Mapy.com letecká",
+        tf: "🤾 Thunderforest", cyclosm: "🌲 CyclOSM (všechny cesty)", ztm: "🇨🇿 ZTM ČÚZK (jen Česko)",
+        wm_hiking: "🤾 Turistické značení (Waymarked)", wm_cycling: "🚴 Cyklotrasy (Waymarked)",
+        wm_mtb: "🚵 MTB trasy (Waymarked)", hillshade: "⛰️ Stínování terénu (Esri)",
+        poi: "📌 Turistické body (OSM)", mapy_names: "🏷️ Popisky a hranice (Mapy.com)",
+        my_track: "🗺️ Moje trasa", my_photos: "📸 Moje fotografie", photo_pos: "📍 Polohy fotek na trase",
+        wikimedia: "🖼️ Fotografie (Wikimedia)", mapillary: "📷 Fotografie (Mapillary)",
+        radar: "🌧️ Aktuální srážky (ČHMÚ)"
+    };
+
+    /** Přeložený název vrstvy podle klíče (viz map_layer_defs / map_context_layer_names). */
+    function layerName(key) {
+        var labels = (window.gpxMapLayers && window.gpxMapLayers.labels) || {};
+        return labels[key] || DEFAULT_NAMES[key] || key;
+    }
+
+    function text(key, fallback) {
+        var texts = (window.gpxMapLayers && window.gpxMapLayers.texts) || {};
+        return texts[key] || fallback;
+    }
+
     /**
      * Build the standard set of base tile layers and the Waymarked overlay.
      *
@@ -103,32 +131,31 @@ window.GpxMapFactory = (function () {
             { maxZoom: 19, maxNativeZoom: 15, opacity: 0.35, attribution: "© Esri" }
         );
 
-        var baseLayers = {
-            "🗺️ OSM":                 baseOSM,
-            "🏞️ Topo":                baseTopo,
-            "🌍 Satelit (Esri)":            baseSat,
-            "🗺️ Mapy.com základní":   baseMapyCOMBasic,
-            "🧭 Mapy.com turistická":  baseMapyCOMTurist,
-            "❄️ Mapy.com zimní":       baseMapyCOMWinter,
-            "✈️ Mapy.com letecká":     baseMapyCOMAerial,
-            "🤾 Thunderforest":              baseThunderforest,
-            "🌲 CyclOSM (všechny cesty)":    baseCyclOSM,
-            "🇨🇿 ZTM ČÚZK (jen Česko)":       baseZTM,
-        };
+        // Názvy podle klíčů z registru (includes/app_constants.php map_layer_defs)
+        var baseLayers = {};
+        baseLayers[layerName("osm")]         = baseOSM;
+        baseLayers[layerName("topo")]        = baseTopo;
+        baseLayers[layerName("esri")]        = baseSat;
+        baseLayers[layerName("mapy_basic")]  = baseMapyCOMBasic;
+        baseLayers[layerName("mapy_out")]    = baseMapyCOMTurist;
+        baseLayers[layerName("mapy_winter")] = baseMapyCOMWinter;
+        baseLayers[layerName("mapy_aerial")] = baseMapyCOMAerial;
+        baseLayers[layerName("tf")]          = baseThunderforest;
+        baseLayers[layerName("cyclosm")]     = baseCyclOSM;
+        baseLayers[layerName("ztm")]         = baseZTM;
 
-        var overlayLayers = {
-            "🤾 Turistické značení (Waymarked)": overlayWaymarked,
-            "🚴 Cyklotrasy (Waymarked)": overlayWaymarkedCycling,
-            "🚵 MTB trasy (Waymarked)": overlayWaymarkedMtb,
-            "⛰️ Stínování terénu (Esri)": overlayHillshade,
-            "📌 Turistické body (OSM)": createPoiLayer(map),
-        };
+        var overlayLayers = {};
+        overlayLayers[layerName("wm_hiking")]  = overlayWaymarked;
+        overlayLayers[layerName("wm_cycling")] = overlayWaymarkedCycling;
+        overlayLayers[layerName("wm_mtb")]     = overlayWaymarkedMtb;
+        overlayLayers[layerName("hillshade")]  = overlayHillshade;
+        overlayLayers[layerName("poi")]        = createPoiLayer(map);
 
         // Názvy a hranice na průhledném podkladu (Mapy.com). Hlavní smysl je nad
         // leteckou a satelitní mapou — ty jsou jinak bez jediného popisku.
         // Bez klíče se vrstva vůbec nenabízí, ať v seznamu nesvítí mrtvá položka.
         if (mapycom) {
-            overlayLayers["🏷️ Popisky a hranice (Mapy.com)"] = L.tileLayer(
+            overlayLayers[layerName("mapy_names")] = L.tileLayer(
                 "https://api.mapy.com/v1/maptiles/names-overlay/256/{z}/{x}/{y}?apikey=" + mapycom,
                 { maxZoom: 20, attribution: "© <a href=\"https://mapy.com\" target=\"_blank\">Mapy.com</a>" }
             );
@@ -143,7 +170,7 @@ window.GpxMapFactory = (function () {
 
         // Podklad přidaný na mapu mohl být právě vypnutý — vzít první zapnutý,
         // ať mapa nezůstane bez podkladu.
-        if (!baseLayers["🗺️ OSM"]) {
+        if (!baseLayers[layerName("osm")]) {
             map.removeLayer(baseOSM);
             var prvni = Object.keys(baseLayers)[0];
             if (prvni) { baseOSM = baseLayers[prvni]; baseOSM.addTo(map); }
@@ -197,13 +224,13 @@ window.GpxMapFactory = (function () {
             tower:     "🗼"
         };
         var poiLabels = {
-            peak:      "vrchol",
-            viewpoint: "vyhlídka",
-            shelter:   "přístřešek",
-            spring:    "pramen",
-            castle:    "hrad/zámek",
-            ruins:     "zřícenina",
-            tower:     "rozhledna"
+            peak:      text("poi_peak",      "vrchol"),
+            viewpoint: text("poi_viewpoint", "vyhlídka"),
+            shelter:   text("poi_shelter",   "přístřešek"),
+            spring:    text("poi_spring",    "pramen"),
+            castle:    text("poi_castle",    "hrad/zámek"),
+            ruins:     text("poi_ruins",     "zřícenina"),
+            tower:     text("poi_tower",     "rozhledna")
         };
 
         var group   = L.layerGroup();
@@ -275,9 +302,9 @@ window.GpxMapFactory = (function () {
                 var container = L.DomUtil.create("div", "leaflet-bar");
                 var btn = L.DomUtil.create("a", "", container);
                 btn.href = "#";
-                btn.title = "Moje poloha";
+                btn.title = text("locate_title", "Moje poloha");
                 btn.setAttribute("role", "button");
-                btn.setAttribute("aria-label", "Moje poloha");
+                btn.setAttribute("aria-label", btn.title);
                 btn.innerHTML = "📍";
                 btn.style.cssText = "font-size:15px; text-align:center;";
 
@@ -299,13 +326,13 @@ window.GpxMapFactory = (function () {
                             marker.setLatLng(ll);
                             circle.setLatLng(ll).setRadius(acc);
                         }
-                        marker.bindTooltip("Moje poloha (±" + Math.round(acc) + " m)");
+                        marker.bindTooltip(text("locate_tooltip", "Moje poloha (±{m} m)").replace("{m}", Math.round(acc)));
                         map.setView(ll, Math.max(map.getZoom(), 15));
                     }, function (err) {
                         btn.innerHTML = "📍";
-                        alert("Polohu se nepodařilo zjistit"
+                        alert(text("locate_failed", "Polohu se nepodařilo zjistit")
                             + (err && err.message ? ": " + err.message : ".")
-                            + " (Vyžaduje HTTPS a povolení polohy v prohlížeči.)");
+                            + " " + text("locate_needs", "(Vyžaduje HTTPS a povolení polohy v prohlížeči.)"));
                     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 });
                 });
 
@@ -711,5 +738,6 @@ window.GpxMapFactory = (function () {
         createLocateControl:   createLocateControl,
         createRadarNowOverlay: createRadarNowOverlay,
         applyLayerConfig:      applyLayerConfig,
+        layerName:             layerName,
     };
 })();

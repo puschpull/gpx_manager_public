@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : null;
 
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
+        overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
         radarNow ? { ["🌧️ " + ((cfg.radarNowI18n || {}).layer || "Aktuální srážky (ČHMÚ)")]: radarNow } : {});
     L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
 

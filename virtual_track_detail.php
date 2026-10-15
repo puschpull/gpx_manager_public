@@ -274,8 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Odhad trasy po cestách (přepínač profilu / porovnání / úseky) je nástroj jen pro admina
     if (window.gpxVtData.isAdmin) overlayLayers[T('vtd_layer_route')] = routeLayer;
     Object.assign(overlayLayers, overlayBase);  // 🥾 Waymarked
-    if (overlayMapillary) overlayLayers["📷 Fotografie (Mapillary)"] = overlayMapillary;
-    overlayLayers["🖼️ Fotografie (Wikimedia)"] = wikimediaMarkers;
+    if (overlayMapillary) overlayLayers[window.GpxMapFactory.layerName("mapillary")] = overlayMapillary;
+    overlayLayers[window.GpxMapFactory.layerName("wikimedia")] = wikimediaMarkers;
 
     // Obnovit uloženou základní vrstvu
     const savedLayer = localStorage.getItem("gpx_map_layer");
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!overlayLayers[name]) return;
         overlayLayers[name].addTo(map);
         if (name === T('vtd_layer_route')) loadRoute();
-        if (name === "🖼️ Fotografie (Wikimedia)" && wikimediaMarkers.loadPhotos) setTimeout(() => wikimediaMarkers.loadPhotos(), 800);
+        if (name === window.GpxMapFactory.layerName("wikimedia") && wikimediaMarkers.loadPhotos) setTimeout(() => wikimediaMarkers.loadPhotos(), 800);
     });
 
     // === Ukládání stavu overlayů (po obnově, ať se obnova nezapisuje dvakrát) ===
@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const arr = JSON.parse(localStorage.getItem(VT_OVL_KEY) || "[]");
         if (!arr.includes(e.name)) { arr.push(e.name); localStorage.setItem(VT_OVL_KEY, JSON.stringify(arr)); }
         if (e.layer === routeLayer) loadRoute();
-        if (e.name === "🖼️ Fotografie (Wikimedia)" && wikimediaMarkers.loadPhotos) wikimediaMarkers.loadPhotos();
+        if (e.name === window.GpxMapFactory.layerName("wikimedia") && wikimediaMarkers.loadPhotos) wikimediaMarkers.loadPhotos();
     });
     map.on("overlayremove", e => {
         const arr = JSON.parse(localStorage.getItem(VT_OVL_KEY) || "[]");

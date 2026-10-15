@@ -197,8 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const overlayMapillary = window.GpxMapFactory.createMapillaryOverlay(keys.mapillary || "");
     const wikimediaMarkers = window.GpxMapFactory.createWikimediaLayer(map);
     const overlayLayers = Object.assign({}, _overlayBase,
-        overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {},
-        { "🖼️ Fotografie (Wikimedia)": wikimediaMarkers }
+        overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {},
+        { [window.GpxMapFactory.layerName("wikimedia")]: wikimediaMarkers }
     );
 
     // Obnovit uloženou vrstvu (factory přidala OSM automaticky)

@@ -105,33 +105,35 @@ function feature_flag_labels(): array {
  * Registr mapových vrstev, které přicházejí ze sdílené továrny
  * (js/lib/map-factory.js) a chovají se stejně na všech mapách.
  *
- * Klíč popisku MUSÍ přesně odpovídat názvu vrstvy v map-factory.js —
- * je to zároveň popisek v ovladači vrstev a identifikátor, pod kterým si
- * prohlížeč pamatuje naposledy zvolený podklad.
+ * Popisek (přeložený přes t()) je zároveň název vrstvy v ovladači — mapová
+ * továrna ho dostává podle klíče z includes/layout_header.php
+ * (window.gpxMapLayers.labels). Nastavení z administrace je uložené pod klíči,
+ * takže platí v každém jazyce. Prohlížeč si podklad pamatuje pod názvem,
+ * po změně jazyka se proto vrátí výchozí podklad.
  *
  * 'needs' = konfigurační klíč, bez kterého se vrstva nezobrazí tak jako tak.
  */
 function map_layer_defs(): array {
     return [
         // --- podkladové mapy ---
-        'osm'         => ['label' => '🗺️ OSM',                       'section' => 'base'],
-        'topo'        => ['label' => '🏞️ Topo',                      'section' => 'base'],
-        'esri'        => ['label' => '🌍 Satelit (Esri)',             'section' => 'base'],
-        'mapy_basic'  => ['label' => '🗺️ Mapy.com základní',         'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
-        'mapy_out'    => ['label' => '🧭 Mapy.com turistická',        'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
-        'mapy_winter' => ['label' => '❄️ Mapy.com zimní',             'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
-        'mapy_aerial' => ['label' => '✈️ Mapy.com letecká',           'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
-        'tf'          => ['label' => '🤾 Thunderforest',              'section' => 'base', 'needs' => 'TF_API_KEY'],
-        'cyclosm'     => ['label' => '🌲 CyclOSM (všechny cesty)',    'section' => 'base'],
-        'ztm'         => ['label' => '🇨🇿 ZTM ČÚZK (jen Česko)',       'section' => 'base'],
+        'osm'         => ['label' => t('mlayer_osm', '🗺️ OSM'),                       'section' => 'base'],
+        'topo'        => ['label' => t('mlayer_topo', '🏞️ Topo'),                      'section' => 'base'],
+        'esri'        => ['label' => t('mlayer_esri', '🌍 Satelit (Esri)'),             'section' => 'base'],
+        'mapy_basic'  => ['label' => t('mlayer_mapy_basic', '🗺️ Mapy.com základní'),         'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
+        'mapy_out'    => ['label' => t('mlayer_mapy_out', '🧭 Mapy.com turistická'),        'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
+        'mapy_winter' => ['label' => t('mlayer_mapy_winter', '❄️ Mapy.com zimní'),             'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
+        'mapy_aerial' => ['label' => t('mlayer_mapy_aerial', '✈️ Mapy.com letecká'),           'section' => 'base', 'needs' => 'MAPYCOM_API_KEY'],
+        'tf'          => ['label' => t('mlayer_tf', '🤾 Thunderforest'),              'section' => 'base', 'needs' => 'TF_API_KEY'],
+        'cyclosm'     => ['label' => t('mlayer_cyclosm', '🌲 CyclOSM (všechny cesty)'),    'section' => 'base'],
+        'ztm'         => ['label' => t('mlayer_ztm', '🇨🇿 ZTM ČÚZK (jen Česko)'),       'section' => 'base'],
 
         // --- překryvné vrstvy ---
-        'wm_hiking'   => ['label' => '🤾 Turistické značení (Waymarked)', 'section' => 'overlay'],
-        'wm_cycling'  => ['label' => '🚴 Cyklotrasy (Waymarked)',         'section' => 'overlay'],
-        'wm_mtb'      => ['label' => '🚵 MTB trasy (Waymarked)',          'section' => 'overlay'],
-        'hillshade'   => ['label' => '⛰️ Stínování terénu (Esri)',        'section' => 'overlay'],
-        'poi'         => ['label' => '📌 Turistické body (OSM)',          'section' => 'overlay'],
-        'mapy_names'  => ['label' => '🏷️ Popisky a hranice (Mapy.com)',   'section' => 'overlay', 'needs' => 'MAPYCOM_API_KEY'],
+        'wm_hiking'   => ['label' => t('mlayer_wm_hiking', '🤾 Turistické značení (Waymarked)'), 'section' => 'overlay'],
+        'wm_cycling'  => ['label' => t('mlayer_wm_cycling', '🚴 Cyklotrasy (Waymarked)'),         'section' => 'overlay'],
+        'wm_mtb'      => ['label' => t('mlayer_wm_mtb', '🚵 MTB trasy (Waymarked)'),          'section' => 'overlay'],
+        'hillshade'   => ['label' => t('mlayer_hillshade', '⛰️ Stínování terénu (Esri)'),        'section' => 'overlay'],
+        'poi'         => ['label' => t('mlayer_poi', '📌 Turistické body (OSM)'),          'section' => 'overlay'],
+        'mapy_names'  => ['label' => t('mlayer_mapy_names', '🏷️ Popisky a hranice (Mapy.com)'),   'section' => 'overlay', 'needs' => 'MAPYCOM_API_KEY'],
     ];
 }
 
@@ -141,14 +143,40 @@ function map_layer_defs(): array {
  * řídí jinde (klíč k API, volitelné funkce).
  */
 function map_context_layers(): array {
+    $n = map_context_layer_names();
     return [
-        '🗺️ Moje trasa'                => t('mlayer_ctx_track',     'detail trasy — vlastní GPX linie'),
-        '📸 Moje fotografie'           => t('mlayer_ctx_photos',    'detail trasy — vlastní fotky'),
-        '📍 Polohy fotek na trase'     => t('mlayer_ctx_photopos',  'detail trasy — body fotek podél trasy'),
-        '🖼️ Fotografie (Wikimedia)'    => t('mlayer_ctx_wikimedia', 'detail trasy'),
-        '📷 Fotografie (Mapillary)'    => t('mlayer_ctx_mapillary', 'jen s klíčem MAPILLARY_TOKEN'),
-        '🌧️ Aktuální srážky (ČHMÚ)'    => t('mlayer_ctx_radar',     'plánovač — Volitelné funkce'),
+        $n['my_track']  => t('mlayer_ctx_track',     'detail trasy — vlastní GPX linie'),
+        $n['my_photos'] => t('mlayer_ctx_photos',    'detail trasy — vlastní fotky'),
+        $n['photo_pos'] => t('mlayer_ctx_photopos',  'detail trasy — body fotek podél trasy'),
+        $n['wikimedia'] => t('mlayer_ctx_wikimedia', 'detail trasy'),
+        $n['mapillary'] => t('mlayer_ctx_mapillary', 'jen s klíčem MAPILLARY_TOKEN'),
+        $n['radar']     => t('mlayer_ctx_radar',     'plánovač — Volitelné funkce'),
     ];
+}
+
+/**
+ * Názvy vrstev, které přidávají jednotlivé stránky (přeložené). Stránky je
+ * berou z GpxMapFactory.layerName(klíč), aby se název v ovladači, v uložených
+ * volbách a v administraci shodoval.
+ */
+function map_context_layer_names(): array {
+    return [
+        'my_track'  => t('mlayer_name_my_track',  '🗺️ Moje trasa'),
+        'my_photos' => t('mlayer_name_my_photos', '📸 Moje fotografie'),
+        'photo_pos' => t('mlayer_name_photo_pos', '📍 Polohy fotek na trase'),
+        'wikimedia' => t('mlayer_name_wikimedia', '🖼️ Fotografie (Wikimedia)'),
+        'mapillary' => t('mlayer_name_mapillary', '📷 Fotografie (Mapillary)'),
+        'radar'     => '🌧️ ' . t('layer_radar_now', 'Aktuální srážky (ČHMÚ)'),
+    ];
+}
+
+/** Texty sdílené mapové továrny mimo názvy vrstev (body zájmu, moje poloha). */
+function map_factory_texts(): array {
+    $keys = ['poi_peak', 'poi_viewpoint', 'poi_shelter', 'poi_spring', 'poi_castle', 'poi_ruins', 'poi_tower',
+             'locate_title', 'locate_tooltip', 'locate_failed', 'locate_needs'];
+    $out = [];
+    foreach ($keys as $k) $out[$k] = t('mf_' . $k);
+    return $out;
 }
 
 /** Klíče vrstev v pořadí, jak je zvolil administrátor (chybějící na konec). */

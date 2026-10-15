@@ -48,17 +48,16 @@ $currentMapLayer = $_COOKIE['app_map_layer'] ?? '';
 $currentLang     = $_COOKIE['app_lang']      ?? 'cs';
 
 /* ===== Mapové vrstvy ===== */
-$mapLayers = [
-    ''                          => '— Poslední použitá —',
-    '🗺️ OSM'                   => '🗺️ OpenStreetMap',
-    '🏞️ Topo'                  => '🏞️ OpenTopoMap',
-    '🌍 Satelit (Esri)'        => '🌍 Satelit (Esri)',
-    '🗺️ Mapy.com základní'     => '🗺️ Mapy.com základní',
-    '🧭 Mapy.com turistická'   => '🧭 Mapy.com turistická',
-    '❄️ Mapy.com zimní'        => '❄️ Mapy.com zimní',
-    '✈️ Mapy.com letecká'      => '✈️ Mapy.com letecká',
-    '🥾 Thunderforest'         => '🥾 Thunderforest Outdoors',
-];
+// Hodnota = název podkladu v ovladači mapy (podle něj ho JS mapy najdou),
+// proto z registru vrstev a v aktuálním jazyce. Dřív tu byl ručně psaný
+// seznam a Thunderforest v něm měl jinou ikonu než mapa — nefungoval.
+$mapLayers = ['' => t('maplayer_last_used', '— Poslední použitá —')];
+foreach (map_layer_order('base') as $_lk) {
+    if (map_layer_enabled($_lk)) {
+        $_lbl = map_layer_defs()[$_lk]['label'];
+        $mapLayers[$_lbl] = $_lbl;
+    }
+}
 ?>
 
 <?php

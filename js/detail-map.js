@@ -309,12 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayLayers = Object.assign({}, _overlayBase);
     // FE-11: only expose Mapillary layer when token is present and plugin loaded
     if (overlayMapillary) {
-        overlayLayers["📷 Fotografie (Mapillary)"] = overlayMapillary;
+        overlayLayers[window.GpxMapFactory.layerName("mapillary")] = overlayMapillary;
     }
     Object.assign(overlayLayers, {
-        "🖼️ Fotografie (Wikimedia)":          wikimediaMarkers,
-        "📸 Moje fotografie":                 myPhotosLayer,
-        "📍 Polohy fotek na trase":           photoLineLayer,
+        [window.GpxMapFactory.layerName("wikimedia")]:          wikimediaMarkers,
+        [window.GpxMapFactory.layerName("my_photos")]:                 myPhotosLayer,
+        [window.GpxMapFactory.layerName("photo_pos")]:           photoLineLayer,
     });
 
     const layerControl = L.control.layers(baseLayers, overlayLayers, { collapsed: true }).addTo(map);
@@ -331,13 +331,13 @@ document.addEventListener("DOMContentLoaded", () => {
     savedOverlays.forEach(name => {
         if (overlayLayers[name]) {
             overlayLayers[name].addTo(map);
-            if (name === "🖼️ Fotografie (Wikimedia)") {
+            if (name === window.GpxMapFactory.layerName("wikimedia")) {
                 setTimeout(() => loadWikimediaPhotos(), 1500);
             }
-            if (name === "📸 Moje fotografie") {
+            if (name === window.GpxMapFactory.layerName("my_photos")) {
                 setTimeout(() => loadMyPhotos(), 500);
             }
-            if (name === "📍 Polohy fotek na trase") {
+            if (name === window.GpxMapFactory.layerName("photo_pos")) {
                 setTimeout(() => loadMyPhotos(), 500);
             }
         }
@@ -352,9 +352,9 @@ map.on("overlayadd", e => {
         const overlays = JSON.parse(localStorage.getItem("gpx_map_overlays") || "[]");
         if (!overlays.includes(e.name)) overlays.push(e.name);
         localStorage.setItem("gpx_map_overlays", JSON.stringify(overlays));
-        if (e.name === "🖼️ Fotografie (Wikimedia)") loadWikimediaPhotos();
-        if (e.name === "📸 Moje fotografie")         loadMyPhotos();
-        if (e.name === "📍 Polohy fotek na trase") {
+        if (e.name === window.GpxMapFactory.layerName("wikimedia")) loadWikimediaPhotos();
+        if (e.name === window.GpxMapFactory.layerName("my_photos"))         loadMyPhotos();
+        if (e.name === window.GpxMapFactory.layerName("photo_pos")) {
             if (_cachedPhotos.length > 0) {
                 buildPhotoLineLayer(_cachedPhotos);
             } else {
@@ -411,11 +411,11 @@ gpxLayer = new L.GPX(xmlText, {
                 }
 
                 // Přidání trasy do ovládání vrstev
-                layerControl.addOverlay(gpxLayer, "🗺️ Moje trasa");
+                layerControl.addOverlay(gpxLayer, window.GpxMapFactory.layerName("my_track"));
 
                 // Obnova stavu z localStorage
                 const savedOverlaysNow = JSON.parse(localStorage.getItem("gpx_map_overlays") || "[]");
-                if (!savedOverlaysNow.includes("🗺️ Moje trasa")) {
+                if (!savedOverlaysNow.includes(window.GpxMapFactory.layerName("my_track"))) {
                     gpxLayer.addTo(map);
                 }
 

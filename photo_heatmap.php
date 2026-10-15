@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         [T('ph_layer_dots')]: photoDots,
         [T('ph_layer_thumbs')]: photoMarkers,
         ..._overlayBase,
-        ...(overlayMapillary ? { "📷 Fotografie (Mapillary)": overlayMapillary } : {}),
+        ...(overlayMapillary ? { [window.GpxMapFactory.layerName("mapillary")]: overlayMapillary } : {}),
     };
 
     // Obnovit uloženou základní vrstvu (factory přidala OSM automaticky)
