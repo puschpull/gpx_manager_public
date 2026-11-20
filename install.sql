@@ -253,6 +253,23 @@ INSERT IGNORE INTO app_config (config_key, config_value) VALUES
 
 SET foreign_key_checks = 1;
 
+-- ------------------------------------------------------------
+--  Tabulka: map_markers — značky s poznámkou na stránce Mapa
+--  (migrace 0021)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS map_markers (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    lat         DECIMAL(9,6)  NOT NULL,
+    lon         DECIMAL(9,6)  NOT NULL,
+    title       VARCHAR(120)  NOT NULL,
+    note        TEXT          DEFAULT NULL,
+    symbol      VARCHAR(16)   NOT NULL DEFAULT 'pin',
+    is_public   TINYINT(1)    NOT NULL DEFAULT 0,
+    created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_mm_public (is_public)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================================
 --  Hotovo! Pokračuj spuštěním setup.php v prohlížeči nebo
 --  ručně vyplň soubor .env (viz .env.example).
