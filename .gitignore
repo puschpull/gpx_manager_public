@@ -46,6 +46,8 @@ setup.php.backup
 /uploads/photo_heatmap_cache.json
 /uploads/_heatmap_rebuild.marker
 /uploads/_poi_cache/
+# Zjednodušené čáry tras pro vrstvu Moje trasy (api/tracks/lines.php)
+/uploads/_line_cache/
 /uploads/radar/
 
 # Značka lokálního vývoje (APP_ENV=local) — nikdy do repa ani na server

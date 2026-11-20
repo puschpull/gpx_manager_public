@@ -14,6 +14,10 @@ check_page_access('map');
 $allowedLangs = available_langs();
 
 $page_title = t('nav_map', 'Mapa');
+
+// Vrstva „Moje fotografie“ jen tam, kde smí návštěvník vidět i stránku Fotografie
+$showPhotos = !empty($_SESSION['is_admin'])
+    || in_array('photos', (array)get_app_config('visible_pages', all_pages()), true);
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -50,6 +54,7 @@ window.gpxMapPageData = {
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
+    showPhotos: <?= $showPhotos ? 'true' : 'false' ?>,
     i18n: <?= js_safe_json([
         'layers'   => t('mp_layers', 'Vrstvy'),
         'active'   => t('mp_active', 'Zapnuté vrstvy'),
@@ -87,6 +92,8 @@ window.gpxMapPageData = {
         'pre_ortho'   => t('mp_pre_ortho', 'Letecké snímky 2001–2003 a dnes'),
         'pre_relief'  => t('mp_pre_relief', 'Turistická se stínováním reliéfu'),
         'pre_cad'     => t('mp_pre_cad', 'Katastr nad leteckou mapou'),
+        'trackDetail' => t('mp_track_detail', 'Detail trasy'),
+        'photoOpen'   => t('mp_photo_open', 'Otevřít fotku'),
         'search'      => [
             'placeholder'       => t('mp_search', 'Hledat místo nebo souřadnice'),
             'placeholderCoords' => t('mp_search_coords_only', 'Zadat souřadnice'),
@@ -103,6 +110,7 @@ window.gpxMapPageData = {
 <script defer src="<?= asset('js/map-page-tools.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-presets.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-search.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-mine.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>
