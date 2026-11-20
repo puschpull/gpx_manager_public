@@ -459,12 +459,72 @@
             });
         }
         if (F.createLocateControl) F.createLocateControl(map);
+        var tools = null;
         if (window.GpxMapTools) {
-            window.GpxMapTools.create(map, {
+            tools = window.GpxMapTools.create(map, {
                 i18n: i18n,
                 copy: Link ? Link.copy : function () { return Promise.resolve(false); },
                 onAddMarker: (markers && cfg.isAdmin) ? markers.startAdd : null,
                 addMarkerLabel: i18n.addMarker
+            });
+        }
+
+        // Klávesové zkratky (js/map-page-keys.js); akce vrací text oznámení
+        if (window.GpxMapKeys) {
+            var K = i18n.keys || {};
+            var onOff = function (label, on) { return label + ": " + (on ? (K.on || "zapnuto") : (K.off || "vypnuto")); };
+            var opacityBy = function (d) {
+                var e = active[0];
+                if (!e) return "";
+                setOpacity(e, e.opacity + d);
+                save();
+                rerender();
+                return e.name + " — " + (i18n.opacity || "Krytí") + " " + e.opacity + " %";
+            };
+            var cmpToggle = function (m, label) {
+                if (!compare) return "";
+                if (active.length < 2) return label + " — " + (i18n.cmpNeed || "");
+                compare.toggle(m);
+                return onOff(label, compare.mode() === m);
+            };
+            var lensBy = function (d) {
+                if (!compare || compare.mode() !== "lens") return K.lensFirst || "Nejdřív zapněte lupu (L)";
+                return (i18n.lensSize || "Velikost lupy") + ": " + compare.lensBy(d) + " px";
+            };
+            window.GpxMapKeys.create(map, {
+                i18n: K,
+                actions: {
+                    panel: function () { if (toggleBtn) toggleBtn.click(); },
+                    search: function () {
+                        var inp = map.getContainer().querySelector(".gpx-se-input");
+                        if (inp) inp.focus();
+                    },
+                    opacityUp:   function () { return opacityBy(10); },
+                    opacityDown: function () { return opacityBy(-10); },
+                    swap: function () {
+                        if (active.length < 2) return "";
+                        move(active[1], -1);
+                        save();
+                        rerender();
+                        return (K.top || "Navrchu") + ": " + active[0].name;
+                    },
+                    swipe: function () { return cmpToggle("swipe", i18n.swipe || "Porovnávací posuvník"); },
+                    lens:  function () { return cmpToggle("lens", i18n.lens || "Lupa"); },
+                    lensBigger:  function () { return lensBy(20); },
+                    lensSmaller: function () { return lensBy(-20); },
+                    measure: function () {
+                        return tools ? onOff(i18n.measure || "Měření", tools.toggleMeasure()) : "";
+                    },
+                    copyLink: function () {
+                        if (!Link) return "";
+                        save();
+                        updateHash();
+                        return Link.copy(location.href).then(function (ok) {
+                            return ok ? "✓ " + (i18n.linkCopied || "Odkaz zkopírován")
+                                      : (i18n.linkFailed || "");
+                        });
+                    }
+                }
             });
         }
 

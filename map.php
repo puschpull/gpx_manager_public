@@ -113,6 +113,30 @@ window.gpxMapPageData = {
         'trackDetail' => t('mp_track_detail', 'Detail trasy'),
         'photoOpen'   => t('mp_photo_open', 'Otevřít fotku'),
         'addMarker'   => t('mp_add_marker', 'Přidat značku'),
+        'keys'        => [
+            'title'     => t('mp_kb_title', 'Klávesové zkratky'),
+            'close'     => t('mp_kb_close', 'Zavřít'),
+            'panel'     => t('mp_kb_panel', 'Panel vrstev sbalit / rozbalit'),
+            'search'    => t('mp_kb_search', 'Hledat místo'),
+            'opDown'    => t('mp_kb_op_down', 'Horní vrstva průhlednější (−10 %)'),
+            'opUp'      => t('mp_kb_op_up', 'Horní vrstva sytější (+10 %)'),
+            'swap'      => t('mp_kb_swap', 'Prohodit horní dvě vrstvy'),
+            'swipe'     => t('mp_swipe', 'Porovnávací posuvník'),
+            'lens'      => t('mp_lens', 'Lupa'),
+            'lensS'     => t('mp_kb_lens_smaller', 'Lupa menší'),
+            'lensB'     => t('mp_kb_lens_bigger', 'Lupa větší'),
+            'measure'   => t('mp_measure', 'Měření vzdálenosti a plochy'),
+            'link'      => t('mp_copy_link', 'Zkopírovat odkaz'),
+            'help'      => t('mp_kb_help', 'Tato nápověda'),
+            'arrows'    => t('mp_kb_arrows', 'Posun mapy (po kliknutí do mapy)'),
+            'zoom'      => t('mp_kb_zoom', 'Přiblížit / oddálit'),
+            'esc'       => t('mp_kb_esc', 'Zavřít bublinu, ukončit měření'),
+            'note'      => t('mp_kb_note', 'Zkratky nefungují při psaní do políčka.'),
+            'on'        => t('mp_kb_on', 'zapnuto'),
+            'off'       => t('mp_kb_off', 'vypnuto'),
+            'top'       => t('mp_kb_top', 'Navrchu'),
+            'lensFirst' => t('mp_kb_lens_first', 'Nejdřív zapněte lupu (L)'),
+        ],
         'markers'     => [
             'title'      => t('mp_mk_title', 'Název'),
             'note'       => t('mp_mk_note', 'Poznámka'),
@@ -145,6 +169,7 @@ window.gpxMapPageData = {
 <script defer src="<?= asset('js/map-page-search.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-mine.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-markers.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-keys.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>

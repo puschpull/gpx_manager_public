@@ -298,7 +298,11 @@
         });
         new Ctl().addTo(map);
 
-        return { toJtsk: toJtsk };
+        return {
+            toJtsk: toJtsk,
+            /** Zapne/vypne měření (klávesové zkratky); vrací nový stav. */
+            toggleMeasure: function () { setMeasuring(!measuring); return measuring; }
+        };
     }
 
     window.GpxMapTools = { create: create, toJtsk: toJtsk, fromJtsk: fromJtsk };
