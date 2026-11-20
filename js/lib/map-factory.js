@@ -1035,5 +1035,6 @@ window.GpxMapFactory = (function () {
         createRadarNowOverlay: createRadarNowOverlay,
         applyLayerConfig:      applyLayerConfig,
         layerName:             layerName,
+        layerKeys:             function () { return Object.keys(DEFAULT_NAMES); },
     };
 })();
