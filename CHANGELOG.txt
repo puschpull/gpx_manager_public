@@ -1,12 +1,139 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 15. října 2026
+  Poslední aktualizace: 19. listopadu 2026
 
 ================================================================================
 
 
+── 19. listopadu 2026 ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  STRÁNKA MAPA — NÁSTROJE PRO HLEDÁNÍ V MAPÁCH                             │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Osm vylepšení stránky Mapa (map.php):
+  - Porovnávací posuvník a lupa: horní vrstva je vidět jen vlevo od čáry,
+    nebo jen v kruhu kolem kurzoru (velikost lupy nastavitelná).
+  - Odkaz s nastavením: adresa stránky obsahuje výřez, vrstvy, krytí,
+    porovnání i období; tlačítko „Zkopírovat odkaz".
+  - Souřadnice pod kurzorem ve stupních a v S-JTSK (vlastní převod,
+    ověřený proti PROJ do 0,2 m), pravým tlačítkem bublina ke zkopírování;
+    měření délky a plochy.
+  - Uložené kombinace vrstev: čtyři připravené a vlastní pod názvem
+    (jen v tomto prohlížeči).
+  - Hledání místa podle názvu (Mapy.com) i podle souřadnic (GPS, stupně-
+    minuty-vteřiny, S-JTSK).
+  - Vrstvy Moje trasy (nový endpoint api/tracks/lines.php, čáry
+    zjednodušené na 10 m s cache v uploads/_line_cache) a Moje fotografie.
+  - Značky s poznámkou (tabulka map_markers, migrace 0021): přidává,
+    upravuje, přesouvá a maže jen admin; návštěvník vidí jen veřejné.
+    Ze značky „Do plánovače" (planner.php#pt=…).
+  - Klávesové zkratky s nápovědou (tlačítko ⌨️ nebo „?").
+  Nová migrace 0021 — po aktualizaci spustit php migrate.php.
+  Soubory: map.php, js/map-page*.js, css/map-page.css, js/lib/map-factory.js,
+           js/planner.js, api/tracks/lines.php, api/markers/*,
+           includes/map_markers.php, includes/app_constants.php,
+           migrations/0021_map_markers.sql, install.sql, lang/*.php
+
+  Opravy z 18. 11.: panel vrstev se sbaluje klikem na hlavičku; rozbalená
+  menu hlavičky („Více", administrace) se už nekreslí pod mapou
+  (.leaflet-container { isolation: isolate } v layout_header.php).
+
+── 18. listopadu 2026 ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  NOVÁ STRÁNKA MAPA — VRSTVY PŘES SEBE S VLASTNÍ PRŮHLEDNOSTÍ              │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Stránka map.php (menu „Mapa"): jen mapa přes celou výšku okna, bez tras
+  a fotek, s celou obrazovkou a „kde jsem". Panel vrstev vpravo nahoře
+  dovolí zapnout libovolnou kombinaci — i několik podkladů najednou
+  (např. turistická, nad ní historická mapa a ortofoto). Každá zapnutá
+  vrstva má posuvník krytí a šipky pro pořadí. Každá vrstva má vlastní
+  panel Leafletu (krytí = opacity panelu, pořadí = z-index), takže to
+  funguje i pro vrstvy s výběrem období a pro body. Prohlížeč si pamatuje
+  vrstvy, krytí, pořadí i výřez mapy. Vrstvy vypnuté v Administraci se
+  nenabízejí. Pro návštěvníky je stránka skrytá, dokud ji nezapnete
+  v Administraci → Návštěvníci.
+  Soubory: map.php, js/map-page.js, css/map-page.css,
+           includes/app_constants.php, includes/admin_new_view.php,
+           admin_classic.php, lang/*.php
+
+── 24. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MAPY: STÍNOVÁNÍ RELIÉFU ČÚZK PROLNUTÉ DO PODKLADU                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Nová překryvná vrstva „Stínování reliéfu ČÚZK" — stínování DMR 5G
+  se do zvolené mapy prolíná násobením (mix-blend-mode: multiply), ne
+  průhledností, takže barvy podkladu zůstanou syté a přibudou jen stíny.
+  Rovina má ve stínování šedou ~188/255, proto vrstvu CSS filtr zesvětlí,
+  jinak by ztmavila celou mapu. Jen Česko.
+  Soubory: js/lib/map-factory.js, includes/layout_header.php,
+           includes/app_constants.php, lang/*.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MAPY: RELIÉF Z LASEROVÉHO SKENOVÁNÍ, CHRÁNĚNÁ ÚZEMÍ, GEOLOGIE, KATASTR    │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Nová podkladová mapa „Reliéf z laserového skenování ČÚZK" (DMR 5G) —
+  terén bez lesa a budov, vidět jsou úvozy, valy, zaniklé cesty a meze;
+  výběr Stínování / Barevný reliéf / Sklon svahů stejným ovladačem jako
+  u leteckých snímků. Nové překryvné vrstvy: Chráněná území (AOPK, NP
+  a CHKO se zónami, rezervace, ochranná pásma), Geologická mapa 1:50 000
+  (ČGS, od zoomu 9) a Katastrální mapa (ČÚZK, služba kreslí parcely až od zoomu 17,
+  proto se při menším přiblížení nic nestahuje). Všechny jsou WMS bez
+  klíče; nevyžádané vrstvy jde vypnout v Administraci → Vrstvy map.
+  Soubory: js/lib/map-factory.js, includes/app_constants.php,
+           includes/security.php (img-src), lang/*.php
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  MAPY: LETECKÉ SNÍMKY ČÚZK PODLE LET A HISTORICKÉ MAPY                    │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Dvě nové podkladové mapy na všech mapách aplikace. „Letecké snímky
+  ČÚZK podle let" mají vlevo nahoře výběr období jako letecká mapa na
+  mapy.com: Nejnovější (aktuální ortofoto) a archiv 2022–2023 až
+  1998–2000. Mapy.com historické snímky přes REST API nenabízí, proto
+  archivní WMS ČÚZK; rok pokrývá jen část republiky, takže se období
+  skládá z více let najednou. „Historické mapy" nabízejí 1., 2. a 3.
+  vojenské mapování z portálu Chartae antiquae (VÚGTK). Výběr si
+  prohlížeč pamatuje, ovladač je společný (createPeriodLayer).
+  Soubory: js/lib/map-factory.js, includes/app_constants.php,
+           includes/layout_header.php, includes/security.php (img-src),
+           lang/*.php
+
+── 17. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  EXPORT GEOJSON: SEGMENTY TRASY                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Převod trasy do GeoJSON je ve společném includes/geojson_helper.php
+  (používá ho i vrstva Moje trasy na stránce Mapa). Export GeoJSON teď
+  respektuje segmenty záznamu (MultiLineString) — přes mezeru v záznamu
+  už nekreslí rovnou čáru. ajax_endpoint() přijímá volitelné příznaky
+  json_encode ('json_flags').
+  Soubory: includes/geojson_helper.php (nový), export_geojson.php,
+           includes/ajax.php
+
 ── 15. října 2026 ─────────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PŘEKLADY: POČASÍ, FOTKY, OBTÍŽNOST, VYHLEDÁVÁNÍ, OKOLÍ, PLÁNOVAČ         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Texty, které nešly přes t(), byly ve všech jazycích česky: popisky
+  obtížnosti, počasí na detailu trasy, názvy měsíců na časové ose fotek,
+  lightbox a bubliny fotek na mapě, odkazy, grafy a stránkování tabulky
+  tras, Hledat na mapě, Trasy v okolí, profily Plánovače, chybové hlášky
+  API, přihlášení a chybová stránka serveru. 89 nových klíčů v 8 jazycích.
+  Názvy tras v Hledat na mapě se nově escapují.
+  Soubory: includes/*_view.php, js/*.js, api/planner/*, api/poi/bbox.php,
+           api/photos/nearby.php, login.php, map_search.php, config.php,
+           lang/*.php
 
 ┌───────────────────────────────────────────────────────────────────────────┐
 │  HORNÍ MENU: POLOŽKY NAVÍC DO „VÍCE"                                      │
