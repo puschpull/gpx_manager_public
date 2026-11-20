@@ -246,7 +246,12 @@ if (!function_exists('t')) {
     .gpx-period-ctl button:focus-visible { background: rgba(255,255,255,.18); }
     .gpx-period-ctl button.is-active { background: rgba(255,255,255,.28); font-weight: 600; }
     .gpx-period-list { list-style: none; margin: 0; padding: 0 0 4px; }
-    .gpx-period-list[hidden] { display: none; }</style>
+    .gpx-period-list[hidden] { display: none; }
+
+    /* Stínování reliéfu prolnuté do podkladu (js/lib/map-factory.js relief_blend).
+       Rovina má ve stínování ČÚZK šedou ~188/255 a násobením by ztmavila celou
+       mapu o čtvrtinu — zesvětlení ji posune k bílé, do mapy se propíšou jen stíny. */
+    .gpx-blend-multiply { mix-blend-mode: multiply; filter: brightness(1.32) contrast(1.15); }</style>
 
     <!-- Obsluhy událostí místo onclick/onerror/onsubmit v HTML (ty CSP s nonce
          nespouští). Záměrně BEZ defer — viz komentář v souboru. -->

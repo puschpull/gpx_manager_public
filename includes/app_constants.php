@@ -128,6 +128,7 @@ function map_layer_defs(): array {
         'ztm'         => ['label' => t('mlayer_ztm', '🇨🇿 ZTM ČÚZK (jen Česko)'),       'section' => 'base'],
         'cuzk_ortho'  => ['label' => t('mlayer_cuzk_ortho', '🕰️ Letecké snímky ČÚZK podle let (jen Česko)'), 'section' => 'base'],
         'hist_maps'   => ['label' => t('mlayer_hist_maps', '📜 Historické mapy (vojenská mapování)'), 'section' => 'base'],
+        'relief'      => ['label' => t('mlayer_relief', '🏔️ Reliéf z laserového skenování ČÚZK (jen Česko)'), 'section' => 'base'],
 
         // --- překryvné vrstvy ---
         'wm_hiking'   => ['label' => t('mlayer_wm_hiking', '🤾 Turistické značení (Waymarked)'), 'section' => 'overlay'],
@@ -136,6 +137,10 @@ function map_layer_defs(): array {
         'hillshade'   => ['label' => t('mlayer_hillshade', '⛰️ Stínování terénu (Esri)'),        'section' => 'overlay'],
         'poi'         => ['label' => t('mlayer_poi', '📌 Turistické body (OSM)'),          'section' => 'overlay'],
         'mapy_names'  => ['label' => t('mlayer_mapy_names', '🏷️ Popisky a hranice (Mapy.com)'),   'section' => 'overlay', 'needs' => 'MAPYCOM_API_KEY'],
+        'relief_blend'=> ['label' => t('mlayer_relief_blend', '🏔️ Stínování reliéfu ČÚZK (jen Česko)'), 'section' => 'overlay'],
+        'protected'   => ['label' => t('mlayer_protected', '🌿 Chráněná území (AOPK)'),          'section' => 'overlay'],
+        'geology'     => ['label' => t('mlayer_geology', '🪨 Geologická mapa (ČGS)'),             'section' => 'overlay'],
+        'cadastre'    => ['label' => t('mlayer_cadastre', '📐 Katastrální mapa (ČÚZK, jen při velkém přiblížení)'), 'section' => 'overlay'],
     ];
 }
 
@@ -176,7 +181,8 @@ function map_context_layer_names(): array {
 function map_factory_texts(): array {
     $keys = ['poi_peak', 'poi_viewpoint', 'poi_shelter', 'poi_spring', 'poi_castle', 'poi_ruins', 'poi_tower',
              'locate_title', 'locate_tooltip', 'locate_failed', 'locate_needs',
-             'ortho_latest', 'ortho_period', 'hist_period', 'hist_m1', 'hist_m2', 'hist_m3'];
+             'ortho_latest', 'ortho_period', 'hist_period', 'hist_m1', 'hist_m2', 'hist_m3',
+             'relief_period', 'relief_shade', 'relief_tint', 'relief_slope'];
     $out = [];
     foreach ($keys as $k) $out[$k] = t('mf_' . $k);
     return $out;

@@ -120,7 +120,7 @@ function send_security_headers(): void {
 
     // Odkud se smějí načítat obrázky. Dřív „https:" = odkudkoli.
     // Seznam ověřen 9/2026 v režimu Report-Only: ukázková dlaždice ze všech
-    // 17 dlaždicových vrstev map + radar, Wikimedia, QR a ikony — nic mimo.
+    // 21 dlaždicových vrstev map + radar, Wikimedia, QR a ikony — nic mimo.
     // NOVÁ MAPOVÁ VRSTVA = přidat sem jejího poskytovatele, jinak zůstane
     // prázdná (bez chyby, jen se nezobrazí — v konzoli „Refused to load image").
     $imgSrc = implode(' ', [
@@ -136,6 +136,9 @@ function send_security_headers(): void {
         'https://ags.cuzk.gov.cz',                  // nejnovější letecké snímky ČÚZK
         'https://geoportal.cuzk.gov.cz',            // archivní letecké snímky ČÚZK (WMS)
         'https://www.chartae-antiquae.cz',          // historické mapy — vojenská mapování (WMS)
+        'https://services.cuzk.gov.cz',             // katastrální mapa ČÚZK (WMS)
+        'https://gis.nature.cz',                    // chráněná území AOPK (WMS)
+        'https://mapy.geology.cz',                  // geologická mapa ČGS (ArcGIS export)
         'https://tile.waymarkedtrails.org',         // turistické / cyklo / MTB trasy
         'https://opendata.chmi.cz',                 // aktuální radar (Plánovač)
         'https://upload.wikimedia.org',             // náhledy fotek Wikimedia
