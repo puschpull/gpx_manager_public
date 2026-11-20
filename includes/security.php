@@ -120,7 +120,7 @@ function send_security_headers(): void {
 
     // Odkud se smějí načítat obrázky. Dřív „https:" = odkudkoli.
     // Seznam ověřen 9/2026 v režimu Report-Only: ukázková dlaždice ze všech
-    // 15 dlaždicových vrstev map + radar, Wikimedia, QR a ikony — nic mimo.
+    // 17 dlaždicových vrstev map + radar, Wikimedia, QR a ikony — nic mimo.
     // NOVÁ MAPOVÁ VRSTVA = přidat sem jejího poskytovatele, jinak zůstane
     // prázdná (bez chyby, jen se nezobrazí — v konzoli „Refused to load image").
     $imgSrc = implode(' ', [
@@ -133,6 +133,9 @@ function send_security_headers(): void {
         'https://*.tile.thunderforest.com',         // Thunderforest
         'https://*.tile-cyclosm.openstreetmap.fr',  // CyclOSM
         'https://ags.cuzk.cz',                      // ZTM ČÚZK
+        'https://ags.cuzk.gov.cz',                  // nejnovější letecké snímky ČÚZK
+        'https://geoportal.cuzk.gov.cz',            // archivní letecké snímky ČÚZK (WMS)
+        'https://www.chartae-antiquae.cz',          // historické mapy — vojenská mapování (WMS)
         'https://tile.waymarkedtrails.org',         // turistické / cyklo / MTB trasy
         'https://opendata.chmi.cz',                 // aktuální radar (Plánovač)
         'https://upload.wikimedia.org',             // náhledy fotek Wikimedia

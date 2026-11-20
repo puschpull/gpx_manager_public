@@ -231,7 +231,22 @@ if (!function_exists('t')) {
     @media (min-width: 40rem) {
         .gpx-sm-inline       { display: inline; }
         .gpx-sm-inline-flex  { display: inline-flex; }
-    }</style>
+    }
+
+    /* Výběr období / mapového díla u podkladů s variantami — letecké snímky
+       ČÚZK, historické mapy (js/lib/map-factory.js createPeriodLayer). Tady, ne
+       v css/style.css — ten nemají všechny stránky s mapou. Tmavý panel jako
+       na mapy.com, stejný ve světlém i tmavém režimu. */
+    .gpx-period-ctl { background: rgba(20,20,20,.88); color: #fff; border-radius: 6px;
+                     box-shadow: 0 1px 5px rgba(0,0,0,.4); font-size: 13px; overflow: hidden; }
+    .gpx-period-ctl button { display: block; width: 100%; padding: 5px 10px; border: 0; background: transparent;
+                            color: inherit; font: inherit; text-align: left; white-space: nowrap; cursor: pointer; }
+    .gpx-period-ctl .gpx-period-btn { font-weight: 600; }
+    .gpx-period-ctl button:hover,
+    .gpx-period-ctl button:focus-visible { background: rgba(255,255,255,.18); }
+    .gpx-period-ctl button.is-active { background: rgba(255,255,255,.28); font-weight: 600; }
+    .gpx-period-list { list-style: none; margin: 0; padding: 0 0 4px; }
+    .gpx-period-list[hidden] { display: none; }</style>
 
     <!-- Obsluhy událostí místo onclick/onerror/onsubmit v HTML (ty CSP s nonce
          nespouští). Záměrně BEZ defer — viz komentář v souboru. -->

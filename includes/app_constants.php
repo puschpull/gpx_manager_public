@@ -126,6 +126,8 @@ function map_layer_defs(): array {
         'tf'          => ['label' => t('mlayer_tf', '🤾 Thunderforest'),              'section' => 'base', 'needs' => 'TF_API_KEY'],
         'cyclosm'     => ['label' => t('mlayer_cyclosm', '🌲 CyclOSM (všechny cesty)'),    'section' => 'base'],
         'ztm'         => ['label' => t('mlayer_ztm', '🇨🇿 ZTM ČÚZK (jen Česko)'),       'section' => 'base'],
+        'cuzk_ortho'  => ['label' => t('mlayer_cuzk_ortho', '🕰️ Letecké snímky ČÚZK podle let (jen Česko)'), 'section' => 'base'],
+        'hist_maps'   => ['label' => t('mlayer_hist_maps', '📜 Historické mapy (vojenská mapování)'), 'section' => 'base'],
 
         // --- překryvné vrstvy ---
         'wm_hiking'   => ['label' => t('mlayer_wm_hiking', '🤾 Turistické značení (Waymarked)'), 'section' => 'overlay'],
@@ -173,7 +175,8 @@ function map_context_layer_names(): array {
 /** Texty sdílené mapové továrny mimo názvy vrstev (body zájmu, moje poloha). */
 function map_factory_texts(): array {
     $keys = ['poi_peak', 'poi_viewpoint', 'poi_shelter', 'poi_spring', 'poi_castle', 'poi_ruins', 'poi_tower',
-             'locate_title', 'locate_tooltip', 'locate_failed', 'locate_needs'];
+             'locate_title', 'locate_tooltip', 'locate_failed', 'locate_needs',
+             'ortho_latest', 'ortho_period', 'hist_period', 'hist_m1', 'hist_m2', 'hist_m3'];
     $out = [];
     foreach ($keys as $k) $out[$k] = t('mf_' . $k);
     return $out;
