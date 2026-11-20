@@ -156,3 +156,11 @@
 }
 .gpx-cmp-size[hidden] { display: none; }
 .gpx-cmp-size input { width: 120px; accent-color: #2f6f4e; }
+
+/* Tlačítko „Zkopírovat odkaz“ nahoře v panelu */
+.gpx-lp-link {
+    display: block; width: 100%; margin: 8px 0 2px; padding: 5px 8px;
+    border: 1px solid #c9d2d9; border-radius: 6px; background: #fff;
+    color: #1f2933; font: inherit; text-align: left; cursor: pointer;
+}
+.gpx-lp-link:hover, .gpx-lp-link:focus-visible { background: #e3eaef; }

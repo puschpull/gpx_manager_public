@@ -60,6 +60,16 @@
         var F    = window.GpxMapFactory;
 
         var state = readState();
+
+        // Otevřený odkaz s nastavením (js/map-page-link.js) má přednost před
+        // tím, co si pamatuje prohlížeč. Období se musí zapsat před vznikem vrstev.
+        var Link = window.GpxMapLink;
+        var fromLink = Link ? Link.parse() : null;
+        if (fromLink) {
+            Link.applyPeriods(fromLink.per);
+            if (fromLink.view) state.view = fromLink.view;
+            state.cmp = Object.assign({}, state.cmp || {}, fromLink.cmp || { mode: null });
+        }
         var map = L.map("gpxMapPage", { fullscreenControl: true });
         if (Array.isArray(state.view) && state.view.length === 3) {
             map.setView([state.view[0], state.view[1]], state.view[2]);
@@ -82,6 +92,14 @@
         var byName  = {};
         var active  = [];
 
+        // Klíč vrstvy (pro odkaz) podle přeloženého názvu
+        var keyByName = {}, nameByKey = {};
+        (F.layerKeys ? F.layerKeys() : []).forEach(function (k) {
+            var n = F.layerName(k);
+            keyByName[n] = k;
+            nameByKey[k] = n;
+        });
+
         function register(layers, group) {
             Object.keys(layers).forEach(function (name) {
                 if (byName[name]) return;
@@ -102,7 +120,7 @@
                 }
                 assignPane(layer, paneName);
 
-                var e = { name: name, layer: layer, group: group, pane: pane, opacity: opacity };
+                var e = { name: name, key: keyByName[name] || "", layer: layer, group: group, pane: pane, opacity: opacity };
                 entries.push(e);
                 byName[name] = e;
             });
@@ -115,7 +133,29 @@
             state.view   = [+c.lat.toFixed(5), +c.lng.toFixed(5), map.getZoom()];
             state.layers = active.map(function (e) { return { n: e.name, o: e.opacity }; });
             writeState(state);
+            scheduleHash();
         }
+
+        /* Adresa stránky = aktuální nastavení. Se zpožděním: posuvník krytí
+           volá save() mnohokrát za sekundu a prohlížeč replaceState omezuje. */
+        var hashTimer = null;
+        function updateHash() {
+            clearTimeout(hashTimer);
+            if (!Link || !state.view) return;
+            Link.update({
+                view: state.view,
+                layers: active.map(function (e) { return { k: e.key, o: e.opacity }; }),
+                cmp: state.cmp
+            });
+        }
+        function scheduleHash() {
+            clearTimeout(hashTimer);
+            hashTimer = setTimeout(updateHash, 300);
+        }
+        // Změna období (historické mapy, snímky) přidá do skupiny jinou vrstvu
+        map.on("layeradd", scheduleHash);
+        // Vložený jiný odkaz do téže karty: replaceState tuhle událost nespouští
+        window.addEventListener("hashchange", function () { location.reload(); });
 
         var compare = null;   // porovnání (js/map-page-compare.js), vzniká níž
 
@@ -159,6 +199,12 @@
             active[i] = active[j];
             active[j] = e;
             applyOrder();
+        }
+
+        if (fromLink && fromLink.layers.length) {
+            state.layers = fromLink.layers
+                .filter(function (l) { return nameByKey[l.k]; })
+                .map(function (l) { return { n: nameByKey[l.k], o: l.o }; });
         }
 
         // Obnovit uložené vrstvy (odspodu, ať horní skončí nahoře)
@@ -265,6 +311,13 @@
 
         function render(focus) {
             panelBody.textContent = "";
+            if (Link) {
+                var lb = el("button", "gpx-lp-link", "🔗 " + (i18n.copyLink || "Zkopírovat odkaz"));
+                lb.type = "button";
+                lb.dataset.act = "link";
+                lb.title = i18n.linkHint || "";
+                panelBody.appendChild(lb);
+            }
             renderActive(panelBody);
             renderInactive(panelBody, "base", i18n.base || "Podkladové mapy");
             renderInactive(panelBody, "overlay", i18n.overlay || "Překryvné vrstvy");
@@ -309,6 +362,18 @@
                 L.DomEvent.on(panelBody, "click", function (ev) {
                     var btn = ev.target.closest("button[data-act]");
                     if (!btn) return;
+                    if (btn.dataset.act === "link") {
+                        save();
+                        updateHash();
+                        Link.copy(location.href).then(function (ok) {
+                            btn.textContent = ok ? "✓ " + (i18n.linkCopied || "Odkaz zkopírován")
+                                                 : (i18n.linkFailed || "Zkopírujte adresu z adresního řádku");
+                            setTimeout(function () {
+                                btn.textContent = "🔗 " + (i18n.copyLink || "Zkopírovat odkaz");
+                            }, 2500);
+                        });
+                        return;
+                    }
                     var e = byName[btn.dataset.name];
                     if (!e) return;
                     if (btn.dataset.act === "up")   move(e, -1);

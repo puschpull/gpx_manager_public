@@ -66,10 +66,15 @@ window.gpxMapPageData = {
         'lens'     => t('mp_lens', 'Lupa'),
         'lensSize' => t('mp_lens_size', 'Velikost lupy'),
         'cmpNeed'  => t('mp_cmp_need', 'zapněte aspoň dvě vrstvy'),
+        'copyLink'   => t('mp_copy_link', 'Zkopírovat odkaz'),
+        'linkHint'   => t('mp_link_hint', ''),
+        'linkCopied' => t('mp_link_copied', 'Odkaz zkopírován'),
+        'linkFailed' => t('mp_link_failed', 'Zkopírujte adresu z adresního řádku'),
     ]) ?>
 };
 </script>
 <script defer src="<?= asset('js/map-page-compare.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-link.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>
