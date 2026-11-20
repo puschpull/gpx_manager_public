@@ -287,19 +287,19 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     <?php if ($totalGalleryPages > 1): ?>
     <div class="gallery-pager" style="margin-top:12px;">
         <?php if ($galleryPage > 1): ?>
-            <a class="btn" href="<?= h($pgUrl(1)) ?>">« První</a>
-            <a class="btn" href="<?= h($pgUrl($galleryPage - 1)) ?>">← Předchozí</a>
+            <a class="btn" href="<?= h($pgUrl(1)) ?>">« <?= htmlspecialchars(t('photos_pager_first', 'První')) ?></a>
+            <a class="btn" href="<?= h($pgUrl($galleryPage - 1)) ?>">← <?= htmlspecialchars(t('photos_pager_prev', 'Předchozí')) ?></a>
         <?php else: ?>
-            <span class="btn" style="opacity:.4; cursor:default;">« První</span>
-            <span class="btn" style="opacity:.4; cursor:default;">← Předchozí</span>
+            <span class="btn" style="opacity:.4; cursor:default;">« <?= htmlspecialchars(t('photos_pager_first', 'První')) ?></span>
+            <span class="btn" style="opacity:.4; cursor:default;">← <?= htmlspecialchars(t('photos_pager_prev', 'Předchozí')) ?></span>
         <?php endif; ?>
-        <span class="pager-info">Strana <strong><?= $galleryPage ?></strong> / <?= $totalGalleryPages ?></span>
+        <span class="pager-info"><?= htmlspecialchars(t('photos_pager_page', 'Strana')) ?> <strong><?= $galleryPage ?></strong> / <?= $totalGalleryPages ?></span>
         <?php if ($galleryPage < $totalGalleryPages): ?>
-            <a class="btn" href="<?= h($pgUrl($galleryPage + 1)) ?>">Další →</a>
-            <a class="btn" href="<?= h($pgUrl($totalGalleryPages)) ?>">Poslední »</a>
+            <a class="btn" href="<?= h($pgUrl($galleryPage + 1)) ?>"><?= htmlspecialchars(t('photos_pager_next', 'Další')) ?> →</a>
+            <a class="btn" href="<?= h($pgUrl($totalGalleryPages)) ?>"><?= htmlspecialchars(t('photos_pager_last', 'Poslední')) ?> »</a>
         <?php else: ?>
-            <span class="btn" style="opacity:.4; cursor:default;">Další →</span>
-            <span class="btn" style="opacity:.4; cursor:default;">Poslední »</span>
+            <span class="btn" style="opacity:.4; cursor:default;"><?= htmlspecialchars(t('photos_pager_next', 'Další')) ?> →</span>
+            <span class="btn" style="opacity:.4; cursor:default;"><?= htmlspecialchars(t('photos_pager_last', 'Poslední')) ?> »</span>
         <?php endif; ?>
     </div>
     <?php endif; ?>

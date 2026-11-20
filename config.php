@@ -104,13 +104,22 @@ set_exception_handler(function (Throwable $e) {
     if (APP_ENV !== 'local') {
         http_response_code(500);
         // JSON response for AJAX, plain text otherwise
+        // t() may not be loaded yet (early bootstrap) or may fail itself (e.g. DB down)
+        $tr = static function (string $k, string $cs): string {
+            try {
+                return function_exists('t') ? t($k, $cs) : $cs;
+            } catch (\Throwable $ignored) {
+                return $cs;
+            }
+        };
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
             || (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json')
         ) {
             header('Content-Type: application/json');
-            echo json_encode(['error' => 'Interní chyba serveru.']);
+            echo json_encode(['error' => $tr('server_error', 'Interní chyba serveru.')]);
         } else {
-            echo '<h1>Chyba serveru</h1><p>Omlouváme se, došlo k neočekávané chybě.</p>';
+            echo '<h1>' . htmlspecialchars($tr('server_error_title', 'Chyba serveru')) . '</h1><p>'
+                . htmlspecialchars($tr('server_error_text', 'Omlouváme se, došlo k neočekávané chybě.')) . '</p>';
         }
     } else {
         // Na lokálu ukázat detaily

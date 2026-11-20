@@ -42,7 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btn && chartSection) {
         const savedState = localStorage.getItem("showChart") === "true";
         chartSection.style.display = savedState ? "block" : "none";
-        btn.textContent = savedState ? "📊 Skrýt přehled" : "📊 Zobrazit přehled";
+        const labelShow = btn.dataset.labelShow || "📊 Zobrazit přehled";
+        const labelHide = btn.dataset.labelHide || "📊 Skrýt přehled";
+        btn.textContent = savedState ? labelHide : labelShow;
 
         if (savedState) {
             setTimeout(() => {
@@ -54,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const visible = chartSection.style.display === "block";
             chartSection.style.display = visible ? "none" : "block";
             localStorage.setItem("showChart", (!visible).toString());
-            btn.textContent = visible ? "📊 Zobrazit přehled" : "📊 Skrýt přehled";
+            btn.textContent = visible ? labelShow : labelHide;
 
             if (!visible) {
                 setTimeout(() => {

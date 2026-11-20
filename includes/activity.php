@@ -55,11 +55,11 @@ function calculateDifficulty(?float $distance_km, ?float $ascent, ?float $elevat
  */
 function difficultyLabel(?int $diff): string {
     return match($diff) {
-        1 => 'Velmi snadná',
-        2 => 'Snadná',
-        3 => 'Středně náročná',
-        4 => 'Náročná',
-        5 => 'Velmi náročná',
+        1 => t('diff_1', 'Velmi snadná'),
+        2 => t('diff_2', 'Snadná'),
+        3 => t('diff_3', 'Středně náročná'),
+        4 => t('diff_4', 'Náročná'),
+        5 => t('diff_5', 'Velmi náročná'),
         default => '—',
     };
 }

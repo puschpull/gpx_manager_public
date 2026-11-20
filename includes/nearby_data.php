@@ -107,7 +107,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $clickLon = (float)($_GET['lon'] ?? 0);
 
     if ($clickLat == 0 && $clickLon == 0) {
-        echo json_encode(['error' => 'Chybí souřadnice bodu.']);
+        echo json_encode(['error' => t('api_missing_point')]);
         exit;
     }
 

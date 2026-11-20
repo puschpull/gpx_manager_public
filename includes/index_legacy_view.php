@@ -22,13 +22,13 @@ require __DIR__ . '/layout_header.php';
         <div>
             <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
                 <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
-                Zpět na novou homepage
+                <?= htmlspecialchars(t('legacy_back_home')) ?>
             </a>
             <h1 class="font-[Manrope] text-3xl md:text-4xl font-extrabold tracking-tight text-forest-700 dark:text-sand-100 flex items-center gap-3">
                 <i data-lucide="table-2" class="w-8 h-8 text-terracotta-500" aria-hidden="true"></i>
                 <?= htmlspecialchars(t('h1_my_tracks')) ?>
             </h1>
-            <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm">Detailní tabulkový pohled — všechny sloupce, filtry, hromadné akce</p>
+            <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm"><?= htmlspecialchars(t('legacy_subtitle')) ?></p>
         </div>
     </div>
 </section>
@@ -518,7 +518,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 <?php if ($filtered_stats['total_tracks'] < $stats['total_tracks']): ?>
                     <span class="text-muted"><?= t('summary_filtered') ?> <?= (int)$stats['total_tracks'] ?> <?= t('summary_tracks') ?></span>
                 <?php endif; ?>
-                <button id="toggleChartBtn" class="btn" style="margin-left:10px;"><?= t('btn_show_chart') ?></button>
+                <button id="toggleChartBtn" class="btn" style="margin-left:10px;" data-label-show="<?= htmlspecialchars(t('btn_show_chart')) ?>" data-label-hide="<?= htmlspecialchars(t('btn_hide_chart')) ?>"><?= t('btn_show_chart') ?></button>
             </div>
         <?php endif; ?>
 

@@ -278,6 +278,17 @@ if (!function_exists('t')) {
         'simplify'        => t('filter_badge_simplify', 'Zjednodušení'),
         'duration'        => t('param_duration', 'Doba (h:m:s)'),
         'distance'        => t('param_distance', 'Vzdálenost'),
+        // Lightbox + photo popups (js/lightbox.js, js/detail-map.js)
+        'lb_close'        => t('lb_close'),
+        'lb_close_tip'    => t('lb_close_tip'),
+        'lb_prev_tip'     => t('lb_prev_tip'),
+        'lb_next_tip'     => t('lb_next_tip'),
+        'lb_prev_aria'    => t('lb_prev_aria'),
+        'lb_next_aria'    => t('lb_next_aria'),
+        'lb_photo_n_of'   => t('lb_photo_n_of'),
+        'photo_click_full'=> t('photo_click_full'),
+        'photos_here'     => t('photos_here'),
+        'unit_m_asl'      => t('unit_m_asl'),
     ];
     ?>
     <script nonce="<?= csp_nonce() ?>">

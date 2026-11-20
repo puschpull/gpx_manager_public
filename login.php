@@ -116,7 +116,7 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
                 </svg>
             </div>
             <h1 class="font-[Manrope] text-2xl font-bold text-forest-700 dark:text-sand-100">GPX Manager</h1>
-            <p class="mt-1 text-sm text-forest-700/65 dark:text-sand-100/65">Správa GPS tras a fotografií</p>
+            <p class="mt-1 text-sm text-forest-700/65 dark:text-sand-100/65"><?= htmlspecialchars(t('login_subtitle')) ?></p>
         </div>
 
         <form method="post" class="card-outdoor p-6 sm:p-8">

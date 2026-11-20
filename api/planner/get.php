@@ -20,7 +20,7 @@ ajax_endpoint(function () use ($pdo): array {
     $id = (int)($_GET['id'] ?? 0);
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id.'];
+        return ['ok' => false, 'error' => t('api_missing_id')];
     }
 
     $stmt = $pdo->prepare(
@@ -32,7 +32,7 @@ ajax_endpoint(function () use ($pdo): array {
     $r = $stmt->fetch(\PDO::FETCH_ASSOC);
     if (!$r) {
         http_response_code(404);
-        return ['ok' => false, 'error' => 'Plán nenalezen.'];
+        return ['ok' => false, 'error' => t('api_plan_not_found')];
     }
 
     return ['ok' => true, 'plan' => [

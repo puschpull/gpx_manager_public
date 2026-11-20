@@ -1055,7 +1055,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btnExport.addEventListener("click", () => {
         if (!(routeData && routeData.coords && routeData.coords.length > 1)) return;
 
-        const name = (nameInput.value || "").trim() || ("Plán " + new Date().toISOString().slice(0, 10));
+        const name = (nameInput.value || "").trim()
+            || (i18n.defaultName || "Plán {date}").replace("{date}", new Date().toISOString().slice(0, 10));
         const now  = new Date().toISOString();
 
         let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n'

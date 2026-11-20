@@ -9,6 +9,7 @@ if (window.GPX_DEBUG) console.log("🗺️ detail-map.js načten");
 
 // Delegát na sdílené lib (js/lib/format-utils.js)
 function escHtml(s) { return window.GpxFmt.escHtml(s); }
+function dmText(key, fallback) { return (window.gpxI18n && window.gpxI18n[key]) || fallback; }
 
 let map;
 let gpxLayer;
@@ -218,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const img = document.createElement("img");
                     img.src = photo.thumb_url;
                     img.style.cssText = "width:100%; border-radius:4px; margin-bottom:6px; cursor:pointer;";
-                    img.title = "Kliknutím zobrazit plnou velikost";
+                    img.title = dmText("photo_click_full", "Kliknutím zobrazit plnou velikost");
                     img.onerror = function() { this.style.display = "none"; };
                     img.addEventListener("click", (e) => {
                         if (window.gpxLightbox) {
@@ -243,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     metaDiv.style.cssText = "font-size:12px; color:#666; line-height:1.6;";
                     const lines = [];
                     if (photo.taken_at) lines.push("📅 " + photo.taken_at.substring(0, 16).replace("T", " "));
-                    if (photo.altitude !== null) lines.push("⛰ " + photo.altitude + " m n. m.");
+                    if (photo.altitude !== null) lines.push("⛰ " + photo.altitude + " " + dmText("unit_m_asl", "m n. m."));
                     if (photo.img_direction !== null && photo.img_direction !== undefined)
                         lines.push("🧭 " + Math.round(photo.img_direction) + "°");
                     lines.push("📍 " + photo.lat.toFixed(5) + ", " + photo.lon.toFixed(5));
@@ -254,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Více fotek — header + mřížka thumbnailů
                     const header = document.createElement("div");
                     header.style.cssText = "font-weight:600; margin-bottom:8px;";
-                    header.textContent = `📸 ${count} fotky z tohoto místa`;
+                    header.textContent = "📸 " + dmText("photos_here", "Fotky z tohoto místa: {n}").replace("{n}", count);
                     popupEl.appendChild(header);
 
                     const grid = document.createElement("div");

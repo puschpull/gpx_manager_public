@@ -24,7 +24,7 @@ ajax_endpoint(function (): array {
 
     if ($s >= $n || $w >= $e || $s < -90 || $n > 90 || $w < -180 || $e > 180) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Neplatný bbox.'];
+        return ['ok' => false, 'error' => t('api_bad_bbox')];
     }
 
     // Přichytit na mřížku 0.05° (rozšířit ven) → posuny mapy trefují cache
@@ -37,7 +37,7 @@ ajax_endpoint(function (): array {
     // Ochrana Overpassu: příliš velký výřez odmítnout (klient volá až od zoomu 11)
     if (($n - $s) > 1.2 || ($e - $w) > 1.8) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Výřez je příliš velký — přibliž mapu.'];
+        return ['ok' => false, 'error' => t('api_bbox_too_big')];
     }
 
     // ---- Diskový cache (TTL 7 dní) ----
@@ -80,7 +80,7 @@ ajax_endpoint(function (): array {
         $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         if ($body === false || $http >= 400) {
-            return ['ok' => false, 'error' => "Overpass nedostupný (HTTP $http) — zkuste později."];
+            return ['ok' => false, 'error' => t('api_overpass_down') . " (HTTP $http)"];
         }
     } else {
         $ctx = stream_context_create(['http' => [
@@ -91,13 +91,13 @@ ajax_endpoint(function (): array {
         ]]);
         $body = @file_get_contents('https://overpass-api.de/api/interpreter', false, $ctx);
         if ($body === false) {
-            return ['ok' => false, 'error' => 'Overpass nedostupný — zkuste později.'];
+            return ['ok' => false, 'error' => t('api_overpass_down')];
         }
     }
 
     $data = json_decode((string)$body, true);
     if (!is_array($data) || !isset($data['elements'])) {
-        return ['ok' => false, 'error' => 'Neplatná odpověď Overpassu.'];
+        return ['ok' => false, 'error' => t('api_overpass_invalid')];
     }
 
     $pois = [];

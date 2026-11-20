@@ -24,14 +24,14 @@ ajax_endpoint(function () use ($pdo): array {
     $trackId = (int)($_POST['track_id'] ?? 0);
     if ($planId <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí plán.'];
+        return ['ok' => false, 'error' => t('api_missing_plan')];
     }
 
     $st = $pdo->prepare('SELECT id FROM planned_routes WHERE id = ?');
     $st->execute([$planId]);
     if (!$st->fetchColumn()) {
         http_response_code(404);
-        return ['ok' => false, 'error' => 'Plán neexistuje.'];
+        return ['ok' => false, 'error' => t('api_plan_not_found')];
     }
 
     if ($trackId > 0) {

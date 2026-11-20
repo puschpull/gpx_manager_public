@@ -21,7 +21,7 @@ ajax_endpoint(function () use ($pdo): array {
     $name = trim((string)($_POST['name'] ?? ''));
     if ($name === '') {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí název plánu.'];
+        return ['ok' => false, 'error' => t('api_plan_no_name')];
     }
     $name = mb_substr($name, 0, 120);
 
@@ -37,7 +37,7 @@ ajax_endpoint(function () use ($pdo): array {
     $wpts = json_decode($wptsRaw, true);
     if (!is_array($wpts) || count($wpts) < 2 || count($wpts) > 500) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Neplatné waypointy (2–500 bodů).'];
+        return ['ok' => false, 'error' => t('api_plan_bad_wp')];
     }
     $cleanWpts = [];
     foreach ($wpts as $w) {
@@ -45,7 +45,7 @@ ajax_endpoint(function () use ($pdo): array {
         // count($w) >= 2, ale $w[0] neexistuje → PHP warning uprostřed JSON odpovědi.
         if (!is_array($w) || !isset($w[0], $w[1]) || !is_numeric($w[0]) || !is_numeric($w[1])) {
             http_response_code(400);
-            return ['ok' => false, 'error' => 'Neplatný formát waypointů.'];
+            return ['ok' => false, 'error' => t('api_plan_bad_wp_fmt')];
         }
         // 3. prvek (volitelný) = příznak ručního úseku (0/1): segment vedoucí
         // DO tohoto bodu je rovná čára místo routingu (přechod pole/lesa).

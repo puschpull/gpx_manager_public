@@ -248,12 +248,11 @@ function load_photos_page_data(\PDO $pdo): array
         $timeline[$month][$day][] = $tp;
     }
 
-    $monthNamesCz = [
-        '01' => 'Leden',   '02' => 'Únor',     '03' => 'Březen',
-        '04' => 'Duben',   '05' => 'Květen',    '06' => 'Červen',
-        '07' => 'Červenec','08' => 'Srpen',     '09' => 'Září',
-        '10' => 'Říjen',   '11' => 'Listopad',  '12' => 'Prosinec',
-    ];
+    // Keyed '01'–'12' like the timeline months; months_full is indexed 1–12
+    $monthNamesCz = [];
+    foreach (t_arr('months_full') as $n => $name) {
+        if ($n >= 1) $monthNamesCz[sprintf('%02d', $n)] = $name;
+    }
     $currentYear = date('Y');
 
     // Pre-group photos for gallery display
