@@ -18,6 +18,8 @@ window.GpxMapFactory = (function () {
         mapy_basic: "🗺️ Mapy.com základní", mapy_out: "🧭 Mapy.com turistická",
         mapy_winter: "❄️ Mapy.com zimní", mapy_aerial: "✈️ Mapy.com letecká",
         tf: "🤾 Thunderforest", cyclosm: "🌲 CyclOSM (všechny cesty)", ztm: "🇨🇿 ZTM ČÚZK (jen Česko)",
+        cuzk_ortho: "🕰️ Letecké snímky ČÚZK podle let (jen Česko)",
+        hist_maps: "📜 Historické mapy (vojenská mapování)",
         wm_hiking: "🤾 Turistické značení (Waymarked)", wm_cycling: "🚴 Cyklotrasy (Waymarked)",
         wm_mtb: "🚵 MTB trasy (Waymarked)", hillshade: "⛰️ Stínování terénu (Esri)",
         poi: "📌 Turistické body (OSM)", mapy_names: "🏷️ Popisky a hranice (Mapy.com)",
@@ -110,6 +112,9 @@ window.GpxMapFactory = (function () {
             { maxZoom: 20, maxNativeZoom: 19, attribution: "© ČÚZK" }
         );
 
+        var baseOrthoArchive = createOrthoArchiveLayer(map);
+        var baseHistoric     = createHistoricMapsLayer(map);
+
         var overlayWaymarked = L.tileLayer(
             "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
             { maxZoom: 19, opacity: 0.7, attribution: "© Waymarked Trails, © OpenStreetMap" }
@@ -143,6 +148,8 @@ window.GpxMapFactory = (function () {
         baseLayers[layerName("tf")]          = baseThunderforest;
         baseLayers[layerName("cyclosm")]     = baseCyclOSM;
         baseLayers[layerName("ztm")]         = baseZTM;
+        baseLayers[layerName("cuzk_ortho")]  = baseOrthoArchive;
+        baseLayers[layerName("hist_maps")]   = baseHistoric;
 
         var overlayLayers = {};
         overlayLayers[layerName("wm_hiking")]  = overlayWaymarked;
@@ -177,6 +184,190 @@ window.GpxMapFactory = (function () {
         }
 
         return { baseLayers: baseLayers, overlayLayers: overlayLayers, baseOSM: baseOSM };
+    }
+
+    /**
+     * Letecké snímky ČÚZK s výběrem období (jako „Letecká" na mapy.com).
+     *
+     * „Nejnovější" jsou dlaždice aktuální ortofotomapy, starší období jdou
+     * z archivní služby WMS, kde je každý rok jedna vrstva. Rok pokrývá jen
+     * část republiky (snímkuje se po pásech), proto se o období žádá všemi
+     * jeho roky najednou — server je složí do jednoho obrázku, novější navrch.
+     * Roky 1998–2001 jsou černobílé, do roku 2008 s pixelem 50 cm.
+     *
+     * @param {L.Map} map
+     * @returns {L.LayerGroup}
+     */
+    function createOrthoArchiveLayer(map) {
+        var ATTR = "© <a href=\"https://geoportal.cuzk.gov.cz\" target=\"_blank\">ČÚZK</a>";
+        var WMS  = "https://geoportal.cuzk.gov.cz/WMS_ORTOFOTO_ARCHIV/WMService.aspx";
+
+        function archive(years) {
+            return {
+                id: years[0] + "-" + years[years.length - 1],
+                label: years[0] + "–" + years[years.length - 1],
+                // Pořadí vrstev WMS = pořadí kreslení, poslední je navrchu
+                create: function () {
+                    return L.tileLayer.wms(WMS, {
+                        layers: years.join(","), styles: "", format: "image/jpeg",
+                        version: "1.3.0", maxZoom: 20, attribution: ATTR
+                    });
+                }
+            };
+        }
+
+        // Období mapy.com + roky, které mapy.com vynechává (2022–23, 2008–09, 1998–2000)
+        return createPeriodLayer(map, {
+            storageKey: "gpx_ortho_period",
+            icon: "🕰️",
+            title: text("ortho_period", "Období leteckých snímků"),
+            periods: [
+                { id: "latest", label: text("ortho_latest", "Nejnovější"), create: function () {
+                    return L.tileLayer(
+                        "https://ags.cuzk.gov.cz/arcgis1/rest/services/ORTOFOTO_WM/MapServer/tile/{z}/{y}/{x}",
+                        { maxZoom: 20, attribution: ATTR }
+                    );
+                } },
+                archive([2022, 2023]),
+                archive([2019, 2020, 2021]),
+                archive([2016, 2017, 2018]),
+                archive([2013, 2014, 2015]),
+                archive([2010, 2011, 2012]),
+                archive([2008, 2009]),
+                archive([2004, 2005, 2006, 2007]),
+                archive([2001, 2002, 2003]),
+                archive([1998, 1999, 2000])
+            ]
+        });
+    }
+
+    /**
+     * Historické mapy — 1., 2. a 3. vojenské mapování z portálu Chartae
+     * antiquae (VÚGTK, projekt NAKI). Každé mapování je samostatná služba
+     * WMS se stejnojmennou vrstvou. Podmínky užití služba neuvádí, zdroj
+     * proto uvádíme v atribuci.
+     *
+     * @param {L.Map} map
+     * @returns {L.LayerGroup}
+     */
+    function createHistoricMapsLayer(map) {
+        var ATTR = "© <a href=\"https://www.chartae-antiquae.cz\" target=\"_blank\">Chartae antiquae</a> (VÚGTK)";
+
+        function survey(layer, label) {
+            return {
+                id: layer,
+                label: label,
+                create: function () {
+                    return L.tileLayer.wms("https://www.chartae-antiquae.cz/WMS/" + layer + "/", {
+                        layers: layer, styles: "", format: "image/jpeg",
+                        version: "1.1.1", maxZoom: 20, attribution: ATTR
+                    });
+                }
+            };
+        }
+
+        return createPeriodLayer(map, {
+            storageKey: "gpx_hist_map",
+            icon: "📜",
+            title: text("hist_period", "Mapové dílo"),
+            periods: [
+                survey("Military3", text("hist_m3", "3. vojenské mapování") + " (1876–1880)"),
+                survey("Military2", text("hist_m2", "2. vojenské mapování") + " (1836–1852)"),
+                survey("Military1", text("hist_m1", "1. vojenské mapování") + " (1764–1783)")
+            ]
+        });
+    }
+
+    /**
+     * Podkladová mapa s výběrem varianty (období, mapové dílo). Výběr je
+     * ovladač vlevo nahoře; je na mapě, jen když je tahle vrstva zvoleným
+     * podkladem. Zvolenou variantu si prohlížeč pamatuje.
+     *
+     * @param {L.Map} map
+     * @param {{ storageKey: string, icon: string, title: string,
+     *           periods: Array<{ id: string, label: string, create: function(): L.Layer }> }} opts
+     *        První varianta je výchozí.
+     * @returns {L.LayerGroup}
+     */
+    function createPeriodLayer(map, opts) {
+        var PERIODS = opts.periods;
+
+        function findPeriod(id) {
+            for (var i = 0; i < PERIODS.length; i++) if (PERIODS[i].id === id) return PERIODS[i];
+            return PERIODS[0];
+        }
+
+        var current;
+        try { current = findPeriod(localStorage.getItem(opts.storageKey)); } catch (e) { current = PERIODS[0]; }
+
+        // Vrstvy vznikají až při prvním zvolení varianty, ať se nic nestahuje zbytečně
+        var tiles = {};
+        function tileLayerFor(p) {
+            if (!tiles[p.id]) tiles[p.id] = p.create();
+            return tiles[p.id];
+        }
+
+        var group = L.layerGroup([tileLayerFor(current)]);
+
+        var control = L.control({ position: "topleft" });
+        control.onAdd = function () {
+            var div = L.DomUtil.create("div", "gpx-period-ctl");
+            var btn = L.DomUtil.create("button", "gpx-period-btn", div);
+            btn.type = "button";
+            btn.title = opts.title;
+            btn.setAttribute("aria-expanded", "false");
+            var list = L.DomUtil.create("ul", "gpx-period-list", div);
+            list.hidden = true;
+
+            /* Seznam se staví jednou a pak se jen přepínají třídy. Kdyby se
+               při kliku přestavěl, Leaflet by u odpojeného tlačítka nepoznal,
+               že klik patří ovladači, a poslal by ho i mapě. */
+            var items = PERIODS.map(function (p) {
+                var li = L.DomUtil.create("li", "", list);
+                var b  = L.DomUtil.create("button", "", li);
+                b.type = "button";
+                b.textContent = p.label;
+                L.DomEvent.on(b, "click", function () {
+                    select(p);
+                    list.hidden = true;
+                    btn.setAttribute("aria-expanded", "false");
+                    render();
+                });
+                return { period: p, el: b };
+            });
+
+            function render() {
+                btn.textContent = opts.icon + " " + current.label + " ▾";
+                items.forEach(function (it) {
+                    var on = it.period === current;
+                    it.el.classList.toggle("is-active", on);
+                    if (on) it.el.setAttribute("aria-current", "true");
+                    else it.el.removeAttribute("aria-current");
+                });
+            }
+
+            L.DomEvent.on(btn, "click", function () {
+                list.hidden = !list.hidden;
+                btn.setAttribute("aria-expanded", String(!list.hidden));
+            });
+            L.DomEvent.disableClickPropagation(div);
+            L.DomEvent.disableScrollPropagation(div);
+            render();
+            return div;
+        };
+
+        function select(p) {
+            if (p === current) return;
+            group.removeLayer(tileLayerFor(current));
+            current = p;
+            group.addLayer(tileLayerFor(current));
+            try { localStorage.setItem(opts.storageKey, p.id); } catch (e) { /* privátní režim */ }
+        }
+
+        group.on("add",    function () { map.addControl(control); });
+        group.on("remove", function () { map.removeControl(control); });
+
+        return group;
     }
 
     /**
