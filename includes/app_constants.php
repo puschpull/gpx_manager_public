@@ -22,7 +22,7 @@ function all_langs(): array {
  * Toto je jediné místo, kde se tento seznam definuje.
  */
 function all_pages(): array {
-    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks', 'links'];
+    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'map', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks', 'links'];
 }
 
 /**
@@ -37,6 +37,7 @@ function nav_menu_items(): array {
         'calendar'       => ['calendar.php',       'calendar',    t('nav_calendar',       'Kalendář'),        null],
         'nearby'         => ['nearby.php',         'map-pin',     t('h1_nearby',          'Trasy v okolí'),   null],
         'heatmap'        => ['heatmap.php',        'flame',       t('nav_heatmap',        'Heatmapa'),        null],
+        'map'            => ['map.php',            'map',         t('nav_map',            'Mapa'),            'map'],
         'virtual_tracks' => ['virtual_tracks.php', 'route',       t('nav_virtual_tracks', 'Virtuální trasy'), 'virtual_tracks'],
         'photos'         => ['photos.php',         'image',       t('nav_photos',         'Fotografie'),      null],
         'photo_nearby'   => ['photo_nearby.php',   'aperture',    t('nav_photo_nearby',   'Fotky v okolí'),   'photo_nearby'],
