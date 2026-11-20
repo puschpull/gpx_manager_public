@@ -10,6 +10,7 @@ declare(strict_types=1);
  *  - Optional CSRF verification (403 JSON on failure)
  *  - try/catch with structured error logging
  *  - APP_ENV=local exposes exception message; production returns generic string
+ *  - Optional extra json_encode flags ('json_flags', e.g. JSON_PRESERVE_ZERO_FRACTION)
  *
  * Usage:
  *   require_once __DIR__ . '/../includes/ajax.php';
@@ -23,6 +24,7 @@ function ajax_endpoint(callable $handler, array $opts = []): void
     $requireCsrf  = $opts['csrf']  ?? true;
     $requireAdmin = $opts['admin'] ?? false;
     $endpoint     = $opts['name']  ?? basename($_SERVER['SCRIPT_NAME'] ?? 'unknown');
+    $jsonFlags    = JSON_UNESCAPED_UNICODE | ($opts['json_flags'] ?? 0);
 
     header('Content-Type: application/json; charset=utf-8');
     header('X-Content-Type-Options: nosniff');
@@ -41,7 +43,7 @@ function ajax_endpoint(callable $handler, array $opts = []): void
         }
 
         $result = $handler();
-        echo json_encode($result, JSON_UNESCAPED_UNICODE);
+        echo json_encode($result, $jsonFlags);
 
     } catch (Throwable $e) {
         error_log(
