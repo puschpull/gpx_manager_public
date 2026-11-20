@@ -62,9 +62,14 @@ window.gpxMapPageData = {
         'off'      => t('mp_off', 'Vypnout'),
         'collapse' => t('mp_collapse', 'Sbalit panel'),
         'expand'   => t('mp_expand', 'Rozbalit panel'),
+        'swipe'    => t('mp_swipe', 'Porovnávací posuvník'),
+        'lens'     => t('mp_lens', 'Lupa'),
+        'lensSize' => t('mp_lens_size', 'Velikost lupy'),
+        'cmpNeed'  => t('mp_cmp_need', 'zapněte aspoň dvě vrstvy'),
     ]) ?>
 };
 </script>
+<script defer src="<?= asset('js/map-page-compare.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>

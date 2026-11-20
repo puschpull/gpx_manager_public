@@ -117,10 +117,13 @@
             writeState(state);
         }
 
+        var compare = null;   // porovnání (js/map-page-compare.js), vzniká níž
+
         function applyOrder() {
             active.forEach(function (e, i) {
                 e.pane.style.zIndex = String(Z_BASE + active.length - i);
             });
+            if (compare) compare.refresh();
         }
 
         function setOpacity(e, value) {
@@ -340,6 +343,14 @@
         });
 
         new Panel().addTo(map);
+        if (window.GpxMapCompare) {
+            compare = window.GpxMapCompare.create(map, {
+                i18n: i18n,
+                state: state,
+                save: save,
+                getActive: function () { return active; }
+            });
+        }
         if (F.createLocateControl) F.createLocateControl(map);
 
         map.on("moveend", save);
