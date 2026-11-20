@@ -79,6 +79,27 @@
         return { y: -r * Math.sin(theta), x: -r * Math.cos(theta) };
     }
 
+    /**
+     * S-JTSK (EPSG:5514) → WGS84 Newtonovou metodou nad toJtsk —
+     * po pár krocích je rozdíl pod milimetr, takže stačí jeden vzorec.
+     */
+    function fromJtsk(y, x) {
+        var lat = 49.8, lon = 15.5, h = 1e-6;
+        for (var i = 0; i < 12; i++) {
+            var f = toJtsk(lat, lon);
+            var fy = f.y - y, fx = f.x - x;
+            if (Math.abs(fy) < 0.001 && Math.abs(fx) < 0.001) break;
+            var a1 = toJtsk(lat + h, lon), a2 = toJtsk(lat, lon + h);
+            var j11 = (a1.y - f.y) / h, j12 = (a2.y - f.y) / h;
+            var j21 = (a1.x - f.x) / h, j22 = (a2.x - f.x) / h;
+            var det = j11 * j22 - j12 * j21;
+            if (!det) break;
+            lat -= ( j22 * fy - j12 * fx) / det;
+            lon -= (-j21 * fy + j11 * fx) / det;
+        }
+        return { lat: lat, lng: lon };
+    }
+
     /* ===== Formáty ===== */
     var LANG = document.documentElement.lang || "cs";
     function nf(v, dec) {
@@ -271,5 +292,5 @@
         return { toJtsk: toJtsk };
     }
 
-    window.GpxMapTools = { create: create, toJtsk: toJtsk };
+    window.GpxMapTools = { create: create, toJtsk: toJtsk, fromJtsk: fromJtsk };
 })();

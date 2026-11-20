@@ -421,6 +421,14 @@
             }
         });
 
+        // Hledání místa nad panelem vrstev (js/map-page-search.js)
+        if (window.GpxMapSearch) {
+            window.GpxMapSearch.create(map, {
+                i18n: i18n.search || {},
+                apiKey: keys.mapycom || "",
+                fromJtsk: window.GpxMapTools ? window.GpxMapTools.fromJtsk : null
+            });
+        }
         new Panel().addTo(map);
         if (window.GpxMapCompare) {
             compare = window.GpxMapCompare.create(map, {

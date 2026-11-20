@@ -39,15 +39,15 @@
 .gpx-lp-body {
     width: 320px;
     max-width: calc(100vw - 70px);
-    max-height: calc(100vh - 4rem - 90px);
-    max-height: calc(100dvh - 4rem - var(--gpx-banner-h, 0px) - 70px);
+    max-height: calc(100vh - 4rem - 135px);
+    max-height: calc(100dvh - 4rem - var(--gpx-banner-h, 0px) - 115px);
     overflow-y: auto;
     padding: 0 10px 10px;
     border-top: 1px solid #e3e8ec;
 }
-/* Ve fullscreen hlavička není — panel smí být vyšší */
+/* Ve fullscreen hlavička není — panel smí být vyšší (115 px = políčko hledání + hlavička panelu) */
 .leaflet-fullscreen-on .gpx-lp-body,
-:fullscreen .gpx-lp-body { max-height: calc(100vh - 70px); }
+:fullscreen .gpx-lp-body { max-height: calc(100vh - 115px); }
 .gpx-lp-body[hidden] { display: none; }
 
 .gpx-lp h3,
@@ -209,3 +209,38 @@
     font: inherit; color: #1f2933; background: #fff;
 }
 .gpx-pr-note { margin: 5px 0 2px; font-size: 11px; color: #52606d; }
+
+/* ===== Hledání místa (js/map-page-search.js) ===== */
+.gpx-se { position: relative; width: 320px; max-width: calc(100vw - 70px); }
+/* Ovladače Leafletu mají všechny z-index 800 a pozdější (panel vrstev)
+   by kreslil přes rozbalené výsledky — hledání je proto o úroveň výš. */
+.leaflet-control.gpx-se { z-index: 801; }
+.gpx-se-form { position: relative; display: flex; }
+.gpx-se-input {
+    flex: 1; min-width: 0; height: 34px; padding: 0 32px 0 11px;
+    border: 0; border-radius: 8px; background: #fff; color: #1f2933;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .3);
+    font: 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.gpx-se-input::placeholder { color: #616e7c; }
+.gpx-se-input:focus { outline: 2px solid #2f6f4e; outline-offset: 0; }
+.gpx-se-input::-webkit-search-cancel-button { display: none; }
+.gpx-se-clear {
+    position: absolute; right: 4px; top: 4px; width: 26px; height: 26px;
+    border: 0; border-radius: 5px; background: transparent; color: #52606d;
+    font-size: 14px; cursor: pointer;
+}
+.gpx-se-clear:hover, .gpx-se-clear:focus-visible { background: #e3eaef; }
+.gpx-se-clear[hidden] { display: none; }
+.gpx-se-list {
+    position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 1001;
+    list-style: none; margin: 0; padding: 4px 0; max-height: 60vh; overflow-y: auto;
+    background: #fff; color: #1f2933; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, .3);
+    font: 13px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.gpx-se-list[hidden] { display: none; }
+.gpx-se-item { padding: 6px 11px; cursor: pointer; }
+.gpx-se-item.is-sel, .gpx-se-item:hover { background: #e6f1eb; }
+.gpx-se-name { display: block; font-weight: 600; }
+.gpx-se-sub { display: block; font-size: 12px; color: #52606d; }
+.gpx-se-msg { padding: 6px 11px; color: #52606d; }
