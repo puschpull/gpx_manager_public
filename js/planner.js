@@ -1079,5 +1079,17 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
     });
 
+    // Bod poslaný z jiné stránky (Mapa → značka → „Do plánovače“):
+    // planner.php#pt=50.087500,14.421400 — přidá ho jako první bod plánu.
+    const pt = /(?:^#|&)pt=(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/.exec(location.hash);
+    if (pt) {
+        const lat = parseFloat(pt[1]), lng = parseFloat(pt[2]);
+        if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+            map.setView([lat, lng], 15);
+            addWaypoint({ lat: lat, lng: lng });
+        }
+        history.replaceState(history.state, "", location.pathname + location.search);
+    }
+
     updateButtons();
 });

@@ -27,7 +27,7 @@ window.GpxMapFactory = (function () {
         wm_hiking: "🤾 Turistické značení (Waymarked)", wm_cycling: "🚴 Cyklotrasy (Waymarked)",
         wm_mtb: "🚵 MTB trasy (Waymarked)", hillshade: "⛰️ Stínování terénu (Esri)",
         poi: "📌 Turistické body (OSM)", mapy_names: "🏷️ Popisky a hranice (Mapy.com)",
-        my_track: "🗺️ Moje trasa", my_tracks: "🥾 Moje trasy", my_photos: "📸 Moje fotografie", photo_pos: "📍 Polohy fotek na trase",
+        my_track: "🗺️ Moje trasa", my_tracks: "🥾 Moje trasy", my_markers: "📍 Moje značky", my_photos: "📸 Moje fotografie", photo_pos: "📍 Polohy fotek na trase",
         wikimedia: "🖼️ Fotografie (Wikimedia)", mapillary: "📷 Fotografie (Mapillary)",
         radar: "🌧️ Aktuální srážky (ČHMÚ)"
     };

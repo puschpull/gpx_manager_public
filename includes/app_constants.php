@@ -155,6 +155,7 @@ function map_context_layers(): array {
     return [
         $n['my_track']  => t('mlayer_ctx_track',     'detail trasy — vlastní GPX linie'),
         $n['my_tracks'] => t('mlayer_ctx_tracks',    'stránka Mapa — vlastní trasy ve výřezu'),
+        $n['my_markers']=> t('mlayer_ctx_markers',   'stránka Mapa — značky s poznámkou'),
         $n['my_photos'] => t('mlayer_ctx_photos',    'detail trasy — vlastní fotky'),
         $n['photo_pos'] => t('mlayer_ctx_photopos',  'detail trasy — body fotek podél trasy'),
         $n['wikimedia'] => t('mlayer_ctx_wikimedia', 'detail trasy'),
@@ -172,6 +173,7 @@ function map_context_layer_names(): array {
     return [
         'my_track'  => t('mlayer_name_my_track',  '🗺️ Moje trasa'),
         'my_tracks' => t('mlayer_name_my_tracks', '🥾 Moje trasy'),
+        'my_markers'=> t('mlayer_name_my_markers', '📍 Moje značky'),
         'my_photos' => t('mlayer_name_my_photos', '📸 Moje fotografie'),
         'photo_pos' => t('mlayer_name_photo_pos', '📍 Polohy fotek na trase'),
         'wikimedia' => t('mlayer_name_wikimedia', '🖼️ Fotografie (Wikimedia)'),

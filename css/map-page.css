@@ -259,3 +259,32 @@
 /* Prohlížeč by po kliknutí orámoval celý obdélník trasy (rámeček zaměření
    SVG cesty); bublina sama ukazuje, co je vybrané. */
 #gpxMapPage path.leaflet-interactive:focus { outline: none; }
+
+/* ===== Značky s poznámkou (js/map-page-markers.js) ===== */
+.gpx-mk-icon { background: none; border: 0; }
+.gpx-mk-sym {
+    display: block; font-size: 24px; line-height: 30px; text-align: center;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6));
+}
+.gpx-mk-pop { font-size: 13px; line-height: 1.4; }
+.gpx-mk-title { display: block; font-size: 14px; margin-bottom: 4px; }
+.gpx-mk-note { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 5px; }
+.gpx-mk-coords { font-size: 12px; color: #52606d; font-variant-numeric: tabular-nums; }
+.gpx-mk-pub { font-size: 12px; color: #2f6f4e; margin-top: 2px; }
+.gpx-mk-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.gpx-mk-btns a.gpx-tl-btn { text-decoration: none; color: #1f2933; }
+.gpx-mk-form { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.gpx-mk-form input[type="text"], .gpx-mk-form textarea {
+    width: 100%; box-sizing: border-box; padding: 4px 7px;
+    border: 1px solid #c9d2d9; border-radius: 5px; font: inherit; color: #1f2933; background: #fff;
+}
+.gpx-mk-form textarea { resize: vertical; }
+.gpx-mk-syms { display: flex; flex-wrap: wrap; gap: 4px; }
+.gpx-mk-symbtn {
+    width: 30px; height: 30px; padding: 0; border: 1px solid #c9d2d9; border-radius: 6px;
+    background: #fff; font-size: 17px; cursor: pointer;
+}
+.gpx-mk-symbtn[aria-checked="true"] { border: 2px solid #2f6f4e; background: #e6f1eb; }
+.gpx-mk-publab { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.gpx-mk-save { font-weight: 600; }
+.gpx-tl-add { margin-top: 6px; width: 100%; }

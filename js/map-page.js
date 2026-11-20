@@ -92,6 +92,20 @@
             overlays[F.layerName("my_tracks")] = window.GpxMapMine.tracks(map, i18n);
             if (cfg.showPhotos) overlays[F.layerName("my_photos")] = window.GpxMapMine.photos(map, i18n);
         }
+        // Značky s poznámkou (js/map-page-markers.js)
+        var markers = null;
+        if (window.GpxMapMarkers && cfg.showMarkers) {
+            markers = window.GpxMapMarkers.create(map, {
+                i18n: i18n.markers || {},
+                isAdmin: !!cfg.isAdmin,
+                plannerVisible: !!cfg.plannerVisible,
+                ensureOn: function () {
+                    var e = byName[F.layerName("my_markers")];
+                    if (e && active.indexOf(e) === -1) { turnOn(e); save(); rerender(); }
+                }
+            });
+            overlays[F.layerName("my_markers")] = markers.layer;
+        }
 
         /* entries: všechny vrstvy; active: zapnuté, první = nahoře */
         var entries = [];
@@ -448,7 +462,9 @@
         if (window.GpxMapTools) {
             window.GpxMapTools.create(map, {
                 i18n: i18n,
-                copy: Link ? Link.copy : function () { return Promise.resolve(false); }
+                copy: Link ? Link.copy : function () { return Promise.resolve(false); },
+                onAddMarker: (markers && cfg.isAdmin) ? markers.startAdd : null,
+                addMarkerLabel: i18n.addMarker
             });
         }
 

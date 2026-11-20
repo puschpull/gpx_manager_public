@@ -214,6 +214,15 @@
                     copy(r[1]).then(function (ok) { b.textContent = ok ? "✓" : "✕"; });
                 });
             });
+            if (opts.onAddMarker) {
+                var add = L.DomUtil.create("button", "gpx-tl-btn gpx-tl-add", wrap);
+                add.type = "button";
+                add.textContent = "📍 " + (opts.addMarkerLabel || "Přidat značku");
+                L.DomEvent.on(add, "click", function () {
+                    map.closePopup();
+                    opts.onAddMarker(ev.latlng);
+                });
+            }
             L.popup({ maxWidth: 360 }).setLatLng(ev.latlng).setContent(wrap).openOn(map);
         });
 
