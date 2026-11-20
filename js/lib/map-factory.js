@@ -20,6 +20,10 @@ window.GpxMapFactory = (function () {
         tf: "🤾 Thunderforest", cyclosm: "🌲 CyclOSM (všechny cesty)", ztm: "🇨🇿 ZTM ČÚZK (jen Česko)",
         cuzk_ortho: "🕰️ Letecké snímky ČÚZK podle let (jen Česko)",
         hist_maps: "📜 Historické mapy (vojenská mapování)",
+        relief: "🏔️ Reliéf z laserového skenování ČÚZK (jen Česko)",
+        relief_blend: "🏔️ Stínování reliéfu ČÚZK (jen Česko)",
+        protected: "🌿 Chráněná území (AOPK)", geology: "🪨 Geologická mapa (ČGS)",
+        cadastre: "📐 Katastrální mapa (ČÚZK, jen při velkém přiblížení)",
         wm_hiking: "🤾 Turistické značení (Waymarked)", wm_cycling: "🚴 Cyklotrasy (Waymarked)",
         wm_mtb: "🚵 MTB trasy (Waymarked)", hillshade: "⛰️ Stínování terénu (Esri)",
         poi: "📌 Turistické body (OSM)", mapy_names: "🏷️ Popisky a hranice (Mapy.com)",
@@ -114,6 +118,7 @@ window.GpxMapFactory = (function () {
 
         var baseOrthoArchive = createOrthoArchiveLayer(map);
         var baseHistoric     = createHistoricMapsLayer(map);
+        var baseRelief       = createReliefLayer(map);
 
         var overlayWaymarked = L.tileLayer(
             "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
@@ -150,6 +155,7 @@ window.GpxMapFactory = (function () {
         baseLayers[layerName("ztm")]         = baseZTM;
         baseLayers[layerName("cuzk_ortho")]  = baseOrthoArchive;
         baseLayers[layerName("hist_maps")]   = baseHistoric;
+        baseLayers[layerName("relief")]      = baseRelief;
 
         var overlayLayers = {};
         overlayLayers[layerName("wm_hiking")]  = overlayWaymarked;
@@ -157,6 +163,47 @@ window.GpxMapFactory = (function () {
         overlayLayers[layerName("wm_mtb")]     = overlayWaymarkedMtb;
         overlayLayers[layerName("hillshade")]  = overlayHillshade;
         overlayLayers[layerName("poi")]        = createPoiLayer(map);
+
+        // Stínování z laserového skenování ČÚZK (DMR 5G) prolnuté do podkladu.
+        // Třída gpx-blend-multiply (includes/layout_header.php) dává vrstvě
+        // mix-blend-mode: multiply — světlé plochy podklad nemění, stíny ho
+        // ztmaví, barvy mapy zůstanou syté (prostá průhlednost by je vybledla).
+        overlayLayers[layerName("relief_blend")] = L.tileLayer.wms(
+            "https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer",
+            { layers: "dmr5g:GrayscaleHillshade", styles: "", format: "image/png", transparent: true,
+              version: "1.3.0", maxZoom: 20, className: "gpx-blend-multiply",
+              attribution: "© <a href=\"https://geoportal.cuzk.gov.cz\" target=\"_blank\">ČÚZK</a>" }
+        );
+
+        // Chráněná území AOPK: velkoplošná (NP, CHKO) se zónami a klidovými
+        // územími, smluvně chráněná, ochranná pásma a maloplošná (NPR, PR, PP).
+        // Pořadí vrstev WMS = pořadí kreslení, drobná území jsou navrchu.
+        overlayLayers[layerName("protected")] = L.tileLayer.wms(
+            "https://gis.nature.cz/arcgis/services/UzemniOchrana/ChranUzemi/MapServer/WMSServer",
+            { layers: "3,2,4,7,1,8,0,5", styles: "", format: "image/png", transparent: true,
+              version: "1.3.0", maxZoom: 20, opacity: 0.55, attribution: "© AOPK ČR" }
+        );
+
+        // Geologická mapa 1 : 50 000 — horniny, jejich hranice a zlomy
+        // (hranice a zlomy kreslí služba až při větším přiblížení). Verze
+        // „mobil" je v Web Mercatoru a odpovídá za desetiny sekundy; WMS
+        // geologicka_mapa50 kreslí dlaždici při zoomu 9 i půl minuty. Pod
+        // zoomem 9 trvá i tahle několik sekund, proto minZoom.
+        overlayLayers[layerName("geology")] = arcgisExportLayer(
+            "https://mapy.geology.cz/arcgis/rest/services/Geologie/GEOCR50_mobil/MapServer",
+            { minZoom: 9, maxZoom: 20, opacity: 0.6,
+              attribution: "© <a href=\"https://www.geology.cz\" target=\"_blank\">ČGS</a>" }
+        );
+
+        // Katastrální mapa ČÚZK — služba kreslí parcely až od měřítka zhruba
+        // 1 : 5 000, při menším přiblížení vrací prázdné dlaždice. minZoom
+        // je proto 17, ať se zbytečně nestahují.
+        overlayLayers[layerName("cadastre")] = L.tileLayer.wms(
+            "https://services.cuzk.gov.cz/wms/wms.asp",
+            { layers: "KN", styles: "", format: "image/png", transparent: true,
+              version: "1.3.0", minZoom: 17, maxZoom: 20,
+              attribution: "© <a href=\"https://www.cuzk.gov.cz\" target=\"_blank\">ČÚZK</a>" }
+        );
 
         // Názvy a hranice na průhledném podkladu (Mapy.com). Hlavní smysl je nad
         // leteckou a satelitní mapou — ty jsou jinak bez jediného popisku.
@@ -274,6 +321,64 @@ window.GpxMapFactory = (function () {
                 survey("Military3", text("hist_m3", "3. vojenské mapování") + " (1876–1880)"),
                 survey("Military2", text("hist_m2", "2. vojenské mapování") + " (1836–1852)"),
                 survey("Military1", text("hist_m1", "1. vojenské mapování") + " (1764–1783)")
+            ]
+        });
+    }
+
+    /**
+     * Dlaždicová vrstva z dynamické služby ArcGIS MapServer (operace export),
+     * pro služby bez WMS. Rozsah dlaždice se počítá stejně jako u L.TileLayer.WMS.
+     *
+     * @param {string} url      adresa služby …/MapServer
+     * @param {object} options  volby L.TileLayer
+     * @returns {L.TileLayer}
+     */
+    function arcgisExportLayer(url, options) {
+        var layer = L.tileLayer("", options);
+        layer.getTileUrl = function (coords) {
+            var nwse = this._tileCoordsToNwSe(coords);
+            var crs  = this._map.options.crs;
+            var b    = L.bounds(crs.project(nwse[0]), crs.project(nwse[1]));
+            var size = this.getTileSize();
+            return url + "/export?f=image&format=png32&transparent=true&bboxSR=3857&imageSR=3857"
+                + "&size=" + size.x + "," + size.y
+                + "&bbox=" + [b.min.x, b.min.y, b.max.x, b.max.y].join(",");
+        };
+        return layer;
+    }
+
+    /**
+     * Reliéf z leteckého laserového skenování ČÚZK (DMR 5G) — terén bez
+     * vegetace a budov, takže jsou vidět i úvozy, valy, zaniklé cesty a meze
+     * pod lesem. Jen Česko. Varianty jsou funkce téže služby ImageServer.
+     *
+     * @param {L.Map} map
+     * @returns {L.LayerGroup}
+     */
+    function createReliefLayer(map) {
+        var ATTR = "© <a href=\"https://geoportal.cuzk.gov.cz\" target=\"_blank\">ČÚZK</a>";
+
+        function variant(fn, label) {
+            return {
+                id: fn,
+                label: label,
+                create: function () {
+                    return L.tileLayer.wms("https://ags.cuzk.gov.cz/arcgis2/services/dmr5g/ImageServer/WMSServer", {
+                        layers: "dmr5g:" + fn, styles: "", format: "image/png",
+                        version: "1.3.0", maxZoom: 20, attribution: ATTR
+                    });
+                }
+            };
+        }
+
+        return createPeriodLayer(map, {
+            storageKey: "gpx_relief_variant",
+            icon: "🏔️",
+            title: text("relief_period", "Zobrazení reliéfu"),
+            periods: [
+                variant("GrayscaleHillshade",         text("relief_shade", "Stínování")),
+                variant("TintedHillshadeContinuous",  text("relief_tint",  "Barevný reliéf")),
+                variant("SlopeRGBMap",                text("relief_slope", "Sklon svahů"))
             ]
         });
     }
