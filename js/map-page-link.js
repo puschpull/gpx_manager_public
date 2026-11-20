@@ -83,7 +83,7 @@
      */
     function build(s) {
         var parts = [];
-        if (s.view) parts.push("map=" + s.view[2] + "/" + s.view[0].toFixed(5) + "/" + s.view[1].toFixed(5));
+        if (s.view && !s.noView) parts.push("map=" + s.view[2] + "/" + s.view[0].toFixed(5) + "/" + s.view[1].toFixed(5));
         var ls = s.layers.filter(function (l) { return l.k; });
         if (ls.length) parts.push("layers=" + ls.map(function (l) { return l.k + ":" + l.o; }).join(","));
 
@@ -130,5 +130,17 @@
         }
     }
 
-    window.GpxMapLink = { parse: parse, applyPeriods: applyPeriods, update: update, copy: copy };
+    /** Kombinace vrstev bez výřezu mapy (pro uložené kombinace). */
+    function combo(s) {
+        return build(Object.assign({}, s, { noView: true })).replace(/^#/, "");
+    }
+
+    /** Přepne na kombinaci a zachová výřez — stránka se znovu načte (hashchange). */
+    function applyCombo(view, comboStr) {
+        var m = "map=" + view[2] + "/" + view[0].toFixed(5) + "/" + view[1].toFixed(5);
+        location.hash = m + (comboStr ? "&" + comboStr : "");
+    }
+
+    window.GpxMapLink = { parse: parse, applyPeriods: applyPeriods, update: update, copy: copy,
+                          combo: combo, applyCombo: applyCombo };
 })();

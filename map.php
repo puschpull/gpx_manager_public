@@ -78,12 +78,22 @@ window.gpxMapPageData = {
         'area'        => t('mp_area', 'Plocha'),
         'undo'        => t('mp_undo', 'Zpět'),
         'clear'       => t('mp_clear', 'Smazat'),
+        'presets'     => t('mp_presets', 'Uložené kombinace'),
+        'preName'     => t('mp_pre_name', 'Název kombinace'),
+        'preSave'     => t('mp_pre_save', 'Uložit současnou'),
+        'preDel'      => t('mp_pre_del', 'Smazat kombinaci'),
+        'preLocal'    => t('mp_pre_local', 'Ukládá se jen v tomto prohlížeči.'),
+        'pre_hist'    => t('mp_pre_hist', 'Historická mapa a dnešek'),
+        'pre_ortho'   => t('mp_pre_ortho', 'Letecké snímky 2001–2003 a dnes'),
+        'pre_relief'  => t('mp_pre_relief', 'Turistická se stínováním reliéfu'),
+        'pre_cad'     => t('mp_pre_cad', 'Katastr nad leteckou mapou'),
     ]) ?>
 };
 </script>
 <script defer src="<?= asset('js/map-page-compare.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-link.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-tools.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-presets.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>
