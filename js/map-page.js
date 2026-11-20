@@ -86,6 +86,12 @@
         var mapillary = F.createMapillaryOverlay(keys.mapillary || "");
         if (mapillary) overlays[F.layerName("mapillary")] = mapillary;
         overlays[F.layerName("wikimedia")] = F.createWikimediaLayer(map);
+        // Vlastní trasy a fotky (js/map-page-mine.js); fotky jen když je
+        // stránka Fotografie pro návštěvníky viditelná
+        if (window.GpxMapMine) {
+            overlays[F.layerName("my_tracks")] = window.GpxMapMine.tracks(map, i18n);
+            if (cfg.showPhotos) overlays[F.layerName("my_photos")] = window.GpxMapMine.photos(map, i18n);
+        }
 
         /* entries: všechny vrstvy; active: zapnuté, první = nahoře */
         var entries = [];
