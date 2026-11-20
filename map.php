@@ -87,6 +87,14 @@ window.gpxMapPageData = {
         'pre_ortho'   => t('mp_pre_ortho', 'Letecké snímky 2001–2003 a dnes'),
         'pre_relief'  => t('mp_pre_relief', 'Turistická se stínováním reliéfu'),
         'pre_cad'     => t('mp_pre_cad', 'Katastr nad leteckou mapou'),
+        'search'      => [
+            'placeholder'       => t('mp_search', 'Hledat místo nebo souřadnice'),
+            'placeholderCoords' => t('mp_search_coords_only', 'Zadat souřadnice'),
+            'coords'            => t('mp_search_coords', 'Souřadnice'),
+            'none'              => t('mp_search_none', 'Nic nenalezeno'),
+            'error'             => t('mp_search_error', 'Hledání teď nefunguje'),
+            'clearSearch'       => t('mp_search_clear', 'Zrušit hledání'),
+        ],
     ]) ?>
 };
 </script>
@@ -94,6 +102,7 @@ window.gpxMapPageData = {
 <script defer src="<?= asset('js/map-page-link.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-tools.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-presets.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-search.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>
