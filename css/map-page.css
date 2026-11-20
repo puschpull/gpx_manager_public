@@ -164,3 +164,31 @@
     color: #1f2933; font: inherit; text-align: left; cursor: pointer;
 }
 .gpx-lp-link:hover, .gpx-lp-link:focus-visible { background: #e3eaef; }
+
+/* ===== Souřadnice a měření (js/map-page-tools.js) ===== */
+.gpx-tl-box {
+    background: rgba(255, 255, 255, .92); color: #1f2933;
+    border-radius: 6px; box-shadow: 0 1px 5px rgba(0, 0, 0, .3);
+    font: 12px/1.35 system-ui, -apple-system, "Segoe UI", sans-serif;
+    overflow: hidden;
+}
+.gpx-tl-coords { padding: 4px 9px; font-variant-numeric: tabular-nums; cursor: help; }
+.gpx-tl-jtsk { color: #52606d; }
+.gpx-tl-meas { padding: 6px 9px; border-bottom: 1px solid #dde3e8; }
+.gpx-tl-meas[hidden] { display: none; }
+.gpx-tl-meas-text { font-weight: 600; margin-bottom: 5px; }
+.gpx-tl-meas-btns { display: flex; gap: 6px; }
+.gpx-tl-btn {
+    padding: 2px 8px; border: 1px solid #c9d2d9; border-radius: 5px;
+    background: #fff; color: #1f2933; font: inherit; cursor: pointer;
+}
+.gpx-tl-btn:hover:not(:disabled), .gpx-tl-btn:focus-visible { background: #e3eaef; }
+.gpx-tl-btn:disabled { opacity: .4; cursor: default; }
+.gpx-tl-measuring, .gpx-tl-measuring .leaflet-interactive { cursor: crosshair; }
+
+/* Bublina se souřadnicemi */
+.gpx-tl-pop { font-size: 12px; }
+.gpx-tl-pop-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+.gpx-tl-pop-lbl { width: 4.2em; color: #52606d; flex: none; }
+.gpx-tl-pop code { flex: 1; font-size: 12px; white-space: nowrap; }
+.gpx-tl-pop .gpx-tl-btn { padding: 1px 6px; }
