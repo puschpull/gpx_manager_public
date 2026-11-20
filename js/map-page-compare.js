@@ -136,7 +136,7 @@
         map.on("move zoomend viewreset resize", refresh);
 
         /* --- tlačítka --- */
-        var btnSwipe, btnLens, sizeBox;
+        var btnSwipe, btnLens, sizeBox, sizeRange;
         function updateButtons(enabled) {
             if (!btnSwipe) return;
             sizeBox.hidden = !(mode === "lens" && enabled);
@@ -177,7 +177,7 @@
                 // Velikost lupy — ukazuje se jen v režimu lupy, vpravo od tlačítek
                 sizeBox = L.DomUtil.create("label", "gpx-cmp-size", bar);
                 L.DomUtil.create("span", "", sizeBox).textContent = i18n.lensSize || "Velikost lupy";
-                var range = L.DomUtil.create("input", "", sizeBox);
+                var range = sizeRange = L.DomUtil.create("input", "", sizeBox);
                 range.type = "range";
                 range.min = String(LENS_MIN); range.max = String(LENS_MAX); range.step = "10";
                 range.value = String(lensR);
@@ -197,7 +197,22 @@
         new Ctl().addTo(map);
 
         refresh();
-        return { refresh: refresh };
+        return {
+            refresh: refresh,
+            /** Zapne/vypne režim (klávesové zkratky). */
+            toggle: setMode,
+            mode: function () { return mode; },
+            /** Zvětší/zmenší lupu o delta px; vrací nový poloměr. */
+            lensBy: function (delta) {
+                lensR = Math.max(LENS_MIN, Math.min(LENS_MAX, lensR + delta));
+                cmp.r = lensR;
+                if (sizeRange) sizeRange.value = String(lensR);
+                sizeRing();
+                refresh();
+                opts.save();
+                return lensR;
+            }
+        };
     }
 
     window.GpxMapCompare = { create: create };
