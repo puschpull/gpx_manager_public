@@ -192,3 +192,20 @@
 .gpx-tl-pop-lbl { width: 4.2em; color: #52606d; flex: none; }
 .gpx-tl-pop code { flex: 1; font-size: 12px; white-space: nowrap; }
 .gpx-tl-pop .gpx-tl-btn { padding: 1px 6px; }
+
+/* ===== Uložené kombinace (js/map-page-presets.js) ===== */
+.gpx-pr-list { list-style: none; margin: 0 0 6px; padding: 0; }
+.gpx-pr-list li { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; }
+.gpx-pr-apply {
+    flex: 1; min-width: 0; padding: 4px 7px; text-align: left;
+    border: 1px solid #dde3e8; border-radius: 5px; background: #f3f6f8;
+    color: #1f2933; font: inherit; cursor: pointer; overflow-wrap: anywhere;
+}
+.gpx-pr-apply:hover, .gpx-pr-apply:focus-visible { background: #e3eaef; }
+.gpx-pr-list li.is-current .gpx-pr-apply { border-color: #2f6f4e; background: #e6f1eb; font-weight: 600; }
+.gpx-pr-form { display: flex; gap: 6px; }
+.gpx-pr-form input {
+    flex: 1; min-width: 0; padding: 3px 7px; border: 1px solid #c9d2d9; border-radius: 5px;
+    font: inherit; color: #1f2933; background: #fff;
+}
+.gpx-pr-note { margin: 5px 0 2px; font-size: 11px; color: #52606d; }

@@ -139,14 +139,17 @@
         /* Adresa stránky = aktuální nastavení. Se zpožděním: posuvník krytí
            volá save() mnohokrát za sekundu a prohlížeč replaceState omezuje. */
         var hashTimer = null;
-        function updateHash() {
-            clearTimeout(hashTimer);
-            if (!Link || !state.view) return;
-            Link.update({
+        function linkState() {
+            return {
                 view: state.view,
                 layers: active.map(function (e) { return { k: e.key, o: e.opacity }; }),
                 cmp: state.cmp
-            });
+            };
+        }
+        function updateHash() {
+            clearTimeout(hashTimer);
+            if (!Link || !state.view) return;
+            Link.update(linkState());
         }
         function scheduleHash() {
             clearTimeout(hashTimer);
@@ -319,6 +322,7 @@
                 panelBody.appendChild(lb);
             }
             renderActive(panelBody);
+            if (presets) presets.render(panelBody);
             renderInactive(panelBody, "base", i18n.base || "Podkladové mapy");
             renderInactive(panelBody, "overlay", i18n.overlay || "Překryvné vrstvy");
             updateToggle();
@@ -336,6 +340,16 @@
         /* Přestavění až po doběhnutí události: Leaflet u kliku hledá, zda
            cíl leží v ovladači, a u odpojeného tlačítka by to nepoznal. */
         function rerender(focus) { setTimeout(function () { render(focus); }, 0); }
+
+        // Uložené kombinace vrstev (js/map-page-presets.js)
+        var presets = (Link && window.GpxMapPresets) ? window.GpxMapPresets.create({
+            i18n: i18n,
+            state: state,
+            save: save,
+            hasKey: function (k) { return !!(nameByKey[k] && byName[nameByKey[k]]); },
+            currentCombo: function () { return Link.combo(linkState()); },
+            apply: function (combo) { save(); Link.applyCombo(state.view, combo); }
+        }) : null;
 
         var Panel = L.Control.extend({
             options: { position: "topright" },
