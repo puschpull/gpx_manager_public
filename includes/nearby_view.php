@@ -52,7 +52,7 @@ require __DIR__ . '/layout_header.php';
 <!-- Tabulka výsledků -->
 <div id="nearby-results" class="nearby-results" style="display:none;">
     <div class="nearby-results-head">
-        <h2>Nalezené nejbližší trasy</h2>
+        <h2><?= htmlspecialchars(t('nb_results_title')) ?></h2>
         <a id="nearby-zip" class="btn-outdoor btn-outdoor-ghost" href="#">
             <i data-lucide="file-archive" class="w-4 h-4" aria-hidden="true"></i>
             <?= htmlspecialchars(t('nb_export_zip', 'Stáhnout vše (ZIP)')) ?>
@@ -62,14 +62,14 @@ require __DIR__ . '/layout_header.php';
         <thead>
             <tr>
                 <th>#</th>
-                <th>Barva</th>
-                <th>Název trasy</th>
-                <th>Vzdálenost od bodu (km)</th>
-                <th>Délka trasy (km)</th>
-                <th>Stoupání (m)</th>
-                <th>Klesání (m)</th>
-                <th>Datum</th>
-                <th>Doba</th>
+                <th><?= htmlspecialchars(t('th_color')) ?></th>
+                <th><?= htmlspecialchars(t('th_track_name')) ?></th>
+                <th><?= htmlspecialchars(t('nb_col_dist_point')) ?></th>
+                <th><?= htmlspecialchars(t('nb_col_length')) ?></th>
+                <th><?= htmlspecialchars(t('label_ascent')) ?></th>
+                <th><?= htmlspecialchars(t('label_descent')) ?></th>
+                <th><?= htmlspecialchars(t('param_date')) ?></th>
+                <th><?= htmlspecialchars(t('th_duration')) ?></th>
                 <th><?= htmlspecialchars(t('nb_col_export', 'Export')) ?></th>
             </tr>
         </thead>
@@ -104,7 +104,17 @@ window.gpxNearbyData = {
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
     i18n: {
-        downloadGpx: <?= js_safe_json(t('nb_download_gpx', 'Stáhnout GPX')) ?>
+        downloadGpx:  <?= js_safe_json(t('nb_download_gpx', 'Stáhnout GPX')) ?>,
+        rowTip:       <?= js_safe_json(t('nb_row_tip')) ?>,
+        searching:    <?= js_safe_json(t('nb_searching')) ?>,
+        none:         <?= js_safe_json(t('nb_none')) ?>,
+        foundLoading: <?= js_safe_json(t('nb_found_loading')) ?>,
+        shown:        <?= js_safe_json(t('nb_shown')) ?>,
+        shownPartial: <?= js_safe_json(t('nb_shown_partial')) ?>,
+        distFromPoint:<?= js_safe_json(t('nb_dist_from_point')) ?>,
+        nearestPoint: <?= js_safe_json(t('nb_nearest_point')) ?>,
+        error:        <?= js_safe_json(t('error', 'Chyba')) ?>,
+        commError:    <?= js_safe_json(t('pn_error')) ?>
     }
 };
 </script>

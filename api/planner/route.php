@@ -38,14 +38,14 @@ ajax_endpoint(function (): array {
             : [];
         if (count($hits) >= 20) {
             http_response_code(429);
-            return ['ok' => false, 'error' => 'Příliš mnoho požadavků — chvíli počkejte.'];
+            return ['ok' => false, 'error' => t('api_too_many_requests')];
         }
         $hits[] = (string)$now;
         file_put_contents($rateFile, implode("\n", array_values($hits)), LOCK_EX);
     }
 
     if (!defined('MAPYCOM_API_KEY') || MAPYCOM_API_KEY === '') {
-        return ['ok' => false, 'error' => 'Chybí Mapy.com API klíč.'];
+        return ['ok' => false, 'error' => t('api_no_mapy_key')];
     }
 
     // ---- Vstup: body ----
@@ -61,13 +61,13 @@ ajax_endpoint(function (): array {
     }
     if (count($pts) < 2) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Zadejte alespoň 2 body.'];
+        return ['ok' => false, 'error' => t('api_min_2_points')];
     }
     // Auto úsek se interně dělí na kousky po 15 mezibodech (řetězení), zvládne
     // tedy víc bodů. Limit je jen pojistka proti extrémnímu vstupu.
     if (count($pts) > 100) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Příliš mnoho bodů v jednom úseku (max 100).'];
+        return ['ok' => false, 'error' => str_replace('{n}', '100', t('api_too_many_points_seg'))];
     }
 
     $profile = (string)($_GET['profile'] ?? 'foot_hiking');
@@ -139,12 +139,12 @@ ajax_endpoint(function (): array {
 
         $data = json_decode((string)$body, true);
         if (!is_array($data)) {
-            return ['ok' => false, 'error' => 'Neplatná odpověď z Mapy.com.'];
+            return ['ok' => false, 'error' => t('api_mapy_invalid')];
         }
 
         $lineLonLat = planner_find_linestring($data);
         if (!$lineLonLat) {
-            return ['ok' => false, 'error' => 'Odpověď neobsahuje geometrii trasy (bod mimo cestní síť?).'];
+            return ['ok' => false, 'error' => t('api_no_geometry')];
         }
 
         foreach ($lineLonLat as $c) {
@@ -187,7 +187,7 @@ ajax_endpoint(function (): array {
     }
 
     if (count($coords) < 2) {
-        return ['ok' => false, 'error' => 'Trasu se nepodařilo sestavit.'];
+        return ['ok' => false, 'error' => t('api_route_failed')];
     }
 
     return [

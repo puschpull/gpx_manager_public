@@ -19,7 +19,7 @@ ajax_endpoint(function () use ($pdo): array {
     $id = (int)($_POST['id'] ?? 0);
     if ($id <= 0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí id.'];
+        return ['ok' => false, 'error' => t('api_missing_id')];
     }
 
     $pdo->prepare('DELETE FROM planned_routes WHERE id = ?')->execute([$id]);

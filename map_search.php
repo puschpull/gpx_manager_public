@@ -127,11 +127,11 @@ require __DIR__ . '/includes/layout_header.php';
 <div class="mb-3 flex flex-wrap gap-2">
     <button id="clearBtn" type="button" class="btn-outdoor btn-outdoor-ghost">
         <i data-lucide="x" class="w-4 h-4" aria-hidden="true"></i>
-        Vymazat výběr
+        <?= htmlspecialchars(t('ms_clear')) ?>
     </button>
 </div>
 <div id="search-status" class="search-status">
-    Nakreslete obdélník na mapě: klikněte na první roh a potom na protější roh.
+    <?= htmlspecialchars(t('ms_hint')) ?>
 </div>
 
 <!-- A11Y-021: skip link + role="img" + aria-label -->
@@ -148,12 +148,12 @@ require __DIR__ . '/includes/layout_header.php';
         <thead>
             <tr>
                 <th>#</th>
-                <th>Název trasy</th>
-                <th>Vzdálenost (km)</th>
-                <th>Stoupání (m)</th>
-                <th>Obtížnost</th>
-                <th>Datum</th>
-                <th>Akce</th>
+                <th><?= htmlspecialchars(t('th_track_name')) ?></th>
+                <th><?= htmlspecialchars(t('label_distance_km')) ?></th>
+                <th><?= htmlspecialchars(t('label_ascent')) ?></th>
+                <th><?= htmlspecialchars(t('th_difficulty')) ?></th>
+                <th><?= htmlspecialchars(t('param_date')) ?></th>
+                <th><?= htmlspecialchars(t('th_action')) ?></th>
             </tr>
         </thead>
         <tbody id="results-tbody"></tbody>
@@ -184,7 +184,15 @@ window.gpxMapSearchData = {
         tf:        <?= js_safe_json(TF_API_KEY) ?>,
         mapycom:   <?= js_safe_json(MAPYCOM_API_KEY) ?>,
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
-    }
+    },
+    i18n: <?= js_safe_json([
+        'hint'        => t('ms_hint'),
+        'firstCorner' => t('ms_first_corner'),
+        'searching'   => t('ms_searching'),
+        'found'       => t('ms_found'),
+        'map'         => t('th_map'),
+        'edit'        => t('link_edit'),
+    ]) ?>
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -216,6 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let firstCorner = null;
     let rectangle = null;
     let bboxRects = []; // obdélníky nalezených tras
+    const i18n = window.gpxMapSearchData.i18n;
+    const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const statusEl = document.getElementById('search-status');
     const resultsEl = document.getElementById('search-results');
     const tbodyEl = document.getElementById('results-tbody');
@@ -241,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstCorner = null;
         resultsEl.style.display = 'none';
         tbodyEl.innerHTML = '';
-        statusEl.textContent = 'Nakreslete obdélník na mapě: klikněte na první roh a potom na protější roh.';
+        statusEl.textContent = i18n.hint;
     }
 
     document.getElementById('clearBtn')?.addEventListener('click', clearSelection);
@@ -250,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!firstCorner) {
             // První klik — uloží roh
             firstCorner = e.latlng;
-            statusEl.textContent = `První roh: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)} — klikněte na protější roh.`;
+            statusEl.textContent = i18n.firstCorner.replace('{pos}', `${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`);
 
             // Vymazat předchozí
             if (rectangle) map.removeLayer(rectangle);
@@ -264,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 color: '#3388ff', weight: 3, fillOpacity: 0.15
             }).addTo(map);
 
-            statusEl.textContent = 'Hledání tras v oblasti...';
+            statusEl.textContent = i18n.searching;
 
             const sw = bounds.getSouthWest();
             const ne = bounds.getNorthEast();
@@ -276,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     bboxRects.forEach(r => map.removeLayer(r));
                     bboxRects = [];
 
-                    statusEl.textContent = `Nalezeno ${data.count} tras v oblasti.`;
+                    statusEl.textContent = i18n.found.replace('{n}', data.count);
 
                     if (data.tracks.length === 0) {
                         resultsEl.style.display = 'none';
@@ -292,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 [[t.bounds.minlat, t.bounds.minlon], [t.bounds.maxlat, t.bounds.maxlon]],
                                 { color: col, weight: 1, fillOpacity: 0.08, dashArray: '4 4' }
                             ).addTo(map);
-                            rect.bindTooltip(t.track_name || t.filename, { sticky: true });
+                            rect.bindTooltip(esc(t.track_name || t.filename), { sticky: true });
                             bboxRects.push(rect);
                         }
                     });
@@ -303,15 +313,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td>${i + 1}</td>
-                            <td><a href="detail.php?id=${t.id}">${t.track_name || t.filename}</a>
+                            <td><a href="detail.php?id=${t.id}">${esc(t.track_name || t.filename)}</a>
                                 ${t.is_favorite ? ' ⭐' : ''}</td>
                             <td>${t.distance_km}</td>
                             <td>${t.ascent}</td>
                             <td>${diffDots(t.difficulty)}</td>
                             <td style="white-space:nowrap;">${(t.date_start || '—').substring(0, 10)}</td>
                             <td>
-                                <a href="detail.php?id=${t.id}" class="result-btn">Mapa</a>
-                                <a href="edit.php?id=${t.id}" class="result-btn">Edit</a>
+                                <a href="detail.php?id=${t.id}" class="result-btn">${esc(i18n.map)}</a>
+                                <a href="edit.php?id=${t.id}" class="result-btn">${esc(i18n.edit)}</a>
                             </td>
                         `;
                         tbodyEl.appendChild(tr);

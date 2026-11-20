@@ -5,10 +5,10 @@ $nextQ  = build_query(['page'=> min($total_pages, $page+1)]);
 $lastQ  = build_query(['page'=> $total_pages]);
 ?>
     <div class="pager">
-        <a class="pgbtn <?= $page<=1?'disabled':'' ?>" href="?<?= h($firstQ) ?>">⏮ První</a>
-        <a class="pgbtn <?= $page<=1?'disabled':'' ?>" href="?<?= h($prevQ) ?>">◀ Předchozí</a>
-        <span class="info">Strana <?= $page ?> / <?= $total_pages ?> • Záznamy: <?= $total_rows ?></span>
-        <a class="pgbtn <?= $page>=$total_pages?'disabled':'' ?>" href="?<?= h($nextQ) ?>">Následující ▶</a>
-        <a class="pgbtn <?= $page>=$total_pages?'disabled':'' ?>" href="?<?= h($lastQ) ?>">Poslední ⏭</a>
+        <a class="pgbtn <?= $page<=1?'disabled':'' ?>" href="?<?= h($firstQ) ?>">⏮ <?= h(t('photos_pager_first')) ?></a>
+        <a class="pgbtn <?= $page<=1?'disabled':'' ?>" href="?<?= h($prevQ) ?>">◀ <?= h(t('photos_pager_prev')) ?></a>
+        <span class="info"><?= h(t('photos_pager_page')) ?> <?= $page ?> / <?= $total_pages ?> • <?= h(t('pager_records')) ?>: <?= $total_rows ?></span>
+        <a class="pgbtn <?= $page>=$total_pages?'disabled':'' ?>" href="?<?= h($nextQ) ?>"><?= h(t('photos_pager_next')) ?> ▶</a>
+        <a class="pgbtn <?= $page>=$total_pages?'disabled':'' ?>" href="?<?= h($lastQ) ?>"><?= h(t('photos_pager_last')) ?> ⏭</a>
     </div>
 <?php

@@ -54,17 +54,17 @@ require __DIR__ . '/layout_header.php';
 <div class="plan-controls">
     <label for="planProfile"><?= htmlspecialchars(t('planner_profile', 'Profil')) ?>:
         <select id="planProfile">
-            <optgroup label="Pěšky">
-                <option value="foot_hiking" selected>🥾 turistická</option>
-                <option value="foot_fast">🚶 pěšky nejkratší</option>
+            <optgroup label="<?= htmlspecialchars(t('activity_walk')) ?>">
+                <option value="foot_hiking" selected>🥾 <?= htmlspecialchars(t('planner_prof_foot_hiking')) ?></option>
+                <option value="foot_fast">🚶 <?= htmlspecialchars(t('planner_prof_foot_fast')) ?></option>
             </optgroup>
-            <optgroup label="Kolo">
-                <option value="bike_road">🚲 cyklostezka</option>
-                <option value="bike_mountain">🚵 terénní cyklo</option>
+            <optgroup label="<?= htmlspecialchars(t('activity_bike')) ?>">
+                <option value="bike_road">🚲 <?= htmlspecialchars(t('planner_prof_bike_road')) ?></option>
+                <option value="bike_mountain">🚵 <?= htmlspecialchars(t('planner_prof_bike_mountain')) ?></option>
             </optgroup>
-            <optgroup label="Auto">
-                <option value="car_fast">🚗 silnice (rychlá)</option>
-                <option value="car_short">🚗 silnice (nejkratší)</option>
+            <optgroup label="<?= htmlspecialchars(t('activity_car')) ?>">
+                <option value="car_fast">🚗 <?= htmlspecialchars(t('planner_prof_car_fast')) ?></option>
+                <option value="car_short">🚗 <?= htmlspecialchars(t('planner_prof_car_short')) ?></option>
             </optgroup>
         </select>
     </label>
@@ -185,6 +185,7 @@ window.gpxPlannerData = {
         bike: <?= js_safe_json($_paceBike) ?>
     },
     i18n: {
+        defaultName: <?= js_safe_json(t('planner_default_name')) ?>,
         computing:  <?= js_safe_json(t('planner_computing', 'Počítám trasu…')) ?>,
         error:      <?= js_safe_json(t('planner_calc_error', 'Výpočet trasy selhal')) ?>,
         clickHint:  <?= js_safe_json(t('planner_click_hint', 'Klikáním do mapy přidávej body — trasa se počítá po skutečných cestách. Body lze přetahovat, kliknutím na bod ho smažeš.')) ?>,

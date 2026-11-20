@@ -37,12 +37,18 @@ if (window.GPX_DEBUG) console.log("📈 index-chart.js načten");
         const savedMetric = localStorage.getItem("lastMetric") || "distance";
         metricSelector.value = savedMetric;
 
+        // Dataset label = the (server-translated) text of the matching <option>
+        function optionText(metric, fallback) {
+            const opt = metricSelector.querySelector('option[value="' + metric + '"]');
+            return (opt && opt.textContent.trim()) || fallback;
+        }
+
         function metricInfo(metric) {
             switch (metric) {
-                case "count":     return { label: "Počet tras (ks)",        data: dataCount,    type: "bar" };
-                case "ascent":    return { label: "Stoupání (m)",           data: dataAscent,   type: "bar" };
-                case "avg_speed": return { label: "Prům. rychlost (km/h)", data: dataAvgSpeed, type: "line" };
-                default:          return { label: "Vzdálenost (km)",        data: dataDistance,  type: "bar" };
+                case "count":     return { label: optionText("count", "Počet tras"),                 data: dataCount,    type: "bar" };
+                case "ascent":    return { label: optionText("ascent", "Stoupání (m)"),              data: dataAscent,   type: "bar" };
+                case "avg_speed": return { label: optionText("avg_speed", "Prům. rychlost (km/h)"), data: dataAvgSpeed, type: "line" };
+                default:          return { label: optionText("distance", "Vzdálenost (km)"),         data: dataDistance,  type: "bar" };
             }
         }
 

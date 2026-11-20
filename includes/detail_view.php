@@ -37,7 +37,8 @@ $backQuery = $_GET; unset($backQuery['id']);
 $origin = ($_GET['from'] ?? '') === 'legacy' ? 'index-legacy.php' : 'index.php';
 unset($backQuery['from']); // 'from' nepatří do back URL
 $backUrl = $origin . (!empty($backQuery) ? '?' . http_build_query($backQuery) : '');
-$backLabel = $origin === 'index-legacy.php' ? 'Zpět na tabulku' : 'Zpět na seznam';
+// Keys carry a leading arrow; the link already has an icon
+$backLabel = trim((string)preg_replace('/^←\s*/u', '', t($origin === 'index-legacy.php' ? 'back_to_table' : 'back_to_list')));
 
 // Nav between tracks — zachovat filtry + origin
 $navQuery = $_GET; unset($navQuery['id']);
@@ -155,8 +156,8 @@ require __DIR__ . '/layout_header.php';
             <div class="card-outdoor p-3 w-52">
                 <div class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-forest-700/60 dark:text-sand-100/60 mb-2 pb-2 border-b border-sand-200 dark:border-forest-700">
                     <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-                    Počasí
-                    <span class="ml-auto normal-case opacity-60" title="Data z klimatického modelu ERA5 (~10 km rozlišení). Mohou se lišit od skutečnosti.">~ model</span>
+                    <?= htmlspecialchars(t('weather_title')) ?>
+                    <span class="ml-auto normal-case opacity-60" title="<?= htmlspecialchars(t('weather_model_tip')) ?>">~ model</span>
                 </div>
                 <div id="weather-widget">
                     <!-- skeleton -->
@@ -535,6 +536,9 @@ window.gpxDetailData = {
     trackDateStart: <?= js_safe_json((string)($track['date_start'] ?? '')) ?>,
     isAdmin:        <?= js_safe_json((bool)$_isAdmin) ?>,
     csrfToken:      <?= js_safe_json(csrf_token()) ?>,
+    <?php // WMO weather code → label for js/detail-weather.js ?>
+    weatherI18n: <?php $_wmoCodes = [0, 1, 2, 3, 45, 48, 51, 53, 55, 61, 63, 65, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99]; ?>
+        <?= js_safe_json(array_combine($_wmoCodes, array_map(fn($c) => t('weather_code_' . $c), $_wmoCodes))) ?>,
     planI18n: {
         loading:  <?= js_safe_json(t('pl_loading', 'Načítám plán…')) ?>,
         error:    <?= js_safe_json(t('pl_error', 'Plán se nepodařilo načíst.')) ?>,

@@ -3,6 +3,14 @@
  * Fullscreen overlay viewer — keyboard (← → Esc), touch swipe, counter
  * A11Y: focus trap, return-focus, role=dialog, aria-modal, aria-label (A11Y-012, A11Y-013)
  */
+
+// UI text from window.gpxI18n (layout_header.php); escaped for use in HTML attributes
+function lbText(key, fallback, escape) {
+    const s = String((window.gpxI18n && window.gpxI18n[key]) || fallback);
+    if (escape === false) return s;
+    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 class PhotoLightbox {
     constructor() {
         this._photos      = [];
@@ -23,15 +31,16 @@ class PhotoLightbox {
         o.setAttribute('role', 'dialog');
         o.setAttribute('aria-modal', 'true');
         // aria-label is set dynamically in _render()
+        const t = lbText;
         o.innerHTML = `
-            <button class="lightbox-close" title="Zavřít (ESC)" aria-label="Zavřít">✕</button>
+            <button class="lightbox-close" title="${t('lb_close_tip', 'Zavřít (Esc)')}" aria-label="${t('lb_close', 'Zavřít')}">✕</button>
             <span class="lightbox-counter" aria-live="polite" aria-atomic="true"></span>
-            <button class="lightbox-nav lightbox-prev" title="Předchozí (←)" aria-label="Předchozí fotografie">&#8249;</button>
+            <button class="lightbox-nav lightbox-prev" title="${t('lb_prev_tip', 'Předchozí (←)')}" aria-label="${t('lb_prev_aria', 'Předchozí fotografie')}">&#8249;</button>
             <div class="lightbox-content">
                 <img class="lightbox-img" src="" alt="">
                 <div class="lightbox-caption"></div>
             </div>
-            <button class="lightbox-nav lightbox-next" title="Další (→)" aria-label="Další fotografie">&#8250;</button>
+            <button class="lightbox-nav lightbox-next" title="${t('lb_next_tip', 'Další (→)')}" aria-label="${t('lb_next_aria', 'Další fotografie')}">&#8250;</button>
         `;
         document.body.appendChild(o);
 
@@ -140,7 +149,8 @@ class PhotoLightbox {
 
         // A11Y-012: update dialog aria-label to describe current photo
         const dialogLabel = total > 1
-            ? `Fotografie ${photoNumber} z ${total} — ${captionText}`
+            ? lbText('lb_photo_n_of', 'Fotografie {n} z {total}', false)
+                .replace('{n}', photoNumber).replace('{total}', total) + ` — ${captionText}`
             : captionText;
         this._overlay.setAttribute('aria-label', dialogLabel);
 

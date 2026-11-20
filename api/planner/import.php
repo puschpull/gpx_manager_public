@@ -20,18 +20,18 @@ ajax_endpoint(function () use ($pdo): array {
     $raw = (string)($_POST['data'] ?? '');
     if ($raw === '' || strlen($raw) > 8 * 1024 * 1024) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí data nebo je soubor příliš velký (max 8 MB).'];
+        return ['ok' => false, 'error' => t('api_import_too_big')];
     }
 
     $doc = json_decode($raw, true);
     if (!is_array($doc) || ($doc['type'] ?? '') !== 'planned_routes' || !is_array($doc['plans'] ?? null)) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Neplatný soubor (očekáván export plánů z GPX Manageru).'];
+        return ['ok' => false, 'error' => t('api_import_invalid')];
     }
     $plans = $doc['plans'];
     if (count($plans) > 1000) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Příliš mnoho plánů v souboru (max 1000).'];
+        return ['ok' => false, 'error' => str_replace('{n}', '1000', t('api_import_too_many'))];
     }
 
     $allowedProfiles = ['foot_fast', 'foot_hiking', 'bike_road', 'bike_mountain', 'car_fast', 'car_short'];

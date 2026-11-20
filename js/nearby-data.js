@@ -50,7 +50,7 @@ function renderNearbyTable(tracks) {
 
     tracks.forEach((t, i) => {
         const tr = document.createElement('tr');
-        tr.title = 'Klikněte pro zobrazení detailu trasy';
+        tr.title = window.gpxNearbyData?.i18n?.rowTip || 'Klikněte pro zobrazení detailu trasy';
         tr.addEventListener('click', () => {
             window.location.href = `detail.php?id=${t.id}`;
         });

@@ -45,7 +45,7 @@ ajax_endpoint(function (): array {
             : [];
         if (count($hits) >= 20) {
             http_response_code(429);
-            return ['ok' => false, 'error' => 'Příliš mnoho požadavků — chvíli počkejte.'];
+            return ['ok' => false, 'error' => t('api_too_many_requests')];
         }
         $hits[] = (string)$now;
         file_put_contents($rateFile, implode("\n", array_values($hits)), LOCK_EX);
@@ -63,11 +63,11 @@ ajax_endpoint(function (): array {
     }
     if (count($pts) < 2) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Zadejte alespoň 2 body.'];
+        return ['ok' => false, 'error' => t('api_min_2_points')];
     }
     if (count($pts) > 256) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Příliš mnoho bodů (max 256).'];
+        return ['ok' => false, 'error' => str_replace('{n}', '256', t('api_too_many_points'))];
     }
 
     $elev   = planner_elev_mapycom($pts);
@@ -78,7 +78,7 @@ ajax_endpoint(function (): array {
         $source = 'openmeteo';
     }
     if ($elev === null) {
-        return ['ok' => false, 'error' => 'Výšky se nepodařilo načíst.'];
+        return ['ok' => false, 'error' => t('api_elev_failed')];
     }
 
     return ['ok' => true, 'source' => $source, 'elevation' => $elev];

@@ -42,6 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ===== API klíče (ze serveru) =====
     const keys = window.gpxNearbyData?.apiKeys || {};
+    const i18n = window.gpxNearbyData?.i18n || {};
+    // Template with {placeholders}; Czech fallback if the key is missing
+    const tx = (key, fallback, vars) => String(i18n[key] || fallback)
+        .replace(/\{(\w+)\}/g, (m, k) => (vars && k in vars ? vars[k] : m));
     const mapillaryToken = keys.mapillary || "";
 
     // ===== Základní vrstvy a Mapillary via shared factory (js/lib/map-factory.js) =====
@@ -178,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Načíst nejbližší trasy
         isLoading = true;
-        setStatus(`Hledám nejbližší trasy k bodu [${lat.toFixed(5)}, ${lng.toFixed(5)}]...`, "loading");
+        setStatus(tx("searching", "Hledám nejbližší trasy k bodu [{pos}]…", { pos: `${lat.toFixed(5)}, ${lng.toFixed(5)}` }), "loading");
 
         try {
             const res = await fetch(`nearby.php?ajax=1&lat=${lat}&lon=${lng}&limit=${limit}`);
@@ -186,19 +190,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             if (data.error) {
-                setStatus("Chyba: " + data.error, "error");
+                setStatus(tx("error", "Chyba") + ": " + data.error, "error");
                 isLoading = false;
                 return;
             }
 
             const tracks = data.tracks || [];
             if (tracks.length === 0) {
-                setStatus("Nebyly nalezeny žádné trasy.", "error");
+                setStatus(tx("none", "Nebyly nalezeny žádné trasy."), "error");
                 isLoading = false;
                 return;
             }
 
-            setStatus(`Nalezeno ${tracks.length} nejbližších tras. Načítám GPX soubory...`, "loading");
+            setStatus(tx("foundLoading", "Nalezené trasy: {n}. Načítám GPX soubory…", { n: tracks.length }), "loading");
 
             // Načíst a vykreslit GPX soubory
             const bounds = L.latLngBounds([[lat, lng]]);
@@ -236,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             loadedCount++;
                             if (loadedCount === tracks.length) {
                                 map.fitBounds(bounds, { padding: [30, 30] });
-                                setStatus(`Zobrazeno ${tracks.length} nejbližších tras.`, "done");
+                                setStatus(tx("shown", "Zobrazené nejbližší trasy: {n}", { n: tracks.length }), "done");
                                 isLoading = false;
                             }
                         })
@@ -248,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Tooltip s názvem trasy
                         gpxLayer.bindTooltip(
                             `<strong>${escapeHtml(track.track_name || track.filename)}</strong><br>` +
-                            `Vzdálenost od bodu: ${track.distance_from_point} km`,
+                            escapeHtml(tx("distFromPoint", "Vzdálenost od bodu: {d} km", { d: track.distance_from_point })),
                             { sticky: true }
                         );
 
@@ -259,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         loadedCount++;
                         if (loadedCount === tracks.length) {
                             map.fitBounds(bounds, { padding: [30, 30] });
-                            setStatus(`Zobrazeno ${trackLayers.length} z ${tracks.length} tras.`, "done");
+                            setStatus(tx("shownPartial", "Zobrazené trasy: {shown} z {total}", { shown: trackLayers.length, total: tracks.length }), "done");
                             isLoading = false;
                         }
                     });
@@ -275,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         zIndexOffset: 500
                     }).addTo(map);
                     nearestMarker.bindTooltip(
-                        `Nejbližší bod: ${escapeHtml(track.track_name || track.filename)}`,
+                        escapeHtml(tx("nearestPoint", "Nejbližší bod: {name}", { name: track.track_name || track.filename })),
                         { direction: 'top' }
                     );
                     nearestMarkers.push(nearestMarker);
@@ -287,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (err) {
             console.error("⚠️ Chyba při hledání nejbližších tras:", err);
-            setStatus("Chyba při komunikaci se serverem.", "error");
+            setStatus(tx("commError", "Chyba při komunikaci se serverem."), "error");
             isLoading = false;
         }
     }

@@ -41,9 +41,9 @@
     function wmoInfo(code) {
         const c = parseInt(code, 10);
         if (isNaN(c)) return { cs: '–', en: '–', icon: '❓' };
-        if (WMO[c]) return WMO[c];
+        if (WMO[c]) return Object.assign({ code: c }, WMO[c]);
         for (let i = c - 1; i >= 0; i--) {
-            if (WMO[i]) return WMO[i];
+            if (WMO[i]) return Object.assign({ code: i }, WMO[i]);
         }
         return { cs: '–', en: '–', icon: '❓' };
     }
@@ -117,7 +117,9 @@
         const cloud  = hourly.cloud_cover[idx];
         const wmo    = wmoInfo(code);
 
-        const label   = lang === 'cs' ? wmo.cs : wmo.en;
+        // Server-translated label (gpxDetailData.weatherI18n); the table is the fallback
+        const wl      = window.gpxDetailData && window.gpxDetailData.weatherI18n;
+        const label   = (wl && wl[wmo.code]) || (lang === 'cs' ? wmo.cs : wmo.en);
         const timeStr = times[idx] ? times[idx].substring(11, 16) : '';
 
         wrap.innerHTML = `

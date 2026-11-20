@@ -20,7 +20,7 @@ ajax_endpoint(function () use ($pdo): array {
     $lon = (float)($_GET['lon'] ?? 0);
     if ($lat == 0.0 && $lon == 0.0) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Chybí souřadnice bodu.'];
+        return ['ok' => false, 'error' => t('api_missing_point')];
     }
 
     $radiusKm = (float)($_GET['radius_km'] ?? 10);
