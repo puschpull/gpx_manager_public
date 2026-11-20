@@ -70,11 +70,20 @@ window.gpxMapPageData = {
         'linkHint'   => t('mp_link_hint', ''),
         'linkCopied' => t('mp_link_copied', 'Odkaz zkopírován'),
         'linkFailed' => t('mp_link_failed', 'Zkopírujte adresu z adresního řádku'),
+        'copy'        => t('mp_copy', 'Kopírovat'),
+        'coordsHint'  => t('mp_coords_hint', ''),
+        'measure'     => t('mp_measure', 'Měření vzdálenosti a plochy'),
+        'measureHint' => t('mp_measure_hint', 'Klikáním do mapy přidávejte body'),
+        'length'      => t('mp_length', 'Délka'),
+        'area'        => t('mp_area', 'Plocha'),
+        'undo'        => t('mp_undo', 'Zpět'),
+        'clear'       => t('mp_clear', 'Smazat'),
     ]) ?>
 };
 </script>
 <script defer src="<?= asset('js/map-page-compare.js') ?>"></script>
 <script defer src="<?= asset('js/map-page-link.js') ?>"></script>
+<script defer src="<?= asset('js/map-page-tools.js') ?>"></script>
 <script defer src="<?= asset('js/map-page.js') ?>"></script>
 
 <?php require __DIR__ . '/includes/layout_footer.php'; ?>

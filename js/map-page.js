@@ -417,6 +417,12 @@
             });
         }
         if (F.createLocateControl) F.createLocateControl(map);
+        if (window.GpxMapTools) {
+            window.GpxMapTools.create(map, {
+                i18n: i18n,
+                copy: Link ? Link.copy : function () { return Promise.resolve(false); }
+            });
+        }
 
         map.on("moveend", save);
         save();
