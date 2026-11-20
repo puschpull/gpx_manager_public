@@ -26,6 +26,7 @@ $_pages = [
     'heatmap'        => ['flame',       $_navLabel('heatmap', 'Heatmapa'), ''],
     'photo_heatmap'  => ['camera',      $_navLabel('photo_heatmap', 'Foto-heatmapa'), ''],
     'virtual_tracks' => ['route',       $_navLabel('virtual_tracks', 'Virtuální trasy'), ''],
+    'map'            => ['map',         $_navLabel('map', 'Mapa'), ''],
     'map_search'     => ['scan-search', admin_new_label(t('tool_map_search', 'Hledat na mapě')), ''],
     'nearby'         => ['map-pin',     $_navLabel('nearby', 'Trasy v okolí'), ''],
     'photo_nearby'   => ['aperture',    $_navLabel('photo_nearby', 'Fotky v okolí'), ''],

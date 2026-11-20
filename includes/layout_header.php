@@ -57,7 +57,12 @@ if (!function_exists('t')) {
          z tmavého motivu, na nich zmizí. Opakovaný zdroj „světlý text na světlém pozadí". -->
     <!-- Výjimka: uvnitř mapy má Leaflet vždy světlé pozadí (ovládání vrstev, bubliny),
          takže tam musí zůstat i světlá zaškrtávátka — jinak by se invertovala. -->
-    <style>:root { color-scheme: light; } html.dark { color-scheme: dark; } .leaflet-container { color-scheme: light; }</style>
+    <style>:root { color-scheme: light; } html.dark { color-scheme: dark; } .leaflet-container { color-scheme: light; }
+    /* Panely Leafletu mají z-index 400–1000. Bez vlastního kontextu vrstvení
+       mapy by soupeřily s hlavičkou (z-40) a přes rozbalené menu („Více",
+       administrace) by prosvítala mapa. isolation místo z-indexu, ať zůstane
+       funkční z-index celoobrazovkového režimu. */
+    .leaflet-container { isolation: isolate; }</style>
 
     <?php
     /* Výška map — JEDINÉ místo, kde se řídí velikost mapy v celé aplikaci.
