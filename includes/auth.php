@@ -12,14 +12,11 @@ require_once __DIR__ . '/security.php';
 start_secure_session();
 send_security_headers();
 
-// ====== Nastavení — povolené admin IP adresy ======
-// Načteno z .env (ADMIN_IPS = 127.0.0.1,::1,vaše.ip.adresa)
-// Localhost je vždy povolen automaticky
-$_admin_ips_cfg = array_filter(array_map('trim', explode(',', ADMIN_IPS)));
-$allowed_ips    = array_unique(array_merge(['127.0.0.1', '::1'], $_admin_ips_cfg));
-unset($_admin_ips_cfg);
+require_once __DIR__ . '/admin_ips.php';
 
-$_auth_is_real_admin = in_array($_SERVER['REMOTE_ADDR'], $allowed_ips);
+// ====== Admin podle IP ======
+// Seznam z .env (ADMIN_IPS); localhost jen na vývojovém PC — viz admin_ips.php
+$_auth_is_real_admin = is_admin_ip((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
 
 // ====== Visitor preview přepínač (stejná logika jako public_access.php) ======
 if ($_auth_is_real_admin && isset($_GET['visitor_preview'])) {

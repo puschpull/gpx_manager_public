@@ -21,7 +21,10 @@ $is_cli = (PHP_SAPI === 'cli');
 
 if (!$is_cli) {
     $remote = $_SERVER['REMOTE_ADDR'] ?? '';
-    if (!in_array($remote, ['127.0.0.1', '::1'], true)) {
+    // Web access only on the development PC (.gpx-local marker): behind the
+    // production proxy REMOTE_ADDR is loopback for any client. Production runs
+    // migrations from CLI ("Nasadit GPX").
+    if (!is_file(__DIR__ . '/.gpx-local') || !in_array($remote, ['127.0.0.1', '::1'], true)) {
         http_response_code(403);
         echo "403 Forbidden — migrate.php is only accessible from localhost or CLI.\n";
         exit(1);
