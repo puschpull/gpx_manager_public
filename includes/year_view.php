@@ -31,7 +31,6 @@ $trackTitle = static function (array $r) use ($pdo): string {
 };
 $fmtDate = static fn(?string $d): string => $d ? date('j. n.', strtotime($d)) : '';
 ?>
-<link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <style>
     .yr-hero { background: linear-gradient(135deg, rgba(63,107,87,.12), rgba(201,123,63,.10)); }
     .yr-kpi-delta { font-size: 11px; margin-top: 2px; }

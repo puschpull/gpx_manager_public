@@ -4,6 +4,11 @@
 @source "../../**/*.php";
 @source "../../**/*.js";
 @source "../../**/*.html";
+/* Not part of the site: archive, minified third-party libraries, user uploads, tests */
+@source not "../../_archiv";
+@source not "../../assets/vendor";
+@source not "../../uploads";
+@source not "../../tests";
 
 /* Manual dark mode via .dark class on <html> */
 @custom-variant dark (&:where(.dark, .dark *));

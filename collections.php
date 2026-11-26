@@ -27,7 +27,6 @@ $fmtRange = static function (?string $a, ?string $b): string {
     return $ya === $yb ? $ya : $ya . '–' . $yb;
 };
 ?>
-<link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <style>
     .col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .col-card { display: flex; flex-direction: column; overflow: hidden; text-decoration: none; color: inherit; transition: transform .15s; }

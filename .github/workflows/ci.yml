@@ -54,11 +54,18 @@ jobs:
         with:
           node-version: '24'
 
+      # Exact versions from package-lock.json; no install scripts (supply chain)
       - name: Install deps
-        run: npm install
+        run: npm ci --ignore-scripts
 
       - name: Build CSS
         run: npm run build
+
+      # The committed assets/css/app.css must match the templates. If this fails,
+      # a template uses a Tailwind class that is not in the build:
+      # run `npm run build` locally and commit app.css.
+      - name: app.css is up to date
+        run: git diff --exit-code --stat assets/css/app.css
 
   security-scan:
     name: Security Scan
