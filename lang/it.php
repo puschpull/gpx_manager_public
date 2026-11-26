@@ -1546,4 +1546,9 @@ return [
     'mf_poi_loading'               => 'Caricamento dei punti escursionistici…',
     'mf_poi_down'                  => 'I punti escursionistici non sono disponibili ora: il servizio OpenStreetMap (Overpass) non risponde. Riprovo spostando la mappa.',
     'mf_poi_stale'                 => 'I punti escursionistici provengono da una copia salvata più vecchia: il servizio OpenStreetMap non risponde.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Pubblico',
+    'planner_public_title'         => 'Un piano spuntato è visibile anche ai visitatori. Meglio lasciare privati i piani futuri: la data rivela quando non sei a casa.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Ricordami su questo dispositivo ({n} giorni)',
 ];

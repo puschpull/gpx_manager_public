@@ -1546,4 +1546,9 @@ return [
     'mf_poi_loading'               => 'Cargando puntos de senderismo…',
     'mf_poi_down'                  => 'Los puntos de senderismo no están disponibles ahora: el servicio de OpenStreetMap (Overpass) no responde. Se reintentará al mover el mapa.',
     'mf_poi_stale'                 => 'Los puntos de senderismo son de una copia guardada antigua: el servicio de OpenStreetMap no responde.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Público',
+    'planner_public_title'         => 'Un plan marcado también lo ven los visitantes. Mejor deja privados los planes futuros: la fecha revela cuándo no estás en casa.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Recordarme en este dispositivo ({n} días)',
 ];

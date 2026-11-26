@@ -11,6 +11,12 @@ declare(strict_types=1);
  * and "X-Real-IP: 127.0.0.1" made anyone an admin without a password.
  * Loopback is therefore dropped in production even when ADMIN_IPS lists it
  * (config.php falls back to "127.0.0.1,::1" when ADMIN_IPS is missing).
+ *
+ * Since 25 Nov 2026 (security check S2) production ignores ADMIN_IPS
+ * completely: a home IP is shared by every device on the network (guests'
+ * phones, the TV) and may move to a stranger when the ISP reassigns it.
+ * Production admin = password login only (with "remember me", see
+ * remember_login.php). The IP allowlist works on the dev PC (APP_ENV local).
  */
 
 /** @return list<string> */
@@ -22,7 +28,7 @@ function admin_allowed_ips(): array
     if (APP_ENV === 'local') {
         return array_values(array_unique(array_merge($loopback, $cfg)));
     }
-    return array_values(array_diff($cfg, $loopback));
+    return [];
 }
 
 function is_admin_ip(string $ip): bool

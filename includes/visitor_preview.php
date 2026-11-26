@@ -61,6 +61,12 @@ function visitor_preview_apply(array &$session, string $param, bool $isIpAdmin, 
 
     $via = $inPreview ? (string) ($session['preview_via'] ?? 'IP') : (string) ($session['admin_via'] ?? 'IP');
     unset($session['visitor_preview'], $session['preview_via']);
+    // Admin rights come back only to who still has them: a password login,
+    // or an IP admin who is (still) on an allowed IP.
+    if ($via !== 'login' && !$isIpAdmin) {
+        unset($session['is_admin'], $session['admin_via']);
+        return $cleanUrl;
+    }
     $session['is_admin']  = true;
     $session['admin_via'] = $via === 'login' ? 'login' : 'IP';
     return $cleanUrl;

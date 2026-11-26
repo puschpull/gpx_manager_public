@@ -185,6 +185,8 @@ CREATE TABLE IF NOT EXISTS planned_routes (
     ascent      INT          DEFAULT NULL,
     descent     INT          DEFAULT NULL,
     note        TEXT         DEFAULT NULL,
+    -- 0024: 1 = plán vidí i návštěvník
+    is_public   TINYINT(1)   NOT NULL DEFAULT 0,
     created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_pr_date (plan_date),

@@ -30,6 +30,10 @@ ajax_endpoint(function () use ($pdo): array {
          WHERE p.id = ?');
     $stmt->execute([$id]);
     $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+    // Neveřejný plán se návštěvníkovi chová jako neexistující (S3)
+    if ($r && empty($_SESSION['is_admin']) && (int)$r['is_public'] !== 1) {
+        $r = false;
+    }
     if (!$r) {
         http_response_code(404);
         return ['ok' => false, 'error' => t('api_plan_not_found')];
@@ -47,6 +51,7 @@ ajax_endpoint(function () use ($pdo): array {
         'ascent'     => $r['ascent']     !== null ? (int)$r['ascent']     : null,
         'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
         'note'       => $r['note'],
+        'is_public'  => (int)$r['is_public'] === 1,
         'track_id'   => ($r['t_name'] !== null || $r['t_file'] !== null) ? (int)$r['track_id'] : null,
         'track_name' => $r['t_name'] ?: $r['t_file'],
         'track_date' => $r['t_date'],

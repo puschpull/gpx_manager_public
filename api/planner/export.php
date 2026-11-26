@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/ajax.php';
 ajax_endpoint(function () use ($pdo): array {
     $rows = $pdo->query('
         SELECT name, profile, plan_date, waypoints, geometry,
-               length_m, duration_s, ascent, descent, note
+               length_m, duration_s, ascent, descent, note, is_public
         FROM planned_routes
         ORDER BY id
     ')->fetchAll(\PDO::FETCH_ASSOC);
@@ -30,6 +30,7 @@ ajax_endpoint(function () use ($pdo): array {
             'ascent'     => $r['ascent']     !== null ? (int)$r['ascent']     : null,
             'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
             'note'       => $r['note'],
+            'is_public'  => (int)$r['is_public'] === 1,
         ];
     }, $rows);
 

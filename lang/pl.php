@@ -1546,4 +1546,9 @@ return [
     'mf_poi_loading'               => 'Wczytuję punkty turystyczne…',
     'mf_poi_down'                  => 'Punkty turystyczne są teraz niedostępne — usługa OpenStreetMap (Overpass) nie odpowiada. Spróbuję ponownie po przesunięciu mapy.',
     'mf_poi_stale'                 => 'Punkty turystyczne pochodzą ze starszej zapisanej kopii — usługa OpenStreetMap nie odpowiada.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Publiczny',
+    'planner_public_title'         => 'Zaznaczony plan zobaczą też odwiedzający. Przyszłe plany lepiej zostaw prywatne — z daty widać, kiedy nie ma cię w domu.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Zapamiętaj na tym urządzeniu ({n} dni)',
 ];

@@ -1546,4 +1546,9 @@ return [
     'mf_poi_loading'               => 'Wanderpunkte werden geladen…',
     'mf_poi_down'                  => 'Wanderpunkte sind gerade nicht verfügbar — der OpenStreetMap-Dienst (Overpass) antwortet nicht. Neuer Versuch beim Verschieben der Karte.',
     'mf_poi_stale'                 => 'Wanderpunkte stammen aus einer älteren gespeicherten Kopie — der OpenStreetMap-Dienst antwortet nicht.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Öffentlich',
+    'planner_public_title'         => 'Ein markierter Plan ist auch für Besucher sichtbar. Künftige Pläne besser privat lassen — am Datum sieht man, wann Sie nicht zu Hause sind.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Auf diesem Gerät merken ({n} Tage)',
 ];

@@ -7,6 +7,9 @@ declare(strict_types=1);
  * plánovačem ve Viditelných stránkách (prohlížení plánů je povoleno,
  * ukládání/mazání zůstává admin-only v save.php/delete.php).
  *
+ * Návštěvník dostane jen plány s is_public = 1 (migrace 0024, kontrola 21. 11.
+ * 2026 S3: z budoucích plánů s datem šlo vyčíst, kdy majitel nebude doma).
+ *
  * with_pos=1 přidá ke každému plánu těžiště (lat/lon) a příznak, zda má
  * spočítanou geometrii. Používá překryv plánu na detailu trasy, aby mohl
  * předvybrat nejbližší plán. Geometrie je MEDIUMTEXT, takže se dekóduje jen
@@ -24,8 +27,9 @@ ajax_endpoint(function () use ($pdo): array {
         return ['ok' => false, 'error' => 'Forbidden'];
     }
     $withPos = ($_GET['with_pos'] ?? '') === '1';
+    $isAdmin = !empty($_SESSION['is_admin']);
     $cols = 'p.id, p.name, p.profile, p.plan_date, p.track_id, p.length_m, p.duration_s,'
-          . ' p.ascent, p.descent, p.updated_at'
+          . ' p.ascent, p.descent, p.updated_at, p.is_public'
           . ($withPos ? ', p.geometry' : '');
 
     // LEFT JOIN, ne INNER: smazaná trasa nesmí plán vyřadit z výpisu —
@@ -34,6 +38,7 @@ ajax_endpoint(function () use ($pdo): array {
         SELECT $cols, t.track_name AS t_name, t.filename AS t_file, t.date_start AS t_date
         FROM planned_routes p
         LEFT JOIN tracks t ON t.id = p.track_id
+        " . ($isAdmin ? '' : 'WHERE p.is_public = 1') . "
         ORDER BY COALESCE(p.plan_date, DATE(p.updated_at)) DESC, p.id DESC
     ")->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -48,6 +53,7 @@ ajax_endpoint(function () use ($pdo): array {
             'ascent'     => $r['ascent']     !== null ? (int)$r['ascent']     : null,
             'descent'    => $r['descent']    !== null ? (int)$r['descent']    : null,
             'updated_at' => $r['updated_at'],
+            'is_public'  => (int)$r['is_public'] === 1,
             // track_id drží i tehdy, když trasa mezitím zmizela; ostatní pole
             // jsou pak null a UI to ukáže jako neuskutečněný plán.
             'track_id'   => $r['t_name'] !== null || $r['t_file'] !== null ? (int)$r['track_id'] : null,

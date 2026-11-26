@@ -13,6 +13,11 @@ require_once __DIR__ . '/../../includes/ajax.php';
 require_once __DIR__ . '/../../includes/map_markers.php';
 
 ajax_endpoint(function () use ($pdo): array {
+    // Vypnutá stránka nevydává data ani přes API (N3)
+    if (!api_pages_visible('map')) {
+        http_response_code(403);
+        return ['ok' => false, 'error' => 'Forbidden'];
+    }
     $where = empty($_SESSION['is_admin']) ? 'WHERE is_public = 1' : '';
     $rows  = $pdo->query("
         SELECT id, lat, lon, title, note, symbol, is_public
