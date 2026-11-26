@@ -148,7 +148,7 @@ Click **Test connection →**
 
 ### Step 3 — Access & API Keys
 
-- **Admin IP addresses:** the wizard pre-fills your current IP address. Edit as needed (separate multiple IPs with commas).
+- **Admin IP addresses:** the wizard pre-fills your current IP address. Edit as needed (separate multiple IPs with commas). They apply to local development only — on a live site the admin logs in with a password.
   - Find your public IP at [whatismyip.com](https://www.whatismyip.com/)
 - **API keys:** optional, see section [9. API Keys for Maps](#9-api-keys-for-maps). Can be added later.
 
@@ -180,7 +180,7 @@ DB_PASS=
 ADMIN_USER=admin
 ADMIN_PASS_HASH=        # see below how to generate
 
-# Admin IP addresses (comma-separated, localhost is always allowed)
+# Admin IP addresses (comma-separated) — LOCAL development only, ignored on a live site
 ADMIN_IPS=127.0.0.1,::1,123.456.789.0
 
 # API keys (optional, can be added at any time)
@@ -223,7 +223,7 @@ php migrate.php
 The script prints the status of each migration (`OK`, `SKIP`) and the total number applied at the end.
 A second run safely does nothing: `Done. 0 migration(s) applied.`
 
-> **Web access:** `migrate.php` can also be opened in a browser, but **from localhost only** (`127.0.0.1` or `::1`). Any other IP receives HTTP 403.
+> **Web access:** `migrate.php` can also be opened in a browser, but **from localhost only** (`127.0.0.1` or `::1`) and only when a `.gpx-local` file exists in the app root. Any other IP receives HTTP 403.
 
 ---
 
@@ -258,13 +258,15 @@ The application distinguishes three roles:
 
 | Role | How they log in | What they can do |
 |---|---|---|
-| **Admin (IP)** | Accesses from an allowed IP address | Everything — manage tracks, import, delete, settings |
+| **Admin (IP)** | Local development only: accesses from an allowed IP address | Everything — manage tracks, import, delete, settings |
 | **Admin (password)** | Logs in via `login.php` | Everything — manage tracks, import, delete, settings |
 | **Visitor** | Does not log in | View-only access to permitted pages |
 
 ### Automatic Login from IP Address
 
-If you access the app from an IP address listed in `ADMIN_IPS`, you are automatically logged in as admin — no password required. Ideal for home network access.
+If you access the app from an IP address listed in `ADMIN_IPS`, you are automatically logged in as admin — no password required. **This works for local development only** — on a machine where an empty `.gpx-local` file exists in the app root (the development marker; never commit it or upload it to a server).
+
+On a live site `ADMIN_IPS` is ignored: a home IP address is shared by every device on the network (guests' phones included) and the provider may give it to someone else. Log in with your password there and tick **"Remember me on this device"** — the login lasts 30 days and logging out ends it on all devices.
 
 ### Password Login
 
@@ -435,8 +437,9 @@ Uploaded GPX files and track thumbnails are stored in `uploads/`. On shared host
 
 ### Admin Access Not Working (no blue banner)
 
-- Check your current IP address at [whatismyip.com](https://www.whatismyip.com/)
-- Add it to `ADMIN_IPS=` in `.env` (comma-separated, no spaces)
+- On a live site, log in with your password at `login.php` — the IP address does not make you an admin there
+- For local development, check your current IP address at [whatismyip.com](https://www.whatismyip.com/)
+- … and add it to `ADMIN_IPS=` in `.env` (comma-separated, no spaces)
 - After editing `.env`, log out (clear cookies or use a private window) and reload
 
 ### Photos Not Showing or Failing to Upload

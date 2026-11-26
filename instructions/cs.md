@@ -146,7 +146,7 @@ Klikni **Otestovat připojení →**
 
 ### Krok 3 — Přístup a API klíče
 
-- **Admin IP adresy:** průvodce předvyplní tvou aktuální IP adresu. Uprav podle potřeby (více IP adres odděluj čárkou).
+- **Admin IP adresy:** průvodce předvyplní tvou aktuální IP adresu. Uprav podle potřeby (více IP adres odděluj čárkou). Platí jen při lokálním vývoji — na ostrém webu se admin přihlašuje heslem (viz [Přihlášení](#automatické-přihlášení-z-ip-adresy)).
   - Svou veřejnou IP zjistíš na [whatismyip.com](https://www.whatismyip.com/)
 - **API klíče:** volitelné, viz sekci [9. API klíče pro mapy](#9-api-klíče-pro-mapy). Lze přidat i později.
 
@@ -178,7 +178,7 @@ DB_PASS=
 ADMIN_USER=admin
 ADMIN_PASS_HASH=        # viz níže jak vygenerovat
 
-# Admin IP adresy (čárkou oddělené, localhost je vždy povolen)
+# Admin IP adresy (čárkou oddělené) — JEN pro lokální vývoj, na ostrém webu se ignorují
 ADMIN_IPS=127.0.0.1,::1,123.456.789.0
 
 # API klíče (volitelné, lze přidat kdykoli)
@@ -257,13 +257,15 @@ Aplikace rozlišuje tři role:
 
 | Role | Jak se přihlásí | Co může dělat |
 |---|---|---|
-| **Admin (IP)** | Přistoupí z povolené IP adresy | Vše — správa tras, import, mazání, nastavení |
+| **Admin (IP)** | Jen při lokálním vývoji: přistoupí z povolené IP adresy | Vše — správa tras, import, mazání, nastavení |
 | **Admin (heslo)** | Přihlásí se přes `login.php` | Vše — správa tras, import, mazání, nastavení |
 | **Návštěvník** | Nepřihlašuje se | Jen prohlížení povolených stránek |
 
 ### Automatické přihlášení z IP adresy
 
-Pokud přistupuješ z IP adresy uvedené v `ADMIN_IPS`, jsi automaticky přihlášen jako admin — bez zadávání hesla. Vhodné pro přístup z domácí sítě.
+Pokud přistupuješ z IP adresy uvedené v `ADMIN_IPS`, jsi automaticky přihlášen jako admin — bez zadávání hesla. **Platí jen při lokálním vývoji** — na počítači, kde v kořeni aplikace existuje prázdný soubor `.gpx-local` (značka vývojového prostředí; do repa ani na server se nedává).
+
+Na ostrém webu se `ADMIN_IPS` ignoruje: domácí IP adresu sdílí všechna zařízení v síti (i telefony návštěv) a poskytovatel ji může přidělit někomu jinému. Přihlas se tam heslem a zaškrtni **„Zapamatovat na tomto zařízení“** — přihlášení vydrží 30 dní a odhlášení ho zruší na všech zařízeních.
 
 ### Přihlášení heslem
 
@@ -470,8 +472,9 @@ Oba se ve výchozím stavu jen rozhlédnou a vypíšou, co by udělaly — **nic
 
 ### Admin přístup nefunguje (šedý, ne modrý banner)
 
-- Ověř svou aktuální IP adresu na [whatismyip.com](https://www.whatismyip.com/)
-- Přidej ji do `ADMIN_IPS=` v `.env` (odděleno čárkou, bez mezer)
+- Na ostrém webu se přihlas heslem na `login.php` — IP adresa tam admina nedělá
+- Při lokálním vývoji ověř svou aktuální IP adresu na [whatismyip.com](https://www.whatismyip.com/)
+- … a přidej ji do `ADMIN_IPS=` v `.env` (odděleno čárkou, bez mezer)
 - Po úpravě `.env` se odhlás (smaž cookies nebo otevři anonymní okno) a načti znovu
 
 ### Fotografie se nezobrazují nebo se nenahrávají

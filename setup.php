@@ -95,7 +95,7 @@ $t = [
         // Krok 3
         'step3_title'     => 'Přístup a API klíče',
         'admin_ips'       => 'Admin IP adresy',
-        'admin_ips_hint'  => 'Čárkou oddělené IP adresy s admin přístupem. Tvoje aktuální IP: <strong>%s</strong><br>Localhost (127.0.0.1, ::1) je vždy povolen.',
+        'admin_ips_hint'  => 'Čárkou oddělené IP adresy s admin přístupem bez hesla. Tvoje aktuální IP: <strong>%s</strong><br>Platí jen na vývojovém počítači se souborem .gpx-local v kořeni aplikace; na ostrém webu se admin přihlašuje heslem (lze zapamatovat na 30 dní).',
         'tf_key'          => 'Thunderforest API klíč',
         'tf_hint'         => 'Pro turistické a cyklo mapové podklady — <a href="https://www.thunderforest.com/" target="_blank">thunderforest.com</a>',
         'mapy_key'        => 'Mapy.cz API klíč',
@@ -141,7 +141,7 @@ $t = [
         'err_pass_match'  => 'Passwords do not match.',
         'step3_title'     => 'Access & API Keys',
         'admin_ips'       => 'Admin IP addresses',
-        'admin_ips_hint'  => 'Comma-separated IP addresses with admin access. Your current IP: <strong>%s</strong><br>Localhost (127.0.0.1, ::1) is always allowed.',
+        'admin_ips_hint'  => 'Comma-separated IP addresses with admin access without a password. Your current IP: <strong>%s</strong><br>Applies only on a development machine with a .gpx-local file in the app root; on a live site the admin logs in with a password (can be remembered for 30 days).',
         'tf_key'          => 'Thunderforest API key',
         'tf_hint'         => 'For hiking and cycling map tiles — <a href="https://www.thunderforest.com/" target="_blank">thunderforest.com</a>',
         'mapy_key'        => 'Mapy.cz API key',
@@ -186,7 +186,7 @@ $t = [
         'err_pass_match'  => 'Die Passwörter stimmen nicht überein.',
         'step3_title'     => 'Zugang & API-Schlüssel',
         'admin_ips'       => 'Admin-IP-Adressen',
-        'admin_ips_hint'  => 'Kommagetrennte IP-Adressen mit Admin-Zugang. Deine aktuelle IP: <strong>%s</strong><br>Localhost (127.0.0.1, ::1) ist immer erlaubt.',
+        'admin_ips_hint'  => 'Kommagetrennte IP-Adressen mit Admin-Zugang ohne Passwort. Deine aktuelle IP: <strong>%s</strong><br>Gilt nur auf einem Entwicklungsrechner mit einer Datei .gpx-local im App-Verzeichnis; auf einer Live-Website meldet sich der Admin mit Passwort an (lässt sich 30 Tage merken).',
         'tf_key'          => 'Thunderforest API-Schlüssel',
         'tf_hint'         => 'Für Wander- und Radkarten — <a href="https://www.thunderforest.com/" target="_blank">thunderforest.com</a>',
         'mapy_key'        => 'Mapy.cz API-Schlüssel',
@@ -277,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $step === 1) {
             . "# Admin account\n"
             . "ADMIN_USER=" . env_safe($s['adminUser']) . "\n"
             . "ADMIN_PASS_HASH=" . env_safe($s['adminHash']) . "\n\n"
-            . "# Admin IPs (comma-separated)\n"
+            . "# Admin IPs (comma-separated) — local development only, ignored on a live site\n"
             . "ADMIN_IPS=" . env_safe($adminIPs) . "\n\n"
             . "# API keys (optional)\n"
             . "TF_API_KEY=" . env_safe($tfKey) . "\n"
