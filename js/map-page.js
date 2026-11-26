@@ -91,6 +91,7 @@
         if (window.GpxMapMine) {
             overlays[F.layerName("my_tracks")] = window.GpxMapMine.tracks(map, i18n);
             if (cfg.showPhotos) overlays[F.layerName("my_photos")] = window.GpxMapMine.photos(map, i18n);
+            if (cfg.showVtracks && window.GpxMapMine.vtracks) overlays[F.layerName("my_vtracks")] = window.GpxMapMine.vtracks(map, i18n);
         }
         // Značky s poznámkou (js/map-page-markers.js)
         var markers = null;

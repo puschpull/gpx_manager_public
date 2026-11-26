@@ -13,6 +13,7 @@
 /uploads/heatmap_cache.json
 logs/*.log
 logs/*.bak
+logs/*.json
 
 # IDE a systémové soubory
 .idea/
@@ -49,6 +50,8 @@ setup.php.backup
 /uploads/_poi_cache/
 # Zjednodušené čáry tras pro vrstvu Moje trasy (api/tracks/lines.php)
 /uploads/_line_cache/
+# Prozkoumané čtverce — dlaždice tras (includes/explore_helper.php)
+/uploads/_explore_cache/
 /uploads/radar/
 
 # Značka lokálního vývoje (APP_ENV=local) — nikdy do repa ani na server

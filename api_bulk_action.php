@@ -7,8 +7,12 @@ declare(strict_types=1);
  *
  * POST parametry:
  *   action: delete | set_category | remove_category | set_color | set_favorite | unset_favorite
+ *           | add_collection | remove_collection
  *   ids[]: pole ID tras
- *   value: hodnota (název kategorie / barva)
+ *   value: hodnota (název kategorie / barva / ID kolekce)
+ *   new_collection: název nové kolekce (add_collection s value = 'new')
+ *   all_filtered = 1 + filter_query: jen u kolekcí — místo označených tras
+ *           všechny trasy, které odpovídají filtru (query string stránky)
  */
 
 require_once __DIR__ . '/includes/db.php';
@@ -39,6 +43,22 @@ $ids = array_filter($ids, fn($id) => $id > 0);
 if (empty($ids)) {
     echo json_encode(['success' => false, 'error' => 'Neplatná ID.']);
     exit;
+}
+
+// Kolekce: volitelně všechny vyfiltrované trasy (stejný filtr jako tabulka)
+if (in_array($action, ['add_collection', 'remove_collection'], true) && ($_POST['all_filtered'] ?? '') === '1') {
+    require_once __DIR__ . '/includes/track_filter.php';
+    parse_str((string)($_POST['filter_query'] ?? ''), $fq);
+    if (isset($fq['filter_submit'])) {
+        $f = buildFilterSQL($fq, 't.');
+        $st = $pdo->prepare('SELECT t.id FROM tracks t' . ($f['where'] !== '' ? ' WHERE ' . $f['where'] : ''));
+        $st->execute($f['params']);
+        $ids = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
+        if (!$ids) {
+            echo json_encode(['success' => false, 'error' => 'Žádné trasy nevybrány.']);
+            exit;
+        }
+    }
 }
 
 $placeholders = implode(',', array_fill(0, count($ids), '?'));
@@ -129,6 +149,53 @@ try {
             $stmt->execute($ids);
             $affected = $stmt->rowCount();
             break;
+
+        case 'add_collection':
+        case 'remove_collection':
+            // value = ID kolekce, nebo 'new' + new_collection = název nové (neveřejné) kolekce
+            if ($action === 'add_collection' && $value === 'new') {
+                $newName = trim((string)($_POST['new_collection'] ?? ''));
+                if ($newName === '' || mb_strlen($newName) > 160) {
+                    echo json_encode(['success' => false, 'error' => t('col_name_required', 'Zadejte název kolekce.')]);
+                    exit;
+                }
+                $pdo->prepare('INSERT INTO collections (name, is_public) VALUES (?, 0)')->execute([$newName]);
+                $colId = (int)$pdo->lastInsertId();
+            } else {
+                $colId = (int)$value;
+                $ex = $pdo->prepare('SELECT COUNT(*) FROM collections WHERE id = ?');
+                $ex->execute([$colId]);
+                if ($colId <= 0 || (int)$ex->fetchColumn() === 0) {
+                    echo json_encode(['success' => false, 'error' => t('col_not_found', 'Kolekce neexistuje.')]);
+                    exit;
+                }
+            }
+            if ($action === 'add_collection') {
+                $pos = $pdo->prepare('SELECT COALESCE(MAX(position), 0) FROM collection_tracks WHERE collection_id = ?');
+                $pos->execute([$colId]);
+                $next = (int)$pos->fetchColumn();
+                // Řazení podle data, ať nová kolekce nemá trasy v náhodném pořadí
+                $ord = $pdo->prepare("SELECT id FROM tracks WHERE id IN ($placeholders) ORDER BY date_start ASC, id ASC");
+                $ord->execute($ids);
+                $ins = $pdo->prepare('INSERT IGNORE INTO collection_tracks (collection_id, track_id, position) VALUES (?, ?, ?)');
+                foreach ($ord->fetchAll(PDO::FETCH_COLUMN) as $tid) {
+                    $ins->execute([$colId, (int)$tid, ++$next]);
+                    $affected += $ins->rowCount();
+                }
+            } else {
+                $stmt = $pdo->prepare("DELETE FROM collection_tracks WHERE collection_id = ? AND track_id IN ($placeholders)");
+                $stmt->execute(array_merge([$colId], $ids));
+                $affected = $stmt->rowCount();
+            }
+            echo json_encode([
+                'success'       => true,
+                'action'        => $action,
+                'affected'      => $affected,
+                'collection_id' => $colId,
+                'message'       => str_replace('{n}', (string)$affected,
+                    t($action === 'add_collection' ? 'col_bulk_added' : 'col_bulk_removed', '{n}')),
+            ]);
+            exit;
 
         default:
             echo json_encode(['success' => false, 'error' => 'Neznámá akce: ' . $action]);

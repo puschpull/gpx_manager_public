@@ -14,6 +14,7 @@
     var TRACK_MIN_ZOOM = 8;
     var PHOTO_MIN_ZOOM = 12;
     var TRACK_COLOR    = "#7b2cbf";   // fialová — na turistické i letecké mapě je vidět
+    var VT_COLOR       = "#d6336c";   // virtuální trasy: malinová, čárkovaná (odhad z fotek)
 
     function el(tag, cls, txt) {
         var n = document.createElement(tag);
@@ -134,5 +135,44 @@
         return group;
     }
 
-    window.GpxMapMine = { tracks: tracksLayer, photos: photosLayer };
+    /** Virtuální trasy: čára přes polohy fotek (api/virtual_tracks/lines.php). */
+    function vtracksLayer(map, i18n) {
+        var group = L.layerGroup();
+        var shown = {};
+        var lang  = document.documentElement.lang || "cs";
+
+        autoLoad(map, group, TRACK_MIN_ZOOM, function (current) {
+            fetch("api/virtual_tracks/lines.php?" + bboxQuery(map), { credentials: "same-origin" })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    if (!d || !current() || !d.tracks) return;
+                    d.tracks.forEach(function (t) {
+                        if (shown[t.id]) return;
+                        shown[t.id] = true;
+                        var line = L.polyline(t.line, {
+                            color: VT_COLOR, weight: 3, opacity: 0.9, dashArray: "6 6", interactive: false
+                        });
+                        var hit = L.polyline(t.line, { color: "#000", weight: 14, opacity: 0 });
+                        var box = el("div", "gpx-mine-pop");
+                        box.appendChild(el("strong", "", t.name));
+                        var meta = [fmtDate(t.date, lang), t.km ? "≈ " + t.km.toLocaleString(lang) + " km" : "",
+                                    t.photos ? "📸 " + t.photos : ""].filter(Boolean).join(" · ");
+                        if (meta) box.appendChild(el("div", "gpx-mine-meta", meta));
+                        var a = el("a", "", (i18n.vtDetail || "Detail virtuální trasy") + " →");
+                        a.href = "virtual_track_detail.php?id=" + encodeURIComponent(t.id);
+                        box.appendChild(a);
+                        hit.bindPopup(box);
+                        hit.bindTooltip(t.name, { sticky: true });
+                        hit.on("mouseover", function () { line.setStyle({ weight: 5 }); });
+                        hit.on("mouseout",  function () { line.setStyle({ weight: 3 }); });
+                        group.addLayer(line);
+                        group.addLayer(hit);
+                    });
+                })
+                .catch(function () { /* bez sítě se prostě nic nenačte */ });
+        });
+        return group;
+    }
+
+    window.GpxMapMine = { tracks: tracksLayer, photos: photosLayer, vtracks: vtracksLayer };
 })();

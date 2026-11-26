@@ -145,6 +145,44 @@ require __DIR__ . '/includes/layout_header.php';
     <?php endif; ?>
 </div>
 
+<?php if ($_isAdmin && count($vtracks) > 0): ?>
+<!-- ===== Hromadné názvy (js/vt-bulk-names.js) ===== -->
+<details class="vt-card" id="vtBulk">
+    <summary style="cursor:pointer; font-weight:600; font-size:16px;"><?= htmlspecialchars(t('vt_bulk_title', 'Hromadné názvy')) ?></summary>
+    <p style="font-size:13px; color:var(--text-muted); margin:10px 0;"><?= htmlspecialchars(t('vt_bulk_help')) ?></p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+        <button type="button" class="vt-btn" id="vtBulkSuggest"><?= htmlspecialchars(t('vt_bulk_suggest', 'Navrhnout názvy podle míst')) ?></button>
+        <button type="button" class="vt-btn vt-btn-primary" id="vtBulkSave"><?= htmlspecialchars(t('vt_bulk_save', 'Uložit zaškrtnuté')) ?></button>
+        <span id="vtBulkStatus" style="font-size:13px; color:var(--text-muted);" role="status" aria-live="polite"></span>
+    </div>
+    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead><tr style="text-align:left; color:var(--text-muted);">
+            <th style="padding:4px;"><input type="checkbox" id="vtBulkAll" aria-label="<?= htmlspecialchars(t('vt_bulk_all', 'Vybrat vše')) ?>"></th>
+            <th style="padding:4px;"><?= htmlspecialchars(t('vt_bulk_current', 'Současný název')) ?></th>
+            <th style="padding:4px;"><?= htmlspecialchars(t('vt_bulk_new', 'Nový název')) ?></th>
+        </tr></thead>
+        <tbody>
+        <?php foreach ($vtracks as $vt): ?>
+            <tr data-vt-id="<?= (int)$vt['id'] ?>" style="border-top:1px dashed var(--border-color);">
+                <td style="padding:4px;"><input type="checkbox" class="vt-bulk-pick" aria-label="<?= h((string)($vt['name'] ?: ('#' . $vt['id']))) ?>"></td>
+                <td style="padding:4px;" class="vt-bulk-cur"><?= h((string)($vt['name'] ?? '')) ?></td>
+                <td style="padding:4px; width:50%;"><input type="text" class="vt-bulk-name" maxlength="255" value="<?= h((string)($vt['name'] ?? '')) ?>"
+                    style="width:100%; padding:4px 6px; border:1px solid var(--border-color); border-radius:6px; background:var(--card-bg); color:var(--text-color);"></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+</details>
+<script defer src="<?= asset('js/vt-bulk-names.js') ?>" data-csrf="<?= h(csrf_token()) ?>" id="vtBulkScript"
+        data-i18n="<?= h(json_encode([
+            'suggesting' => t('vt_bulk_suggesting', 'Hledám místa… {i}/{n}'),
+            'saving'     => t('vt_bulk_saving', 'Ukládám… {i}/{n}'),
+            'done'       => t('vt_bulk_done', 'Hotovo.'),
+            'none'       => t('vt_bulk_none', 'Nic není zaškrtnuté.'),
+            'failed'     => t('vt_bulk_failed', 'Některé názvy se nepodařilo zpracovat: {n}'),
+        ], JSON_UNESCAPED_UNICODE)) ?>"></script>
+<?php endif; ?>
+
 </div>
 
 <script nonce="<?= csp_nonce() ?>">

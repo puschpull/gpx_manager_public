@@ -526,7 +526,7 @@ $cfgPages  = get_app_config('visible_pages', all_pages());
 $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩🇪 Deutsch',
     'sk'=>'🇸🇰 Slovenčina','es'=>'🇪🇸 Español','fr'=>'🇫🇷 Français',
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
-$pageLabels = ['stats'=>'📊 Statistiky','calendar'=>'📅 Kalendář',
+$pageLabels = ['stats'=>'📊 Statistiky','year'=>'🗓️ Roční souhrn','explore'=>'▦ Prozkoumané čtverce','collections'=>'📚 Kolekce (jen veřejné)','calendar'=>'📅 Kalendář',
     'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě','map'=>'🗺️ Mapa (vrstvy přes sebe)',
     'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
     'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení','links'=>'🧭 Podobné weby',

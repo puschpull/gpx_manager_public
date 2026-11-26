@@ -127,6 +127,8 @@ CREATE TABLE IF NOT EXISTS virtual_tracks (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     name          VARCHAR(255) DEFAULT NULL,
     note          TEXT         DEFAULT NULL,
+    -- 0023: úseky zadané na detailu (JSON jako text)
+    sections      TEXT         DEFAULT NULL,
     color         VARCHAR(20)  DEFAULT NULL,
     is_favorite   TINYINT(1)   NOT NULL DEFAULT 0,
     date_start    DATETIME     DEFAULT NULL,
@@ -269,6 +271,31 @@ CREATE TABLE IF NOT EXISTS map_markers (
     updated_at  TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_mm_public (is_public)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ------------------------------------------------------------
+--  Tabulky: collections, collection_tracks — kolekce tras
+--  (migrace 0022)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS collections (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name         VARCHAR(160)  NOT NULL,
+    description  TEXT          DEFAULT NULL,
+    is_public    TINYINT(1)    NOT NULL DEFAULT 0,
+    created_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_col_public (is_public)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS collection_tracks (
+    collection_id  INT UNSIGNED NOT NULL,
+    track_id       INT          NOT NULL,
+    position       INT          NOT NULL DEFAULT 0,
+    added_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (collection_id, track_id),
+    INDEX idx_ct_track (track_id),
+    CONSTRAINT fk_ct_collection FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ct_track      FOREIGN KEY (track_id)      REFERENCES tracks(id)      ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
 --  Hotovo! Pokračuj spuštěním setup.php v prohlížeči nebo

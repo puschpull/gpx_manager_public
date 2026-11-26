@@ -120,10 +120,12 @@ $topCats = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $_isAdmin = !empty($_SESSION['is_admin']);
+$_yearVisible = $_isAdmin || in_array('year', (array)get_app_config('visible_pages', all_pages()), true);
 $page_title = t('h1_stats');
 require __DIR__ . '/includes/layout_header.php';
 ?>
 
+<link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
         <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
@@ -136,6 +138,12 @@ require __DIR__ . '/includes/layout_header.php';
     <p class="mt-1 text-forest-700/70 dark:text-sand-100/70 text-sm">
         <?= htmlspecialchars(t('stats_subtitle')) ?>
     </p>
+    <?php if ($_yearVisible && !empty($yearly)): ?>
+    <a href="year.php?y=<?= (int)$yearly[0]['yr'] ?>" class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-forest-600 hover:text-terracotta-500 transition-colors">
+        <i data-lucide="calendar-range" class="w-4 h-4" aria-hidden="true"></i>
+        <?= htmlspecialchars(t('yr_page', 'Roční souhrn')) ?> <?= (int)$yearly[0]['yr'] ?> →
+    </a>
+    <?php endif; ?>
 </section>
 
 <!-- ===== CELKOVÉ STATISTIKY ===== -->
@@ -327,7 +335,7 @@ require __DIR__ . '/includes/layout_header.php';
                 <tbody class="divide-y divide-sand-100 dark:divide-forest-700">
                     <?php foreach ($yearly as $y): ?>
                         <tr class="hover:bg-sand-50 dark:hover:bg-forest-800/50 transition-colors">
-                            <td class="px-4 py-2.5 stat-num font-semibold text-forest-700 dark:text-sand-100"><?= (int)$y['yr'] ?></td>
+                            <td class="px-4 py-2.5 stat-num font-semibold text-forest-700 dark:text-sand-100"><?php if ($_yearVisible): ?><a href="year.php?y=<?= (int)$y['yr'] ?>" class="hover:text-terracotta-500 underline decoration-dotted underline-offset-4" title="<?= htmlspecialchars(t('yr_page', 'Roční souhrn')) ?>"><?= (int)$y['yr'] ?></a><?php else: ?><?= (int)$y['yr'] ?><?php endif; ?></td>
                             <td class="px-4 py-2.5 text-right stat-num"><?= (int)$y['tracks'] ?></td>
                             <td class="px-4 py-2.5 text-right stat-num"><?= fmtDist((float)$y['km']) ?></td>
                             <td class="px-4 py-2.5 text-right stat-num text-forest-600"><?= fmtElev((float)$y['ascent']) ?></td>

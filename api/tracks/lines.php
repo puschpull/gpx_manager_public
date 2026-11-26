@@ -20,52 +20,9 @@ require_once __DIR__ . '/../../includes/ajax.php';
 require_once __DIR__ . '/../../includes/geojson_helper.php';
 require_once __DIR__ . '/../../includes/track_title.php';
 
-const TRACK_LINES_MAX      = 150;
-const TRACK_LINES_SIMPLIFY = 10.0;   // metry
+require_once __DIR__ . '/../../includes/track_lines.php';   // track_lines_cached()
 
-/**
- * Úseky trasy jako [[lat, lon], …] (MultiLineString → víc úseků), z cache.
- *
- * @return array<int, array<int, array{0: float, 1: float}>>|null
- */
-function track_lines_cached(int $id, string $filename): ?array
-{
-    try {
-        $gpxPath = uploads_fs($filename);
-        $dir     = uploads_fs('_line_cache');
-    } catch (\RuntimeException $e) {
-        return null;
-    }
-    $cache = $dir . DIRECTORY_SEPARATOR . $id . '.json';
-    if (is_file($cache) && is_file($gpxPath) && filemtime($cache) >= filemtime($gpxPath)) {
-        $data = json_decode((string)file_get_contents($cache), true);
-        if (is_array($data)) {
-            return $data;
-        }
-    }
-
-    $err  = null;
-    $geom = track_geojson_geometry($filename, false, 1, $err, true, TRACK_LINES_SIMPLIFY);
-    if ($geom === null) {
-        return null;
-    }
-    $segments = [];
-    foreach ($geom['coordinates'] as $line) {
-        $seg = [];
-        foreach ($line as $p) {
-            $seg[] = [round((float)$p[1], 5), round((float)$p[0], 5)];
-        }
-        if (count($seg) >= 2) {
-            $segments[] = $seg;
-        }
-    }
-
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0775, true);
-    }
-    @file_put_contents($cache, json_encode($segments), LOCK_EX);
-    return $segments;
-}
+const TRACK_LINES_MAX = 150;
 
 ajax_endpoint(function () use ($pdo): array {
     $num = static function (string $k, float $lim): ?float {

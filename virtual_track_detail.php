@@ -229,6 +229,8 @@ window.gpxVtData = {
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
     vtId: <?= (int)$vt['id'] ?>,
+    // Úseky uložené v databázi (0023); null = nezadané nebo starší databáze bez sloupce
+    sections: <?= js_safe_json($_isAdmin && !empty($vt['sections']) ? json_decode((string)$vt['sections'], true) : null) ?>,
     csrf: <?= json_encode(csrf_token()) ?>,
     isAdmin: <?= $_isAdmin ? 'true' : 'false' ?>,
     color: <?= js_safe_json($vt['color'] ?: '') ?>,
@@ -692,14 +694,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 `<option value="${v}"${v === sel ? ' selected' : ''}>${PROFILE_LABEL[v]}</option>`).join('');
         }
 
+        // Úseky se ukládají do databáze (api/virtual_tracks/sections.php), aby je
+        // viděl i jiný počítač; localStorage zůstává jako záloha a zdroj pro
+        // jednorázový přenos úseků zadaných před migrací 0023.
+        let secSaveTimer = null;
+        function postSections(payload) {
+            const body = new URLSearchParams();
+            body.append('id', String(window.gpxVtData.vtId));
+            Object.keys(payload).forEach(k => body.append(k, payload[k]));
+            return fetch('api/virtual_tracks/sections.php', {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'X-CSRF-Token': window.gpxVtData.csrf, 'X-Requested-With': 'XMLHttpRequest' },
+                body
+            }).catch(() => {});
+        }
         function saveSections() {
             const starts = secStarts();
             const profiles = starts.map(s => secProfileByStart[s] || secGlobalProfile());
-            localStorage.setItem(SECTION_LS_KEY, JSON.stringify({ boundaries: secBoundaries, starts, profiles }));
+            const data = JSON.stringify({ boundaries: secBoundaries, starts, profiles });
+            localStorage.setItem(SECTION_LS_KEY, data);
+            clearTimeout(secSaveTimer);
+            secSaveTimer = setTimeout(() => postSections(secBoundaries.length ? { sections: data } : { clear: '1' }), 600);
         }
         function loadSections() {
             try {
-                const raw = JSON.parse(localStorage.getItem(SECTION_LS_KEY) || 'null');
+                const server = window.gpxVtData.sections;
+                const local  = JSON.parse(localStorage.getItem(SECTION_LS_KEY) || 'null');
+                const raw = (server && Array.isArray(server.boundaries)) ? server : local;
+                // Úseky jen v prohlížeči → přenést do databáze
+                if (raw === local && local && Array.isArray(local.boundaries) && local.boundaries.length) {
+                    postSections({ sections: JSON.stringify(local) });
+                }
                 if (raw && Array.isArray(raw.boundaries)) {
                     secBoundaries = raw.boundaries.slice().sort((a, b) => a - b);
                     if (Array.isArray(raw.starts) && Array.isArray(raw.profiles)) {
@@ -819,6 +844,8 @@ document.addEventListener('DOMContentLoaded', () => {
             secTotal.textContent = '';
             secHide.style.display = 'none';
             localStorage.removeItem(SECTION_LS_KEY);
+            clearTimeout(secSaveTimer);
+            postSections({ clear: '1' });
             afterBoundaryChange();
         });
 
