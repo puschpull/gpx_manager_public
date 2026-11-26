@@ -53,7 +53,7 @@ window.GpxTrackSetMap = (function () {
                     a.href = "detail.php?id=" + encodeURIComponent(t.id);
                     pop.appendChild(a);
                     hit.bindPopup(pop);
-                    hit.bindTooltip(t.name, { sticky: true });
+                    hit.bindTooltip(el("span", "", t.name), { sticky: true });   // text, ne HTML (N1)
                     hit.on("mouseover", function () { line.setStyle({ weight: 6 }); });
                     hit.on("mouseout", function () { line.setStyle({ weight: 3 }); });
                     bounds.extend(line.getBounds());

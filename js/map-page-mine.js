@@ -78,7 +78,7 @@
                         a.href = "detail.php?id=" + encodeURIComponent(t.id);
                         box.appendChild(a);
                         hit.bindPopup(box);
-                        hit.bindTooltip(t.name, { sticky: true });
+                        hit.bindTooltip(el("span", "", t.name), { sticky: true });   // text, ne HTML (N1)
                         hit.on("mouseover", function () { line.setStyle({ weight: 5 }); });
                         hit.on("mouseout",  function () { line.setStyle({ weight: 3 }); });
                         group.addLayer(line);
@@ -162,7 +162,7 @@
                         a.href = "virtual_track_detail.php?id=" + encodeURIComponent(t.id);
                         box.appendChild(a);
                         hit.bindPopup(box);
-                        hit.bindTooltip(t.name, { sticky: true });
+                        hit.bindTooltip(el("span", "", t.name), { sticky: true });   // text, ne HTML (N1)
                         hit.on("mouseover", function () { line.setStyle({ weight: 5 }); });
                         hit.on("mouseout",  function () { line.setStyle({ weight: 3 }); });
                         group.addLayer(line);
