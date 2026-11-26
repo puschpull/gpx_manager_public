@@ -24,21 +24,21 @@
 - Alpine.js 3.x pro interaktivitu v novém UI
 - Legacy CSS proměnné pro světlý/tmavý režim v `css/style.css` (`:root` + `html.dark`) — koexistuje s Tailwind
 - Vanilla JS v `js/` (žádný build pipeline, soubory servovány raw)
-**Mapy**: Leaflet 1.9.4 (CDN), leaflet-gpx, leaflet.heat, leaflet.vectorgrid (Mapillary)
-**Grafy**: Chart.js 4.x (CDN)
-**Ikony**: Lucide (CDN)
-**Auth**: IP allowlist (z `.env ADMIN_IPS`) + session-based login s bcrypt hashem (`password_hash`/`password_verify`), CSRF tokeny ručně přes `includes/security.php`
+**Mapy**: Leaflet 1.9.4, leaflet-gpx, leaflet.heat, leaflet.vectorgrid (Mapillary) — vše v `assets/vendor/`
+**Grafy**: Chart.js 4.4.1 (`assets/vendor/`)
+**Ikony**: Lucide 0.469.0 (`assets/vendor/`)
+**Auth**: produkce = jen session login s bcrypt hashem + „zapamatovat“ 30 dní (`includes/remember_login.php`, podepsaná cookie, odhlášení ruší všude); IP allowlist (`.env ADMIN_IPS`) platí jen lokálně (APP_ENV local) — od 25. 11. 2026, kontrola S2; login (`password_hash`/`password_verify`), CSRF tokeny ručně přes `includes/security.php`
 **Hosting**: produkce = VPS s CloudPanelem (nginx → Varnish → nginx, PHP 8.4 FPM, MySQL 8.4); vývoj = WAMP (Apache + `.htaccess`). Viz „Prostředí a nasazení"
 **Observability**: PHP `error_log` → `logs/errors.log`; výsledky nasazení v `deploy.log` na serveru (mimo webroot)
 **i18n**: vlastní pole v `lang/{cs,en,de,sk,es,fr,pl,it}.php`, funkce `t($key)`
-**Build**: žádný (Tailwind kompiluje se lokálně, `app.css` se commituje); cíl: minimální CI build krok
+**Build**: jen CSS — `npm run build` (Tailwind 4.2.4 z `package-lock.json`, jednorázově `npm ci --ignore-scripts`); `app.css` se commituje a CI hlídá, že odpovídá šablonám. **Po přidání nové Tailwind třídy do šablony VŽDY `npm run build` a commitnout `app.css`** — jinak třída tiše nefunguje (do 26. 11. 2026 byl build z května a 35 tříd v šablonách nefungovalo)
 
 ---
 
 ## Konvence kódu
 
 - **PHP**: PSR-12 styl, `declare(strict_types=1);` POVINNĚ v nových souborech. V existujících je dopsaný všude kromě HTML šablon (`includes/*_view.php`, `table_tracks.php`, `pager_*.php`, `layout_*.php`) a stránek, které samy generují HTML (`stats.php`, `calendar.php`, `admin.php`, `edit.php`, `settings.php`, `login.php`, `import.php`, `heatmap.php`, `photo_heatmap.php`, `map_search.php`, `virtual_tracks*.php`) — tam je přes 370 volání `htmlspecialchars()`/`h()` s implicitní konverzí int→string, které by `strict_types` shodilo za běhu na konkrétní datové cestě. Do těch souborů ho nepřidávej, dokud nebudou volání přetypovaná. Stav: 101/127 souborů.
-- **Verze PHP v kódu**: syntaxe nejvýš **PHP 8.1** (`readonly` vlastnosti, `never`, `strval(...)` už používá `src/Cestopis/` a `migrate.php`). Novinky z 8.2+ NEPOUŽÍVAT, i když produkce i WAMP běží na 8.4: `readonly class`, typy `true`/`null`/`false` a DNF, typované konstanty tříd, `#[\Override]`, `json_validate()`, property hooks, asymetrická viditelnost, `new Foo()->x` bez závorek. Důvod: aplikace má běžet i na běžném hostingu a cloudové sezení Claude Code má PHP 8.3, takže `php -l` syntaxi 8.4 neprojde. `composer.json` zatím uvádí `^8.0`, což je nepřesné.
+- **Verze PHP v kódu**: syntaxe nejvýš **PHP 8.1** (`readonly` vlastnosti, `never`, `strval(...)` už používá `src/Cestopis/` a `migrate.php`). Novinky z 8.2+ NEPOUŽÍVAT, i když produkce i WAMP běží na 8.4: `readonly class`, typy `true`/`null`/`false` a DNF, typované konstanty tříd, `#[\Override]`, `json_validate()`, property hooks, asymetrická viditelnost, `new Foo()->x` bez závorek. Důvod: aplikace má běžet i na běžném hostingu a cloudové sezení Claude Code má PHP 8.3, takže `php -l` syntaxi 8.4 neprojde. `composer.json` uvádí `^8.1` (od 26. 11. 2026).
 - **Naming**: **snake_case** pro funkce (`get_app_config`, `csrf_verify`), camelCase je legacy dluh
 - **Strings**: všechny user-facing texty přes `t('key')` z lang souborů; technické komentáře v češtině jsou OK, ale komentáře v kódu by měly být postupně angličtinou (kód má identifikátory anglické)
 - **DB**: výhradně prepared statements, NIKDY `$pdo->quote()` se string konkatenací
@@ -57,7 +57,7 @@
 - **Track / trasa**: GPX záznam (`tracks` tabulka), může mít difficulty (1–5), activity_type, kategorie (N:M přes `track_categories`)
 - **Photo / fotka**: obrázek (JPG/PNG/WebP) v `track_photos`, volitelně přiřazen ke trase přes time+geo proximity (`auto_assign_photo_to_track` v `photo_helper.php`)
 - **Visitor mode / visitor preview**: read-only přístup pro nepřihlášené uživatele (omezeno na stránky v `app_config.visible_pages`)
-- **Admin via IP / Admin via login**: dva způsoby autentizace; `$_SESSION['admin_via']` = `'IP'` nebo `'login'`
+- **Admin via IP / Admin via login**: dva způsoby autentizace; `$_SESSION['admin_via']` = `'IP'` (jen lokálně) nebo `'login'`
 - **App config**: globální runtime nastavení v tabulce `app_config` (themes, jazyky, viditelné stránky, uploads cesta)
 - **Theme**: světlý/tmavý režim — řízený Tailwind `.dark` třídou (`gpx-theme` v localStorage, přepínač v `layout_header.php`); legacy stránky dědí přes CSS proměnné `:root`/`html.dark` v `css/style.css`. (9 barevných témat bylo odstraněno jako mrtvý kód, 2026-06-25.)
 - **Activity type**: hodnota v `tracks.activity_type` — momentálně české stringy (`'Pěšky'`, `'Auto'`, `'Kolo'`...) — i18n přes label funkci
@@ -104,7 +104,7 @@ Kontrolní seznam, který má projít každá změna:
 - [ ] **`declare(strict_types=1);`** v každém novém PHP souboru
 - [ ] **Žádné nové `console.log`** v JS bez `if (window.GPX_DEBUG)`
 - [ ] **Žádné `hidden md:flex`** a podobné CSS-only přepínače viditelnosti (`php scripts/lint_css_fragile.php` projde)
-- [ ] **CDN scripty pinnuté** na konkrétní verzi + SRI hash (žádné `@latest`)
+- [ ] **Knihovny třetích stran jen z `assets/vendor/<název>-<verze>/`** + SRI hash, žádné nové CDN (postup v `assets/vendor/README.md`)
 - [ ] **WCAG 2.2 AA** — kontrast ≥ 4.5:1 pro normální text ve světlém i tmavém režimu
 - [ ] **`prefers-reduced-motion` honored** — žádné animace bez respektování
 - [ ] **`<html lang>` reflektuje `app_lang()`**, ne hardcoded `cs`
@@ -147,10 +147,9 @@ Kontrolní seznam, který má projít každá změna:
 - Klient-side v Leaflet layers
 - Volitelné — pokud klíč není, vrstva se nezobrazí (musí být guarded — viz FE-11)
 
-### CDN (Leaflet, Chart.js, Alpine.js, Lucide, Google Fonts)
-- Pinout konkrétní verze + SRI integrity
-- Long-term cíl: stáhnout do `assets/vendor/` (self-host)
-- Pokud Google Fonts: vždy `&display=swap`
+### Knihovny třetích stran (Leaflet, Chart.js, Alpine.js, Lucide) a Google Fonts
+- Od 26. 11. 2026 self-host v `assets/vendor/` (soubory beze změny, ověřené proti SRI; zdroje a postup aktualizace v `assets/vendor/README.md`); šablony mají dál `integrity`
+- Z CDN se už nic nenačítá — Google Fonts zůstávají (`&display=swap`)
 
 ### Composer
 - PSR-4 autoload: `GpxManager\` → `src/`

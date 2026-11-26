@@ -1,10 +1,106 @@
 ================================================================================
   GPX Manager Redesign – Přehled změn
   Projekt: https://github.com/puschpull/gpx_manager_public
-  Poslední aktualizace: 19. listopadu 2026
+  Poslední aktualizace: 26. listopadu 2026
 
 ================================================================================
 
+
+── 26. listopadu 2026 ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PŘEKLADY, PODOBNÉ WEBY, COMPOSER                                         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Texty mimo t(): pro návštěvníky (mobilní popisky tabulky, kalendář,
+  graf, nastavení, fotky) i ve správě — Fotky, Čistič GPX, Lokální import
+  fotek, údržbové stránky, klasická administrace, hlášky nahrávání
+  a hromadných akcí. ~230 klíčů v 8 jazycích; česky nově s diakritikou
+  (Čistič a import byly bez ní). Nová t_html() pro věty s HTML uvnitř.
+  Česky zůstává Cestopis a data (typy aktivit, záhlaví CSV exportu).
+  Podobné weby: kontrola všech odkazů (opravené adresy openrouteservice,
+  ViewGPX, MyGeodata; aktuální popisy Komoot a Garmin BaseCamp),
+  13 nových odkazů a kategorie „Na výlet v Česku“; popisy všech 62 odkazů
+  v 8 jazycích (includes/links_desc/<jazyk>.php, hlídá LinksDescTest).
+  composer.json: "php": "^8.1" (kód už syntaxi 8.1 vyžaduje).
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  TAILWIND BUILD                                                           │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  assets/css/app.css byl z 15. 5. 2026 — třídy přidané do šablon od té doby
+  nefungovaly. Teď npm run build (Tailwind 4.2.4, pevná verze
+  v package-lock.json, instalace npm ci --ignore-scripts); CI kontroluje,
+  že commitnutý app.css odpovídá šablonám. Viditelné změny (záměr šablon):
+  karta počasí na detailu a virtuální trase 208 px, tabulka výšek pro
+  čtečky už není vidět, Statistiky — aktivity netučně, Podobné weby —
+  mezery mezi sekcemi, Cestopis — článek max. 896 px na střed.
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  KNIHOVNY Z VLASTNÍHO SERVERU                                             │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  Leaflet 1.9.4 (+ fullscreen 1.6.0, vectorgrid 1.3.0, heat 0.2.0, gpx 1.7.0),
+  Chart.js 4.4.1, Lucide 0.469.0 a Alpine 3.14.1 (CSP + focus) se už
+  nenačítají z unpkg / jsdelivr / cdnjs, ale z assets/vendor/ — soubory
+  beze změny, ověřené proti SRI otiskům (otisky v šablonách zůstaly).
+  CSP: script-src jen 'self' + nonce, z style-src a img-src zmizel unpkg.
+  Zdroje, licence a postup aktualizace: assets/vendor/README.md.
+  .gitattributes: assets/vendor/** -text (jinak by Git přepsal konce
+  řádků a soubory by na serveru neprošly kontrolou SRI).
+  .gitleaks.toml: výjimka pro ukázkový klíč v dokumentaci VectorGrid.
+
+── 25. listopadu 2026 ──────────────────────────────────────────────────────────
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PĚT NOVÝCH FUNKCÍ                                                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  1. Roční souhrn (year.php?y=RRRR): výlety, km, převýšení, dny venku
+     a hodiny proti předchozímu roku, mapa všech tras roku, km po měsících,
+     rekordy, oblíbené, poprvé navštívená místa, 12 fotek přes rok.
+  2. Hledání: slova v libovolném pořadí, "přesná fráze" v uvozovkách,
+     -slovo vyloučí; hledá i v popiscích fotek a ve zveřejněném cestopisu.
+     Znaky % a _ už nefungují jako zástupné.
+  3. Prozkoumané čtverce (explore.php): dlaždice zoomu 14, kterými vedla
+     trasa; počet, největší cluster a čtverec N × N, nové v roce, filtr
+     jen pěší. Cache uploads/_explore_cache/.
+  4. Kolekce tras (collections.php, collection.php): vlastní seznamy
+     napříč kategoriemi, veřejné i neveřejné, mapa, součty, pořadí, odkaz
+     ke sdílení. Přidávání z kolekce, z detailu, v „Upravit trasu“
+     a hromadnou akcí v detailní tabulce (i všechny vyfiltrované trasy).
+  5. Virtuální trasy: úseky se ukládají do databáze, hromadné názvy podle
+     míst a vrstva „Virtuální trasy“ na stránce Mapa.
+  Migrace 0022 (kolekce) a 0023 (úseky virtuálních tras) — spustit
+  php migrate.php. Nové stránky jsou pro návštěvníky skryté, dokud je
+  nezapnete v Administraci.
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│  BEZPEČNOST — POZOR, ZMĚNA PŘIHLÁŠENÍ ADMINA                              │
+└───────────────────────────────────────────────────────────────────────────┘
+
+  ADMIN_IPS platí nově JEN na vývojovém počítači se souborem .gpx-local
+  v kořeni aplikace. Na ostrém webu se ignoruje — admin
+  se přihlašuje heslem, volba „Zapamatovat na tomto zařízení“ drží
+  přihlášení 30 dní (podepsaná cookie) a odhlášení ho zruší na všech
+  zařízeních. Důvod: domácí IP sdílí všechna zařízení v síti a poskytovatel
+  ji může přidělit někomu jinému. Kdo dosud chodil do administrace bez
+  hesla z domácí IP, musí se po aktualizaci jednou přihlásit.
+  Další opravy z bezpečnostní kontroly:
+  - Za proxy už localhost (127.0.0.1, ::1) není adminem na produkci —
+    podvržená hlavička X-Real-IP ani Host: localhost tak nikoho adminem
+    neudělá. Webový přístup k migrate.php jen se souborem .gpx-local.
+  - uploads_fs() odmítá cesty s „..“ a nulovým znakem (únik mimo uploads/).
+  - Bubliny na mapách vkládají názvy jako text, ne HTML.
+  - session.use_strict_mode; přesměrování po náhledu návštěvníka jen
+    v rámci aplikace.
+  - Plány v Plánovači mají přepínač „Veřejný“, nové plány jsou neveřejné
+    (migrace 0024).
+  - API respektují vypnuté stránky; log CSP má limit a rotaci; anonymní
+    API požadavky nezakládají session.
+  Dále: náhled jako návštěvník začíná na aktuální stránce a funguje i po
+  přihlášení heslem; turistické body (OSM) — delší čekání na Overpass,
+  záložní server, starší kopie při výpadku a hláška na mapě, cache 30 dní.
 
 ── 19. listopadu 2026 ──────────────────────────────────────────────────────────
 
