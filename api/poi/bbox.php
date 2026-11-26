@@ -117,7 +117,7 @@ ajax_endpoint(function (): array {
 
     // Hlavní server bývá přetížený (25. 11. 2026 odpovídal za 39 s, dřív
     // jsme čekali jen 20 s) — čekat déle a ve zbylém čase zkusit zálohu.
-    // Celkem nejvýš ~55 s: proxy na produkci (nginx/Varnish) čeká asi 60 s.
+    // Celkem nejvýš ~55 s: reverzní proxy před PHP obvykle čeká asi 60 s.
     set_time_limit(90);
     $deadline = microtime(true) + 55;
     $servers = [
