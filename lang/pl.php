@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Mapy i szlaki znakowane',
     'links_cat_community'  => 'Dzienniki i społeczność',
     'links_cat_peaks'      => 'Góry i panoramy',
+    'links_cat_trips'                  => 'Na wycieczkę po Czechach',
     'links_cat_tools'      => 'Konwersja i narzędzia',
     'links_cat_device'     => 'Na urządzenie i offline',
     'links_cat_stats'      => 'Statystyki i eksploracja terenu',

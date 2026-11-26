@@ -864,6 +864,7 @@ return [
     'links_cat_maps'       => 'Maps and waymarked trails',
     'links_cat_community'  => 'Logs and community',
     'links_cat_peaks'      => 'Mountains and panoramas',
+    'links_cat_trips'                  => 'Trips in Czechia',
     'links_cat_tools'      => 'Conversion and tools',
     'links_cat_device'     => 'On the device and offline',
     'links_cat_stats'      => 'Statistics and exploration',

@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Mapas y senderos señalizados',
     'links_cat_community'  => 'Diarios y comunidad',
     'links_cat_peaks'      => 'Montañas y panorámicas',
+    'links_cat_trips'                  => 'Excursiones por Chequia',
     'links_cat_tools'      => 'Conversión y herramientas',
     'links_cat_device'     => 'En el dispositivo y sin conexión',
     'links_cat_stats'      => 'Estadísticas y exploración',

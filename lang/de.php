@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Karten und markierte Wege',
     'links_cat_community'  => 'Tagebücher und Community',
     'links_cat_peaks'      => 'Berge und Panoramen',
+    'links_cat_trips'                  => 'Ausflüge in Tschechien',
     'links_cat_tools'      => 'Umwandlung und Werkzeuge',
     'links_cat_device'     => 'Aufs Gerät und offline',
     'links_cat_stats'      => 'Statistik und Erkundung',

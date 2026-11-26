@@ -4,12 +4,12 @@ declare(strict_types=1);
 /**
  * links_data.php — obsah rozcestníku na příbuzné weby.
  *
- * Popisky jsou ZÁMĚRNĚ česky a mimo t(): je jich přes dvacet a překládat je
- * do osmi jazyků by bylo nepoměrné k užitku, protože část odkazovaných
- * nástrojů je stejně jen česká. Přeložené je okolí stránky — nadpisy,
- * kategorie a odznaky.
+ * Popisky jsou tady česky (zdroj). Překlady do ostatních jazyků jsou
+ * v includes/links_desc/<jazyk>.php podle názvu odkazu (od 26. 11. 2026).
+ * Okolí stránky — nadpisy, kategorie a odznaky — jde přes t().
  *
- * Přidání odkazu = jeden řádek v poli. Nic dalšího se nemusí měnit.
+ * Přidání odkazu = položka v poli níže + popis ve všech includes/links_desc/*.php
+ * (jinak test LinksDescTest selže a v daném jazyce zůstane popis česky).
  *
  * Odznaky (badge): 'cz' česky | 'free' zdarma | 'reg' vyžaduje registraci
  *                  | 'noreg' bez registrace | 'app' i mobilní aplikace
@@ -25,6 +25,35 @@ declare(strict_types=1);
  * @return array<int, array{title:string, items:array<int, array{name:string, url:string, desc:string, badges:array<int,string>}>}>
  */
 function links_catalog(): array
+{
+    $catalog = links_catalog_cs();
+    $lang = function_exists('app_lang') ? app_lang() : 'cs';
+    $file = __DIR__ . '/links_desc/' . preg_replace('/[^a-z]/', '', $lang) . '.php';
+    if ($lang === 'cs' || !is_file($file)) {
+        return $catalog;
+    }
+    // Translated descriptions, keyed by the link name; a missing one stays Czech
+    $desc = (array) require $file;
+    foreach ($catalog as &$cat) {
+        foreach ($cat['items'] as &$item) {
+            if (isset($desc[$item['name']]) && is_string($desc[$item['name']])) {
+                $item['desc'] = $desc[$item['name']];
+            }
+        }
+        unset($item);
+    }
+    unset($cat);
+    return $catalog;
+}
+
+/**
+ * The catalogue with Czech descriptions (the source; other languages are in
+ * includes/links_desc/<lang>.php, keyed by 'name' — tests/unit/LinksDescTest.php
+ * checks that every language has exactly the same names).
+ *
+ * @return array<int, array{title:string, icon:string, items:array<int, array{name:string, url:string, desc:string, badges:array<int,string>}>}>
+ */
+function links_catalog_cs(): array
 {
     return [
         [
@@ -62,7 +91,7 @@ function links_catalog(): array
                 ],
                 [
                     'name' => 'ViewGPX',
-                    'url'  => 'https://www.viewgpx.com/dashboard',
+                    'url'  => 'https://www.viewgpx.com/',
                     'desc' => 'Prohlížeč se sdílením — vygeneruje odkaz na trasu, který můžeš '
                             . 'poslat dál. Hodí se, když nechceš posílat samotný soubor.',
                     'badges' => ['free'],
@@ -80,6 +109,13 @@ function links_catalog(): array
                     'desc' => 'Další rychlý prohlížeč v prohlížeči — nahraj a koukej. '
                             . 'Užitečné jako druhý názor, když se ti něco nezdá.',
                     'badges' => ['free', 'noreg'],
+                ],
+                [
+                    'name' => 'GPXSee',
+                    'url'  => 'https://www.gpxsee.org/',
+                    'desc' => 'Rychlý otevřený prohlížeč do počítače (Windows, Mac, Linux). Kromě GPX '
+                            . 'otevře i FIT a TCX, ukáže výšku, rychlost i tep a umí víc tras naráz.',
+                    'badges' => ['free'],
                 ],
                 [
                     'name' => 'Mappr GPX Viewer',
@@ -110,7 +146,7 @@ function links_catalog(): array
                 ],
                 [
                     'name' => 'openrouteservice',
-                    'url'  => 'https://maps.openrouteservice.org/',
+                    'url'  => 'https://routing.heigit.org/ors/',
                     'desc' => 'Plánovač nad OpenStreetMap s profily pro pěší, kolo i vozík. '
                             . 'Umí izochrony — kam se dostaneš za daný čas.',
                     'badges' => ['free', 'noreg'],
@@ -119,7 +155,8 @@ function links_catalog(): array
                     'name' => 'Komoot',
                     'url'  => 'https://www.komoot.com/cs-cz',
                     'desc' => 'Plánovač s doporučeními od komunity a odhadem času podle '
-                            . 'kondice. Základ zdarma, offline mapy za peníze.',
+                            . 'kondice. Zdarma jen jeden region, jinak předplatné (od roku 2025, '
+                            . 'kdy Komoot koupila firma Bending Spoons).',
                     'badges' => ['cz', 'reg', 'app'],
                 ],
                 [
@@ -198,6 +235,20 @@ function links_catalog(): array
                     'badges' => ['free', 'noreg'],
                 ],
                 [
+                    'name' => 'Staré mapy (Geolab)',
+                    'url'  => 'https://geolab.cz/stare-mapy',
+                    'desc' => 'Historické mapy českých zemí od vojenských mapování po císařské '
+                            . 'otisky, s porovnáním s dneškem. Kudy vedla cesta před sto lety.',
+                    'badges' => ['cz', 'free', 'noreg'],
+                ],
+                [
+                    'name' => 'Geoportál ČÚZK',
+                    'url'  => 'https://geoportal.cuzk.gov.cz/',
+                    'desc' => 'Státní zdroj leteckých snímků, katastru a reliéfu — odtud bere '
+                            . 'své vrstvy i tenhle web. Archivní ortofota ukážou, jak místo vypadalo dřív.',
+                    'badges' => ['cz', 'free', 'noreg'],
+                ],
+                [
                     'name' => 'Freemap Slovakia',
                     'url'  => 'https://www.freemap.sk/',
                     'desc' => 'Slovenská outdoorová mapa s plánováním a exportem GPX. '
@@ -242,8 +293,9 @@ function links_catalog(): array
                 [
                     'name' => 'Garmin BaseCamp',
                     'url'  => 'https://www.garmin.com/cs-CZ/software/basecamp/',
-                    'desc' => 'Program do počítače pro správu tras a bodů v Garminu. '
-                            . 'Starší, ale pro přenos dat do přístroje pořád nejjistější cesta.',
+                    'desc' => 'Program do počítače pro správu tras a bodů v Garminu. Už se '
+                            . 'nevyvíjí a na nových Macích nemusí běžet, ve Windows je pro přenos '
+                            . 'dat do přístroje pořád nejjistější cesta.',
                     'badges' => ['cz', 'free'],
                 ],
                 [
@@ -287,6 +339,20 @@ function links_catalog(): array
                             . 'Původně pro cyklisty, ale zvládne i chůzi.',
                     'badges' => ['reg'],
                 ],
+                [
+                    'name' => 'Squadrats',
+                    'url'  => 'https://squadrats.com/',
+                    'desc' => 'Čtverce jako u StatsHunters, jen s rychlejší mapou a doplňkem '
+                            . 'pro plánování tras přes neprozkoumaná místa. Dvě velikosti čtverců.',
+                    'badges' => ['free', 'reg'],
+                ],
+                [
+                    'name' => 'CityStrides',
+                    'url'  => 'https://citystrides.com/',
+                    'desc' => 'Počítá prošlé ulice ve městech a obcích. Podobné jako Wandrer, '
+                            . 'jen s důrazem na „mám tu obec celou“.',
+                    'badges' => ['free', 'reg'],
+                ],
             ],
         ],
         [
@@ -303,8 +369,7 @@ function links_catalog(): array
                 [
                     'name' => 'Trackalyzer',
                     'url'  => 'https://trackalyzer.trackthisout.com/',
-                    'desc' => 'Rozbor trasy a 3D přelet nad terénem. Nástupce zrušené Doaramy, '
-                            . 'umí i trasy ze Stravy.',
+                    'desc' => 'Rozbor trasy a 3D přelet nad terénem, umí i trasy ze Stravy.',
                     'badges' => ['free'],
                 ],
                 [
@@ -313,6 +378,13 @@ function links_catalog(): array
                     'desc' => 'Filmové přelety nad trasou pro sdílení. Pozor, kde končí verze '
                             . 'zdarma — z webu to není zřejmé.',
                     'badges' => [],
+                ],
+                [
+                    'name' => 'Relive',
+                    'url'  => 'https://www.relive.com/',
+                    'desc' => 'Nejznámější 3D video z výletu — přelet nad trasou i s fotkami. '
+                            . 'Základ zdarma, delší a kvalitnější videa za předplatné.',
+                    'badges' => ['reg', 'app'],
                 ],
             ],
         ],
@@ -340,6 +412,13 @@ function links_catalog(): array
                     'desc' => 'Počasí, webkamery a túry, těžiště v Alpách a v Rakousku. '
                             . 'Webkamery se hodí ke zjištění, jak to na místě opravdu vypadá.',
                     'badges' => ['cz', 'free', 'app'],
+                ],
+                [
+                    'name' => 'ČHMÚ',
+                    'url'  => 'https://www.chmi.cz/',
+                    'desc' => 'Oficiální předpověď, radar a výstrahy Českého hydrometeorologického '
+                            . 'ústavu. Když je potřeba vědět, jestli varování opravdu platí i pro tvůj kraj.',
+                    'badges' => ['cz', 'free', 'noreg'],
                 ],
             ],
         ],
@@ -369,6 +448,20 @@ function links_catalog(): array
                     'badges' => ['cz', 'free', 'app'],
                 ],
                 [
+                    'name' => 'AllTrails',
+                    'url'  => 'https://www.alltrails.com/',
+                    'desc' => 'Největší světová databáze tras s hodnocením a recenzemi od lidí. '
+                            . 'GPX jde stáhnout po registraci.',
+                    'badges' => ['free', 'app'],
+                ],
+                [
+                    'name' => 'Hikr',
+                    'url'  => 'https://www.hikr.org/',
+                    'desc' => 'Podrobné túrové zprávy s fotkami, hlavně z Alp. Když chceš vědět, '
+                            . 'jak je na tom konkrétní hřeben teď, ne před deseti lety.',
+                    'badges' => ['free'],
+                ],
+                [
                     'name' => 'Treking.cz',
                     'url'  => 'https://www.treking.cz/',
                     'desc' => 'Outdoorový magazín s články o horách, popisy hřebenovek '
@@ -388,6 +481,40 @@ function links_catalog(): array
                     'desc' => 'Hledání schránek podle souřadnic. Umí z obyčejné procházky '
                             . 'udělat výpravu a zavede tě na místa, kam bys jinak nezašel.',
                     'badges' => ['cz', 'reg', 'app'],
+                ],
+            ],
+        ],
+        [
+            'title' => t('links_cat_trips', 'Na výlet v Česku'),
+            'icon'  => 'flag',
+            'items' => [
+                [
+                    'name' => 'eStudánky',
+                    'url'  => 'https://www.estudanky.eu/',
+                    'desc' => 'Národní registr pramenů a studánek s mapou a fotkami. '
+                            . 'Kde se dá cestou napít — a jestli voda ještě teče.',
+                    'badges' => ['cz', 'free', 'noreg'],
+                ],
+                [
+                    'name' => 'Turistické známky',
+                    'url'  => 'https://turisticke-znamky.cz/',
+                    'desc' => 'Dřevěné známky z výletních míst a deník, kam si je zapisuješ. '
+                            . 'Mapa míst se známkou je i dobrý seznam tipů na výlet.',
+                    'badges' => ['cz', 'free'],
+                ],
+                [
+                    'name' => 'Rozhledny',
+                    'url'  => 'https://rozhledny.webzdarma.cz/',
+                    'desc' => 'Dlouholetá databáze českých rozhleden s fotkami a otevírací dobou. '
+                            . 'Vzhled starší, obsah poctivý.',
+                    'badges' => ['cz', 'free', 'noreg'],
+                ],
+                [
+                    'name' => 'Kudy z nudy',
+                    'url'  => 'https://www.kudyznudy.cz/',
+                    'desc' => 'Tipy na výlety a akce po celém Česku od agentury CzechTourism. '
+                            . 'Hodí se, když chceš výšlap spojit s něčím k vidění.',
+                    'badges' => ['cz', 'free', 'noreg'],
                 ],
             ],
         ],
@@ -424,7 +551,7 @@ function links_catalog(): array
                 ],
                 [
                     'name' => 'MyGeodata Converter',
-                    'url'  => 'https://mygeodata.cloud/converter/',
+                    'url'  => 'https://mygeodata.cloud/',
                     'desc' => 'Převody mezi mapovými formáty rovnou v prohlížeči — GPX, KML, '
                             . 'shapefile a další. Zdarma do určitého objemu dat.',
                     'badges' => ['free'],
