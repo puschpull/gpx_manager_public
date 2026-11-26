@@ -1547,4 +1547,9 @@ return [
     'col_bulk_open'                => 'Open the collection?',
     'col_new_placeholder'          => 'New collection — type a name and the track is added to it',
     'col_how'                      => 'Add tracks to a collection: in the detailed table tick tracks (e.g. after filtering) and choose the bulk action “Add to collection…”; in “Edit track” by ticking; on the track detail via the Collections row; or by searching on the collection page.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Hiking points appear when you zoom in.',
+    'mf_poi_loading'               => 'Loading hiking points…',
+    'mf_poi_down'                  => 'Hiking points are not available right now — the OpenStreetMap service (Overpass) is not responding. I will retry when the map moves.',
+    'mf_poi_stale'                 => 'Hiking points come from an older saved copy — the OpenStreetMap service is not responding.',
 ];

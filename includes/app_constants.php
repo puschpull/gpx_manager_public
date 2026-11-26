@@ -189,6 +189,7 @@ function map_context_layer_names(): array {
 /** Texty sdílené mapové továrny mimo názvy vrstev (body zájmu, moje poloha). */
 function map_factory_texts(): array {
     $keys = ['poi_peak', 'poi_viewpoint', 'poi_shelter', 'poi_spring', 'poi_castle', 'poi_ruins', 'poi_tower',
+             'poi_zoom', 'poi_loading', 'poi_down', 'poi_stale',
              'locate_title', 'locate_tooltip', 'locate_failed', 'locate_needs',
              'ortho_latest', 'ortho_period', 'hist_period', 'hist_m1', 'hist_m2', 'hist_m3',
              'relief_period', 'relief_shade', 'relief_tint', 'relief_slope'];

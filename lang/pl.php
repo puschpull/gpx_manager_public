@@ -1541,4 +1541,9 @@ return [
     'col_bulk_open'                => 'Otworzyć kolekcję?',
     'col_new_placeholder'          => 'Nowa kolekcja — wpisz nazwę, a trasa zostanie do niej dodana',
     'col_how'                      => 'Trasy do kolekcji dodasz: w szczegółowej tabeli zaznacz trasy (np. po filtrowaniu) i wybierz akcję zbiorczą „Dodaj do kolekcji…”; w „Edytuj trasę” zaznaczeniem; w szczegółach trasy w wierszu Kolekcje; albo wyszukiwaniem na stronie kolekcji.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Punkty turystyczne pojawią się po przybliżeniu mapy.',
+    'mf_poi_loading'               => 'Wczytuję punkty turystyczne…',
+    'mf_poi_down'                  => 'Punkty turystyczne są teraz niedostępne — usługa OpenStreetMap (Overpass) nie odpowiada. Spróbuję ponownie po przesunięciu mapy.',
+    'mf_poi_stale'                 => 'Punkty turystyczne pochodzą ze starszej zapisanej kopii — usługa OpenStreetMap nie odpowiada.',
 ];

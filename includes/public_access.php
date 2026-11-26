@@ -29,27 +29,9 @@ if ($_pub_is_real_admin) {
     }
 }
 
-// Visitor preview přepínač — funguje pouze pro adminy ze správné IP
-if ($_pub_is_real_admin && isset($_GET['visitor_preview'])) {
-    // Odstraní visitor_preview z URL a přesměruje (čistá URL po přepnutí)
-    // Back to the same page of this app only: the script name, never the raw
-    // request path ("//evil.example/…" would be an open redirect, N9).
-    $parts = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '')) ?: [];
-    parse_str($parts['query'] ?? '', $_vp_q);
-    unset($_vp_q['visitor_preview']);
-    $cleanUrl = basename((string) ($_SERVER['SCRIPT_NAME'] ?? 'index.php')) . ($_vp_q ? '?' . http_build_query($_vp_q) : '');
-
-    if ($_GET['visitor_preview'] === '1') {
-        $_SESSION['is_admin']       = false;
-        $_SESSION['visitor_preview'] = true;
-    } else {
-        unset($_SESSION['visitor_preview']);
-        $_SESSION['is_admin']   = true;
-        $_SESSION['admin_via']  = 'IP';
-    }
-    header('Location: ' . $cleanUrl);
-    exit;
-}
+// Visitor preview přepínač (admin podle IP i po přihlášení heslem)
+require_once __DIR__ . '/visitor_preview.php';
+visitor_preview_handle($_pub_is_real_admin, false);
 
 unset($_pub_is_real_admin);
 

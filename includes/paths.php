@@ -172,3 +172,20 @@ function is_safe_image_path(string $path): bool {
     $base = rtrim($base, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     return strpos($real . DIRECTORY_SEPARATOR, $base) === 0;
 }
+
+/**
+ * Link that switches the admin into visitor preview on the CURRENT page
+ * (script name + its query, never the raw request path). A page the visitor
+ * may not see redirects to index.php by itself (check_page_access), and
+ * admin-only pages (auth.php) send the preview to index.php.
+ */
+function visitor_preview_url(): string {
+    $q = $_GET;
+    unset($q['visitor_preview']);
+    $q['visitor_preview'] = '1';
+    $script = basename((string)($_SERVER['SCRIPT_NAME'] ?? 'index.php'));
+    if (!preg_match('/^[a-z0-9_\-]+\.php$/i', $script)) {
+        $script = 'index.php';
+    }
+    return $script . '?' . http_build_query($q);
+}

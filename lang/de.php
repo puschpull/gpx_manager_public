@@ -1541,4 +1541,9 @@ return [
     'col_bulk_open'                => 'Sammlung öffnen?',
     'col_new_placeholder'          => 'Neue Sammlung — Namen eingeben, die Tour wird hinzugefügt',
     'col_how'                      => 'Touren zur Sammlung hinzufügen: in der Detailtabelle Touren markieren (z. B. nach dem Filtern) und die Sammelaktion „Zur Sammlung hinzufügen…“ wählen; unter „Tour bearbeiten“ per Häkchen; im Tourdetail über die Zeile Sammlungen; oder per Suche auf der Sammlungsseite.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Wanderpunkte erscheinen beim Hineinzoomen.',
+    'mf_poi_loading'               => 'Wanderpunkte werden geladen…',
+    'mf_poi_down'                  => 'Wanderpunkte sind gerade nicht verfügbar — der OpenStreetMap-Dienst (Overpass) antwortet nicht. Neuer Versuch beim Verschieben der Karte.',
+    'mf_poi_stale'                 => 'Wanderpunkte stammen aus einer älteren gespeicherten Kopie — der OpenStreetMap-Dienst antwortet nicht.',
 ];

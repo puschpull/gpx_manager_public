@@ -1547,4 +1547,9 @@ return [
     'col_bulk_open'                => 'Otevřít kolekci?',
     'col_new_placeholder'          => 'Nová kolekce — napište název a trasa se do ní přidá',
     'col_how'                      => 'Trasy do kolekce přidáte: v detailní tabulce označte trasy (třeba po vyfiltrování) a zvolte hromadnou akci „Přidat do kolekce…“; v „Upravit trasu“ zaškrtnutím; na detailu trasy výběrem u řádku Kolekce; nebo hledáním přímo na stránce kolekce.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Turistické body se ukážou po přiblížení mapy.',
+    'mf_poi_loading'               => 'Načítám turistické body…',
+    'mf_poi_down'                  => 'Turistické body teď nejsou dostupné — služba OpenStreetMap (Overpass) neodpovídá. Zkusím to znovu při posunu mapy.',
+    'mf_poi_stale'                 => 'Turistické body jsou ze starší uložené kopie — služba OpenStreetMap teď neodpovídá.',
 ];

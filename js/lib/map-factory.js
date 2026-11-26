@@ -538,12 +538,42 @@ window.GpxMapFactory = (function () {
 
         var group   = L.layerGroup();
         var loading = false;
+        var again   = false;   // mapa se posunula během načítání → načíst znovu
+
+        /* Stavová hláška dole uprostřed mapy: načítání (Overpass umí odpovídat
+           desítky sekund), výpadek služby, nebo málo přiblížená mapa. */
+        var statusBox = null;
+        function status(msg) {
+            if (!msg) {
+                if (statusBox) { statusBox.remove(); statusBox = null; }
+                return;
+            }
+            if (!statusBox) {
+                statusBox = L.control({ position: "bottomleft" });
+                statusBox.onAdd = function () {
+                    var d = L.DomUtil.create("div", "gpx-poi-status");
+                    d.setAttribute("role", "status");
+                    d.style.cssText = "background:rgba(255,255,255,.92);color:#222;padding:4px 10px;border-radius:6px;"
+                        + "font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.25);max-width:320px;";
+                    return d;
+                };
+                statusBox.addTo(map);
+            }
+            statusBox.getContainer().textContent = "📌 " + msg;
+        }
 
         async function load() {
-            if (loading || !map.hasLayer(group)) return;
-            if (map.getZoom() < POI_MIN_ZOOM) { group.clearLayers(); return; }
+            if (!map.hasLayer(group)) { status(null); return; }
+            if (loading) { again = true; return; }
+            if (map.getZoom() < POI_MIN_ZOOM) {
+                group.clearLayers();
+                status(text("poi_zoom", "Turistické body se ukážou po přiblížení mapy."));
+                return;
+            }
 
             loading = true;
+            again = false;
+            status(text("poi_loading", "Načítám turistické body…"));
             var b = map.getBounds();
             var url = "api/poi/bbox.php?s=" + b.getSouth().toFixed(4)
                 + "&w=" + b.getWest().toFixed(4)
@@ -552,7 +582,11 @@ window.GpxMapFactory = (function () {
             try {
                 var res  = await fetch(url);
                 var data = await res.json();
-                if (!data.ok || !Array.isArray(data.pois)) return;
+                if (!data.ok || !Array.isArray(data.pois)) {
+                    status(text("poi_down", "Turistické body teď nejsou dostupné — služba OpenStreetMap (Overpass) neodpovídá. Zkusím to znovu při posunu mapy."));
+                    return;
+                }
+                status(data.stale ? text("poi_stale", "Turistické body jsou ze starší uložené kopie — služba OpenStreetMap teď neodpovídá.") : null);
 
                 group.clearLayers();
                 data.pois.forEach(function (p) {
@@ -570,17 +604,19 @@ window.GpxMapFactory = (function () {
                 });
             } catch (err) {
                 if (window.GPX_DEBUG) console.error("POI chyba:", err);
+                status(text("poi_down", "Turistické body teď nejsou dostupné — služba OpenStreetMap (Overpass) neodpovídá. Zkusím to znovu při posunu mapy."));
             } finally {
                 loading = false;
+                if (again && map.hasLayer(group)) load();
             }
         }
 
         map.on("moveend zoomend", function () {
             if (map.hasLayer(group)) load();
         });
-        map.on("overlayadd", function (ev) {
-            if (ev.layer === group) load();
-        });
+        // "add" pokryje ovladač vrstev Leafletu i vlastní panel stránky Mapa
+        group.on("add", load);
+        group.on("remove", function () { status(null); });
 
         return group;
     }

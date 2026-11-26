@@ -580,7 +580,7 @@ if (!function_exists('t')) {
                 </a>
                 <?php // Na mobilu je admin menu v hlavičce skryté — náhled a odhlášení musí být tady. ?>
                 <div class="my-2 mx-4 border-t border-sand-200 dark:border-forest-800"></div>
-                <a href="index.php?visitor_preview=1" class="flex items-center gap-3 px-4 py-3 text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors">
+                <a href="<?= htmlspecialchars(visitor_preview_url(), ENT_QUOTES, 'UTF-8') ?>" class="flex items-center gap-3 px-4 py-3 text-forest-700 dark:text-sand-100 hover:bg-sand-100 dark:hover:bg-forest-800 transition-colors">
                     <i data-lucide="eye" class="w-5 h-5 shrink-0" aria-hidden="true"></i>
                     <span class="font-medium"><?= htmlspecialchars(t('preview_as_visitor', 'Náhled jako návštěvník')) ?></span>
                 </a>

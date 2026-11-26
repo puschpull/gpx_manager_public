@@ -1541,4 +1541,9 @@ return [
     'col_bulk_open'                => 'Ouvrir la collection ?',
     'col_new_placeholder'          => 'Nouvelle collection — saisissez un nom, la trace y sera ajoutée',
     'col_how'                      => 'Ajouter des traces : dans le tableau détaillé cochez des traces (p. ex. après filtrage) et choisissez l\'action groupée « Ajouter à une collection… » ; dans « Modifier la trace » en cochant ; sur le détail de la trace via la ligne Collections ; ou par recherche sur la page de la collection.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Les points de randonnée apparaissent en zoomant.',
+    'mf_poi_loading'               => 'Chargement des points de randonnée…',
+    'mf_poi_down'                  => 'Points de randonnée indisponibles pour le moment — le service OpenStreetMap (Overpass) ne répond pas. Nouvel essai au déplacement de la carte.',
+    'mf_poi_stale'                 => 'Les points de randonnée proviennent d\'une ancienne copie enregistrée — le service OpenStreetMap ne répond pas.',
 ];
