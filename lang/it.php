@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Mappe e sentieri segnalati',
     'links_cat_community'  => 'Diari e comunità',
     'links_cat_peaks'      => 'Montagne e panorami',
+    'links_cat_trips'                  => 'Gite in Cechia',
     'links_cat_tools'      => 'Conversione e strumenti',
     'links_cat_device'     => 'Sul dispositivo e offline',
     'links_cat_stats'      => 'Statistiche ed esplorazione',

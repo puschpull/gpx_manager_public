@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Cartes et sentiers balisés',
     'links_cat_community'  => 'Carnets et communauté',
     'links_cat_peaks'      => 'Montagnes et panoramas',
+    'links_cat_trips'                  => 'Excursions en Tchéquie',
     'links_cat_tools'      => 'Conversion et outils',
     'links_cat_device'     => 'Sur l’appareil et hors ligne',
     'links_cat_stats'      => 'Statistiques et exploration',

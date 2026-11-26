@@ -849,6 +849,7 @@ return [
     'links_cat_maps'       => 'Mapy a značené trasy',
     'links_cat_community'  => 'Denníky a komunita',
     'links_cat_peaks'      => 'Hory a panoráma',
+    'links_cat_trips'                  => 'Na výlet v Česku',
     'links_cat_tools'      => 'Prevody a nástroje',
     'links_cat_device'     => 'Do prístroja a offline',
     'links_cat_stats'      => 'Štatistiky a prieskum územia',
