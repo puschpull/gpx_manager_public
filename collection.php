@@ -46,7 +46,6 @@ $page_title = (string)$col['name'];
 require __DIR__ . '/includes/layout_header.php';
 ?>
 <link rel="stylesheet" href="assets/vendor/leaflet-1.9.4/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
-<link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <style>
     .col-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
     #colMap { height: 440px; border-radius: 12px; z-index: 0; }

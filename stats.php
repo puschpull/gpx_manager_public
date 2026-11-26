@@ -125,7 +125,6 @@ $page_title = t('h1_stats');
 require __DIR__ . '/includes/layout_header.php';
 ?>
 
-<link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <section class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     <a href="index.php" class="inline-flex items-center gap-1.5 text-sm text-forest-700/70 dark:text-sand-100/70 hover:text-terracotta-500 transition-colors mb-3">
         <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
