@@ -15,12 +15,11 @@ require_once __DIR__ . '/security.php';
 start_secure_session();
 send_security_headers();
 
+require_once __DIR__ . '/admin_ips.php';
+
 // Auto-přihlášení admina z povolené IP (stejná logika jako auth.php)
-// Načteno z .env (ADMIN_IPS), localhost je vždy povolen
-$_pub_admin_ips_cfg = array_filter(array_map('trim', explode(',', ADMIN_IPS)));
-$_pub_allowed_ips   = array_unique(array_merge(['127.0.0.1', '::1'], $_pub_admin_ips_cfg));
-unset($_pub_admin_ips_cfg);
-$_pub_is_real_admin = in_array($_SERVER['REMOTE_ADDR'], $_pub_allowed_ips);
+// Seznam z .env (ADMIN_IPS); localhost jen na vývojovém PC — viz admin_ips.php
+$_pub_is_real_admin = is_admin_ip((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
 
 if ($_pub_is_real_admin) {
     if (empty($_SESSION['is_admin']) && empty($_SESSION['visitor_preview'])) {
@@ -50,7 +49,7 @@ if ($_pub_is_real_admin && isset($_GET['visitor_preview'])) {
     exit;
 }
 
-unset($_pub_allowed_ips, $_pub_is_real_admin);
+unset($_pub_is_real_admin);
 
 // Admin partials (render_admin_menu, render_visitor_preview_banner).
 require_once __DIR__ . '/partials/admin_banner.php';
