@@ -310,14 +310,14 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
 <?php if ($unassigned > 0): ?>
 <div class="photos-tab-content" id="tab-unassigned">
     <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-        Tyto fotky nebylo možné automaticky přiřadit k trase (chybí GPS, čas nesedí nebo žádná trasa neexistuje v daném okně).
-        Přiřadit je můžete ručně tlačítkem ✏.
-        <?php if ($unassigned > 500): ?><strong>Zobrazeno prvních 500.</strong><?php endif; ?>
+        <?= htmlspecialchars(t('photos_unassigned_info', 'Tyto fotky nebylo možné automaticky přiřadit k trase (chybí GPS, čas nesedí nebo žádná trasa neexistuje v daném okně).')) ?>
+        <?php if ($_isAdmin): ?><?= htmlspecialchars(t('photos_unassigned_hint', 'Přiřadit je můžete ručně tlačítkem ✏.')) ?><?php endif; ?>
+        <?php if ($unassigned > 500): ?><strong><?= htmlspecialchars(t('photos_first_500', 'Zobrazeno prvních 500.')) ?></strong><?php endif; ?>
     </p>
     <?php if ($_isAdmin): ?>
     <p style="margin-bottom:14px;">
-        <a href="virtual_tracks.php" class="btn-outdoor btn-outdoor-primary">🧭 Vytvořit virtuální trasy z nepřiřazených</a>
-        <span style="font-size:12px; color:var(--text-muted); margin-left:8px;">Chytře seskupí fotky s GPS a časem do výletů.</span>
+        <a href="virtual_tracks.php" class="btn-outdoor btn-outdoor-primary">🧭 <?= htmlspecialchars(t('photos_vt_create', 'Vytvořit virtuální trasy z nepřiřazených')) ?></a>
+        <span style="font-size:12px; color:var(--text-muted); margin-left:8px;"><?= htmlspecialchars(t('photos_vt_create_hint', 'Chytře seskupí fotky s GPS a časem do výletů.')) ?></span>
     </p>
     <?php endif; ?>
     <div class="photo-grid">
@@ -327,7 +327,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                 <input type="checkbox" class="photo-select-cb" data-id="<?= (int)$p['id'] ?>">
             </div>
             <?php if (!$p['lat']): ?>
-                <div class="photo-no-gps">Bez GPS</div>
+                <div class="photo-no-gps"><?= htmlspecialchars(t('photos_no_gps', 'Bez GPS')) ?></div>
             <?php endif; ?>
             <img src="<?= h(photo_thumb_url($p['filename'])) ?>"
                  data-full-url="<?= h(photo_full_url($p['filename'])) ?>"
@@ -343,7 +343,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
                 <button class="btn btn-assign"
                         data-id="<?= (int)$p['id'] ?>"
                         data-track="0"
-                        title="Přiřadit k trase">✏ Přiřadit</button>
+                        title="<?= htmlspecialchars(t('photos_action_assign', 'Přiřadit k trase')) ?>">✏ <?= htmlspecialchars(t('photos_assign_short', 'Přiřadit')) ?></button>
                 <button class="btn btn-delete"
                         data-id="<?= (int)$p['id'] ?>"
                         data-name="<?= h($p['orig_name'] ?? $p['filename']) ?>">🗑</button>
@@ -358,14 +358,13 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
 <?php if (!empty($virtualGroups)): ?>
 <div class="photos-tab-content" id="tab-virtual">
     <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-        Fotky poskládané do <strong>virtuálních tras</strong> (z výšlapů bez GPX záznamu).
-        Jsou oddělené od fotek u GPX tras. Správa na stránce
-        <a href="virtual_tracks.php">🧭 Virtuální trasy</a>.
+        <?= htmlspecialchars(t('photos_virtual_info', 'Fotky poskládané do virtuálních tras (z výšlapů bez GPX záznamu). Jsou oddělené od fotek u GPX tras. Správa na stránce')) ?>
+        <a href="virtual_tracks.php">🧭 <?= htmlspecialchars(t('photos_tab_virtual', 'Virtuální trasy')) ?></a>.
     </p>
     <?php foreach ($virtualGroups as $vg): ?>
     <div class="track-section" style="border-left:4px solid #e91e63; padding-left:10px;">
         <div class="track-section-header">
-            🧭 <a href="virtual_track_detail.php?id=<?= (int)$vg['id'] ?>"><?= h($vg['name'] ?: ('Virtuální trasa #' . $vg['id'])) ?></a>
+            🧭 <a href="virtual_track_detail.php?id=<?= (int)$vg['id'] ?>"><?= h($vg['name'] ?: str_replace('{id}', (string)$vg['id'], t('vt_default_name', 'Virtuální trasa #{id}'))) ?></a>
             <span style="font-size:12px; color:var(--text-muted);">
                 · <?= $vg['date_start'] ? h(date('j. n. Y', strtotime($vg['date_start']))) : '—' ?>
                 · 📸 <?= (int)$vg['photo_count'] ?> · 📏 ≈<?= h(number_format((float)$vg['distance_km'], 2, ',', ' ')) ?> km
@@ -468,7 +467,7 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
             <optgroup label="🧭 <?= htmlspecialchars(t('photos_optgroup_virtual', 'Virtuální trasy')) ?>">
             <?php foreach ($virtualTracksForSelect as $vt): ?>
             <option value="v<?= (int)$vt['id'] ?>">
-                <?= h($vt['name'] ?: ('Virtuální trasa #' . $vt['id'])) ?>
+                <?= h($vt['name'] ?: str_replace('{id}', (string)$vt['id'], t('vt_default_name', 'Virtuální trasa #{id}'))) ?>
                 <?= $vt['date_start'] ? ' (' . substr($vt['date_start'], 0, 10) . ')' : '' ?>
             </option>
             <?php endforeach; ?>
@@ -490,6 +489,26 @@ if (!empty($filterTrack) && in_array($activeTab, ['upload','unassigned'])) {
     </div>
 </div>
 
+<script nonce="<?= csp_nonce() ?>">
+window.gpxPhotosI18n = <?= js_safe_json([
+    'zip_batch'           => t('phjs_zip_batch', '⏳ Nahrávám ZIP dávku {i} / {n}…'),
+    'batch_progress'      => t('phjs_batch_progress', '⏳ Dávka {i} / {n} · fotky {done} / {total} ({pct} %)'),
+    'batch_error'         => t('phjs_batch_error', 'Chyba v dávce {i}: {msg}'),
+    'done_files'          => t('phjs_done_files', '✅ Hotovo — zpracováno souborů: {n}'),
+    'gps_found'           => t('phjs_gps_found', '📍 GPS nalezena'),
+    'no_gps'              => t('phjs_no_gps', '⚠ Bez GPS — nezobrazí se na mapě'),
+    'assigned'            => t('phjs_assigned', '🗺 Přiřazeno: {name}'),
+    'not_assigned'        => t('phjs_not_assigned', '⚠ Nepřiřazeno k trase'),
+    'duplicate'           => t('phjs_duplicate', '⚠ Duplikát'),
+    'uploaded'            => t('phjs_uploaded', '✅ Nahráno fotek: {n}. Stránka se za chvíli obnoví…'),
+    'vis_shown'           => t('phjs_vis_shown', 'Zobrazená na trase — kliknutím skrýt'),
+    'vis_hidden'          => t('phjs_vis_hidden', 'Skrytá — kliknutím zobrazit na trase'),
+    'confirm_delete_one'  => t('phjs_confirm_delete_one', 'Smazat fotku „{name}“? Tuto akci nelze vrátit.'),
+    'selected'            => t('phjs_selected', 'Vybráno: {n}'),
+    'confirm_delete_many' => t('phjs_confirm_delete_many', 'Smazat vybrané fotky ({n})? Tuto akci nelze vrátit.'),
+    'delete_error'        => t('phjs_delete_error', 'Chyba při mazání: {msg}'),
+]) ?>;
+</script>
 <script src="<?= asset('js/photos.js') ?>" defer></script>
 
 </div><!-- /content wrapper -->

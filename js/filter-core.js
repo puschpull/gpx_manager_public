@@ -500,7 +500,7 @@ window.GpxFilter = (function () {
             const r = filterMaxSpeed(current, params.max_speed_kmh, params.speed_window);
             current = r.kept;
             removedByFilter.speed = r.removed;
-            if (r.warning === "no_time") warnings.push("Trasa neobsahuje casove znacky — filtr rychlosti preskocen.");
+            if (r.warning === "no_time") warnings.push((window.gpxFilterI18n && window.gpxFilterI18n.no_time) || "Trasa neobsahuje časové značky — filtr rychlosti přeskočen.");
         }
 
         // 1b. Detekce mezer po filtru rychlosti
@@ -671,9 +671,11 @@ window.GpxFilter = (function () {
 
     /* ===== Vychozi parametry pro presety ===== */
 
+    // Built-in preset names: translated via window.gpxFilterI18n.preset_<key> (filter_view.php)
+    const _pn = (k, fb) => (window.gpxFilterI18n && window.gpxFilterI18n['preset_' + k]) || fb;
     const PRESETS = {
         hiking: {
-            name: "Turistika (standard)",
+            name: _pn('hiking', "Turistika (standard)"),
             builtin: true,
             settings: {
                 speed_enabled: true, max_speed_kmh: 12, speed_window: 3,
@@ -685,7 +687,7 @@ window.GpxFilter = (function () {
             }
         },
         trail: {
-            name: "Trail running",
+            name: _pn('trail', "Trail running"),
             builtin: true,
             settings: {
                 speed_enabled: true, max_speed_kmh: 20, speed_window: 3,
@@ -697,7 +699,7 @@ window.GpxFilter = (function () {
             }
         },
         walk: {
-            name: "Prochazka",
+            name: _pn('walk', "Procházka"),
             builtin: true,
             settings: {
                 speed_enabled: true, max_speed_kmh: 8, speed_window: 3,
@@ -709,7 +711,7 @@ window.GpxFilter = (function () {
             }
         },
         cycling: {
-            name: "Cyklistika",
+            name: _pn('cycling', "Cyklistika"),
             builtin: true,
             settings: {
                 speed_enabled: true, max_speed_kmh: 45, speed_window: 3,

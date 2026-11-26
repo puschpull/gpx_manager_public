@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Přepočet typu aktivity</title>
+    <title><?= h(t('ra_title', 'Přepočet typu aktivity')) ?></title>
     <style>
         body { font-family: sans-serif; margin: 40px auto; max-width: 560px; color: #333; }
         .card { border: 1px solid #ddd; border-radius: 10px; padding: 20px 24px; }
@@ -36,21 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 </head>
 <body>
 <div class="card">
-    <h2>🏃 Přepočet typu aktivity</h2>
-    <p>Celkem tras: <strong><?= $total ?></strong>, z toho bez aktivity: <strong><?= $missing ?></strong>.</p>
+    <h2>🏃 <?= h(t('ra_title', 'Přepočet typu aktivity')) ?></h2>
+    <p><?= t_html('ra_intro_counts', 'Celkem tras: {total}, z toho bez aktivity: {missing}.', ['total' => '<strong>' . $total . '</strong>', 'missing' => '<strong>' . $missing . '</strong>']) ?></p>
     <div class="warn">
-        ⚠️ Přepočet <strong>všech</strong> tras přepíše i ručně nastavené typy aktivit
-        (detekce podle rychlosti). Výchozí volba proto zpracuje jen trasy bez aktivity.
+        ⚠️ <?= h(t('ra_warn', 'Přepočet všech tras přepíše i ručně nastavené typy aktivit (detekce podle rychlosti). Výchozí volba proto zpracuje jen trasy bez aktivity.')) ?>
     </div>
     <form method="post">
         <?= csrf_field() ?>
         <label>
             <input type="checkbox" name="only_missing" value="1" checked>
-            Jen trasy bez nastavené aktivity (<?= $missing ?> tras)
+            <?= h(str_replace('{n}', (string)$missing, t('ra_only_missing', 'Jen trasy bez nastavené aktivity ({n} tras)'))) ?>
         </label>
-        <button type="submit">▶ Spustit přepočet</button>
+        <button type="submit">▶ <?= h(t('maint_start_recalc', 'Spustit přepočet')) ?></button>
     </form>
-    <p><a href="index.php">← Zpět na přehled</a></p>
+    <p><a href="index.php">← <?= h(t('maint_back_tracks', 'Zpět na přehled tras')) ?></a></p>
 </div>
 </body>
 </html><?php
@@ -60,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /* ===== POST: provedení přepočtu ===== */
 if (!csrf_verify()) {
     http_response_code(403);
-    die('Neplatný bezpečnostní token.');
+    die(h(t('maint_bad_token', 'Neplatný bezpečnostní token.')));
 }
 
 $onlyMissing = !empty($_POST['only_missing']);
@@ -116,8 +115,8 @@ foreach ($tracks as $t) {
     }
 }
 
-echo "Režim: " . ($onlyMissing ? 'jen trasy bez aktivity' : 'všechny trasy') . "<br>\n";
-echo "Aktualizováno activity_type: {$updated} tras<br>\n";
-echo "Nových kategorií přiřazeno: {$catAssigned} | Přeskočeno (již měly kategorii): {$catSkipped}\n";
-echo "<br><a href='index.php'>← Zpět na přehled</a>";
-echo " | <a href='stats.php'>📊 Statistiky</a>";
+echo h(t('ra_mode', 'Režim:')) . ' ' . h($onlyMissing ? t('ra_mode_missing', 'jen trasy bez aktivity') : t('ra_mode_all', 'všechny trasy')) . "<br>\n";
+echo h(str_replace('{n}', (string)$updated, t('ra_updated', 'Aktualizováno activity_type: {n} tras'))) . "<br>\n";
+echo h(str_replace(['{assigned}', '{skipped}'], [(string)$catAssigned, (string)$catSkipped], t('ra_categories', 'Nových kategorií přiřazeno: {assigned} | Přeskočeno (již měly kategorii): {skipped}'))) . "\n";
+echo "<br><a href='index.php'>← " . h(t('maint_back_tracks', 'Zpět na přehled tras')) . "</a>";
+echo " | <a href='stats.php'>📊 " . h(t('nav_stats', 'Statistiky')) . "</a>";

@@ -70,7 +70,7 @@ $totalWeeks = $weekNum + 1;
 $maxValue = 1;
 foreach ($cells as $c) { if ($c['value'] > $maxValue) $maxValue = $c['value']; }
 
-$metricLabels = ['tracks' => 'Počet tras', 'km' => 'Vzdálenost (km)', 'ascent' => 'Stoupání (m)'];
+$metricLabels = ['tracks' => t('metric_count', 'Počet tras'), 'km' => t('metric_distance', 'Vzdálenost (km)'), 'ascent' => t('metric_ascent', 'Stoupání (m)')];
 
 $_isAdmin = !empty($_SESSION['is_admin']);
 $page_title = t('h1_calendar') . ' ' . $selectedYear;

@@ -49,7 +49,7 @@ require __DIR__ . '/layout_header.php';
 
 <?php if ($track): ?>
 <div class="filter-db-banner">
-    📂 Trasa načtena z databáze: <strong><?= h($track['track_name'] ?: $track['filename']) ?></strong>
+    📂 <?= h(t('flt_loaded_from_db', 'Trasa načtena z databáze:')) ?> <strong><?= h($track['track_name'] ?: $track['filename']) ?></strong>
     <?php if ($track['distance_km']): ?>
         &nbsp;·&nbsp; <?= number_format((float)$track['distance_km'], 1, ',', ' ') ?> km
     <?php endif; ?>
@@ -64,13 +64,13 @@ require __DIR__ . '/layout_header.php';
 
     <!-- Levy panel - Filtry -->
     <aside class="filter-panel" id="filterPanel">
-        <h2>Filtry</h2>
+        <h2><?= h(t('flt_panel_title', 'Filtry')) ?></h2>
 
         <?php if (!$track): ?>
         <!-- Upload zona -->
         <div class="filter-section">
             <div id="dropzone" class="filter-dropzone">
-                Pretahnete GPX soubor sem<br>nebo kliknete pro vyber
+                <?= h(t('flt_dropzone_1', 'Přetáhněte GPX soubor sem')) ?><br><?= h(t('flt_dropzone_2', 'nebo klikněte pro výběr')) ?>
                 <input type="file" id="fileInput" accept=".gpx" aria-label="<?= htmlspecialchars(t('filter_file_label', 'Vybrat GPX soubor pro filtraci')) ?>">
             </div>
         </div>
@@ -81,21 +81,21 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_speed_enabled" checked>
-                    Max rychlost
+                    <?= h(t('flt_speed', 'Max. rychlost')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_max_speed">Prah (km/h):</label>
+                    <label for="f_max_speed"><?= h(t('flt_threshold_kmh', 'Práh (km/h):')) ?></label>
                     <input type="range" id="f_max_speed" min="3" max="60" step="1" value="12">
                     <output for="f_max_speed" id="f_max_speed_val">12</output>
                 </div>
                 <div class="slider-row">
-                    <label for="f_speed_window">Okno (body):</label>
+                    <label for="f_speed_window"><?= h(t('flt_window_points', 'Okno (body):')) ?></label>
                     <input type="range" id="f_speed_window" min="1" max="10" step="1" value="3">
                     <output for="f_speed_window" id="f_speed_window_val">3</output>
                 </div>
-                <p class="filter-hint">Odebere body kde prumerna rychlost presahuje prah. Zachyti jizdu autem.</p>
+                <p class="filter-hint"><?= h(t('flt_speed_hint', 'Odebere body, kde průměrná rychlost přesahuje práh. Zachytí jízdu autem.')) ?></p>
             </div>
         </details>
 
@@ -104,21 +104,21 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_spike_enabled" checked>
-                    GPS skoky / drift
+                    <?= h(t('flt_spikes', 'GPS skoky / drift')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_spike_distance">Vzdalenost (m):</label>
+                    <label for="f_spike_distance"><?= h(t('flt_distance_m', 'Vzdálenost (m):')) ?></label>
                     <input type="range" id="f_spike_distance" min="10" max="500" step="5" value="100">
                     <output for="f_spike_distance" id="f_spike_distance_val">100</output>
                 </div>
                 <div class="slider-row">
-                    <label for="f_spike_time">Max cas (s):</label>
+                    <label for="f_spike_time"><?= h(t('flt_max_time_s', 'Max. čas (s):')) ?></label>
                     <input type="range" id="f_spike_time" min="1" max="60" step="1" value="10">
                     <output for="f_spike_time" id="f_spike_time_val">10</output>
                 </div>
-                <p class="filter-hint">Detekuje jednotlive body s nerealistickym skokem (GPS drift u budov).</p>
+                <p class="filter-hint"><?= h(t('flt_spikes_hint', 'Detekuje jednotlivé body s nerealistickým skokem (GPS drift u budov).')) ?></p>
             </div>
         </details>
 
@@ -127,21 +127,21 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_stationary_enabled" checked>
-                    Stani na miste
+                    <?= h(t('flt_stationary', 'Stání na místě')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_stationary_radius">Polomer (m):</label>
+                    <label for="f_stationary_radius"><?= h(t('flt_radius_m', 'Poloměr (m):')) ?></label>
                     <input type="range" id="f_stationary_radius" min="3" max="50" step="1" value="15">
                     <output for="f_stationary_radius" id="f_stationary_radius_val">15</output>
                 </div>
                 <div class="slider-row">
-                    <label for="f_stationary_time">Min doba (s):</label>
+                    <label for="f_stationary_time"><?= h(t('flt_min_time_s', 'Min. doba (s):')) ?></label>
                     <input type="range" id="f_stationary_time" min="30" max="1800" step="30" value="300">
                     <output for="f_stationary_time" id="f_stationary_time_val">300</output>
                 </div>
-                <p class="filter-hint">Proredi shluky bodu kdyz se nestojite na miste prilis dlouho.</p>
+                <p class="filter-hint"><?= h(t('flt_stationary_hint', 'Prořídí shluky bodů, když stojíte na místě příliš dlouho.')) ?></p>
             </div>
         </details>
 
@@ -150,16 +150,16 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_elevation_enabled" checked>
-                    Vyskove anomalie
+                    <?= h(t('flt_elevation', 'Výškové anomálie')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_elevation_spike">Max zmena (m):</label>
+                    <label for="f_elevation_spike"><?= h(t('flt_max_change_m', 'Max. změna (m):')) ?></label>
                     <input type="range" id="f_elevation_spike" min="5" max="100" step="1" value="30">
                     <output for="f_elevation_spike" id="f_elevation_spike_val">30</output>
                 </div>
-                <p class="filter-hint">Odebere body s nerealistickou vyskovou zmenou vuci obema sousedum.</p>
+                <p class="filter-hint"><?= h(t('flt_elevation_hint', 'Odebere body s nerealistickou výškovou změnou vůči oběma sousedům.')) ?></p>
             </div>
         </details>
 
@@ -168,21 +168,21 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_segment_enabled" checked>
-                    Kratke segmenty
+                    <?= h(t('flt_segments', 'Krátké segmenty')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_min_segment_dist">Min vzdalenost (m):</label>
+                    <label for="f_min_segment_dist"><?= h(t('flt_min_dist_m', 'Min. vzdálenost (m):')) ?></label>
                     <input type="range" id="f_min_segment_dist" min="10" max="1000" step="10" value="200">
                     <output for="f_min_segment_dist" id="f_min_segment_dist_val">200</output>
                 </div>
                 <div class="slider-row">
-                    <label for="f_min_segment_time">Min doba (s):</label>
+                    <label for="f_min_segment_time"><?= h(t('flt_min_time_s', 'Min. doba (s):')) ?></label>
                     <input type="range" id="f_min_segment_time" min="10" max="600" step="10" value="120">
                     <output for="f_min_segment_time" id="f_min_segment_time_val">120</output>
                 </div>
-                <p class="filter-hint">Po filtraci odstrani prilis kratke zbylove useky.</p>
+                <p class="filter-hint"><?= h(t('flt_segments_hint', 'Po filtraci odstraní příliš krátké zbylé úseky.')) ?></p>
             </div>
         </details>
 
@@ -191,16 +191,16 @@ require __DIR__ . '/layout_header.php';
             <summary>
                 <label class="filter-toggle">
                     <input type="checkbox" id="f_simplify_enabled">
-                    Zjednoduseni trasy
+                    <?= h(t('flt_simplify', 'Zjednodušení trasy')) ?>
                 </label>
             </summary>
             <div class="filter-body">
                 <div class="slider-row">
-                    <label for="f_simplify_tolerance">Tolerance (m):</label>
+                    <label for="f_simplify_tolerance"><?= h(t('flt_tolerance_m', 'Tolerance (m):')) ?></label>
                     <input type="range" id="f_simplify_tolerance" min="1" max="50" step="1" value="5">
                     <output for="f_simplify_tolerance" id="f_simplify_tolerance_val">5</output>
                 </div>
-                <p class="filter-hint">Douglas-Peucker: snizi pocet bodu pri zachovani tvaru trasy.</p>
+                <p class="filter-hint"><?= h(t('flt_simplify_hint', 'Douglas-Peucker: sníží počet bodů při zachování tvaru trasy.')) ?></p>
             </div>
         </details>
 
@@ -208,15 +208,15 @@ require __DIR__ . '/layout_header.php';
 
         <!-- Presety -->
         <div class="filter-section preset-section">
-            <h3>Presety</h3>
+            <h3><?= h(t('flt_presets', 'Presety')) ?></h3>
             <div class="preset-controls">
                 <select id="presetSelect" class="select">
-                    <option value="">-- Vyberte preset --</option>
+                    <option value="">-- <?= h(t('flt_preset_choose', 'Vyberte preset')) ?> --</option>
                 </select>
                 <div class="preset-buttons">
-                    <button id="presetLoad" class="btn" title="Nacist preset">Nacist</button>
-                    <button id="presetSave" class="btn" title="Ulozit soucasne nastaveni">Ulozit</button>
-                    <button id="presetDelete" class="btn" title="Smazat preset">Smazat</button>
+                    <button id="presetLoad" class="btn" title="<?= h(t('flt_preset_load_title', 'Načíst preset')) ?>"><?= h(t('flt_preset_load', 'Načíst')) ?></button>
+                    <button id="presetSave" class="btn" title="<?= h(t('flt_preset_save_title', 'Uložit současné nastavení')) ?>"><?= h(t('save', 'Uložit')) ?></button>
+                    <button id="presetDelete" class="btn" title="<?= h(t('flt_preset_delete_title', 'Smazat preset')) ?>"><?= h(t('delete', 'Smazat')) ?></button>
                 </div>
             </div>
         </div>
@@ -225,12 +225,12 @@ require __DIR__ . '/layout_header.php';
 
         <!-- Akce -->
         <div class="filter-actions">
-            <button id="btnApply" class="btn btn-primary">▶ Aplikovat filtry</button>
-            <button id="btnReset" class="btn">↺ Resetovat</button>
-            <button id="btnExport" class="btn" disabled title="Stáhnout vyčištěný GPX soubor">⬇ Stáhnout GPX</button>
+            <button id="btnApply" class="btn btn-primary">▶ <?= h(t('flt_apply', 'Aplikovat filtry')) ?></button>
+            <button id="btnReset" class="btn">↺ <?= h(t('flt_reset', 'Resetovat')) ?></button>
+            <button id="btnExport" class="btn" disabled title="<?= h(t('flt_export_title', 'Stáhnout vyčištěný GPX soubor')) ?>">⬇ <?= h(t('flt_export', 'Stáhnout GPX')) ?></button>
             <?php if ($track && $_isAdmin): ?>
-            <button id="btnApplyTrack" class="btn btn-primary" disabled title="Přepíše přímo tuto trasu (#<?= (int)$track['id'] ?>) vyčištěnou verzí — fotky i kategorie zůstanou, originál GPX se zazálohuje (.bak)">♻ Aplikovat na tuto trasu</button>
-            <button id="btnSaveCatalog" class="btn" disabled title="Uložit vyčištěnou verzi jako novou trasu v databázi (originál zůstane nedotčen)">💾 Uložit jako novou trasu</button>
+            <button id="btnApplyTrack" class="btn btn-primary" disabled title="<?= h(str_replace('{id}', (string)(int)$track['id'], t('flt_apply_track_title', 'Přepíše přímo tuto trasu (#{id}) vyčištěnou verzí — fotky i kategorie zůstanou, originál GPX se zazálohuje (.bak)'))) ?>">♻ <?= h(t('flt_apply_track', 'Aplikovat na tuto trasu')) ?></button>
+            <button id="btnSaveCatalog" class="btn" disabled title="<?= h(t('flt_save_catalog_title', 'Uložit vyčištěnou verzi jako novou trasu v databázi (originál zůstane nedotčen)')) ?>">💾 <?= h(t('flt_save_catalog', 'Uložit jako novou trasu')) ?></button>
             <?php endif; ?>
         </div>
     </aside>
@@ -241,28 +241,28 @@ require __DIR__ . '/layout_header.php';
         <!-- Statistiky pred/po -->
         <div class="filter-stats" id="filterStats">
             <div class="stat-group">
-                <span class="stat-label">Body:</span>
+                <span class="stat-label"><?= h(t('flt_stat_points', 'Body:')) ?></span>
                 <span class="stat-orig" id="statPointsOrig">-</span>
                 <span class="stat-arrow">→</span>
                 <span class="stat-new" id="statPointsNew">-</span>
                 <span class="stat-diff" id="statPointsDiff"></span>
             </div>
             <div class="stat-group">
-                <span class="stat-label">Vzdalenost:</span>
+                <span class="stat-label"><?= h(t('flt_stat_distance', 'Vzdálenost:')) ?></span>
                 <span class="stat-orig" id="statDistOrig">-</span>
                 <span class="stat-arrow">→</span>
                 <span class="stat-new" id="statDistNew">-</span>
                 <span class="stat-diff" id="statDistDiff"></span>
             </div>
             <div class="stat-group">
-                <span class="stat-label">Prevyseni:</span>
+                <span class="stat-label"><?= h(t('flt_stat_ascent', 'Převýšení:')) ?></span>
                 <span class="stat-orig" id="statAscentOrig">-</span>
                 <span class="stat-arrow">→</span>
                 <span class="stat-new" id="statAscentNew">-</span>
                 <span class="stat-diff" id="statAscentDiff"></span>
             </div>
             <div class="stat-group">
-                <span class="stat-label">Doba:</span>
+                <span class="stat-label"><?= h(t('flt_stat_duration', 'Doba:')) ?></span>
                 <span class="stat-orig" id="statDurationOrig">-</span>
                 <span class="stat-arrow">→</span>
                 <span class="stat-new" id="statDurationNew">-</span>
@@ -280,15 +280,15 @@ require __DIR__ . '/layout_header.php';
         <div class="map-legend">
             <label class="map-legend-item">
                 <input type="checkbox" id="layerOriginal" class="map-layer-cb">
-                <span class="map-legend-line original"></span> Cela puvodni trasa
+                <span class="map-legend-line original"></span> <?= h(t('flt_layer_original', 'Celá původní trasa')) ?>
             </label>
             <label class="map-legend-item">
                 <input type="checkbox" id="layerFiltered" class="map-layer-cb" checked>
-                <span class="map-legend-line kept"></span> Vycistena trasa
+                <span class="map-legend-line kept"></span> <?= h(t('flt_layer_filtered', 'Vyčištěná trasa')) ?>
             </label>
             <label class="map-legend-item">
                 <input type="checkbox" id="layerRemoved" class="map-layer-cb" checked>
-                <span class="map-legend-line removed"></span> Odfiltrovaná cast
+                <span class="map-legend-line removed"></span> <?= h(t('flt_layer_removed', 'Odfiltrovaná část')) ?>
             </label>
         </div>
 
@@ -315,7 +315,7 @@ require __DIR__ . '/layout_header.php';
 
         <!-- Statistiky odstraneni dle filtru -->
         <div class="filter-removal-stats" id="removalStats">
-            <h3>Odebrane body dle filtru</h3>
+            <h3><?= h(t('flt_removed_by_filter', 'Odebrané body dle filtru')) ?></h3>
             <div class="removal-badges" id="removalBadges"></div>
         </div>
 
@@ -366,6 +366,30 @@ window.gpxFilterData = {
 <script src="<?= asset('js/lib/map-factory.js') ?>"></script>
 
 <!-- JS moduly -->
+<script nonce="<?= csp_nonce() ?>">
+window.gpxFilterI18n = <?= js_safe_json([
+    'load_error'             => t('flt_js_load_error', 'Nepodařilo se načíst GPX soubor: {msg}'),
+    'saving'                 => t('flt_js_saving', '⏳ Ukládám…'),
+    'saved_redirect'         => t('flt_js_saved_redirect', '✅ Uloženo! Přesměrovávám…'),
+    'save_error'             => t('flt_js_save_error', 'Chyba při ukládání: {msg}'),
+    'unknown_error'          => t('flt_js_unknown_error', 'neznámá chyba'),
+    'confirm_overwrite'      => t('flt_js_confirm_overwrite', 'Přepsat přímo tuto trasu #{id} vyčištěnou verzí?'),
+    'confirm_overwrite_note' => t('flt_js_confirm_overwrite_note', 'Fotky i kategorie zůstanou, statistiky se přepočítají. Originál GPX se zazálohuje (.bak).'),
+    'done_redirect'          => t('flt_js_done_redirect', '✅ Hotovo! Přesměrovávám…'),
+    'apply_error'            => t('flt_js_apply_error', 'Chyba při aplikaci: {msg}'),
+    'preset_choose'          => t('flt_preset_choose', 'Vyberte preset'),
+    'preset_prompt'          => t('flt_js_preset_prompt', 'Název presetu:'),
+    'preset_empty'           => t('flt_js_preset_empty', 'Název presetu nesmí být prázdný.'),
+    'preset_confirm_delete'  => t('flt_js_preset_confirm_delete', 'Smazat preset „{name}“?'),
+    'view_normal'            => t('flt_js_view_normal', '↙ Normální pohled'),
+    'view_big'               => t('flt_js_view_big', '↗ Velká mapa + panel'),
+    'no_time'                => t('flt_js_no_time', 'Trasa neobsahuje časové značky — filtr rychlosti přeskočen.'),
+    'preset_hiking'          => t('flt_preset_hiking', 'Turistika (standard)'),
+    'preset_trail'           => t('flt_preset_trail', 'Trail running'),
+    'preset_walk'            => t('flt_preset_walk', 'Procházka'),
+    'preset_cycling'         => t('flt_preset_cycling', 'Cyklistika'),
+]) ?>;
+</script>
 <script src="<?= asset('js/filter-core.js') ?>"></script>
 <script src="<?= asset('js/filter-map.js') ?>"></script>
 <script src="<?= asset('js/filter-elevation.js') ?>"></script>

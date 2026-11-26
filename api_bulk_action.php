@@ -24,7 +24,7 @@ header('Content-Type: application/json; charset=utf-8');
 // CSRF kontrola
 if (!csrf_verify()) {
     http_response_code(403);
-    echo json_encode(['success' => false, 'error' => 'Neplatný CSRF token.']);
+    echo json_encode(['success' => false, 'error' => t('maint_bad_token', 'Neplatný bezpečnostní token.')]);
     exit;
 }
 
@@ -33,7 +33,7 @@ $ids    = $_POST['ids'] ?? [];
 $value  = trim($_POST['value'] ?? '');
 
 if (!is_array($ids) || empty($ids)) {
-    echo json_encode(['success' => false, 'error' => 'Žádné trasy nevybrány.']);
+    echo json_encode(['success' => false, 'error' => t('api_no_tracks_selected', 'Žádné trasy nevybrány.')]);
     exit;
 }
 
@@ -41,7 +41,7 @@ $ids = array_map('intval', $ids);
 $ids = array_filter($ids, fn($id) => $id > 0);
 
 if (empty($ids)) {
-    echo json_encode(['success' => false, 'error' => 'Neplatná ID.']);
+    echo json_encode(['success' => false, 'error' => t('api_bad_ids', 'Neplatná ID.')]);
     exit;
 }
 
@@ -55,7 +55,7 @@ if (in_array($action, ['add_collection', 'remove_collection'], true) && ($_POST[
         $st->execute($f['params']);
         $ids = array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
         if (!$ids) {
-            echo json_encode(['success' => false, 'error' => 'Žádné trasy nevybrány.']);
+            echo json_encode(['success' => false, 'error' => t('api_no_tracks_selected', 'Žádné trasy nevybrány.')]);
             exit;
         }
     }
@@ -93,7 +93,7 @@ try {
 
         case 'set_category':
             if ($value === '') {
-                echo json_encode(['success' => false, 'error' => 'Název kategorie je povinný.']);
+                echo json_encode(['success' => false, 'error' => t('api_category_name_required', 'Název kategorie je povinný.')]);
                 exit;
             }
 
@@ -104,7 +104,7 @@ try {
             $catId = (int)$catSel->fetchColumn();
 
             if ($catId <= 0) {
-                echo json_encode(['success' => false, 'error' => 'Nelze vytvořit kategorii.']);
+                echo json_encode(['success' => false, 'error' => t('api_category_create_failed', 'Nelze vytvořit kategorii.')]);
                 exit;
             }
 
@@ -118,7 +118,7 @@ try {
 
         case 'remove_category':
             if ($value === '') {
-                echo json_encode(['success' => false, 'error' => 'Název kategorie je povinný.']);
+                echo json_encode(['success' => false, 'error' => t('api_category_name_required', 'Název kategorie je povinný.')]);
                 exit;
             }
 
@@ -198,7 +198,7 @@ try {
             exit;
 
         default:
-            echo json_encode(['success' => false, 'error' => 'Neznámá akce: ' . $action]);
+            echo json_encode(['success' => false, 'error' => t('api_unknown_action', 'Neznámá akce:') . ' ' . $action]);
             exit;
     }
 
@@ -215,6 +215,6 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error'   => APP_ENV === 'local' ? $e->getMessage() : 'Interní chyba serveru.',
+        'error'   => APP_ENV === 'local' ? $e->getMessage() : t('server_error', 'Interní chyba serveru.'),
     ]);
 }

@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Přepočet obtížnosti</title>
+    <title><?= h(t('rd_title', 'Přepočet obtížnosti')) ?></title>
     <style>
         body { font-family: sans-serif; margin: 40px auto; max-width: 560px; color: #333; }
         .card { border: 1px solid #ddd; border-radius: 10px; padding: 20px 24px; }
@@ -29,14 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 </head>
 <body>
 <div class="card">
-    <h2>⛰️ Přepočet obtížnosti</h2>
-    <p>Přepočítá obtížnost (1–5) podle vzdálenosti a převýšení u všech
-       <strong><?= $total ?></strong> tras.</p>
+    <h2>⛰️ <?= h(t('rd_title', 'Přepočet obtížnosti')) ?></h2>
+    <p><?= t_html('rd_intro', 'Přepočítá obtížnost (1–5) podle vzdálenosti a převýšení u všech {n} tras.', ['n' => '<strong>' . $total . '</strong>']) ?></p>
     <form method="post">
         <?= csrf_field() ?>
-        <button type="submit">▶ Spustit přepočet</button>
+        <button type="submit">▶ <?= h(t('maint_start_recalc', 'Spustit přepočet')) ?></button>
     </form>
-    <p><a href="index.php">← Zpět na přehled</a></p>
+    <p><a href="index.php">← <?= h(t('maint_back_tracks', 'Zpět na přehled tras')) ?></a></p>
 </div>
 </body>
 </html><?php
@@ -46,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /* ===== POST: provedení přepočtu ===== */
 if (!csrf_verify()) {
     http_response_code(403);
-    die('Neplatný bezpečnostní token.');
+    die(h(t('maint_bad_token', 'Neplatný bezpečnostní token.')));
 }
 
 $tracks = $pdo->query("SELECT id, distance_km, ascent, elevation_max, elevation_min FROM tracks")->fetchAll(PDO::FETCH_ASSOC);
@@ -65,5 +64,5 @@ foreach ($tracks as $t) {
     $updated++;
 }
 
-echo "Přepočteno: {$updated} tras.\n";
-echo "<br><a href='index.php'>← Zpět na přehled</a>";
+echo h(str_replace('{n}', (string)$updated, t('rd_result', 'Přepočteno: {n} tras.'))) . "\n";
+echo "<br><a href='index.php'>← " . h(t('maint_back_tracks', 'Zpět na přehled tras')) . "</a>";

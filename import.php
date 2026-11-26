@@ -442,7 +442,7 @@ require __DIR__ . '/includes/layout_header.php';
 
 
 <div class="controls">
-    <select id="dupMode" class="select" title="Jak naložit s duplicitami">
+    <select id="dupMode" class="select" title="<?= htmlspecialchars(t('dup_mode_title', 'Jak naložit s duplicitami')) ?>">
         <option value="skip" selected><?= t('dup_mode_skip') ?></option>
         <option value="overwrite"><?= t('dup_mode_overwrite') ?></option>
     </select>

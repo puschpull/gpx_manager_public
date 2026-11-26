@@ -63,11 +63,11 @@ foreach ($allKeys as $name => $keys) {
 // The per-language comparison above cannot see a key that is missing in ALL
 // files at once — t() then silently shows its Czech default (or the raw key,
 // like "h2_elevation" on every track detail until 10/2026). Scan the code for
-// t('key') / t_arr('key') with a literal key; keys built at runtime
+// t('key') / t_arr('key') / t_html('key') with a literal key; keys built at runtime
 // (t('lang_' . $code)) are skipped because the literal is followed by a dot.
 $appRoot = realpath(__DIR__ . '/..');
-$skipDir = '#[\\\\/](vendor|node_modules|_archiv|lang|\.git|\.claude)[\\\\/]#';
-$callRe  = '/(?<![\w>$:])t(?:_arr)?\(\s*([\'"])([A-Za-z0-9_.\-]+)\1\s*[,)]/';
+$skipDir = '#[\\\\/](vendor|node_modules|_archiv|lang|tests|\.git|\.claude)[\\\\/]#';
+$callRe  = '/(?<![\w>$:])t(?:_arr|_html)?\(\s*([\'"])([A-Za-z0-9_.\-]+)\1\s*[,)]/';
 $refSet  = array_flip($reference);
 $unknown = [];
 $codeFiles = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($appRoot, FilesystemIterator::SKIP_DOTS));

@@ -14,12 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 if (!csrf_verify()) {
-    die('Neplatný bezpečnostní token.');
+    die(h(t('maint_bad_token', 'Neplatný bezpečnostní token.')));
 }
 
 $id = (int)($_POST['id'] ?? 0);
 if ($id <= 0) {
-    die('Neplatné ID.');
+    die(h(t('api_bad_id', 'Neplatné ID.')));
 }
 
 // Načteme trasu pro smazání souboru
@@ -47,7 +47,7 @@ try {
 } catch (Throwable $e) {
     $pdo->rollBack();
     error_log("delete.php: " . $e->getMessage());
-    die('Chyba při mazání trasy.' . (APP_ENV === 'local' ? ' Detail: ' . htmlspecialchars($e->getMessage()) : ''));
+    die(h(t('api_delete_failed', 'Chyba při mazání trasy.')) . (APP_ENV === 'local' ? ' Detail: ' . htmlspecialchars($e->getMessage()) : ''));
 }
 
 // Přesměrování zpět na index s filtry

@@ -137,7 +137,7 @@ require __DIR__ . '/layout_header.php';
         <label class="story-ed-label" for="story-ed-text"><?= h(t('story_text', 'Text')) ?></label>
         <textarea id="story-ed-text" name="text" rows="16" spellcheck="true"></textarea>
         <label class="story-ed-label" for="story-ed-sources"><?= h(t('story_sources_title', 'Prameny')) ?></label>
-        <textarea id="story-ed-sources" name="sources" rows="4" placeholder="Název | https://…"></textarea>
+        <textarea id="story-ed-sources" name="sources" rows="4" placeholder="<?= h(t('story_sources_placeholder', 'Název | https://…')) ?>"></textarea>
         <p class="story-hint"><?= h(t('story_ed_sources_hint', 'Jeden pramen na řádek: „Název | https://…“. Zobrazí se pod článkem.')) ?></p>
 
         <?php if ($_storyPickStops !== []): ?>

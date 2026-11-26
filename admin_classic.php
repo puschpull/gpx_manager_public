@@ -419,7 +419,7 @@ require __DIR__ . '/includes/layout_header.php';
                 <a href="rebuild_thumbs.php">
                     <span><?= t('tool_rebuild_thumbs') ?></span>
                 </a>
-                <div class="tool-desc"><?= t('desc_rebuild_thumbs') ?><?= $withoutThumbs > 0 ? " — {$withoutThumbs} ×" : '' ?><?= $orphanThumbs > 0 ? " · {$orphanThumbs} osiřelých náhledů" : '' ?></div>
+                <div class="tool-desc"><?= t('desc_rebuild_thumbs') ?><?= $withoutThumbs > 0 ? " — {$withoutThumbs} ×" : '' ?><?= $orphanThumbs > 0 ? ' · ' . h(str_replace('{n}', (string)$orphanThumbs, t('adm_orphan_thumbs', 'osiřelé náhledy: {n}'))) : '' ?></div>
             </li>
         </ul>
     </div>
@@ -526,13 +526,23 @@ $cfgPages  = get_app_config('visible_pages', all_pages());
 $langFlagsAll = ['cs'=>'🇨🇿 Čeština','en'=>'🇬🇧 English','de'=>'🇩🇪 Deutsch',
     'sk'=>'🇸🇰 Slovenčina','es'=>'🇪🇸 Español','fr'=>'🇫🇷 Français',
     'pl'=>'🇵🇱 Polski','it'=>'🇮🇹 Italiano'];
-$pageLabels = ['stats'=>'📊 Statistiky','year'=>'🗓️ Roční souhrn','explore'=>'▦ Prozkoumané čtverce','collections'=>'📚 Kolekce (jen veřejné)','calendar'=>'📅 Kalendář',
-    'heatmap'=>'🔥 Heatmapa','photo_heatmap'=>'📸 Foto-heatmapa','virtual_tracks'=>'🧭 Virtuální trasy','map_search'=>'🗺️ Hledat na mapě','map'=>'🗺️ Mapa (vrstvy přes sebe)',
-    'nearby'=>'📍 Nejbližší trasy','photo_nearby'=>'📷 Fotografie v okolí','filter'=>'🧹 GPX Cleaner',
-    'compare'=>'⚖️ Porovnat trasy','settings'=>'🔧 Nastavení','links'=>'🧭 Podobné weby',
-    'photos'=>'📸 Fotografie (jen prohlížení)',
-    'planner'=>'🥾 Plánovač (bez ukládání — čerpá mapovou API kvótu!)',
-    'story'=>'📖 Cestopis (jen zveřejněné texty; funkce musí být zapnutá)'];
+// Same labels as the new administration (menu names from nav_menu_items(), hints adm2_hint_*)
+$_cfgNav = nav_menu_items();
+$_cfgNl  = static fn(string $k, string $fb): string => isset($_cfgNav[$k]) ? (string)$_cfgNav[$k][2] : $fb;
+$pageLabels = ['stats'=>'📊 ' . $_cfgNl('stats', 'Statistiky'), 'year'=>'🗓️ ' . t('yr_page', 'Roční souhrn'),
+    'explore'=>'▦ ' . $_cfgNl('explore', 'Prozkoumané čtverce'),
+    'collections'=>'📚 ' . $_cfgNl('collections', 'Kolekce') . ' (' . t('adm2_hint_collections', 'jen veřejné kolekce') . ')',
+    'calendar'=>'📅 ' . $_cfgNl('calendar', 'Kalendář'),
+    'heatmap'=>'🔥 ' . $_cfgNl('heatmap', 'Heatmapa'), 'photo_heatmap'=>'📸 ' . $_cfgNl('photo_heatmap', 'Foto-heatmapa'),
+    'virtual_tracks'=>'🧭 ' . $_cfgNl('virtual_tracks', 'Virtuální trasy'), 'map_search'=>t('tool_map_search', '🗺️ Hledat na mapě'),
+    'map'=>'🗺️ ' . $_cfgNl('map', 'Mapa'),
+    'nearby'=>'📍 ' . $_cfgNl('nearby', 'Trasy v okolí'), 'photo_nearby'=>'📷 ' . $_cfgNl('photo_nearby', 'Fotky v okolí'),
+    'filter'=>t('tool_gpx_cleaner', '🧹 GPX Cleaner'),
+    'compare'=>'⚖️ ' . t('h1_compare', 'Porovnání tras'), 'settings'=>t('tool_settings', '🔧 Nastavení'),
+    'links'=>'🧭 ' . $_cfgNl('links', 'Podobné weby'),
+    'photos'=>'📸 ' . $_cfgNl('photos', 'Fotografie') . ' (' . t('adm2_hint_photos', 'jen prohlížení') . ')',
+    'planner'=>'🥾 ' . $_cfgNl('planner', 'Plánovač') . ' (' . t('adm2_hint_planner', 'bez ukládání, čerpá kvótu mapového API') . ')',
+    'story'=>'📖 ' . t('adm2_page_story', 'Cestopis') . ' (' . t('adm2_hint_story', 'jen zveřejněné texty, funkce musí být zapnutá') . ')'];
 ?>
 <div style="margin:24px 0;">
     <h2 style="font-size:17px;margin-bottom:12px;color:var(--text-color);">🔐 <?= htmlspecialchars(t('admin_access_config', 'Konfigurace přístupu pro návštěvníky')) ?></h2>
@@ -748,40 +758,40 @@ $pageLabels = ['stats'=>'📊 Statistiky','year'=>'🗓️ Roční souhrn','expl
         <?= csrf_field() ?>
         <label class="block">
             <span class="block text-xs uppercase tracking-wider text-forest-700/65 dark:text-sand-100/65 mb-1">
-                Filesystem path <span class="lowercase tracking-normal opacity-70">(pro PHP — čtení GPX, fotek, thumbnailů)</span>
+                <?= h(t('adm_fs_path', 'Cesta na disku')) ?> <span class="lowercase tracking-normal opacity-70">(<?= h(t('adm_fs_path_hint', 'pro PHP — čtení GPX, fotek, náhledů')) ?>)</span>
             </span>
             <input type="text" name="uploads_fs_path" value="<?= h($cfgUploadsFs) ?>"
-                   placeholder="např. /var/www/html/uploads nebo C:/wamp64/www/gpx/uploads"
+                   placeholder="<?= h(t('eg_prefix', 'např.')) ?> /var/www/html/uploads, C:/wamp64/www/gpx/uploads"
                    class="w-full px-3 py-2 rounded-md bg-white dark:bg-forest-800 border border-sand-200 dark:border-forest-700 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/30 font-mono text-sm">
             <span class="block mt-1 text-xs text-forest-700/55 dark:text-sand-100/55">
-                Aktuálně se používá: <code class="text-forest-700 dark:text-sand-100"><?= h($effectiveFs) ?></code>
+                <?= h(t('adm_in_use', 'Aktuálně se používá:')) ?> <code class="text-forest-700 dark:text-sand-100"><?= h($effectiveFs) ?></code>
                 <?php if ($fsExists): ?>
-                    <span class="text-forest-600 ml-1">✓ existuje</span>
-                    <?= $fsWritable ? '<span class="text-forest-600">+ zapisovatelná</span>' : '<span class="text-terracotta-500">(jen pro čtení)</span>' ?>
+                    <span class="text-forest-600 ml-1">✓ <?= h(t('adm_exists', 'existuje')) ?></span>
+                    <?= $fsWritable ? '<span class="text-forest-600">+ ' . h(t('adm_writable', 'zapisovatelná')) . '</span>' : '<span class="text-terracotta-500">(' . h(t('adm_read_only', 'jen pro čtení')) . ')</span>' ?>
                 <?php else: ?>
-                    <span class="text-terracotta-500 ml-1">✗ neexistuje</span>
+                    <span class="text-terracotta-500 ml-1">✗ <?= h(t('adm_not_exists', 'neexistuje')) ?></span>
                 <?php endif; ?>
             </span>
         </label>
 
         <label class="block">
             <span class="block text-xs uppercase tracking-wider text-forest-700/65 dark:text-sand-100/65 mb-1">
-                URL prefix <span class="lowercase tracking-normal opacity-70">(pro browser — img src, odkazy ke stažení)</span>
+                <?= h(t('adm_url_prefix', 'Adresa (URL)')) ?> <span class="lowercase tracking-normal opacity-70">(<?= h(t('adm_url_prefix_hint', 'pro prohlížeč — obrázky, odkazy ke stažení')) ?>)</span>
             </span>
             <input type="text" name="uploads_url" value="<?= h($cfgUploadsUrl) ?>"
-                   placeholder="např. https://yourdomain.com/gpx/uploads/"
+                   placeholder="<?= h(t('eg_prefix', 'např.')) ?> https://yourdomain.com/gpx/uploads/"
                    class="w-full px-3 py-2 rounded-md bg-white dark:bg-forest-800 border border-sand-200 dark:border-forest-700 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/30 font-mono text-sm">
             <span class="block mt-1 text-xs text-forest-700/55 dark:text-sand-100/55">
-                Aktuálně se používá: <code class="text-forest-700 dark:text-sand-100"><?= h($effectiveUrl) ?></code>
+                <?= h(t('adm_in_use', 'Aktuálně se používá:')) ?> <code class="text-forest-700 dark:text-sand-100"><?= h($effectiveUrl) ?></code>
             </span>
         </label>
 
         <div class="pt-2 border-t border-sand-200 dark:border-forest-700 flex items-center gap-3 flex-wrap">
             <button type="submit" name="save_uploads_config" class="btn-outdoor btn-outdoor-primary">
-                <i data-lucide="save" class="w-4 h-4" aria-hidden="true"></i> Uložit cesty
+                <i data-lucide="save" class="w-4 h-4" aria-hidden="true"></i> <?= h(t('adm_save_paths', 'Uložit cesty')) ?>
             </button>
             <span class="text-xs text-forest-700/60 dark:text-sand-100/60">
-                Tip: prázdné hodnoty = výchozí lokální <code>./uploads/</code>
+                <?= t_html('adm_paths_tip', 'Tip: prázdné hodnoty = výchozí lokální {dir}', ['dir' => '<code>./uploads/</code>']) ?>
             </span>
         </div>
     </form>

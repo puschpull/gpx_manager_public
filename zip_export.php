@@ -26,13 +26,13 @@ $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 if (empty($rows)) {
     http_response_code(404);
-    die('Žádné trasy neodpovídají filtru.');
+    die(h(t('api_zip_no_tracks', 'Žádné trasy neodpovídají filtru.')));
 }
 
 /* ===== Kontrola ZipArchive ===== */
 if (!class_exists('ZipArchive')) {
     http_response_code(500);
-    die('PHP rozšíření ZipArchive není dostupné.');
+    die(h(t('api_no_ziparchive', 'PHP ZipArchive není na serveru dostupný')));
 }
 
 /* ===== Sestavení ZIP ===== */
@@ -43,7 +43,7 @@ $tmpZip    = sys_get_temp_dir() . '/' . $zipName;
 $zip = new ZipArchive();
 if ($zip->open($tmpZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
     http_response_code(500);
-    die('Nepodařilo se vytvořit ZIP archiv.');
+    die(h(t('api_zip_create_failed', 'Nepodařilo se vytvořit ZIP archiv.')));
 }
 
 $added   = 0;
@@ -69,7 +69,7 @@ if (!empty($missing)) {
 if ($added === 0) {
     unlink($tmpZip);
     http_response_code(404);
-    die('Žádný GPX soubor nebyl nalezen na disku.');
+    die(h(t('api_zip_no_gpx', 'Žádný GPX soubor nebyl nalezen na disku.')));
 }
 
 /* ===== Odeslání ZIP ===== */

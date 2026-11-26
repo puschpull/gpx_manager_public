@@ -67,7 +67,7 @@ function radar_fetch_for_track(\PDO $pdo, int $trackId): array {
     $st->execute([$trackId]);
     $tr = $st->fetch(\PDO::FETCH_ASSOC);
     if (!$tr || empty($tr['date_start'])) {
-        return ['ok' => false, 'error' => 'Trasa nenalezena nebo nemá časové údaje.'];
+        return ['ok' => false, 'error' => t('api_radar_no_track', 'Trasa nenalezena nebo nemá časové údaje.')];
     }
 
     // Lokální čas trasy → UTC, zarovnat na 5minutový krok
@@ -83,7 +83,7 @@ function radar_fetch_for_track(\PDO $pdo, int $trackId): array {
 
     $dir = uploads_fs('radar/' . $trackId . '/');
     if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
-        return ['ok' => false, 'error' => 'Nelze vytvořit adresář pro radar.'];
+        return ['ok' => false, 'error' => t('api_radar_no_dir', 'Nelze vytvořit adresář pro radar.')];
     }
 
     // Stahování desítek snímků po 5 minutách trvá déle než výchozí limit
