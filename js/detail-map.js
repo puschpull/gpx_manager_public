@@ -395,9 +395,9 @@ map.on("overlayadd", e => {
 gpxLayer = new L.GPX(xmlText, {
                 async: true,
                 marker_options: {
-                    startIconUrl: "https://unpkg.com/leaflet-gpx@1.7.0/pin-icon-start.png",
-                    endIconUrl:   "https://unpkg.com/leaflet-gpx@1.7.0/pin-icon-end.png",
-                    shadowUrl:    "https://unpkg.com/leaflet-gpx@1.7.0/pin-shadow.png"
+                    startIconUrl: "assets/vendor/leaflet-gpx-1.7.0/pin-icon-start.png",
+                    endIconUrl:   "assets/vendor/leaflet-gpx-1.7.0/pin-icon-end.png",
+                    shadowUrl:    "assets/vendor/leaflet-gpx-1.7.0/pin-shadow.png"
                 },
                 polyline_options: {
                     color:   window.strokeColor,

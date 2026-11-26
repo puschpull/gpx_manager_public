@@ -37,6 +37,10 @@ function start_secure_session(): void {
         'samesite' => 'Lax',
     ]);
 
+    // Reject session IDs the server never issued (a planted cookie gets a
+    // fresh ID instead of being adopted). Security check 21 Nov 2026, N8.
+    ini_set('session.use_strict_mode', '1');
+
     session_start();
 }
 
@@ -125,7 +129,6 @@ function send_security_headers(): void {
     // prázdná (bez chyby, jen se nezobrazí — v konzoli „Refused to load image").
     $imgSrc = implode(' ', [
         "'self'", 'data:', 'blob:',
-        'https://unpkg.com',                        // ikony Leafletu (vrstvy, celá obrazovka), špendlíky start/cíl
         'https://*.tile.openstreetmap.org',         // OSM
         'https://*.tile.opentopomap.org',           // Topo
         'https://server.arcgisonline.com',          // satelit + stínování terénu (Esri)
@@ -149,12 +152,14 @@ function send_security_headers(): void {
     // (vzor v docbloku csp_nonce() výše; v // komentáři nesmí být PHP koncová značka).
     // 'report-sample' posílá v hlášení začátek zablokovaného kódu — podle něj
     // se pozná, který skript nebo obsluha chybí.
-    $scriptSrc = "script-src 'self' 'nonce-" . csp_nonce() . "' 'report-sample' "
-               . "https://unpkg.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; ";
+    // Knihovny třetích stran jsou od 26. 11. 2026 v assets/vendor/ (kontrola
+    // 21. 11. 2026, N2) — žádná CDN v script-src. Nová knihovna patří tam,
+    // ne sem (postup v assets/vendor/README.md).
+    $scriptSrc = "script-src 'self' 'nonce-" . csp_nonce() . "' 'report-sample'; ";
 
     $csp = "default-src 'self'; "
          . $scriptSrc
-         . "style-src 'self' 'unsafe-inline' https://unpkg.com https://fonts.googleapis.com; "
+         . "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
          . "img-src " . $imgSrc . "; "
          . "font-src 'self' https://fonts.gstatic.com; "
          . "connect-src 'self' "

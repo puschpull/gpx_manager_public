@@ -1,0 +1,12 @@
+# Gitleaks configuration — the default rules plus one narrow exception.
+# (A commit-hash based .gitleaksignore would break here: pull requests are
+# merged with "rebase", which gives every commit a new hash.)
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Third-party library Leaflet.VectorGrid 1.3.0: a placeholder API key in a documentation comment (file kept byte-identical, verified against its SRI hash)"
+paths = [
+  '''^assets/vendor/leaflet\.vectorgrid-1\.3\.0/Leaflet\.VectorGrid\.bundled\.js$''',
+]

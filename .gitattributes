@@ -10,3 +10,6 @@
 *.webp binary
 *.pdf binary
 *.zip binary
+
+# Third-party libraries: byte-exact (SRI hashes in templates must match on the server)
+assets/vendor/** -text

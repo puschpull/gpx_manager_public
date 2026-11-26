@@ -99,7 +99,7 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
     <?php // Alpine tu není potřeba: tmavý režim nastaví skript o řádek výš a nic jiného stránka nemá. ?>
     <!-- lucide@0.516.0 nemá UMD build (404) — sjednoceno na 0.469.0 jako v layout_header.php -->
     <script defer
-            src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"
+            src="assets/vendor/lucide-0.469.0/lucide.min.js"
             integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM"
             crossorigin="anonymous"></script>
     <link rel="icon" type="image/svg+xml" href="assets/img/logo-mountain.svg">
