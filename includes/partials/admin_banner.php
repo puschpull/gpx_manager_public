@@ -35,10 +35,11 @@ function render_admin_menu(): void
     $via = htmlspecialchars($_SESSION['admin_via'] ?? 'login', ENT_QUOTES, 'UTF-8');
     $ip  = htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? '?', ENT_QUOTES, 'UTF-8');
 
-    // Visitor-preview toggle is handled in public_access.php — pages that use auth.php
-    // (admin.php, edit.php, import.php) never reach that code. Always route through
-    // index.php which uses public_access.php, so the toggle is reliably processed.
-    $previewUrl = htmlspecialchars('index.php?visitor_preview=1', ENT_QUOTES, 'UTF-8');
+    // Preview starts on the current page (visitor_preview_url() in paths.php).
+    // Both public_access.php and auth.php handle the toggle; admin-only pages
+    // (auth.php) send the preview to index.php, a page hidden from visitors
+    // redirects there via check_page_access().
+    $previewUrl = htmlspecialchars(visitor_preview_url(), ENT_QUOTES, 'UTF-8');
 
     $csrf = function_exists('csrf_field') ? csrf_field() : '';
 

@@ -1541,4 +1541,9 @@ return [
     'col_bulk_open'                => 'Aprire la raccolta?',
     'col_new_placeholder'          => 'Nuova raccolta: scrivi un nome e il percorso verrà aggiunto',
     'col_how'                      => 'Aggiungere percorsi a una raccolta: nella tabella dettagliata seleziona i percorsi (ad es. dopo il filtro) e scegli l\'azione «Aggiungi alla raccolta…»; in «Modifica percorso» con la casella; nel dettaglio del percorso dalla riga Raccolte; oppure cercando nella pagina della raccolta.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'I punti escursionistici compaiono ingrandendo la mappa.',
+    'mf_poi_loading'               => 'Caricamento dei punti escursionistici…',
+    'mf_poi_down'                  => 'I punti escursionistici non sono disponibili ora: il servizio OpenStreetMap (Overpass) non risponde. Riprovo spostando la mappa.',
+    'mf_poi_stale'                 => 'I punti escursionistici provengono da una copia salvata più vecchia: il servizio OpenStreetMap non risponde.',
 ];

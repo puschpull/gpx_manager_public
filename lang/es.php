@@ -1541,4 +1541,9 @@ return [
     'col_bulk_open'                => '¿Abrir la colección?',
     'col_new_placeholder'          => 'Nueva colección: escriba un nombre y la ruta se añadirá',
     'col_how'                      => 'Añadir rutas a una colección: en la tabla detallada marque rutas (p. ej. tras filtrar) y elija la acción «Añadir a colección…»; en «Editar ruta» marcando la casilla; en el detalle de la ruta con la fila Colecciones; o buscando en la página de la colección.',
+    // ===== Turisticke body: stav vrstvy =====
+    'mf_poi_zoom'                  => 'Los puntos de senderismo aparecen al acercar el mapa.',
+    'mf_poi_loading'               => 'Cargando puntos de senderismo…',
+    'mf_poi_down'                  => 'Los puntos de senderismo no están disponibles ahora: el servicio de OpenStreetMap (Overpass) no responde. Se reintentará al mover el mapa.',
+    'mf_poi_stale'                 => 'Los puntos de senderismo son de una copia guardada antigua: el servicio de OpenStreetMap no responde.',
 ];
