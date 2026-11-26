@@ -268,14 +268,14 @@ if (!function_exists('t')) {
 
     <!-- Alpine.js focus plugin (x-trap for focus management — A11Y-003) -->
     <!-- Must be loaded before Alpine core (defer preserves script order) -->
-    <script defer src="https://unpkg.com/@alpinejs/focus@3.14.1/dist/cdn.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>
+    <script defer src="assets/vendor/alpinejs-3.14.1/focus.min.js" integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous"></script>
 
     <!-- Alpine.js — CSP build: nepotřebuje 'unsafe-eval' v Content-Security-Policy.
          Výrazy v šablonách smějí být jen názvy vlastností/metod z js/alpine-components.js. -->
-    <script defer src="https://unpkg.com/@alpinejs/csp@3.14.1/dist/cdn.min.js" integrity="sha384-rCnzN/DdCU4dORuP99iqMm3OJPQKDUtMAjgeZ9nfqF9Fz4P/n4BGlOrtfsaiDNAL" crossorigin="anonymous"></script>
+    <script defer src="assets/vendor/alpinejs-3.14.1/csp.min.js" integrity="sha384-rCnzN/DdCU4dORuP99iqMm3OJPQKDUtMAjgeZ9nfqF9Fz4P/n4BGlOrtfsaiDNAL" crossorigin="anonymous"></script>
 
     <!-- Lucide icons -->
-    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>
+    <script defer src="assets/vendor/lucide-0.469.0/lucide.min.js" integrity="sha384-hJnF5AwidE18GSWTAGHv3ByzzvfNZ1Tcx5y1UUV3WkauuMCEzBJBMSwSt/PUPXnM" crossorigin="anonymous"></script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="assets/img/logo-mountain.svg">

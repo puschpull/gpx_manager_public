@@ -17,7 +17,7 @@ $years = year_list($pdo);
 $page_title = t('ex_title', 'Prozkoumané čtverce');
 require __DIR__ . '/includes/layout_header.php';
 ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/vendor/leaflet-1.9.4/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
 <link rel="stylesheet" href="<?= asset('css/extra-utilities.css') ?>">
 <style>
     #exMap { height: 68vh; min-height: 420px; border-radius: 12px; z-index: 0; }
@@ -87,7 +87,7 @@ require __DIR__ . '/includes/layout_header.php';
     <p class="mt-3 text-xs text-forest-700/60 dark:text-sand-100/60"><?= h(t('ex_help')) ?></p>
 </section>
 
-<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script defer src="assets/vendor/leaflet-1.9.4/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script defer src="<?= asset('js/lib/map-factory.js') ?>"></script>
 <script defer src="<?= asset('js/explore-page.js') ?>"></script>
 <script nonce="<?= csp_nonce() ?>">

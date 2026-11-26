@@ -355,7 +355,7 @@ require __DIR__ . '/includes/layout_header.php';
 
 <!-- Chart.js + outdoor theme -->
 <script defer
-        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"
+        src="assets/vendor/chart.js-4.4.1/chart.umd.min.js"
         integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4"
         crossorigin="anonymous"></script>
 <script src="<?= asset('js/chart-theme.js') ?>"></script>
