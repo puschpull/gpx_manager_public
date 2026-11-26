@@ -176,7 +176,7 @@ function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 
     $info = @getimagesize($srcPath);
     if (!$info || !isset($info[0], $info[1], $info[2])) {
         error_log("photo_helper: getimagesize failed for $srcPath");
-        photo_thumb_error('obrázek je poškozený nebo nečitelný');
+        photo_thumb_error(t('api_img_corrupt', 'obrázek je poškozený nebo nečitelný'));
         return false;
     }
     [$imgW, $imgH, $type] = $info;
@@ -184,20 +184,20 @@ function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 
     // SEC-018: Image bomb — reject oversized images before GD allocates memory
     if ($imgW * $imgH > PHOTO_MAX_PIXELS) {
         error_log("photo_helper: image too large ({$imgW}x{$imgH} = " . ($imgW * $imgH) . " px) for $srcPath");
-        photo_thumb_error(sprintf('příliš mnoho pixelů (%d Mpx, max %d Mpx)',
-            (int)round($imgW * $imgH / 1e6), PHOTO_MAX_PIXELS / 1_000_000));
+        photo_thumb_error(strtr(t('api_img_too_many_px', 'příliš mnoho pixelů ({mpx} Mpx, max {max} Mpx)'),
+            ['{mpx}' => (string)(int)round($imgW * $imgH / 1e6), '{max}' => (string)(int)(PHOTO_MAX_PIXELS / 1_000_000)]));
         return false;
     }
     $fileSize = @filesize($srcPath);
     if ($fileSize !== false && $fileSize > PHOTO_MAX_BYTES) {
         error_log("photo_helper: file too large ($fileSize bytes) for $srcPath");
-        photo_thumb_error(sprintf('soubor je příliš velký (max %d MB)', PHOTO_MAX_BYTES >> 20));
+        photo_thumb_error(strtr(t('api_img_too_big', 'soubor je příliš velký (max {mb} MB)'), ['{mb}' => (string)(PHOTO_MAX_BYTES >> 20)]));
         return false;
     }
     // Only allow safe image types before handing to GD
     if (!in_array($type, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
         error_log("photo_helper: unsupported image type $type for $srcPath");
-        photo_thumb_error('nepodporovaný formát');
+        photo_thumb_error(t('api_img_bad_format', 'nepodporovaný formát'));
         return false;
     }
 
@@ -216,7 +216,7 @@ function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 
 
     if (!photo_fits_in_memory($imgW, $imgH, $rotate)) {
         error_log("photo_helper: not enough memory for {$imgW}x{$imgH}" . ($rotate ? ' (rotated)' : '') . " — $srcPath");
-        photo_thumb_error(sprintf('na zpracování fotky %d Mpx nestačí paměť serveru', (int)round($imgW * $imgH / 1e6)));
+        photo_thumb_error(strtr(t('api_img_no_memory', 'na zpracování fotky {mpx} Mpx nestačí paměť serveru'), ['{mpx}' => (string)(int)round($imgW * $imgH / 1e6)]));
         return false;
     }
 
@@ -227,7 +227,7 @@ function generate_photo_thumb(string $srcPath, string $destPath, int $maxSize = 
         default        => false,
     };
     if (!$src) {
-        photo_thumb_error('obrázek se nepodařilo načíst (poškozený soubor)');
+        photo_thumb_error(t('api_img_load_failed', 'obrázek se nepodařilo načíst (poškozený soubor)'));
         return false;
     }
 
@@ -383,7 +383,7 @@ function process_single_photo(string $tmpPath, string $origName, int $origSize):
     finfo_close($finfo);
     $allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!in_array($mime, $allowedMimes)) {
-        return ['ok' => false, 'file' => $origName, 'msg' => 'Nepodporovaný formát (jen JPEG/PNG/WebP)'];
+        return ['ok' => false, 'file' => $origName, 'msg' => t('api_photo_bad_format', 'Nepodporovaný formát (jen JPEG/PNG/WebP)')];
     }
 
     // Hash originálu pro detekci duplicit (před resizem)
@@ -403,7 +403,7 @@ function process_single_photo(string $tmpPath, string $origName, int $origSize):
             'ok'         => false,
             'duplicate'  => true,
             'file'       => $origName,
-            'msg'        => 'Duplikát — fotka již byla nahrána jako „' . ($dup['orig_name'] ?: $dup['filename']) . '"',
+            'msg'        => strtr(t('api_photo_duplicate', 'Duplikát — fotka již byla nahrána jako „{name}“'), ['{name}' => (string)($dup['orig_name'] ?: $dup['filename'])]),
             'thumb_url'  => photo_thumb_url($dup['filename']),
             'track_name' => $trackName,
         ];

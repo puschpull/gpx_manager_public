@@ -314,6 +314,7 @@ if (!function_exists('t')) {
         'photo_click_full'=> t('photo_click_full'),
         'photos_here'     => t('photos_here'),
         'unit_m_asl'      => t('unit_m_asl'),
+        'chart_axis_month'=> t('chart_axis_month', 'Měsíc'),   // js/index-chart.js
     ];
     ?>
     <script nonce="<?= csp_nonce() ?>">

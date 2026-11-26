@@ -94,7 +94,7 @@ if (window.GPX_DEBUG) console.log("📈 index-chart.js načten");
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        title: { display: true, text: "Měsíc", color: textColor },
+                        title: { display: true, text: (window.gpxI18n && window.gpxI18n.chart_axis_month) || "Měsíc", color: textColor },
                         ticks: { color: textColor }
                     },
                     y: {

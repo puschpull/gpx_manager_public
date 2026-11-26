@@ -11,7 +11,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'similar') {
 
     $trackId = (int)($_GET['id'] ?? 0);
     if ($trackId <= 0) {
-        echo json_encode(['error' => 'Neplatné ID.']);
+        echo json_encode(['error' => t('api_bad_id', 'Neplatné ID.')]);
         exit;
     }
 
@@ -168,7 +168,7 @@ $allowedLangs = available_langs();
 
 // ====== Načtení dat o trase ======
 $id = (int)($_GET['id'] ?? 0);
-if ($id <= 0) die('Neplatné ID.');
+if ($id <= 0) die(h(t('api_bad_id', 'Neplatné ID.')));
 
 $stmt = $pdo->prepare('SELECT * FROM tracks WHERE id = ?');
 $stmt->execute([$id]);

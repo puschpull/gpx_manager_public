@@ -14,6 +14,13 @@ function _t(key, fallback) {
     return (window.gpxI18n && window.gpxI18n[key]) || fallback || key;
 }
 
+// Page texts from includes/filter_view.php (window.gpxFilterI18n); {name} placeholders from `vars`
+function ft(key, fallback, vars) {
+    let s = (window.gpxFilterI18n && window.gpxFilterI18n[key]) || fallback;
+    if (vars) for (const k in vars) s = s.split('{' + k + '}').join(String(vars[k]));
+    return s;
+}
+
 (function () {
     "use strict";
 
@@ -58,7 +65,7 @@ function _t(key, fallback) {
             })
             .catch(err => {
                 if (window.GPX_DEBUG) { console.error("Chyba pri nacitani GPX:", err); }
-                showWarning("Nepodařilo se nacist GPX soubor: " + err.message);
+                showWarning(ft('load_error', 'Nepodařilo se načíst GPX soubor: {msg}', { msg: err.message }));
             });
     }
 
@@ -352,7 +359,7 @@ function _t(key, fallback) {
 
         const btn = el("btnSaveCatalog");
         const origLabel = btn ? btn.textContent : "";
-        if (btn) { btn.disabled = true; btn.textContent = "⏳ Ukládám…"; }
+        if (btn) { btn.disabled = true; btn.textContent = ft('saving', '⏳ Ukládám…'); }
 
         const gpxContent = GpxFilter.exportGpx(originalXmlText, lastResult.filtered);
         const fileName = window.gpxFilterData?.fileName || "track.gpx";
@@ -370,16 +377,16 @@ function _t(key, fallback) {
             .then(r => r.json())
             .then(data => {
                 if (data.ok) {
-                    if (btn) { btn.textContent = "✅ Uloženo! Přesměrovávám…"; }
+                    if (btn) { btn.textContent = ft('saved_redirect', '✅ Uloženo! Přesměrovávám…'); }
                     setTimeout(() => { window.location.href = "detail.php?id=" + data.id; }, 800);
                 } else {
                     if (btn) { btn.disabled = false; btn.textContent = origLabel; }
-                    showWarning("Chyba při ukládání: " + (data.error || "neznámá chyba"));
+                    showWarning(ft('save_error', 'Chyba při ukládání: {msg}', { msg: data.error || ft('unknown_error', 'neznámá chyba') }));
                 }
             })
             .catch(err => {
                 if (btn) { btn.disabled = false; btn.textContent = origLabel; }
-                showWarning("Chyba při ukládání: " + err.message);
+                showWarning(ft('save_error', 'Chyba při ukládání: {msg}', { msg: err.message }));
             });
     }
 
@@ -388,9 +395,8 @@ function _t(key, fallback) {
         if (!originalXmlText || !lastResult) return;
         const trackId = window.gpxFilterData?.trackId;
         if (!trackId) return;
-        if (!confirm("Přepsat přímo tuto trasu #" + trackId + " vyčištěnou verzí?\n\n"
-            + "Fotky i kategorie zůstanou, statistiky se přepočítají. "
-            + "Originál GPX se zazálohuje (.bak).")) return;
+        if (!confirm(ft('confirm_overwrite', 'Přepsat přímo tuto trasu #{id} vyčištěnou verzí?', { id: trackId }) + "\n\n"
+            + ft('confirm_overwrite_note', 'Fotky i kategorie zůstanou, statistiky se přepočítají. Originál GPX se zazálohuje (.bak).'))) return;
 
         const btn = el("btnApplyTrack");
         const origLabel = btn ? btn.textContent : "";
@@ -408,16 +414,16 @@ function _t(key, fallback) {
             .then(r => r.json())
             .then(data => {
                 if (data.ok) {
-                    if (btn) { btn.textContent = "✅ Hotovo! Přesměrovávám…"; }
+                    if (btn) { btn.textContent = ft('done_redirect', '✅ Hotovo! Přesměrovávám…'); }
                     setTimeout(() => { window.location.href = "detail.php?id=" + data.id; }, 800);
                 } else {
                     if (btn) { btn.disabled = false; btn.textContent = origLabel; }
-                    showWarning("Chyba při aplikaci: " + (data.error || "neznámá chyba"));
+                    showWarning(ft('apply_error', 'Chyba při aplikaci: {msg}', { msg: data.error || ft('unknown_error', 'neznámá chyba') }));
                 }
             })
             .catch(err => {
                 if (btn) { btn.disabled = false; btn.textContent = origLabel; }
-                showWarning("Chyba při aplikaci: " + err.message);
+                showWarning(ft('apply_error', 'Chyba při aplikaci: {msg}', { msg: err.message }));
             });
     }
 
@@ -466,7 +472,11 @@ function _t(key, fallback) {
     function populatePresetSelect() {
         const select = el("presetSelect");
         if (!select) return;
-        select.innerHTML = '<option value="">-- Vyberte preset --</option>';
+        select.innerHTML = '';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = '-- ' + ft('preset_choose', 'Vyberte preset') + ' --';
+        select.appendChild(opt0);
         for (const p of allPresets) {
             const opt = document.createElement("option");
             opt.value = p.id;
@@ -498,7 +508,7 @@ function _t(key, fallback) {
 
             if (!dialog || !input) {
                 // Fallback if dialog element is missing
-                const name = window.prompt("Název presetu:");
+                const name = window.prompt(ft('preset_prompt', 'Název presetu:'));
                 resolve(name && name.trim() ? name.trim() : null);
                 return;
             }
@@ -542,7 +552,7 @@ function _t(key, fallback) {
                     if (!trimmed) {
                         e.preventDefault();
                         if (errorEl) {
-                            errorEl.textContent = "Název presetu nesmí být prázdný.";
+                            errorEl.textContent = ft('preset_empty', 'Název presetu nesmí být prázdný.');
                             errorEl.hidden = false;
                         }
                         input.focus();
@@ -589,7 +599,7 @@ function _t(key, fallback) {
             showWarning("Vestaveene presety nelze smazat.");
             return;
         }
-        if (!confirm(`Smazat preset "${preset.name}"?`)) return;
+        if (!confirm(ft('preset_confirm_delete', 'Smazat preset „{name}“?', { name: preset.name }))) return;
 
         // localStorage
         try {
@@ -637,10 +647,10 @@ function _t(key, fallback) {
         const btn = el("btnMapMode");
         if (expanded) {
             document.body.classList.add("filter-mode-expanded");
-            if (btn) btn.textContent = "↙ Normální pohled";
+            if (btn) btn.textContent = ft('view_normal', '↙ Normální pohled');
         } else {
             document.body.classList.remove("filter-mode-expanded");
-            if (btn) btn.textContent = "↗ Velká mapa + panel";
+            if (btn) btn.textContent = ft('view_big', '↗ Velká mapa + panel');
         }
         // Leaflet musí přepočítat rozměry kontejneru po CSS přechodu
         setTimeout(() => {

@@ -51,7 +51,7 @@ $_bulkCollections = $_isAdmin ? collections_names($pdo) : [];
         <?= t('btn_filter') ?>
     </button>
     <?php if ($_isAdmin): ?><a class="btn" href="import.php"><?= t('btn_import') ?></a><?php endif; ?>
-    <?php if ($_isAdmin || in_array('photos', $_visiblePages)): ?><a class="btn" href="photos.php">📸 Fotografie</a><?php endif; ?>
+    <?php if ($_isAdmin || in_array('photos', $_visiblePages)): ?><a class="btn" href="photos.php">📸 <?= htmlspecialchars(t('nav_photos', 'Fotografie')) ?></a><?php endif; ?>
     <?php if ($_isAdmin || in_array('stats', $_visiblePages)): ?><a class="btn" href="stats.php"><?= t('btn_stats') ?></a><?php endif; ?>
     <?php if ($_isAdmin || in_array('calendar', $_visiblePages)): ?><a class="btn" href="calendar.php"><?= t('btn_calendar') ?></a><?php endif; ?>
     <?php if ($_isAdmin || in_array('heatmap', $_visiblePages)): ?><a class="btn" href="heatmap.php"><?= t('btn_heatmap') ?></a><?php endif; ?>

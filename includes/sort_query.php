@@ -63,6 +63,6 @@ function sort_th(string $label, string $col, string $currentBy, string $currentD
     $arrow      = $isCurrent ? ($currentDir === 'ASC' ? ' ↑' : ' ↓') : '';
     $ariaSort   = $isCurrent ? ($currentDir === 'ASC' ? 'ascending' : 'descending') : 'none';
     $classAttr  = $class !== '' ? ' class="' . htmlspecialchars($class, ENT_QUOTES) . '"' : '';
-    $link       = '<a href="?' . h($qs) . '" title="Seřadit">' . $label . $arrow . '</a>';
+    $link       = '<a href="?' . h($qs) . '" title="' . h(t('sort_title', 'Seřadit')) . '">' . $label . $arrow . '</a>';
     return '<th scope="col" aria-sort="' . $ariaSort . '"' . $classAttr . '>' . $link . '</th>';
 }

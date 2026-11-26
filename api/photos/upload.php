@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../includes/photo_helper.php';
 ajax_endpoint(function (): array {
     if (!isset($_FILES['photos'])) {
         http_response_code(400);
-        return ['ok' => false, 'error' => 'Žádné soubory.'];
+        return ['ok' => false, 'error' => t('api_no_files', 'Žádné soubory.')];
     }
 
     $results = [];
@@ -60,12 +60,12 @@ ajax_endpoint(function (): array {
 
         if ($isZip) {
             if (!class_exists('ZipArchive')) {
-                $results[] = ['file' => $origName, 'ok' => false, 'msg' => 'PHP ZipArchive není dostupný na serveru'];
+                $results[] = ['file' => $origName, 'ok' => false, 'msg' => t('api_no_ziparchive', 'PHP ZipArchive není na serveru dostupný')];
                 continue;
             }
             $zip = new ZipArchive();
             if ($zip->open($tmpPath) !== true) {
-                $results[] = ['file' => $origName, 'ok' => false, 'msg' => 'Nepodařilo se otevřít ZIP soubor'];
+                $results[] = ['file' => $origName, 'ok' => false, 'msg' => t('api_zip_open_failed', 'Nepodařilo se otevřít ZIP soubor')];
                 continue;
             }
 
@@ -88,7 +88,7 @@ ajax_endpoint(function (): array {
             $numEntries = min($zip->numFiles, $entryLimit);
             if ($zip->numFiles > $entryLimit) {
                 $results[] = ['ok' => false, 'file' => $origName,
-                              'msg' => "ZIP má {$zip->numFiles} položek — prohlédnuto jen prvních {$entryLimit}"];
+                              'msg' => strtr(t('api_zip_too_many', 'ZIP má {n} položek — prohlédnuto jen prvních {limit}'), ['{n}' => (string)$zip->numFiles, '{limit}' => (string)$entryLimit])];
             }
 
             for ($e = 0; $e < $numEntries; $e++) {
@@ -99,24 +99,24 @@ ajax_endpoint(function (): array {
                 if (!in_array($ext, $imageExts, true)) continue;
 
                 if ($imgCount >= $imgLimit) {
-                    $stopMsg = "Limit {$imgLimit} fotek/ZIP — zbytek přeskočen";
+                    $stopMsg = strtr(t('api_zip_photo_limit', 'Limit {n} fotek na ZIP — zbytek přeskočen'), ['{n}' => (string)$imgLimit]);
                     break;
                 }
                 // Deklarovaná velikost ve hlavičce ZIPu — rychlé odmítnutí
                 if ($st['size'] > PHOTO_MAX_BYTES) {
                     $results[] = ['ok' => false, 'file' => $entryName,
-                                  'msg' => 'Fotku nelze zpracovat: soubor je příliš velký (max ' . (PHOTO_MAX_BYTES >> 20) . ' MB)'];
+                                  'msg' => strtr(t('api_photo_too_big', 'Fotku nelze zpracovat: soubor je příliš velký (max {mb} MB)'), ['{mb}' => (string)(PHOTO_MAX_BYTES >> 20)])];
                     continue;
                 }
                 if ($totalBytes + $st['size'] > $totalLimit) {
-                    $stopMsg = 'ZIP je po rozbalení příliš velký (max ' . ($totalLimit >> 30) . ' GB) — zbytek přeskočen';
+                    $stopMsg = strtr(t('api_zip_too_big', 'ZIP je po rozbalení příliš velký (max {gb} GB) — zbytek přeskočen'), ['{gb}' => (string)($totalLimit >> 30)]);
                     break;
                 }
 
                 // Hlavičce se nevěří: kopíruje se nejvýš limit + 1 bajt
                 $in = $zip->getStream($st['name']);
                 if ($in === false) {
-                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => 'Položku ZIPu nelze přečíst'];
+                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => t('api_zip_entry_read', 'Položku ZIPu nelze přečíst')];
                     continue;
                 }
                 $outPath = $tmpDir . '/' . $e . '.' . $ext;
@@ -127,13 +127,13 @@ ajax_endpoint(function (): array {
 
                 if ($written === false) {
                     @unlink($outPath);
-                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => 'Položku ZIPu nelze rozbalit'];
+                    $results[] = ['ok' => false, 'file' => $entryName, 'msg' => t('api_zip_entry_extract', 'Položku ZIPu nelze rozbalit')];
                     continue;
                 }
                 if ($written > PHOTO_MAX_BYTES) {
                     @unlink($outPath);
                     $results[] = ['ok' => false, 'file' => $entryName,
-                                  'msg' => 'Fotku nelze zpracovat: soubor je příliš velký (max ' . (PHOTO_MAX_BYTES >> 20) . ' MB)'];
+                                  'msg' => strtr(t('api_photo_too_big', 'Fotku nelze zpracovat: soubor je příliš velký (max {mb} MB)'), ['{mb}' => (string)(PHOTO_MAX_BYTES >> 20)])];
                     continue;
                 }
                 $totalBytes += $written;

@@ -420,7 +420,7 @@ require __DIR__ . '/includes/layout_header.php';
             </div>
             <div class="col">
                 <label for="color"><?= t('label_color') ?></label>
-                <input type="text" id="color" name="color" value="<?= h($track['color'] ?? '') ?>" placeholder="např. Cyan, Red, Blue">
+                <input type="text" id="color" name="color" value="<?= h($track['color'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> Cyan, Red, Blue">
             </div>
         </div>
 
@@ -469,26 +469,26 @@ require __DIR__ . '/includes/layout_header.php';
         <div class="row">
             <div class="col">
                 <label for="distance_km"><?= t('label_distance_km') ?></label>
-                <input type="text" id="distance_km" name="distance_km" value="<?= h($track['distance_km'] ?? '') ?>" placeholder="např. 12.345">
+                <input type="text" id="distance_km" name="distance_km" value="<?= h($track['distance_km'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 12.345">
             </div>
             <div class="col">
                 <label for="ascent"><?= t('label_ascent') ?></label>
-                <input type="text" id="ascent" name="ascent" value="<?= h($track['ascent'] ?? '') ?>" placeholder="např. 123.4">
+                <input type="text" id="ascent" name="ascent" value="<?= h($track['ascent'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 123.4">
             </div>
             <div class="col">
                 <label for="descent"><?= t('label_descent') ?></label>
-                <input type="text" id="descent" name="descent" value="<?= h($track['descent'] ?? '') ?>" placeholder="např. 123.4">
+                <input type="text" id="descent" name="descent" value="<?= h($track['descent'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 123.4">
             </div>
         </div>
 
         <div class="row">
             <div class="col">
                 <label for="elevation_min"><?= t('label_elev_min') ?></label>
-                <input type="text" id="elevation_min" name="elevation_min" value="<?= h($track['elevation_min'] ?? '') ?>" placeholder="např. 12.3">
+                <input type="text" id="elevation_min" name="elevation_min" value="<?= h($track['elevation_min'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 12.3">
             </div>
             <div class="col">
                 <label for="elevation_max"><?= t('label_elev_max') ?></label>
-                <input type="text" id="elevation_max" name="elevation_max" value="<?= h($track['elevation_max'] ?? '') ?>" placeholder="např. 123.4">
+                <input type="text" id="elevation_max" name="elevation_max" value="<?= h($track['elevation_max'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 123.4">
             </div>
             <div class="col">
                 <label for="trackpoints_count"><?= t('label_trackpoints') ?></label>
@@ -499,37 +499,37 @@ require __DIR__ . '/includes/layout_header.php';
         <div class="row">
             <div class="col">
                 <label for="speed_max"><?= t('label_speed_max') ?></label>
-                <input type="text" id="speed_max" name="speed_max" value="<?= h($track['speed_max'] ?? '') ?>" placeholder="např. 12.345">
+                <input type="text" id="speed_max" name="speed_max" value="<?= h($track['speed_max'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 12.345">
             </div>
             <div class="col">
                 <label for="speed_avg"><?= t('label_speed_avg') ?></label>
-                <input type="text" id="speed_avg" name="speed_avg" value="<?= h($track['speed_avg'] ?? '') ?>" placeholder="např. 3.456">
+                <input type="text" id="speed_avg" name="speed_avg" value="<?= h($track['speed_avg'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 3.456">
             </div>
             <div class="col">
                 <label for="speed_avg_total"><?= t('label_speed_avg_t') ?></label>
-                <input type="text" id="speed_avg_total" name="speed_avg_total" value="<?= h($track['speed_avg_total'] ?? '') ?>" placeholder="např. 2.345">
+                <input type="text" id="speed_avg_total" name="speed_avg_total" value="<?= h($track['speed_avg_total'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 2.345">
             </div>
         </div>
 
         <div class="row">
             <div class="col">
                 <label for="avg_ascent_rate">avg↑ (m/s)</label>
-                <input type="text" id="avg_ascent_rate" name="avg_ascent_rate" value="<?= h($track['avg_ascent_rate'] ?? '') ?>" placeholder="např. 0.123">
+                <input type="text" id="avg_ascent_rate" name="avg_ascent_rate" value="<?= h($track['avg_ascent_rate'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 0.123">
             </div>
             <div class="col">
                 <label for="avg_descent_rate">avg↓ (m/s)</label>
-                <input type="text" id="avg_descent_rate" name="avg_descent_rate" value="<?= h($track['avg_descent_rate'] ?? '') ?>" placeholder="např. 0.123">
+                <input type="text" id="avg_descent_rate" name="avg_descent_rate" value="<?= h($track['avg_descent_rate'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 0.123">
             </div>
             <div class="col">
                 <label for="max_ascent_rate">max↑ (m/s)</label>
-                <input type="text" id="max_ascent_rate" name="max_ascent_rate" value="<?= h($track['max_ascent_rate'] ?? '') ?>" placeholder="např. 0.456">
+                <input type="text" id="max_ascent_rate" name="max_ascent_rate" value="<?= h($track['max_ascent_rate'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 0.456">
             </div>
         </div>
 
         <div class="row">
             <div class="col">
                 <label for="max_descent_rate">max↓ (m/s)</label>
-                <input type="text" id="max_descent_rate" name="max_descent_rate" value="<?= h($track['max_descent_rate'] ?? '') ?>" placeholder="např. 0.456">
+                <input type="text" id="max_descent_rate" name="max_descent_rate" value="<?= h($track['max_descent_rate'] ?? '') ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> 0.456">
             </div>
             <div class="col">
                 <label for="file_hash"><?= t('label_file_hash') ?></label>
@@ -551,7 +551,7 @@ require __DIR__ . '/includes/layout_header.php';
         <div class="row">
             <div class="col">
                 <label for="categories"><?= t('label_categories') ?></label>
-                <input type="text" id="categories" name="categories" value="<?= h($catsText) ?>" placeholder="např. Krušné, Výhledy">
+                <input type="text" id="categories" name="categories" value="<?= h($catsText) ?>" placeholder="<?= h(t('eg_prefix', 'např.')) ?> Krušné, Výhledy">
                 <?php if (!empty($allCats)): ?>
                     <div class="hint"><?= t('meta_avail_cats') ?>
                         <span class="taglist">

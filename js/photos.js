@@ -6,6 +6,14 @@
 /* CSRF token read once from meta tag — sent as header on all mutating requests */
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
+/* Texts translated on the server (window.gpxPhotosI18n from includes/photos_view.php);
+   {name} placeholders are filled from `vars`. The Czech fallback covers a missing key. */
+function pt(key, fallback, vars) {
+    let s = (window.gpxPhotosI18n && window.gpxPhotosI18n[key]) || fallback;
+    if (vars) for (const k in vars) s = s.split('{' + k + '}').join(String(vars[k]));
+    return s;
+}
+
 /* ===================== Záložky ===================== */
 document.querySelectorAll('.photos-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -123,9 +131,9 @@ async function uploadFiles(files) {
         const pct = total > 0 ? Math.round((doneFiles / total) * 100) : 0;
         barFill.style.width = pct + '%';
         if (hasZip) {
-            statusEl.textContent = `⏳ Nahrávám ZIP dávku ${batchIdx + 1} / ${batches.length}…`;
+            statusEl.textContent = pt('zip_batch', '⏳ Nahrávám ZIP dávku {i} / {n}…', { i: batchIdx + 1, n: batches.length });
         } else {
-            statusEl.textContent = `⏳ Dávka ${batchIdx + 1} / ${batches.length} · ${doneFiles} / ${total} fotek (${pct}%)`;
+            statusEl.textContent = pt('batch_progress', '⏳ Dávka {i} / {n} · fotky {done} / {total} ({pct} %)', { i: batchIdx + 1, n: batches.length, done: doneFiles, total: total, pct: pct });
         }
     };
 
@@ -151,7 +159,7 @@ async function uploadFiles(files) {
         } catch (err) {
             const errDiv = document.createElement('div');
             errDiv.style.cssText = 'color:#c62828; font-size:13px;';
-            errDiv.textContent = `Chyba v dávce ${bi + 1}: ${err.message}`;
+            errDiv.textContent = pt('batch_error', 'Chyba v dávce {i}: {msg}', { i: bi + 1, msg: err.message });
             progress.appendChild(errDiv);
             doneFiles += batch.length;
         }
@@ -159,7 +167,7 @@ async function uploadFiles(files) {
 
     // Finální výpis výsledků
     barFill.style.width = '100%';
-    statusEl.textContent = `✅ Hotovo — zpracováno ${total} ${total === 1 ? 'soubor' : 'souborů'}`;
+    statusEl.textContent = pt('done_files', '✅ Hotovo — zpracováno souborů: {n}', { n: total });
 
     for (const r of results) {
         const div = document.createElement('div');
@@ -172,14 +180,14 @@ async function uploadFiles(files) {
                 <img src="${r.thumb_url}" data-img-fallback="dim">
                 <div class="res-info">
                     <span class="badge-ok">✓</span> ${escHtml(r.file)}${sizeInfo}
-                    <br><span class="badge-gps">${r.has_gps ? '📍 GPS nalezena' : '⚠ Bez GPS — nezobrazí se na mapě'}</span>
-                    ${r.track_name ? `<div class="res-track">🗺 Přiřazeno: ${escHtml(r.track_name)}</div>` : '<div class="res-track">⚠ Nepřiřazeno k trase</div>'}
+                    <br><span class="badge-gps">${escHtml(r.has_gps ? pt('gps_found', '📍 GPS nalezena') : pt('no_gps', '⚠ Bez GPS — nezobrazí se na mapě'))}</span>
+                    ${r.track_name ? `<div class="res-track">${escHtml(pt('assigned', '🗺 Přiřazeno: {name}', { name: r.track_name }))}</div>` : `<div class="res-track">${escHtml(pt('not_assigned', '⚠ Nepřiřazeno k trase'))}</div>`}
                 </div>`;
         } else if (r.duplicate) {
             div.innerHTML = `
                 <img src="${r.thumb_url}" data-img-fallback="dim">
                 <div class="res-info">
-                    <span style="color:#e65c00; font-weight:700;">⚠ Duplikát</span> ${escHtml(r.file)}
+                    <span style="color:#e65c00; font-weight:700;">${escHtml(pt('duplicate', '⚠ Duplikát'))}</span> ${escHtml(r.file)}
                     <br><span class="badge-gps" style="color:#e65c00;">${escHtml(r.msg)}</span>
                     ${r.track_name ? `<div class="res-track">🗺 ${escHtml(r.track_name)}</div>` : ''}
                 </div>`;
@@ -192,7 +200,7 @@ async function uploadFiles(files) {
     if (totalOk > 0) {
         const note = document.createElement('div');
         note.style.cssText = 'margin-top:10px; font-size:13px; color:var(--text-muted);';
-        note.textContent = `✅ Nahráno ${totalOk} fotek. Stránka se za chvíli obnoví…`;
+        note.textContent = pt('uploaded', '✅ Nahráno fotek: {n}. Stránka se za chvíli obnoví…', { n: totalOk });
         progress.appendChild(note);
         setTimeout(() => location.reload(), 2500);
     }
@@ -233,7 +241,7 @@ function applyVisibleUI(btn, visible) {
     const card = btn.closest('.photo-card');
     btn.dataset.visible = visible ? '1' : '0';
     btn.textContent     = visible ? '👁' : '🙈';
-    btn.title           = visible ? 'Zobrazená na trase — kliknutím skrýt' : 'Skrytá — kliknutím zobrazit na trase';
+    btn.title           = visible ? pt('vis_shown', 'Zobrazená na trase — kliknutím skrýt') : pt('vis_hidden', 'Skrytá — kliknutím zobrazit na trase');
     btn.classList.toggle('btn-hidden', !visible);
     if (card) card.classList.toggle('photo-is-hidden', !visible);
 }
@@ -296,7 +304,7 @@ document.querySelectorAll('.btn-visible').forEach(btn => {
 document.querySelectorAll('.btn-delete').forEach(btn => {
     btn.addEventListener('click', async () => {
         const name = btn.dataset.name;
-        if (!confirm(`Smazat fotku "${name}"? Tuto akci nelze vrátit.`)) return;
+        if (!confirm(pt('confirm_delete_one', 'Smazat fotku „{name}“? Tuto akci nelze vrátit.', { name: name }))) return;
         const fd = new FormData();
         fd.append('photo_id', btn.dataset.id);
         const resp = await fetch('api/photos/delete.php', {
@@ -515,7 +523,7 @@ function getSelectedIds() {
 
 function updateBulkBar() {
     const ids = getSelectedIds();
-    bulkCountEl.textContent = ids.length + ' vybráno';
+    bulkCountEl.textContent = pt('selected', 'Vybráno: {n}', { n: ids.length });
     if (ids.length > 0) {
         bulkBar.classList.add('visible');
     } else {
@@ -592,7 +600,7 @@ if (bulkDeleteBtn) {
     bulkDeleteBtn.addEventListener('click', async () => {
         const ids = getSelectedIds();
         if (!ids.length) return;
-        if (!confirm(`Smazat ${ids.length} vybraných fotek? Tuto akci nelze vrátit.`)) return;
+        if (!confirm(pt('confirm_delete_many', 'Smazat vybrané fotky ({n})? Tuto akci nelze vrátit.', { n: ids.length }))) return;
 
         const fd = new FormData();
         ids.forEach(id => fd.append('photo_ids[]', id));
@@ -611,7 +619,7 @@ if (bulkDeleteBtn) {
                 clearBulkSelection();
             }
         } catch (err) {
-            alert('Chyba při mazání: ' + err.message);
+            alert(pt('delete_error', 'Chyba při mazání: {msg}', { msg: err.message }));
         }
     });
 }

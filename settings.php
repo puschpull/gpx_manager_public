@@ -321,12 +321,14 @@ require __DIR__ . '/includes/layout_header.php';
 document.querySelectorAll('input[name="units"]').forEach(radio => {
     radio.addEventListener('change', () => {
         const preview = document.getElementById('unitPreview');
+        // Translated label as text; the sample values below are fixed markup
+        preview.textContent = <?= js_safe_json(t('units_preview')) ?> + ' ';
         if (radio.value === 'imperial') {
-            preview.innerHTML = 'Příklad: <strong>10 km</strong> → <strong>6,2 mi</strong>, ' +
+            preview.insertAdjacentHTML('beforeend', '<strong>10 km</strong> → <strong>6,2 mi</strong>, ' +
                 '<strong>500 m</strong> → <strong>1 640 ft</strong>, ' +
-                '<strong>25 km/h</strong> → <strong>15,5 mph</strong>';
+                '<strong>25 km/h</strong> → <strong>15,5 mph</strong>');
         } else {
-            preview.innerHTML = 'Příklad: <strong>10 km</strong>, <strong>500 m</strong>, <strong>25 km/h</strong>';
+            preview.insertAdjacentHTML('beforeend', '<strong>10 km</strong>, <strong>500 m</strong>, <strong>25 km/h</strong>');
         }
     });
 });

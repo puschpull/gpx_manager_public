@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Rebuild náhledů</title>
+    <title><?= h(t('rt_title', 'Generování náhledů tras')) ?></title>
     <style>
         body { font-family: monospace; margin: 40px auto; max-width: 560px; background: #1e1e1e; color: #ccc; }
         .card { border: 1px solid #444; border-radius: 10px; padding: 20px 24px; }
@@ -35,16 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 </head>
 <body>
 <div class="card">
-    <h2>🖼️ Generování náhledů tras</h2>
-    <p>Projde všech <strong><?= $total ?></strong> tras po dávkách
-       (<?= $batchSize ?> tras/dávka) a vygeneruje <em>chybějící</em> náhledy.
-       Existující náhledy se přeskakují.</p>
+    <h2>🖼️ <?= h(t('rt_title', 'Generování náhledů tras')) ?></h2>
+    <p><?= t_html('rt_intro', 'Projde všech {total} tras po dávkách ({n} tras/dávka) a vygeneruje chybějící náhledy. Existující náhledy se přeskakují.', ['total' => '<strong>' . $total . '</strong>', 'n' => (string)$batchSize]) ?></p>
     <form method="post">
         <?= csrf_field() ?>
         <input type="hidden" name="offset" value="0">
-        <button type="submit">▶ Spustit generování</button>
+        <button type="submit">▶ <?= h(t('rt_start', 'Spustit generování')) ?></button>
     </form>
-    <p><a href="index.php">← Zpět na přehled</a></p>
+    <p><a href="index.php">← <?= h(t('maint_back_tracks', 'Zpět na přehled tras')) ?></a></p>
 </div>
 </body>
 </html><?php
@@ -54,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /* ===== POST: zpracování jedné dávky ===== */
 if (!csrf_verify()) {
     http_response_code(403);
-    die('Neplatný bezpečnostní token.');
+    die(h(t('maint_bad_token', 'Neplatný bezpečnostní token.')));
 }
 
 if (!is_dir($thumbDir)) @mkdir($thumbDir, 0755, true);
@@ -83,13 +81,13 @@ foreach ($rows as $row) {
     $thumbPath = $thumbDir . $thumbName;
 
     if (is_file($thumbPath)) {
-        $log[] = ['status' => 'skip', 'msg' => "⏭ [{$row['id']}] {$filename} – přeskočeno"];
+        $log[] = ['status' => 'skip', 'msg' => "⏭ [{$row['id']}] {$filename} – " . t('rt_log_skipped', 'přeskočeno')];
         $skipped++;
         continue;
     }
 
     if (!is_file($gpxPath)) {
-        $log[] = ['status' => 'fail', 'msg' => "✗ [{$row['id']}] {$filename} – GPX nenalezen"];
+        $log[] = ['status' => 'fail', 'msg' => "✗ [{$row['id']}] {$filename} – " . t('rt_log_no_gpx', 'GPX nenalezen')];
         $failed++;
         continue;
     }
@@ -99,7 +97,7 @@ foreach ($rows as $row) {
         $log[] = ['status' => 'ok', 'msg' => "✓ [{$row['id']}] {$filename}"];
         $ok++;
     } else {
-        $log[] = ['status' => 'fail', 'msg' => "✗ [{$row['id']}] {$filename} – selhalo"];
+        $log[] = ['status' => 'fail', 'msg' => "✗ [{$row['id']}] {$filename} – " . t('rt_log_failed', 'selhalo')];
         $failed++;
     }
 }
@@ -112,7 +110,7 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Rebuild náhledů</title>
+    <title><?= h(t('rt_title', 'Generování náhledů tras')) ?></title>
     <style>
         body { font-family: monospace; margin: 20px; background: #1e1e1e; color: #ccc; }
         .ok   { color: #4caf50; }
@@ -129,17 +127,17 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 </head>
 <body>
 
-<h2>🖼️ Generování náhledů tras</h2>
+<h2>🖼️ <?= h(t('rt_title', 'Generování náhledů tras')) ?></h2>
 
 <div class="progress-wrap">
     <div class="progress-bar" style="width:<?= $progress ?>%"><?= $progress ?>%</div>
 </div>
 
 <p>
-    Zpracováno: <strong><?= min($nextOffset, $total) ?></strong> / <strong><?= $total ?></strong> tras
-    &nbsp;|&nbsp; Dávka: <?= $offset + 1 ?>–<?= min($nextOffset, $total) ?>
+    <?= t_html('maint_processed_tracks', 'Zpracováno: {done} / {total} tras', ['done' => '<strong>' . min($nextOffset, $total) . '</strong>', 'total' => '<strong>' . $total . '</strong>']) ?>
+    &nbsp;|&nbsp; <?= h(t('rt_batch', 'Dávka:')) ?> <?= $offset + 1 ?>–<?= min($nextOffset, $total) ?>
     <?php if (!$done): ?>
-        &nbsp;|&nbsp; <em>Pokračuji za 2 sekundy…</em>
+        &nbsp;|&nbsp; <em><?= h(t('maint_continuing', 'Pokračuji za 2 sekundy…')) ?></em>
     <?php endif; ?>
 </p>
 
@@ -150,23 +148,23 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 </pre>
 
 <?php if ($done): ?>
-    <div class="done">✅ Hotovo! Všechny náhledy byly zpracovány.</div>
+    <div class="done">✅ <?= h(t('rt_done', 'Hotovo! Všechny náhledy byly zpracovány.')) ?></div>
     <div class="summary">
-        Celkem: <strong><?= $total ?></strong> tras<br>
-        <a href="index.php" style="color:#4da3ff;">← Zpět na přehled tras</a>
+        <?= t_html('rt_total', 'Celkem: {n} tras', ['n' => '<strong>' . $total . '</strong>']) ?><br>
+        <a href="index.php" style="color:#4da3ff;">← <?= h(t('maint_back_tracks', 'Zpět na přehled tras')) ?></a>
     </div>
 <?php else: ?>
     <form method="post" id="next-batch">
         <?= csrf_field() ?>
         <input type="hidden" name="offset" value="<?= $nextOffset ?>">
         <div class="summary">
-            <button type="submit" class="btn-next">▶ Pokračovat ručně pokud stránka nepokračuje sama</button>
+            <button type="submit" class="btn-next">▶ <?= h(t('maint_continue_manual', 'Pokračovat ručně, pokud stránka nepokračuje sama')) ?></button>
         </div>
     </form>
     <form method="post">
         <?= csrf_field() ?>
         <input type="hidden" name="offset" value="0">
-        <button type="submit" class="btn-restart">↺ Začít od začátku</button>
+        <button type="submit" class="btn-restart">↺ <?= h(t('maint_restart', 'Začít od začátku')) ?></button>
     </form>
     <script nonce="<?= csp_nonce() ?>">setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>
 <?php endif; ?>

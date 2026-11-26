@@ -24,7 +24,7 @@ if ($ajax !== '') {
         }
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo json_encode(['error' => 'Přístup odepřen']);
+            echo json_encode(['error' => t('flt_err_access', 'Přístup odepřen')]);
             exit;
         }
         $name = trim($_POST['name'] ?? '');
@@ -56,7 +56,7 @@ if ($ajax !== '') {
         }
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo json_encode(['error' => 'Přístup odepřen']);
+            echo json_encode(['error' => t('flt_err_access', 'Přístup odepřen')]);
             exit;
         }
         $id = (int)($_POST['id'] ?? 0);
@@ -76,7 +76,7 @@ if ($ajax !== '') {
         }
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo json_encode(['error' => 'Přístup odepřen']);
+            echo json_encode(['error' => t('flt_err_access', 'Přístup odepřen')]);
             exit;
         }
         $gpxContent = $_POST['gpx_content'] ?? '';
@@ -204,13 +204,13 @@ if ($ajax !== '') {
         }
         if (empty($_SESSION['is_admin'])) {
             http_response_code(403);
-            echo json_encode(['error' => 'Přístup odepřen']);
+            echo json_encode(['error' => t('flt_err_access', 'Přístup odepřen')]);
             exit;
         }
         $trackId = (int)($_POST['track_id'] ?? 0);
         if ($trackId <= 0) {
             http_response_code(400);
-            echo json_encode(['error' => 'Chybí track_id']);
+            echo json_encode(['error' => t('flt_err_no_track', 'Chybí track_id')]);
             exit;
         }
         $gpxContent = $_POST['gpx_content'] ?? '';
@@ -261,7 +261,7 @@ if ($ajax !== '') {
         if (file_put_contents($targetPath, $gpxContent) === false) {
             $restore();   // i napůl zapsaný soubor vrátit do původního stavu
             http_response_code(500);
-            echo json_encode(['error' => 'Zápis GPX selhal']);
+            echo json_encode(['error' => t('flt_err_write', 'Zápis GPX selhal')]);
             exit;
         }
 

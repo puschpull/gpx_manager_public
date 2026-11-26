@@ -98,20 +98,20 @@ $_isAdmin = !empty($_SESSION['is_admin']);
         <tr class="<?= $rangeActive && $inRange ? 'in-range-row' : '' ?>">
 
             <td class="col-compare"><input type="checkbox" class="compare-cb" value="<?= (int)$t['id'] ?>"></td>
-            <td class="col-id" data-label="ID"><?= (int)$t['id'] ?></td>
-            <td class="col-filename" data-label="Soubor"><?= h($t['filename']) ?></td>
-            <td class="col-track_name" data-label="Název trasy"><?= h($t['track_name']) ?></td>
-            <td class="col-alt_title" data-label="Alt název"><?= h($t['alt_title']) ?></td>
-            <td class="col-note" data-label="Poznámka"><?= h($t['note']) ?></td>
-            <td class="col-color" data-label="Barva"><?= h($t['color']) ?></td>
-            <td class="col-device" data-label="Zařízení"><?= h($t['device']) ?></td>
-            <td class="col-place_name" data-label="Místo"><?php if (!empty($t['place_name'])): ?>
+            <td class="col-id" data-label="<?= htmlspecialchars(t('th_id', 'ID')) ?>"><?= (int)$t['id'] ?></td>
+            <td class="col-filename" data-label="<?= htmlspecialchars(t('th_filename', 'Soubor')) ?>"><?= h($t['filename']) ?></td>
+            <td class="col-track_name" data-label="<?= htmlspecialchars(t('th_track_name', 'Název trasy')) ?>"><?= h($t['track_name']) ?></td>
+            <td class="col-alt_title" data-label="<?= htmlspecialchars(t('th_alt_title', 'Alt název')) ?>"><?= h($t['alt_title']) ?></td>
+            <td class="col-note" data-label="<?= htmlspecialchars(t('th_note', 'Poznámka')) ?>"><?= h($t['note']) ?></td>
+            <td class="col-color" data-label="<?= htmlspecialchars(t('th_color', 'Barva')) ?>"><?= h($t['color']) ?></td>
+            <td class="col-device" data-label="<?= htmlspecialchars(t('th_device', 'Zařízení')) ?>"><?= h($t['device']) ?></td>
+            <td class="col-place_name" data-label="<?= htmlspecialchars(t('th_place', 'Místo')) ?>"><?php if (!empty($t['place_name'])): ?>
                 <!-- Proklik = zkratka k filtru podle místa (jedno kliknutí místo rozbalení panelu) -->
                 <a href="index-legacy.php?place=<?= urlencode($t['place_name']) ?>&amp;filter_submit=1"
                    title="<?= htmlspecialchars(t('filter_place_link', 'Zobrazit všechny trasy odtud')) ?>"><?= h($t['place_name']) ?></a>
             <?php endif; ?></td>
 
-            <td class="col-radar" data-label="Radar"><?php
+            <td class="col-radar" data-label="<?= htmlspecialchars(t('th_radar', 'Radar')) ?>"><?php
                 $_rn = $radarCounts[(int)$t['id']] ?? 0;
                 if ($_rn > 0) {
                     echo '<span title="' . htmlspecialchars(t('radar_have', 'Stažené radarové snímky')) . '">🌧️ ' . $_rn . '</span>';
@@ -121,37 +121,37 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 }
             ?></td>
             <td class="col-date_start <?= $rangeActive && $inRange ? 'nowrap in-range' : 'nowrap' ?>"
-                data-label="Start"
+                data-label="<?= htmlspecialchars(t('th_date_start', 'Start')) ?>"
                 title="<?= h($t['date_start']) ?>">
                 <?= h($t['date_start']) ?>
             </td>
             <td class="col-date_end <?= $rangeActive && $inRange ? 'nowrap in-range' : 'nowrap' ?>"
-                data-label="Konec"
+                data-label="<?= htmlspecialchars(t('th_date_end', 'Konec')) ?>"
                 title="<?= h($t['date_end']) ?>">
                 <?= h($t['date_end']) ?>
             </td>
 
-            <td class="col-duration" data-label="Doba"><?= formatSecondsToHMS((int)$t['duration']) ?></td>
-            <td class="col-moving_time" data-label="Pohyb"><?= formatSecondsToHMS((int)$t['moving_time']) ?></td>
-            <td class="col-stopped_time" data-label="Stání"><?= formatSecondsToHMS((int)$t['stopped_time']) ?></td>
+            <td class="col-duration" data-label="<?= htmlspecialchars(t('th_duration', 'Doba')) ?>"><?= formatSecondsToHMS((int)$t['duration']) ?></td>
+            <td class="col-moving_time" data-label="<?= htmlspecialchars(t('th_moving_time', 'Pohyb')) ?>"><?= formatSecondsToHMS((int)$t['moving_time']) ?></td>
+            <td class="col-stopped_time" data-label="<?= htmlspecialchars(t('th_stopped_time', 'Stání')) ?>"><?= formatSecondsToHMS((int)$t['stopped_time']) ?></td>
 
-            <td class="col-distance_km" data-label="Vzdálenost"><?= fmtDist((float)$t['distance_km']) ?></td>
-            <td class="col-ascent" data-label="Stoupání"><?= fmtElev((float)$t['ascent']) ?></td>
-            <td class="col-descent" data-label="Klesání"><?= fmtElev((float)$t['descent']) ?></td>
+            <td class="col-distance_km" data-label="<?= htmlspecialchars(t('th_distance', 'Vzdálenost')) ?>"><?= fmtDist((float)$t['distance_km']) ?></td>
+            <td class="col-ascent" data-label="<?= htmlspecialchars(t('th_ascent', 'Stoupání')) ?>"><?= fmtElev((float)$t['ascent']) ?></td>
+            <td class="col-descent" data-label="<?= htmlspecialchars(t('th_descent', 'Klesání')) ?>"><?= fmtElev((float)$t['descent']) ?></td>
 
-            <td class="col-elevation_min" data-label="Min výška"><?= fmtElev((float)$t['elevation_min']) ?></td>
-            <td class="col-elevation_max" data-label="Max výška"><?= fmtElev((float)$t['elevation_max']) ?></td>
+            <td class="col-elevation_min" data-label="<?= htmlspecialchars(t('th_elev_min', 'Min výška')) ?>"><?= fmtElev((float)$t['elevation_min']) ?></td>
+            <td class="col-elevation_max" data-label="<?= htmlspecialchars(t('th_elev_max', 'Max výška')) ?>"><?= fmtElev((float)$t['elevation_max']) ?></td>
 
-            <td class="col-speed_max" data-label="Max rychl."><?= fmtSpeed((float)$t['speed_max']) ?></td>
-            <td class="col-speed_avg" data-label="Prům. rychl."><?= fmtSpeed((float)$t['speed_avg']) ?></td>
-            <td class="col-speed_avg_total" data-label="Prům. rychl. celk."><?= fmtSpeed((float)$t['speed_avg_total']) ?></td>
+            <td class="col-speed_max" data-label="<?= htmlspecialchars(t('th_speed_max', 'Max rychl.')) ?>"><?= fmtSpeed((float)$t['speed_max']) ?></td>
+            <td class="col-speed_avg" data-label="<?= htmlspecialchars(t('th_speed_avg', 'Prům. rychl.')) ?>"><?= fmtSpeed((float)$t['speed_avg']) ?></td>
+            <td class="col-speed_avg_total" data-label="<?= htmlspecialchars(t('th_speed_avg_total', 'Prům. rychl. celk.')) ?>"><?= fmtSpeed((float)$t['speed_avg_total']) ?></td>
 
-            <td class="col-avg_ascent_rate" data-label="avg↑ (m/s)"><?= h($t['avg_ascent_rate']) ?></td>
-            <td class="col-avg_descent_rate" data-label="avg↓ (m/s)"><?= h($t['avg_descent_rate']) ?></td>
-            <td class="col-max_ascent_rate" data-label="max↑ (m/s)"><?= h($t['max_ascent_rate']) ?></td>
-            <td class="col-max_descent_rate" data-label="max↓ (m/s)"><?= h($t['max_descent_rate']) ?></td>
+            <td class="col-avg_ascent_rate" data-label="<?= htmlspecialchars(t('th_avg_ascent_rate', 'avg↑ (m/s)')) ?>"><?= h($t['avg_ascent_rate']) ?></td>
+            <td class="col-avg_descent_rate" data-label="<?= htmlspecialchars(t('th_avg_descent_rate', 'avg↓ (m/s)')) ?>"><?= h($t['avg_descent_rate']) ?></td>
+            <td class="col-max_ascent_rate" data-label="<?= htmlspecialchars(t('th_max_ascent_rate', 'max↑ (m/s)')) ?>"><?= h($t['max_ascent_rate']) ?></td>
+            <td class="col-max_descent_rate" data-label="<?= htmlspecialchars(t('th_max_descent_rate', 'max↓ (m/s)')) ?>"><?= h($t['max_descent_rate']) ?></td>
 
-            <td class="col-bounds bounds-cell" data-label="Souřadnice" title="<?= h($t['bounds']) ?>">
+            <td class="col-bounds bounds-cell" data-label="<?= htmlspecialchars(t('th_bounds', 'Souřadnice')) ?>" title="<?= h($t['bounds']) ?>">
                 <?php
                 $boundsRaw = trim($t['bounds'] ?? '');
                 if ($boundsRaw === '' || strtolower($boundsRaw) === 'null') {
@@ -171,17 +171,17 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 ?>
             </td>
 
-            <td class="col-trackpoints_count" data-label="Počet bodů"><?= (int)$t['trackpoints_count'] ?></td>
+            <td class="col-trackpoints_count" data-label="<?= htmlspecialchars(t('th_trackpoints', 'Počet bodů')) ?>"><?= (int)$t['trackpoints_count'] ?></td>
 
-            <td class="col-difficulty" data-label="Obtížnost">
+            <td class="col-difficulty" data-label="<?= htmlspecialchars(t('th_difficulty', 'Obtížnost')) ?>">
                 <?= difficultyBadge($t['difficulty'] ?? null) ?>
             </td>
 
-            <td class="col-activity" data-label="Aktivita">
+            <td class="col-activity" data-label="<?= htmlspecialchars(t('th_activity', 'Aktivita')) ?>">
                 <?= activityBadge($t['activity_type'] ?? null) ?>
             </td>
 
-            <td class="col-thumb" data-label="Náhled">
+            <td class="col-thumb" data-label="<?= htmlspecialchars(t('th_thumb', 'Náhled')) ?>">
                 <?php if ($thumbExists): ?>
                     <a href="<?= h('detail.php?' . http_build_query(array_merge($_GET, ['id' => $t['id'], 'from' => 'legacy']))) ?>"
                        title="<?= t('title_show_track') ?> <?= (int)$t['id'] ?>">
@@ -195,22 +195,22 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 <?php endif; ?>
             </td>
 
-            <td class="col-categories" data-label="Kategorie">
+            <td class="col-categories" data-label="<?= htmlspecialchars(t('th_categories', 'Kategorie')) ?>">
                 <?= isset($catsByTrack[(int)$t['id']]) ? h(implode(', ', $catsByTrack[(int)$t['id']])) : '' ?>
             </td>
 
-            <td class="col-gpx" data-label="GPX" title="<?= h(gpx_url($t['filename'])) ?>">
+            <td class="col-gpx" data-label="<?= htmlspecialchars(t('th_gpx', 'GPX')) ?>" title="<?= h(gpx_url($t['filename'])) ?>">
                 <a href="<?= h(gpx_url($t['filename'])) ?>" target="_blank"><?= t('link_download') ?></a>
             </td>
 
-            <td class="col-map" data-label="Mapa">
+            <td class="col-map" data-label="<?= htmlspecialchars(t('th_map', 'Mapa')) ?>">
                 <a href="<?= h('detail.php?' . http_build_query(array_merge($_GET, ['id' => $t['id'], 'from' => 'legacy']))) ?>"
                    title="<?= t('title_show_track') ?> <?= (int)$t['id'] ?>">
                     <?= t('link_show') ?>
                 </a>
             </td>
 
-            <td class="col-photos" data-label="Fotky">
+            <td class="col-photos" data-label="<?= htmlspecialchars(t('th_photos', 'Fotky')) ?>">
                 <?php $pc = (int)($t['photo_count'] ?? 0); ?>
                 <?php if ($pc > 0): ?>
                     <a href="photos.php?track_id=<?= (int)$t['id'] ?>"
@@ -228,7 +228,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 <?php endif; ?>
             </td>
             <?php endif; ?>
-            <td class="col-favorite" data-label="Oblíbené">
+            <td class="col-favorite" data-label="<?= htmlspecialchars(t('th_favorite', 'Oblíbené')) ?>">
                 <?php if ($_isAdmin): ?>
                 <button class="fav-btn" data-id="<?= (int)$t['id'] ?>" title="<?= t('title_toggle_fav') ?>">
                     <?= !empty($t['is_favorite']) ? '⭐' : '☆' ?>
@@ -239,7 +239,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             </td>
 
             <?php if ($_isAdmin): ?>
-            <td class="col-action" data-label="Akce">
+            <td class="col-action" data-label="<?= htmlspecialchars(t('th_action', 'Akce')) ?>">
                 <a href="edit.php?id=<?= $t['id'] ?>&from=legacy&<?= h(http_build_query($_GET)) ?>"
                    title="<?= t('title_edit_track') ?> <?= (int)$t['id'] ?>">
                     <?= t('link_edit') ?>

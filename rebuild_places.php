@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Doplnění názvů míst</title>
+    <title><?= h(t('rp_title', 'Doplnění názvů míst')) ?></title>
     <style>
         body { font-family: monospace; margin: 40px auto; max-width: 620px; background: #1e1e1e; color: #ccc; }
         .card { border: 1px solid #444; border-radius: 10px; padding: 20px 24px; }
@@ -53,25 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 </head>
 <body>
 <div class="card">
-    <h2>📍 Doplnění názvů míst</h2>
-    <p>Tras celkem: <strong><?= $total ?></strong>, z toho bez zjištěného místa
-       <strong><?= $missing ?></strong>.</p>
-    <p>U každé se přečte start (a u přejezdové trasy i cíl) přímo z GPX
-       a přes Mapy.com se zjistí název místa. Zpracovává se po
-       <?= $batchSize ?> trasách; výsledek se vypisuje ke kontrole.</p>
+    <h2>📍 <?= h(t('rp_title', 'Doplnění názvů míst')) ?></h2>
+    <p><?= t_html('rp_intro_counts', 'Tras celkem: {total}, z toho bez zjištěného místa {missing}.', ['total' => '<strong>' . $total . '</strong>', 'missing' => '<strong>' . $missing . '</strong>']) ?></p>
+    <p><?= t_html('rp_intro_how', 'U každé se přečte start (a u přejezdové trasy i cíl) přímo z GPX a přes Mapy.com se zjistí název místa. Zpracovává se po {n} trasách; výsledek se vypisuje ke kontrole.', ['n' => (string)$batchSize]) ?></p>
     <?php if (!$hasKey): ?>
-        <p class="warn">⚠ Chybí MAPYCOM_API_KEY — bez klíče se nezjistí nic.</p>
+        <p class="warn">⚠ <?= h(t('rp_no_key', 'Chybí MAPYCOM_API_KEY — bez klíče se nezjistí nic.')) ?></p>
     <?php endif; ?>
     <form method="post">
         <?= csrf_field() ?>
         <input type="hidden" name="offset" value="0">
         <label>
             <input type="checkbox" name="refresh" value="1">
-            Přepočítat i trasy, které místo už mají (jinak se přeskakují)
+            <?= h(t('rp_refresh', 'Přepočítat i trasy, které místo už mají (jinak se přeskakují)')) ?>
         </label>
-        <button type="submit">▶ Spustit doplňování</button>
+        <button type="submit">▶ <?= h(t('rp_start', 'Spustit doplňování')) ?></button>
     </form>
-    <p><a href="admin.php">← Zpět do administrace</a></p>
+    <p><a href="admin.php">← <?= h(t('maint_back_admin', 'Zpět do administrace')) ?></a></p>
 </div>
 </body>
 </html><?php
@@ -81,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /* ===== POST: zpracování jedné dávky ===== */
 if (!csrf_verify()) {
     http_response_code(403);
-    die('Neplatný bezpečnostní token.');
+    die(h(t('maint_bad_token', 'Neplatný bezpečnostní token.')));
 }
 
 $offset  = max(0, (int)($_POST['offset'] ?? 0));
@@ -133,7 +130,7 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 <html lang="<?= htmlspecialchars(function_exists('app_lang') ? app_lang() : 'cs') ?>">
 <head>
     <meta charset="UTF-8">
-    <title>Doplnění názvů míst</title>
+    <title><?= h(t('rp_title', 'Doplnění názvů míst')) ?></title>
     <style>
         body { font-family: monospace; margin: 20px; background: #1e1e1e; color: #ccc; }
         table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -153,20 +150,20 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 </head>
 <body>
 
-<h2>📍 Doplnění názvů míst</h2>
+<h2>📍 <?= h(t('rp_title', 'Doplnění názvů míst')) ?></h2>
 
 <div class="progress-wrap">
     <div class="progress-bar" style="width:<?= $progress ?>%"><?= $progress ?>%</div>
 </div>
 
 <p>
-    Zpracováno: <strong><?= min($nextOffset, $total) ?></strong> / <strong><?= $total ?></strong> tras
-    &nbsp;|&nbsp; v této dávce: nalezeno <?= $found ?>, přeskočeno <?= $skipped ?>, bez výsledku <?= $failed ?>
-    <?php if (!$done): ?>&nbsp;|&nbsp; <em>Pokračuji za 2 sekundy…</em><?php endif; ?>
+    <?= t_html('maint_processed_tracks', 'Zpracováno: {done} / {total} tras', ['done' => '<strong>' . min($nextOffset, $total) . '</strong>', 'total' => '<strong>' . $total . '</strong>']) ?>
+    &nbsp;|&nbsp; <?= t_html('rp_batch_counts', 'v této dávce: nalezeno {found}, přeskočeno {skipped}, bez výsledku {failed}', ['found' => (string)$found, 'skipped' => (string)$skipped, 'failed' => (string)$failed]) ?>
+    <?php if (!$done): ?>&nbsp;|&nbsp; <em><?= h(t('maint_continuing', 'Pokračuji za 2 sekundy…')) ?></em><?php endif; ?>
 </p>
 
 <table>
-    <tr><th>trasa</th><th>místo</th><th>výsledný titulek</th></tr>
+    <tr><th><?= h(t('rp_col_track', 'trasa')) ?></th><th><?= h(t('rp_col_place', 'místo')) ?></th><th><?= h(t('rp_col_title', 'výsledný titulek')) ?></th></tr>
     <?php foreach ($log as $e): ?>
     <tr class="<?= $e['status'] ?>">
         <td><a href="detail.php?id=<?= $e['id'] ?>" target="_blank">#<?= $e['id'] ?></a></td>
@@ -177,12 +174,10 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
 </table>
 
 <?php if ($done): ?>
-    <div class="done">✅ Hotovo.</div>
+    <div class="done">✅ <?= h(t('maint_done', 'Hotovo.')) ?></div>
     <div class="summary">
-        Nepovedený název přepiš v editaci trasy v poli <strong>Místo</strong>.
-        Celý titulek jde přebít <strong>alternativním titulkem</strong>,
-        ten má přednost před vším.<br>
-        <a href="admin.php">← Zpět do administrace</a>
+        <?= h(t('rp_done_hint', 'Nepovedený název přepište v editaci trasy v poli Místo. Celý titulek jde přebít alternativním titulkem, ten má přednost před vším.')) ?><br>
+        <a href="admin.php">← <?= h(t('maint_back_admin', 'Zpět do administrace')) ?></a>
     </div>
 <?php else: ?>
     <form method="post" id="next-batch">
@@ -190,7 +185,7 @@ $progress   = $total > 0 ? min(100, (int)round($nextOffset / $total * 100)) : 10
         <input type="hidden" name="offset" value="<?= $nextOffset ?>">
         <?php if ($refresh): ?><input type="hidden" name="refresh" value="1"><?php endif; ?>
         <div class="summary">
-            <button type="submit" class="btn-next">▶ Pokračovat ručně, pokud stránka nepokračuje sama</button>
+            <button type="submit" class="btn-next">▶ <?= h(t('maint_continue_manual', 'Pokračovat ručně, pokud stránka nepokračuje sama')) ?></button>
         </div>
     </form>
     <script nonce="<?= csp_nonce() ?>">setTimeout(function () { document.getElementById('next-batch').submit(); }, 2000);</script>

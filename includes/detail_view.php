@@ -433,7 +433,7 @@ require __DIR__ . '/layout_header.php';
 
     <!-- QR box (toggle) -->
     <div id="qrBox" class="qr-box mt-3 p-4 rounded-xl bg-white dark:bg-forest-800 border border-sand-200 dark:border-forest-700 hidden flex-col items-center gap-2 max-w-sm">
-        <img src="<?= h($qrApiUrl) ?>" alt="QR kód" width="180" height="180" loading="lazy" class="rounded-md">
+        <img src="<?= h($qrApiUrl) ?>" alt="<?= h(t('qr_alt', 'QR kód')) ?>" width="180" height="180" loading="lazy" class="rounded-md">
         <p class="qr-url text-xs text-forest-700/70 dark:text-sand-100/70 break-all"><?= h($shareUrl) ?></p>
     </div>
 </section>

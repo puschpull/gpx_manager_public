@@ -30,6 +30,13 @@ const loadingEl      = document.getElementById('impLoading');
 const impStats       = document.getElementById('impStats');
 const selCountEl     = document.getElementById('selCount');
 const selHintEl      = document.getElementById('selHint');
+
+/* Texts from includes/photo_import_view.php (window.gpxPhotoImportI18n); {name} placeholders from `vars` */
+function pi(key, fallback, vars) {
+    let s = (window.gpxPhotoImportI18n && window.gpxPhotoImportI18n[key]) || fallback;
+    if (vars) for (const k in vars) s = s.split('{' + k + '}').join(String(vars[k]));
+    return s;
+}
 const btnImport      = document.getElementById('btnImport');
 const impResults     = document.getElementById('impResults');
 const progressWrap   = document.getElementById('barProgress');
@@ -50,7 +57,7 @@ function saveRecent(dir) {
 function renderRecent() {
     const dirs = loadRecent();
     if (!dirs.length) { recentEl.innerHTML = ''; return; }
-    recentEl.innerHTML = '<span style="color:var(--text-muted)">Naposledy:</span> ' +
+    recentEl.innerHTML = '<span style="color:var(--text-muted)">' + escHtml(pi('recent', 'Naposledy:')) + '</span> ' +
         dirs.map(d =>
             `<a class="imp-recent-chip" href="#" data-dir="${escHtml(d)}">${escHtml(d)}</a>`
         ).join('');
@@ -83,7 +90,7 @@ async function startScan() {
     btnScan.disabled = true;
     progressWrap.style.display = 'none';
     progressBar.style.width = '0%';
-    selHintEl.textContent = '— skenuju…';
+    selHintEl.textContent = '— ' + pi('scanning', 'skenuji…');
 
     try {
         const resp = await fetch('api/photo_import/scan.php?dir=' + encodeURIComponent(dir), {
@@ -100,7 +107,7 @@ async function startScan() {
 
         if (!data.files.length) {
             loadingEl.innerHTML =
-                `<div class="imp-loading">Zadny fotky (JPEG/PNG/WebP) nenalezeny v adresari.</div>`;
+                `<div class="imp-loading">${escHtml(pi('none_found', 'V adresáři nebyly nalezeny žádné fotky (JPEG/PNG/WebP).'))}</div>`;
             btnScan.disabled = false;
             return;
         }
@@ -123,14 +130,14 @@ async function startScan() {
         renderGallery();
         updateStats();
         btnScan.disabled = false;
-        selHintEl.textContent = '— nacitam EXIF…';
+        selHintEl.textContent = '— ' + pi('loading_exif', 'načítám EXIF…');
 
         // Load EXIF asynchronously in batches
         loadExifBatches();
 
     } catch(err) {
         loadingEl.innerHTML =
-            `<div class="imp-loading" style="color:#c62828;">Chyba: ${escHtml(String(err))}</div>`;
+            `<div class="imp-loading" style="color:#c62828;">${escHtml(pi('error', 'Chyba: {msg}', { msg: String(err) }))}</div>`;
         btnScan.disabled = false;
     }
 }
@@ -248,7 +255,7 @@ function refreshCardUI(idx) {
         if (gpsEl) {
             gpsEl.innerHTML = f.hasGps
                 ? '<span class="gps-yes">&#128994; GPS</span>'
-                : '<span class="gps-no">&#9898; bez GPS</span>';
+                : '<span class="gps-no">&#9898; ' + escHtml(pi('no_gps', 'bez GPS')) + '</span>';
         }
         if (f.takenAt) {
             const metaEl = card.querySelector('.imp-card-meta-' + idx);
@@ -323,16 +330,16 @@ function updateStats() {
     const dups    = allFiles.filter(f => f.isDup).length;
 
     impStats.innerHTML =
-        `Nalezeno: <strong>${total}</strong> &nbsp;&middot;&nbsp; ` +
-        `S GPS: <strong>${withGps}</strong> &nbsp;&middot;&nbsp; ` +
-        `Novych: <strong>${fresh}</strong> &nbsp;&middot;&nbsp; ` +
-        `Duplikatu: <strong>${dups}</strong>` +
+        `${escHtml(pi('stat_found', 'Nalezeno:'))} <strong>${total}</strong> &nbsp;&middot;&nbsp; ` +
+        `${escHtml(pi('stat_gps', 'S GPS:'))} <strong>${withGps}</strong> &nbsp;&middot;&nbsp; ` +
+        `${escHtml(pi('stat_new', 'Nových:'))} <strong>${fresh}</strong> &nbsp;&middot;&nbsp; ` +
+        `${escHtml(pi('stat_dups', 'Duplikátů:'))} <strong>${dups}</strong>` +
         (loaded < total ? ` &nbsp;&middot;&nbsp; <em>EXIF: ${loaded}/${total}</em>` : '');
 
     const n = selected.size;
-    selCountEl.textContent = `Vybrano: ${n}`;
+    selCountEl.textContent = pi('selected', 'Vybráno: {n}', { n: n });
     btnImport.disabled = n === 0;
-    btnImport.textContent = n > 0 ? `Importovat vybrane (${n})` : 'Importovat vybrane';
+    btnImport.textContent = n > 0 ? pi('import_n', 'Importovat vybrané ({n})', { n: n }) : pi('import', 'Importovat vybrané');
 }
 
 /* ── Filters ────────────────────────────────────────── */
@@ -382,7 +389,7 @@ async function startImport() {
 
     const resultHeader = document.createElement('h3');
     resultHeader.style.cssText = 'font-size:15px;margin:0 0 8px;';
-    resultHeader.textContent = 'Vysledky importu';
+    resultHeader.textContent = pi('results', 'Výsledky importu');
     impResults.appendChild(resultHeader);
 
     for (let i = 0; i < total; i += IMP_BATCH) {
@@ -415,19 +422,19 @@ async function startImport() {
 
         const pct = Math.round((done / total) * 100);
         progressBar.style.width = pct + '%';
-        progressText.textContent = `${done} / ${total} zpracovano…`;
+        progressText.textContent = pi('progress', 'zpracováno {done} / {total}…', { done: done, total: total });
     }
 
     progressText.textContent =
-        `Hotovo: ✅ importovano ${okCount}` +
-        (dupCount ? ` · ⏭ duplikatu ${dupCount}` : '') +
-        (errCount ? ` · ❌ chyb ${errCount}` : '');
+        pi('done_ok', 'Hotovo: ✅ importováno {n}', { n: okCount }) +
+        (dupCount ? ' · ' + pi('done_dups', '⏭ duplikátů {n}', { n: dupCount }) : '') +
+        (errCount ? ' · ' + pi('done_errors', '❌ chyb {n}', { n: errCount }) : '');
     progressBar.style.background = errCount > 0 ? '#e53935' : '#2e7d32';
 
     if (okCount > 0) {
         const link = document.createElement('p');
         link.style.cssText = 'margin:10px 0 16px;';
-        link.innerHTML = `<a href="photos.php" style="color:var(--accent-color);font-weight:600;font-size:14px;">→ Zobrazit ${okCount} novych fotek v galerii</a>`;
+        link.innerHTML = `<a href="photos.php" style="color:var(--accent-color);font-weight:600;font-size:14px;">${escHtml(pi('show_new', '→ Zobrazit nové fotky v galerii ({n})', { n: okCount }))}</a>`;
         impResults.insertBefore(link, resultHeader.nextSibling);
     }
 
@@ -447,17 +454,17 @@ function buildResultRow(r) {
 
     let badge = '', sub = '';
     if (r.ok) {
-        badge = '<span class="res-ok">✅ OK</span>';
-        sub   = r.track_name ? `Prirazeno: ${escHtml(r.track_name)}` : '(bez prirazene trasy)';
+        badge = '<span class="res-ok">' + escHtml(pi('res_ok', '✅ OK')) + '</span>';
+        sub   = escHtml(r.track_name ? pi('res_assigned', 'Přiřazeno: {name}', { name: r.track_name }) : pi('res_no_track', '(bez přiřazené trasy)'));
         if (r.orig_size && r.stored_size && r.orig_size > r.stored_size) {
             const pct = Math.round((1 - r.stored_size / r.orig_size) * 100);
-            sub += ` · zmenšeno o ${pct}%`;
+            sub += ' · ' + escHtml(pi('res_shrunk', 'zmenšeno o {pct} %', { pct: pct }));
         }
     } else if (r.duplicate) {
-        badge = '<span class="res-dup">⏭ Duplikat</span>';
-        sub   = r.track_name ? `Jiz prirazeno: ${escHtml(r.track_name)}` : 'Jiz v databazi';
+        badge = '<span class="res-dup">' + escHtml(pi('res_dup', '⏭ Duplikát')) + '</span>';
+        sub   = escHtml(r.track_name ? pi('res_dup_track', 'Již přiřazeno: {name}', { name: r.track_name }) : pi('res_dup_db', 'Již v databázi'));
     } else {
-        badge = '<span class="res-err">❌ Chyba</span>';
+        badge = '<span class="res-err">' + escHtml(pi('res_error', '❌ Chyba')) + '</span>';
         sub   = escHtml(r.msg || '');
     }
 
