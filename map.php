@@ -70,6 +70,7 @@ window.gpxMapPageData = {
         mapillary: <?= js_safe_json(MAPILLARY_TOKEN) ?>
     },
     showPhotos: <?= $showPhotos ? 'true' : 'false' ?>,
+    showVtracks: <?= $pageVisible('virtual_tracks') ? 'true' : 'false' ?>,
     showMarkers: <?= $showMarkers ? 'true' : 'false' ?>,
     isAdmin: <?= $_isAdmin ? 'true' : 'false' ?>,
     plannerVisible: <?= $pageVisible('planner') ? 'true' : 'false' ?>,
@@ -111,6 +112,7 @@ window.gpxMapPageData = {
         'pre_relief'  => t('mp_pre_relief', 'Turistická se stínováním reliéfu'),
         'pre_cad'     => t('mp_pre_cad', 'Katastr nad leteckou mapou'),
         'trackDetail' => t('mp_track_detail', 'Detail trasy'),
+        'vtDetail'    => t('mp_vt_detail', 'Detail virtuální trasy'),
         'photoOpen'   => t('mp_photo_open', 'Otevřít fotku'),
         'addMarker'   => t('mp_add_marker', 'Přidat značku'),
         'keys'        => [

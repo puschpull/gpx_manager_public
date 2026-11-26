@@ -56,6 +56,41 @@ function buildRangeSQL(string $col, ?string $min, ?string $max, bool $inv, array
  *   'where'  — SQL fragment suitable for appending after WHERE (empty string if no filters).
  *   'params' — Associative array of bound parameters for PDO execute / bindValue.
  */
+/**
+ * Splits a search query into terms: "quoted phrase" stays one term,
+ * a leading minus (-word) negates the term. At most 8 terms.
+ *
+ * @return list<array{0: string, 1: bool}>  [term, negate]
+ */
+function search_terms(string $q): array
+{
+    preg_match_all('/(-?)"([^"]+)"|(-?)(\S+)/u', $q, $m, PREG_SET_ORDER);
+    $out = [];
+    foreach ($m as $hit) {
+        if (isset($hit[4]) && $hit[4] !== '') {
+            $neg  = $hit[3] === '-';
+            $term = $hit[4];
+        } else {
+            $neg  = $hit[1] === '-';
+            $term = $hit[2];
+        }
+        $term = trim($term);
+        // A lone "-" or a negated term only makes sense with something to keep
+        if ($term === '' || $term === '-') {
+            continue;
+        }
+        $out[] = [$term, $neg];
+        if (count($out) >= 8) {
+            break;
+        }
+    }
+    // Only negative terms → treat them as positive (otherwise "-x" lists everything else)
+    if ($out && !array_filter($out, static fn($t) => !$t[1])) {
+        $out = array_map(static fn($t) => [$t[0], false], $out);
+    }
+    return $out;
+}
+
 function buildFilterSQL(?array $filters = null, string $prefix = ''): array
 {
     $filters = $filters ?? $_GET;
@@ -63,20 +98,39 @@ function buildFilterSQL(?array $filters = null, string $prefix = ''): array
     $clauses = [];
 
     // --- Full-text search ---
-    $q = trim($filters['q'] ?? '');
+    // Words are ANDed (order does not matter), each word may hit any field:
+    // name, title, place, note, file, device, category, photo caption or the
+    // published travelogue. "quoted phrase" = one term, -word = must not match.
+    // LIKE wildcards in user input are escaped (ESCAPE '!').
+    $q = trim((string)($filters['q'] ?? ''));
     if ($q !== '') {
-        $clauses[] = "({$prefix}track_name LIKE :q
-            OR {$prefix}alt_title LIKE :q
-            OR {$prefix}place_name LIKE :q
-            OR {$prefix}note LIKE :q
-            OR {$prefix}filename LIKE :q
-            OR {$prefix}device LIKE :q
-            OR EXISTS (
-                SELECT 1 FROM track_categories tc
-                JOIN categories c ON c.id = tc.category_id
-                WHERE tc.track_id = {$prefix}id AND c.name LIKE :q
-            ))";
-        $params[':q'] = "%$q%";
+        $hiddenPhotos = !empty($_SESSION['is_admin']) ? '' : ' AND (tp.visible IS NULL OR tp.visible = 1)';
+        foreach (search_terms($q) as $i => [$term, $negate]) {
+            $p = ":q$i";
+            $esc = " ESCAPE '!'";
+            $any = "({$prefix}track_name LIKE $p$esc
+                OR {$prefix}alt_title LIKE $p$esc
+                OR {$prefix}place_name LIKE $p$esc
+                OR {$prefix}note LIKE $p$esc
+                OR {$prefix}filename LIKE $p$esc
+                OR {$prefix}device LIKE $p$esc
+                OR EXISTS (
+                    SELECT 1 FROM track_categories tc
+                    JOIN categories c ON c.id = tc.category_id
+                    WHERE tc.track_id = {$prefix}id AND c.name LIKE $p$esc
+                )
+                OR EXISTS (
+                    SELECT 1 FROM track_photos tp
+                    WHERE tp.track_id = {$prefix}id AND tp.caption LIKE $p$esc$hiddenPhotos
+                )
+                OR EXISTS (
+                    SELECT 1 FROM track_stories ts
+                    WHERE ts.track_id = {$prefix}id AND ts.is_published = 1 AND ts.status = 'done'
+                      AND ts.story LIKE $p$esc
+                ))";
+            $clauses[] = $negate ? "NOT $any" : $any;
+            $params[$p] = '%' . strtr($term, ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
+        }
     }
 
     // --- Favourites ---

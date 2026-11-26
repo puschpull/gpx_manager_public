@@ -37,6 +37,9 @@ require __DIR__ . '/layout_header.php';
 <?php
 $_visiblePages = get_app_config('visible_pages', all_pages());
 $_isAdmin = !empty($_SESSION['is_admin']);
+// Kolekce pro hromadné akce (prázdné před migrací 0022 — helper chybu tabulky spolkne)
+require_once __DIR__ . '/collections_helper.php';
+$_bulkCollections = $_isAdmin ? collections_names($pdo) : [];
 ?>
 <!-- Topbar -->
 <div class="topbar">
@@ -65,8 +68,27 @@ $_isAdmin = !empty($_SESSION['is_admin']);
             <option value="set_category"><?= t('bulk_set_category') ?></option>
             <option value="remove_category"><?= t('bulk_remove_category') ?></option>
             <option value="set_color"><?= t('bulk_set_color') ?></option>
+            <?php if ($_isAdmin): ?>
+            <option value="add_collection"><?= h(t('col_bulk_add', 'Přidat do kolekce…')) ?></option>
+            <?php if ($_bulkCollections): ?><option value="remove_collection"><?= h(t('col_bulk_remove', 'Odebrat z kolekce…')) ?></option><?php endif; ?>
+            <?php endif; ?>
             <option value="delete"><?= t('bulk_delete') ?></option>
         </select>
+        <?php if ($_isAdmin): ?>
+        <!-- Kolekce: výběr cílové kolekce (nebo nové) a rozsah — ukazuje se jen u akcí s kolekcí -->
+        <select id="bulk-collection-select" class="select" style="display:none;" aria-label="<?= h(t('col_title', 'Kolekce tras')) ?>">
+            <option value="new"><?= h(t('col_bulk_new', '➕ Nová kolekce…')) ?></option>
+            <?php foreach ($_bulkCollections as $_bcId => $_bcName): ?>
+                <option value="<?= (int)$_bcId ?>"><?= h($_bcName) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <?php if ($filterActive && $total_rows > count($tracks)): ?>
+        <label id="bulk-all-filtered-wrap" style="display:none; font-size:12px; white-space:nowrap; align-items:center; gap:4px;">
+            <input type="checkbox" id="bulk-all-filtered">
+            <?= h(str_replace('{n}', (string)$total_rows, t('col_bulk_all_filtered', 'všech {n} vyfiltrovaných'))) ?>
+        </label>
+        <?php endif; ?>
+        <?php endif; ?>
         <button class="btn btn-bulk" id="bulk-run-btn"><?= t('btn_bulk_run') ?></button>
     </span>
     <?php if ($_isAdmin || in_array('filter', $_visiblePages)): ?><a class="btn" href="filter.php"><?= t('btn_gpx_cleaner') ?></a><?php endif; ?>
@@ -219,7 +241,7 @@ $_isAdmin = !empty($_SESSION['is_admin']);
                 <!-- Hledání -->
                 <div>
                     <label><?= t('filter_search') ?></label>
-                    <input type="text" name="q" value="<?= h($q) ?>" placeholder="<?= t('placeholder_search') ?>">
+                    <input type="text" name="q" value="<?= h($q) ?>" placeholder="<?= t('placeholder_search') ?>" title="<?= h(t('search_syntax_hint')) ?>">
                 </div>
 
                 <!-- Místo -->
@@ -626,6 +648,21 @@ function updateSelectionUI() {
 // Obsluhy tlačítek — dřív onclick="…" v HTML, ten se s CSP nonce nespouští
 document.getElementById('compare-btn')?.addEventListener('click', openCompare);
 document.getElementById('bulk-run-btn')?.addEventListener('click', runBulkAction);
+// Výběr kolekce a „všech vyfiltrovaných" jen u akcí s kolekcí
+document.getElementById('bulk-action-select')?.addEventListener('change', e => {
+    const isColl = e.target.value === 'add_collection' || e.target.value === 'remove_collection';
+    const sel  = document.getElementById('bulk-collection-select');
+    const wrap = document.getElementById('bulk-all-filtered-wrap');
+    if (sel) {
+        sel.style.display = isColl ? '' : 'none';
+        const nw = sel.querySelector('option[value="new"]');
+        if (nw) {
+            nw.disabled = e.target.value === 'remove_collection';
+            if (nw.disabled && sel.value === 'new' && sel.options.length > 1) sel.selectedIndex = 1;
+        }
+    }
+    if (wrap) wrap.style.display = isColl ? 'inline-flex' : 'none';
+});
 
 function openCompare() {
     const ids = getSelectedIds();
@@ -647,6 +684,19 @@ function runBulkAction() {
         value = value.trim();
     }
 
+    const isColl = action === 'add_collection' || action === 'remove_collection';
+    let newCollection = '';
+    if (isColl) {
+        value = document.getElementById('bulk-collection-select')?.value || '';
+        if (value === 'new') {
+            if (action !== 'add_collection') return;
+            newCollection = prompt(<?= js_safe_json(t('col_bulk_prompt_name', 'Název nové kolekce:')) ?>);
+            if (newCollection === null || newCollection.trim() === '') return;
+            newCollection = newCollection.trim();
+        }
+    }
+    const allFiltered = isColl && !!document.getElementById('bulk-all-filtered')?.checked;
+
     if (action === 'set_color') {
         value = prompt(<?= js_safe_json(t('prompt_color')) ?>);
         if (value === null || value.trim() === '') return;
@@ -662,6 +712,13 @@ function runBulkAction() {
     body.append('value', value);
     body.append('_csrf_token', csrfToken);
     ids.forEach(id => body.append('ids[]', id));
+    if (isColl) {
+        body.append('new_collection', newCollection);
+        if (allFiltered) {
+            body.append('all_filtered', '1');
+            body.append('filter_query', location.search.replace(/^\?/, ''));
+        }
+    }
 
     fetch('api_bulk_action.php', {
         method: 'POST',
@@ -670,7 +727,15 @@ function runBulkAction() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
+            // Po přidání do kolekce nabídnout rovnou přechod na ni
+            if (data.action === 'add_collection' && data.collection_id) {
+                if (confirm(data.message + '\n\n' + <?= js_safe_json(t('col_bulk_open', 'Otevřít kolekci?')) ?>)) {
+                    location.href = 'collection.php?id=' + encodeURIComponent(data.collection_id);
+                    return;
+                }
+            } else {
+                alert(data.message);
+            }
             location.reload();
         } else {
             alert(<?= js_safe_json(t('msg_error')) ?> + (data.error || <?= js_safe_json(t('msg_unknown_error')) ?>));

@@ -22,6 +22,9 @@ $_nav = nav_menu_items();
 $_navLabel = static fn(string $k, string $fallback): string => isset($_nav[$k]) ? (string)$_nav[$k][2] : $fallback;
 $_pages = [
     'stats'          => ['bar-chart-2', $_navLabel('stats', 'Statistiky'), ''],
+    'year'           => ['calendar-range', t('yr_page', 'Roční souhrn'), ''],
+    'explore'        => ['grid-3x3',    $_navLabel('explore', 'Čtverce'), ''],
+    'collections'    => ['library',     $_navLabel('collections', 'Kolekce'), t('adm2_hint_collections', 'jen veřejné kolekce')],
     'calendar'       => ['calendar',    $_navLabel('calendar', 'Kalendář'), ''],
     'heatmap'        => ['flame',       $_navLabel('heatmap', 'Heatmapa'), ''],
     'photo_heatmap'  => ['camera',      $_navLabel('photo_heatmap', 'Foto-heatmapa'), ''],

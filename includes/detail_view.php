@@ -148,6 +148,7 @@ require __DIR__ . '/layout_header.php';
                     </span>
                 <?php endif; ?>
             </div>
+            <?php require __DIR__ . '/partials/track_collections.php'; ?>
         </div>
 
         <!-- Weather widget (uprostřed, skrytý dokud JS nenačte data) -->

@@ -89,6 +89,7 @@ function gpx_chip_url($overrides = []) {
                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-forest-700/50 dark:text-sand-100/50"></i>
                         <input type="search" name="q" value="<?= htmlspecialchars($activeQ) ?>"
                                placeholder="<?= htmlspecialchars(t('search_placeholder')) ?>"
+                               title="<?= htmlspecialchars(t('search_syntax_hint')) ?>"
                                class="w-full pl-9 pr-3 py-2.5 rounded-md bg-white dark:bg-forest-800 border border-sand-200 dark:border-forest-700 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/30 transition">
                     </div>
                     <button type="submit" class="btn-outdoor btn-outdoor-primary">

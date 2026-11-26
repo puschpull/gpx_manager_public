@@ -22,7 +22,7 @@ function all_langs(): array {
  * Toto je jediné místo, kde se tento seznam definuje.
  */
 function all_pages(): array {
-    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'map', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks', 'links'];
+    return ['stats', 'calendar', 'heatmap', 'photo_heatmap', 'map_search', 'map', 'nearby', 'photo_nearby', 'filter', 'compare', 'settings', 'virtual_tracks', 'links', 'year', 'explore', 'collections'];
 }
 
 /**
@@ -37,6 +37,8 @@ function nav_menu_items(): array {
         'calendar'       => ['calendar.php',       'calendar',    t('nav_calendar',       'Kalendář'),        null],
         'nearby'         => ['nearby.php',         'map-pin',     t('h1_nearby',          'Trasy v okolí'),   null],
         'heatmap'        => ['heatmap.php',        'flame',       t('nav_heatmap',        'Heatmapa'),        null],
+        'explore'        => ['explore.php',        'grid-3x3',    t('nav_explore',        'Čtverce'),         'explore'],
+        'collections'    => ['collections.php',    'library',     t('nav_collections',    'Kolekce'),         'collections'],
         'map'            => ['map.php',            'map',         t('nav_map',            'Mapa'),            'map'],
         'virtual_tracks' => ['virtual_tracks.php', 'route',       t('nav_virtual_tracks', 'Virtuální trasy'), 'virtual_tracks'],
         'photos'         => ['photos.php',         'image',       t('nav_photos',         'Fotografie'),      null],
@@ -157,6 +159,7 @@ function map_context_layers(): array {
         $n['my_tracks'] => t('mlayer_ctx_tracks',    'stránka Mapa — vlastní trasy ve výřezu'),
         $n['my_markers']=> t('mlayer_ctx_markers',   'stránka Mapa — značky s poznámkou'),
         $n['my_photos'] => t('mlayer_ctx_photos',    'detail trasy — vlastní fotky'),
+        $n['my_vtracks']=> t('mlayer_ctx_vtracks',   'stránka Mapa — virtuální trasy z fotek ve výřezu'),
         $n['photo_pos'] => t('mlayer_ctx_photopos',  'detail trasy — body fotek podél trasy'),
         $n['wikimedia'] => t('mlayer_ctx_wikimedia', 'detail trasy'),
         $n['mapillary'] => t('mlayer_ctx_mapillary', 'jen s klíčem MAPILLARY_TOKEN'),
@@ -175,6 +178,7 @@ function map_context_layer_names(): array {
         'my_tracks' => t('mlayer_name_my_tracks', '🥾 Moje trasy'),
         'my_markers'=> t('mlayer_name_my_markers', '📍 Moje značky'),
         'my_photos' => t('mlayer_name_my_photos', '📸 Moje fotografie'),
+        'my_vtracks'=> t('mlayer_name_my_vtracks', '🧭 Virtuální trasy'),
         'photo_pos' => t('mlayer_name_photo_pos', '📍 Polohy fotek na trase'),
         'wikimedia' => t('mlayer_name_wikimedia', '🖼️ Fotografie (Wikimedia)'),
         'mapillary' => t('mlayer_name_mapillary', '📷 Fotografie (Mapillary)'),

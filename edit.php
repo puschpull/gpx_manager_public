@@ -28,6 +28,19 @@ $currentCats = $catStmt->fetchAll(PDO::FETCH_COLUMN);
 
 $allCats = $pdo->query("SELECT name FROM categories ORDER BY name")->fetchAll(PDO::FETCH_COLUMN);
 
+/* ===== Kolekce (migrace 0022; bez tabulek se blok nezobrazí ani neukládá) ===== */
+require_once __DIR__ . '/includes/collections_helper.php';
+$collTablesOk = true;
+try {
+    $pdo->query("SELECT 1 FROM collection_tracks LIMIT 1");
+} catch (Throwable $e) {
+    $collTablesOk = false;
+}
+$loadTrackColls = static function () use ($pdo, $id, $collTablesOk): array {
+    return $collTablesOk ? array_column(collections_of_track($pdo, $id, true), 'id') : [];
+};
+$currentColls = $loadTrackColls();
+
 /* ===== Pomocné funkce pro datetime ===== */
 function dt_to_local_value($dt) {
     if (empty($dt) || $dt === '0000-00-00 00:00:00') return '';
@@ -257,8 +270,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Kolekce: zaškrtnuté = členství, prázdné = odebrat; nová kolekce se založí neveřejná
+        if ($collTablesOk && isset($_POST['collections_form'])) {
+            $wantColls = array_values(array_unique(array_filter(array_map('intval', (array)($_POST['collections'] ?? [])), static fn($v) => $v > 0)));
+            $newColl   = trim((string)($_POST['new_collection'] ?? ''));
+            if ($newColl !== '') {
+                $pdo->prepare("INSERT INTO collections (name, is_public) VALUES (?, 0)")->execute([mb_substr($newColl, 0, 160)]);
+                $wantColls[] = (int)$pdo->lastInsertId();
+            }
+            foreach (array_diff($currentColls, $wantColls) as $cid) {
+                $pdo->prepare("DELETE FROM collection_tracks WHERE collection_id = ? AND track_id = ?")->execute([$cid, $id]);
+            }
+            $insCT = $pdo->prepare("INSERT IGNORE INTO collection_tracks (collection_id, track_id, position)
+                                    SELECT c.id, ?, COALESCE((SELECT MAX(position) FROM collection_tracks WHERE collection_id = c.id), 0) + 1
+                                    FROM collections c WHERE c.id = ?");
+            foreach (array_diff($wantColls, $currentColls) as $cid) {
+                $insCT->execute([$id, $cid]);
+            }
+        }
+
         $pdo->commit();
         $flash = t('flash_saved');
+        $currentColls = $loadTrackColls();
 
         $stmt->execute([$id]);
         $track = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -530,6 +563,25 @@ require __DIR__ . '/includes/layout_header.php';
                 <?php endif; ?>
             </div>
         </div>
+
+        <?php if ($collTablesOk): $allColls = collections_names($pdo); ?>
+        <div class="row">
+            <div class="col">
+                <input type="hidden" name="collections_form" value="1">
+                <label><?= h(t('nav_collections', 'Kolekce')) ?></label>
+                <div style="display:flex; flex-wrap:wrap; gap:6px 16px; margin:4px 0 8px;">
+                    <?php foreach ($allColls as $_cid => $_cname): ?>
+                        <label style="display:inline-flex; align-items:center; gap:6px; font-weight:normal;">
+                            <input type="checkbox" name="collections[]" value="<?= (int)$_cid ?>"<?= in_array($_cid, $currentColls, true) ? ' checked' : '' ?>>
+                            <?= h($_cname) ?>
+                        </label>
+                    <?php endforeach; ?>
+                    <?php if (!$allColls): ?><span class="hint"><?= h(t('col_empty', 'Zatím tu není žádná kolekce.')) ?></span><?php endif; ?>
+                </div>
+                <input type="text" name="new_collection" maxlength="160" placeholder="<?= h(t('col_new_placeholder', 'Nová kolekce — napište název a trasa se do ní přidá')) ?>">
+            </div>
+        </div>
+        <?php endif; ?>
 
         <div class="row">
             <div class="col">
