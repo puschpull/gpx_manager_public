@@ -32,6 +32,13 @@ window.GpxMapFactory = (function () {
         radar: "🌧️ Aktuální srážky (ČHMÚ)"
     };
 
+    /** Text z cizího zdroje (OSM) do bublinky jako text, ne HTML. */
+    function textSpan(s) {
+        var n = document.createElement("span");
+        n.textContent = s;
+        return n;
+    }
+
     /** Přeložený název vrstvy podle klíče (viz map_layer_defs / map_context_layer_names). */
     function layerName(key) {
         var labels = (window.gpxMapLayers && window.gpxMapLayers.labels) || {};
@@ -558,7 +565,7 @@ window.GpxMapFactory = (function () {
                         + (p.ele !== null && p.ele !== undefined ? " (" + p.ele + " m)" : "");
                     group.addLayer(
                         L.marker([p.lat, p.lon], { icon: icon, keyboard: false })
-                            .bindTooltip(label, { direction: "top", offset: [0, -10] })
+                            .bindTooltip(textSpan(label), { direction: "top", offset: [0, -10] })
                     );
                 });
             } catch (err) {

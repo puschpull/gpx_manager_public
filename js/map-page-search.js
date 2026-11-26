@@ -139,7 +139,10 @@
             marker = L.circleMarker([lat, lng], {
                 radius: 8, color: "#fff", weight: 3, fillColor: "#d1342f", fillOpacity: 1
             }).addTo(map);
-            marker.bindTooltip(name, { direction: "top", offset: [0, -8] });
+            // Název z Mapy.com nebo z hledaného textu — jako text, ne HTML (N1)
+            var tip = document.createElement("span");
+            tip.textContent = name;
+            marker.bindTooltip(tip, { direction: "top", offset: [0, -8] });
             if (bbox && bbox.length === 4 && (bbox[2] - bbox[0] > 1e-4 || bbox[3] - bbox[1] > 1e-4)) {
                 map.fitBounds([[bbox[1], bbox[0]], [bbox[3], bbox[2]]], { maxZoom: 17, padding: [20, 20] });
             } else {

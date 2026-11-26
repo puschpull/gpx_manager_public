@@ -27,6 +27,15 @@ function uploads_fs(string $relative = ''): string {
     }
     if ($relative === '') return $base;
 
+    // Reject ".." segments and NUL bytes outright. The realpath() check below
+    // only works when the parent directory exists: "missing/../../config.php"
+    // has an unresolvable parent, so it used to pass and point outside uploads/
+    // (security check 21 Nov 2026, S1). No legitimate caller needs "..".
+    if (strpos($relative, "\0") !== false
+        || in_array('..', preg_split('#[/\\\\]+#', $relative) ?: [], true)) {
+        throw new RuntimeException("Path traversal blocked: $relative");
+    }
+
     // Strip any leading slashes/backslashes from the caller-supplied segment.
     $clean     = ltrim($relative, "/\\");
     $candidate = $base . $clean;
