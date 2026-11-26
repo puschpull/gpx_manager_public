@@ -1546,4 +1546,9 @@ return [
     'mf_poi_loading'               => 'Chargement des points de randonnée…',
     'mf_poi_down'                  => 'Points de randonnée indisponibles pour le moment — le service OpenStreetMap (Overpass) ne répond pas. Nouvel essai au déplacement de la carte.',
     'mf_poi_stale'                 => 'Les points de randonnée proviennent d\'une ancienne copie enregistrée — le service OpenStreetMap ne répond pas.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Public',
+    'planner_public_title'         => 'Un plan coché est visible aussi par les visiteurs. Mieux vaut garder privés les plans futurs — la date révèle quand vous êtes absent.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Se souvenir de moi sur cet appareil ({n} jours)',
 ];

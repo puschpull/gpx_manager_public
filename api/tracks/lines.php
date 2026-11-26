@@ -25,6 +25,11 @@ require_once __DIR__ . '/../../includes/track_lines.php';   // track_lines_cache
 const TRACK_LINES_MAX = 150;
 
 ajax_endpoint(function () use ($pdo): array {
+    // Vypnutá stránka nevydává data ani přes API (N3)
+    if (!api_pages_visible('map')) {
+        http_response_code(403);
+        return ['ok' => false, 'error' => 'Forbidden'];
+    }
     $num = static function (string $k, float $lim): ?float {
         $v = $_GET[$k] ?? null;
         if (!is_string($v) || !is_numeric($v)) {

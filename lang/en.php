@@ -1552,4 +1552,9 @@ return [
     'mf_poi_loading'               => 'Loading hiking points…',
     'mf_poi_down'                  => 'Hiking points are not available right now — the OpenStreetMap service (Overpass) is not responding. I will retry when the map moves.',
     'mf_poi_stale'                 => 'Hiking points come from an older saved copy — the OpenStreetMap service is not responding.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Public',
+    'planner_public_title'         => 'A ticked plan is visible to site visitors too. Better keep future plans private — the date tells when you are away from home.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Remember me on this device ({n} days)',
 ];

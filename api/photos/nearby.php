@@ -16,6 +16,11 @@ require_once __DIR__ . '/../../includes/ajax.php';
 require_once __DIR__ . '/../../includes/gpx_parser.php'; // haversine()
 
 ajax_endpoint(function () use ($pdo): array {
+    // Vypnutá stránka nevydává data ani přes API (N3)
+    if (!api_pages_visible('photo_nearby')) {
+        http_response_code(403);
+        return ['ok' => false, 'error' => 'Forbidden'];
+    }
     $lat = (float)($_GET['lat'] ?? 0);
     $lon = (float)($_GET['lon'] ?? 0);
     if ($lat == 0.0 && $lon == 0.0) {

@@ -1552,4 +1552,9 @@ return [
     'mf_poi_loading'               => 'Načítám turistické body…',
     'mf_poi_down'                  => 'Turistické body teď nejsou dostupné — služba OpenStreetMap (Overpass) neodpovídá. Zkusím to znovu při posunu mapy.',
     'mf_poi_stale'                 => 'Turistické body jsou ze starší uložené kopie — služba OpenStreetMap teď neodpovídá.',
+    // ===== Planovac: verejny plan =====
+    'planner_public'               => 'Veřejný',
+    'planner_public_title'         => 'Zaškrtnutý plán uvidí i návštěvníci webu. Budoucí plány raději nechej neveřejné — z data se dá vyčíst, kdy nejsi doma.',
+    // ===== Prihlaseni: zapamatovat =====
+    'login_remember'               => 'Zapamatovat na tomto zařízení ({n} dní)',
 ];

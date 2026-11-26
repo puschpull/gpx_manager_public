@@ -3,6 +3,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/remember_login.php';
 
 start_secure_session();
 send_security_headers();
@@ -20,6 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) {
         http_response_code(403);
         die('CSRF verification failed.');
     }
+    // Odhlášení zruší i „zapamatovat“ na všech zařízeních (ztracený telefon)
+    remember_revoke_all();
+    remember_cookie_clear();
     $_SESSION = [];
     if (ini_get('session.use_cookies')) {
         $p = session_get_cookie_params();
@@ -68,6 +72,9 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
             session_regenerate_id(true);
             $_SESSION['is_admin']  = true;
             $_SESSION['admin_via'] = 'login';
+            if (($_POST['remember'] ?? '') === '1') {
+                remember_cookie_set();
+            }
             // Clean up failed attempts for this IP to reset the lockout counter
             $pdo->prepare("DELETE FROM login_attempts WHERE ip = ? AND success = 0")
                 ->execute([$ip]);
@@ -139,6 +146,11 @@ if ($failedCount >= LOGIN_MAX_ATTEMPTS) {
                        autocomplete="current-password"
                        class="w-full px-3 py-2.5 rounded-md bg-white dark:bg-forest-700 border border-sand-200 dark:border-forest-600 focus:border-forest-500 focus:outline-none focus:ring-2 focus:ring-forest-500/30 transition">
             </div>
+
+            <label for="login-remember" class="flex items-center gap-2 mb-4 text-sm text-forest-700/80 dark:text-sand-100/80">
+                <input type="checkbox" id="login-remember" name="remember" value="1" checked>
+                <?= htmlspecialchars(str_replace('{n}', (string) REMEMBER_DAYS, t('login_remember', 'Zapamatovat na tomto zařízení ({n} dní)'))) ?>
+            </label>
 
             <button type="submit" class="btn-outdoor btn-outdoor-primary w-full justify-center py-2.5">
                 <i data-lucide="log-in" class="w-4 h-4" aria-hidden="true"></i>

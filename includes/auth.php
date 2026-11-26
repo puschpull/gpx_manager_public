@@ -13,6 +13,13 @@ start_secure_session();
 send_security_headers();
 
 require_once __DIR__ . '/admin_ips.php';
+require_once __DIR__ . '/db.php';              // $pdo — klíč pro „zapamatovat“ je v app_config
+require_once __DIR__ . '/remember_login.php';
+
+// Produkce: admin jen přes přihlášení heslem (S2) — dřívější session podle IP
+// přestává platit; zapamatované zařízení (cookie gpx_remember) se přihlásí samo.
+drop_ip_admin_session();
+remember_try_login();
 
 // ====== Admin podle IP ======
 // Seznam z .env (ADMIN_IPS); localhost jen na vývojovém PC — viz admin_ips.php

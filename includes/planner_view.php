@@ -86,6 +86,11 @@ require __DIR__ . '/layout_header.php';
         <input type="date" id="planDate">
     </label>
     <?php if ($_plannerIsAdmin): ?>
+    <!-- Veřejný plán vidí i návštěvník (migrace 0024); výchozí neveřejný — z budoucích
+         plánů s datem se dá vyčíst, kdy nejsi doma -->
+    <label for="planPublic" style="white-space:nowrap;" title="<?= htmlspecialchars(t('planner_public_title', 'Zaškrtnutý plán uvidí i návštěvníci webu. Budoucí plány raději nechej neveřejné — z data se dá vyčíst, kdy nejsi doma.')) ?>">
+        <input type="checkbox" id="planPublic"> 👁 <?= htmlspecialchars(t('planner_public', 'Veřejný')) ?>
+    </label>
     <button type="button" id="planSave" class="plan-btn" disabled>💾 <?= htmlspecialchars(t('planner_save', 'Uložit plán')) ?></button>
     <?php endif; ?>
     <label for="planList">📂 <?= htmlspecialchars(t('planner_my_plans', 'Moje plány')) ?>:

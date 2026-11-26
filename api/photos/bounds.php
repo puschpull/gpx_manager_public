@@ -13,6 +13,11 @@ require_once __DIR__ . '/../../includes/ajax.php';
 require_once __DIR__ . '/../../includes/photo_helper.php';
 
 ajax_endpoint(function () use ($pdo): array {
+    // Vypnutá stránka nevydává data ani přes API (N3)
+    if (!api_pages_visible('map', 'photos')) {
+        http_response_code(403);
+        return ['ok' => false, 'error' => 'Forbidden'];
+    }
     $minLat = (float)($_GET['minlat'] ?? 0);
     $maxLat = (float)($_GET['maxlat'] ?? 0);
     $minLon = (float)($_GET['minlon'] ?? 0);

@@ -64,9 +64,9 @@ ajax_endpoint(function () use ($pdo): array {
 
         $ins = $pdo->prepare('INSERT INTO planned_routes
             (name, profile, plan_date, waypoints, geometry,
-             length_m, duration_s, ascent, descent, note)
+             length_m, duration_s, ascent, descent, note, is_public)
             VALUES (:name, :profile, :plan_date, :waypoints, :geometry,
-                    :length_m, :duration_s, :ascent, :descent, :note)');
+                    :length_m, :duration_s, :ascent, :descent, :note, :is_public)');
 
         foreach ($plans as $p) {
             if (!is_array($p)) { $skipped++; continue; }
@@ -118,6 +118,8 @@ ajax_endpoint(function () use ($pdo): array {
                 ':ascent'     => $intOrNull($p['ascent']     ?? null),
                 ':descent'    => $intOrNull($p['descent']    ?? null),
                 ':note'       => trim((string)($p['note'] ?? '')) ?: null,
+                // starší export příznak nemá → neveřejný (bezpečnější výchozí stav)
+                ':is_public'  => !empty($p['is_public']) ? 1 : 0,
             ]);
             $imported++;
         }

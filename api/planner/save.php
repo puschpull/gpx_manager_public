@@ -4,7 +4,8 @@ declare(strict_types=1);
 /**
  * api/planner/save.php — uložení / aktualizace plánu z Plánovače
  * POST id? (0 = nový), name, profile, plan_date?, waypoints (JSON),
- *      geometry? (JSON), length_m?, duration_s?, ascent?, descent?, note?
+ *      geometry? (JSON), length_m?, duration_s?, ascent?, descent?, note?,
+ *      is_public (1 = vidí i návštěvník; chybí = 0)
  * csrf: yes | admin: yes
  */
 
@@ -81,30 +82,35 @@ ajax_endpoint(function () use ($pdo): array {
         ':ascent'     => $intOrNull($_POST['ascent']     ?? null),
         ':descent'    => $intOrNull($_POST['descent']    ?? null),
         ':note'       => trim((string)($_POST['note'] ?? '')) ?: null,
+        ':is_public'  => ($_POST['is_public'] ?? '0') === '1' ? 1 : 0,
     ];
 
     $id = (int)($_POST['id'] ?? 0);
+    // Existenci ověřit dotazem: rowCount() po UPDATE je 0 i tehdy, když se
+    // nic nezměnilo — dřív tak uložení beze změny založilo kopii plánu.
+    if ($id > 0) {
+        $ex = $pdo->prepare('SELECT COUNT(*) FROM planned_routes WHERE id = ?');
+        $ex->execute([$id]);
+        if ((int)$ex->fetchColumn() === 0) {
+            $id = 0;
+        }
+    }
     if ($id > 0) {
         $params[':id'] = $id;
         $stmt = $pdo->prepare('UPDATE planned_routes SET
             name = :name, profile = :profile, plan_date = :plan_date,
             waypoints = :waypoints, geometry = :geometry,
             length_m = :length_m, duration_s = :duration_s,
-            ascent = :ascent, descent = :descent, note = :note
+            ascent = :ascent, descent = :descent, note = :note, is_public = :is_public
             WHERE id = :id');
         $stmt->execute($params);
-        if ($stmt->rowCount() === 0) {
-            // id neexistuje → vytvořit jako nový
-            unset($params[':id']);
-            $id = 0;
-        }
     }
     if ($id === 0) {
         $stmt = $pdo->prepare('INSERT INTO planned_routes
             (name, profile, plan_date, waypoints, geometry,
-             length_m, duration_s, ascent, descent, note)
+             length_m, duration_s, ascent, descent, note, is_public)
             VALUES (:name, :profile, :plan_date, :waypoints, :geometry,
-                    :length_m, :duration_s, :ascent, :descent, :note)');
+                    :length_m, :duration_s, :ascent, :descent, :note, :is_public)');
         $stmt->execute($params);
         $id = (int)$pdo->lastInsertId();
     }

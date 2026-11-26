@@ -12,10 +12,30 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/security.php';
 
-start_secure_session();
-send_security_headers();
-
 require_once __DIR__ . '/admin_ips.php';
+
+// JSON API bez session cookie (a bez „zapamatovat“, ne z povolené IP) je vždy
+// návštěvník: session se nezakládá, aby každý anonymní požadavek nevytvářel
+// na serveru soubor session (kontrola 21. 11. 2026, N11). $_SESSION zůstane
+// prázdné pole, takže kontroly is_admin fungují stejně. CSRF endpointy si
+// session případně založí samy v csrf_verify() — a stejně jsou jen pro admina.
+$_pub_script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+if (strpos($_pub_script, '/api/') !== false
+    && !isset($_COOKIE[session_name()]) && !isset($_COOKIE['gpx_remember'])
+    && !is_admin_ip((string) ($_SERVER['REMOTE_ADDR'] ?? ''))) {
+    $_SESSION = [];
+} else {
+    start_secure_session();
+}
+unset($_pub_script);
+send_security_headers();
+require_once __DIR__ . '/db.php';              // $pdo — klíč pro „zapamatovat“ je v app_config
+require_once __DIR__ . '/remember_login.php';
+
+// Produkce: admin jen přes přihlášení heslem (S2) — dřívější session podle IP
+// přestává platit; zapamatované zařízení (cookie gpx_remember) se přihlásí samo.
+drop_ip_admin_session();
+remember_try_login();
 
 // Auto-přihlášení admina z povolené IP (stejná logika jako auth.php)
 // Seznam z .env (ADMIN_IPS); localhost jen na vývojovém PC — viz admin_ips.php
@@ -37,6 +57,24 @@ unset($_pub_is_real_admin);
 
 // Admin partials (render_admin_menu, render_visitor_preview_banner).
 require_once __DIR__ . '/partials/admin_banner.php';
+
+/**
+ * Pro JSON API: smí tento požadavek data číst? Admin vždy, návštěvník jen
+ * když jsou VŠECHNY uvedené stránky ve visible_pages (kontrola 21. 11. 2026,
+ * N3 — vypnutá stránka dřív dál vydávala data přes své API).
+ */
+function api_pages_visible(string ...$pageKeys): bool {
+    if (!empty($_SESSION['is_admin'])) {
+        return true;
+    }
+    $visible = (array) get_app_config('visible_pages', all_pages());
+    foreach ($pageKeys as $k) {
+        if (!in_array($k, $visible, true)) {
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * Zkontroluje přístup k dané stránce pro návštěvníky.

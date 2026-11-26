@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnSave    = document.getElementById("planSave");
     const btnDelete  = document.getElementById("planDelete");
     const dateInput  = document.getElementById("planDate");
+    const publicCb   = document.getElementById("planPublic");   // jen admin
     const planListEl = document.getElementById("planList");
     const weatherEl  = document.getElementById("plan-weather");
 
@@ -711,6 +712,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 o.value = String(p.id);
                 const parts = [p.name];
                 if (p.plan_date) parts.push(p.plan_date);
+                // Admin vidí, které plány návštěvník nevidí
+                if (p.is_public === false && publicCb) parts.push("🔒");
                 if (p.length_m)  parts.push(fmtKm(p.length_m));
                 o.textContent = parts.join(" · ");
                 planListEl.appendChild(o);
@@ -737,6 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fd.append("name", name);
         fd.append("profile", profileSel.value || "foot_hiking");
         fd.append("plan_date", dateInput.value || "");
+        fd.append("is_public", publicCb && publicCb.checked ? "1" : "0");
         fd.append("waypoints", JSON.stringify(waypoints.map(w => [+w.lat.toFixed(6), +w.lng.toFixed(6), w.manual ? 1 : 0])));
         fd.append("geometry", JSON.stringify(routeData.coords.map(c => [+c[0].toFixed(6), +c[1].toFixed(6)])));
         if (routeData.length_m   != null) fd.append("length_m",   String(Math.round(routeData.length_m)));
@@ -777,6 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
             nameInput.value  = p.name || "";
             profileSel.value = p.profile || "foot_hiking";
             dateInput.value  = p.plan_date || "";
+            if (publicCb) publicCb.checked = !!p.is_public;
             currentPlanId    = p.id;
 
             if (Array.isArray(p.geometry) && p.geometry.length > 1) {
@@ -1037,6 +1042,7 @@ document.addEventListener("DOMContentLoaded", () => {
         waypoints.forEach(w => map.removeLayer(w.marker));
         waypoints = [];
         currentPlanId = 0;
+        if (publicCb) publicCb.checked = false;
         if (planListEl) planListEl.value = "";
         if (weatherEl) weatherEl.style.display = "none";
         if (manualMode) setManualMode(false);
